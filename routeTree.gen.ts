@@ -12,11 +12,13 @@ import { Route as rootRouteImport } from './dashboard/__root'
 import { Route as IndexRouteImport } from './dashboard/index'
 import { Route as DashboardRouteImport } from './dashboard/dashboard'
 import { Route as ApiCheckUsernameRouteImport } from './dashboard/api/check-username'
+import { Route as ApiDatabaseUsersRouteImport } from './dashboard/api/database/users'
+import { Route as AdminBancoRouteImport } from './dashboard/admin/banco'
 import { Route as LoginIndexRouteImport } from './dashboard/login/index'
 import { Route as LoginRegistroRouteImport } from './dashboard/login/registro'
 
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
+  id: '/', | '/api/database/users' | '/admin/banco'
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
@@ -28,6 +30,16 @@ const DashboardRoute = DashboardRouteImport.update({
 const ApiCheckUsernameRoute = ApiCheckUsernameRouteImport.update({
   id: '/api/check-username',
   path: '/api/check-username',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDatabaseUsersRoute = ApiDatabaseUsersRouteImport.update({
+  id: '/api/database/users',
+  path: '/api/database/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminBancoRoute = AdminBancoRouteImport.update({
+  id: '/admin/banco',
+  path: '/admin/banco',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
@@ -47,6 +59,8 @@ export interface FileRoutesByFullPath {
   '/api/check-username': typeof ApiCheckUsernameRoute
   '/login/registro': typeof LoginRegistroRoute
   '/login/': typeof LoginIndexRoute
+  '/api/database/users': typeof ApiDatabaseUsersRoute
+  '/admin/banco': typeof AdminBancoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +68,8 @@ export interface FileRoutesByTo {
   '/api/check-username': typeof ApiCheckUsernameRoute
   '/login/registro': typeof LoginRegistroRoute
   '/login': typeof LoginIndexRoute
+  '/api/database/users': typeof ApiDatabaseUsersRoute
+  '/admin/banco': typeof AdminBancoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +78,15 @@ export interface FileRoutesById {
   '/api/check-username': typeof ApiCheckUsernameRoute
   '/login/registro': typeof LoginRegistroRoute
   '/login/': typeof LoginIndexRoute
+  '/api/database/users': typeof ApiDatabaseUsersRoute
+  '/admin/banco': typeof AdminBancoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
+  fullPaths: | '/api/database/users' | '/admin/banco'
     '/' | '/dashboard' | '/api/check-username' | '/login/registro' | '/login/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/api/check-username' | '/login/registro' | '/login'
+  to: '/' | '/dashboard' | '/api/check-username' | '/login/registro' | '/login' | '/api/database/users' | '/admin/banco'
   id:
     | '__root__'
     | '/'
@@ -84,6 +102,8 @@ export interface RootRouteChildren {
   ApiCheckUsernameRoute: typeof ApiCheckUsernameRoute
   LoginRegistroRoute: typeof LoginRegistroRoute
   LoginIndexRoute: typeof LoginIndexRoute
+  ApiDatabaseUsersRoute: typeof ApiDatabaseUsersRoute
+  AdminBancoRoute: typeof AdminBancoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -109,6 +129,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCheckUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/database/users': {
+      id: '/api/database/users'
+      path: '/api/database/users'
+      fullPath: '/api/database/users'
+      preLoaderRoute: typeof ApiDatabaseUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/banco': {
+      id: '/admin/banco'
+      path: '/admin/banco'
+      fullPath: '/admin/banco'
+      preLoaderRoute: typeof AdminBancoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login/': {
       id: '/login/'
       path: '/login'
@@ -130,6 +164,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
   ApiCheckUsernameRoute: ApiCheckUsernameRoute,
+  ApiDatabaseUsersRoute: ApiDatabaseUsersRoute,
+  AdminBancoRoute: AdminBancoRoute,
   LoginRegistroRoute: LoginRegistroRoute,
   LoginIndexRoute: LoginIndexRoute,
 }
