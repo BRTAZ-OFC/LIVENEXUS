@@ -18,10 +18,10 @@ function DashboardPage() {
         </div>
         <nav className="flex flex-1 flex-col gap-2 p-2 pt-4">
           <button type="button" onClick={() => setActiveSection("overview")} title="Início" aria-label="Início" className={`flex h-11 items-center rounded-lg transition hover:bg-white/5 ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} ${activeSection === "overview" ? "bg-violet-500/15 text-violet-200" : "text-slate-300 hover:text-white"}`}>
-            <House className="h-5 w-5 shrink-0" />{sidebarExpanded && <span className="text-sm font-semibold">Início</span>}
+            <House className="h-2.5 w-2.5 shrink-0" />{sidebarExpanded && <span className="text-[7px] font-semibold">Início</span>}
           </button>
           <button type="button" onClick={() => setActiveSection("database")} title="Banco de dados" aria-label="Banco de dados" className={`flex h-11 items-center rounded-lg transition hover:bg-white/5 ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} ${activeSection === "database" ? "bg-violet-500/15 text-violet-200" : "text-slate-300 hover:text-white"}`}>
-            <Database className="h-5 w-5 shrink-0" />{sidebarExpanded && <span className="text-sm font-semibold">Banco de dados</span>}
+            <Database className="h-2.5 w-2.5 shrink-0" />{sidebarExpanded && <span className="text-[7px] font-semibold">Banco de dados</span>}
           </button>
         </nav>
         <button type="button" onClick={() => setSidebarExpanded((expanded) => !expanded)} aria-label={sidebarExpanded ? "Recolher menu" : "Estender menu"} title={sidebarExpanded ? "Recolher menu" : "Estender menu"} className="m-2 flex h-10 items-center justify-center rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 hover:text-white">
