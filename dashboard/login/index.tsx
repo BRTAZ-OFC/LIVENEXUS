@@ -17,6 +17,7 @@ function LoginPage() {
     try {
       const result = await loginUser({ data: { user, password } });
       if (result.ok) {
+        if (typeof window !== "undefined") sessionStorage.setItem("livenexus_role", result.user.role ?? "user");
         setPassword("");
         await navigate({ to: "/dashboard" });
         return;

@@ -33,6 +33,7 @@ function formatDate(value?: string) {
 
 function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
   const [selectedTable, setSelectedTable] = useState("usuarios");
+  const [isAdmin, setIsAdmin] = useState(embedded);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [draft, setDraft] = useState<UserDraft | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -57,8 +58,11 @@ function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
   }
 
   useEffect(() => {
-    void loadUsers();
-  }, []);
+    const admin = embedded || sessionStorage.getItem("livenexus_role") === "admin";
+    setIsAdmin(admin);
+    if (admin) void loadUsers();
+    else setLoading(false);
+  }, [embedded]);
 
   function startEditing(row: UserRow) {
     setEditingId(row.user_id);
@@ -100,6 +104,10 @@ function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
     } finally {
       setSaving(false);
     }
+  }
+
+  if (!embedded && !isAdmin) {
+    return <main className="flex min-h-screen items-center justify-center bg-[#080a13] p-6 text-slate-100"><section className="rounded-xl border border-white/10 bg-[#0d1120] p-6 text-center"><h1 className="text-lg font-bold">Acesso restrito</h1><p className="mt-2 text-sm text-slate-400">O banco de dados está disponível somente para administradores.</p><Link to="/dashboard" className="mt-4 inline-block text-sm font-semibold text-cyan-300">Voltar ao dashboard</Link></section></main>;
   }
 
   return (
