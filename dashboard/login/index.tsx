@@ -22,8 +22,11 @@ function LoginPage() {
         return;
       }
       setMessage(result.message);
-    } catch {
-      setMessage("Não foi possível verificar o login. Tente novamente.");
+    } catch (error) {
+      console.error("[LiveNexus] Falha no login:", error);
+      const detail =
+        error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error);
+      setMessage(`Diagnóstico do login: ${detail || "Erro sem mensagem retornada pelo servidor."}`);
     }
   }
 
