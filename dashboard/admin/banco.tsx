@@ -33,6 +33,7 @@ function formatDate(value?: string) {
 
 function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
   const [selectedTable, setSelectedTable] = useState("usuarios");
+  const [isAdmin, setIsAdmin] = useState(embedded);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [draft, setDraft] = useState<UserDraft | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
