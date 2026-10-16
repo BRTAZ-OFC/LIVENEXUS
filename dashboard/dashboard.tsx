@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import DatabasePage from "./admin/banco";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AudioLines, Radio, Settings2, UserRound, LogOut, ArrowRight, House, Database, ChevronRight, ChevronLeft } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({ component: DashboardPage });
@@ -8,6 +8,13 @@ export const Route = createFileRoute("/dashboard")({ component: DashboardPage })
 function DashboardPage() {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [activeSection, setActiveSection] = useState<"overview" | "database">("overview");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const admin = sessionStorage.getItem("livenexus_role") === "admin";
+    setIsAdmin(admin);
+    if (!admin) setActiveSection("overview");
+  }, []);
   return (
     <div className="flex min-h-screen bg-[#080a13] text-slate-100">
       <aside className={`flex min-h-screen shrink-0 flex-col border-r border-white/10 bg-[#0b0e19] transition-[width] duration-200 ${sidebarExpanded ? "w-52" : "w-16"}`}>
@@ -20,9 +27,9 @@ function DashboardPage() {
           <button type="button" onClick={() => setActiveSection("overview")} title="Início" aria-label="Início" className={`flex h-11 items-center rounded-lg transition hover:bg-white/5 ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} ${activeSection === "overview" ? "bg-violet-500/15 text-violet-200" : "text-slate-300 hover:text-white"}`}>
             <House className="h-2.5 w-2.5 shrink-0" />{sidebarExpanded && <span className="text-[7px] font-semibold">Início</span>}
           </button>
-          <button type="button" onClick={() => setActiveSection("database")} title="Banco de dados" aria-label="Banco de dados" className={`flex h-11 items-center rounded-lg transition hover:bg-white/5 ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} ${activeSection === "database" ? "bg-violet-500/15 text-violet-200" : "text-slate-300 hover:text-white"}`}>
+          {isAdmin && <button type="button" onClick={() => setActiveSection("database")} title="Banco de dados" aria-label="Banco de dados" className={`flex h-11 items-center rounded-lg transition hover:bg-white/5 ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} ${activeSection === "database" ? "bg-violet-500/15 text-violet-200" : "text-slate-300 hover:text-white"}`}>
             <Database className="h-2.5 w-2.5 shrink-0" />{sidebarExpanded && <span className="text-[7px] font-semibold">Banco de dados</span>}
-          </button>
+          </button>}
         </nav>
         <button type="button" onClick={() => setSidebarExpanded((expanded) => !expanded)} aria-label={sidebarExpanded ? "Recolher menu" : "Estender menu"} title={sidebarExpanded ? "Recolher menu" : "Estender menu"} className="m-2 flex h-10 items-center justify-center rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 hover:text-white">
           {sidebarExpanded ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
@@ -97,11 +104,11 @@ function DashboardPage() {
             </article>
           </div>
         </section>
-      ) : (
+      ) : isAdmin ? (
         <section className="mx-auto w-full max-w-7xl px-5 py-5 sm:px-8">
           <DatabasePage embedded />
         </section>
-      )}
+      ) : null}
       </main>
     </div>
   );
