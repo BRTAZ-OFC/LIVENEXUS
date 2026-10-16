@@ -24,6 +24,12 @@ function DashboardPage() {
           </Link>
         </div>
       </header>
+      <nav className="border-b border-white/10 bg-[#0b0e19]">
+        <div className="mx-auto flex max-w-7xl gap-2 px-5 py-3 sm:px-8">
+          <Link to="/dashboard" className="rounded-lg bg-violet-500/15 px-4 py-2 text-sm font-semibold text-violet-200">Início</Link>
+          <Link to="/dashboard/banco" className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white">Banco de dados</Link>
+        </div>
+      </nav>
       <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8">
         <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-300">
           Área do usuário
