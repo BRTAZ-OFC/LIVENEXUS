@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AudioLines, ArrowLeft, Database, Pencil, RefreshCw, Save, X } from "lucide-react";
+import { AudioLines, ArrowLeft, Database, Pencil, RefreshCw, Save, X, House, ChevronRight, ChevronLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/dashboard/banco")({ component: DatabasePage });
@@ -19,6 +19,12 @@ type UserDraft = {
   imagen: string;
 };
 
+function displayValue(value: unknown) {
+  if (value === null || value === undefined || value === "") return "—";
+  const text = String(value);
+  return text.length > 10 ? `${text.slice(0, 10)}…` : text;
+}
+
 function formatDate(value?: string) {
   if (!value) return "—";
   const date = new Date(value);
@@ -26,6 +32,7 @@ function formatDate(value?: string) {
 }
 
 function DatabasePage() {
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [users, setUsers] = useState<UserRow[]>([]);
   const [draft, setDraft] = useState<UserDraft | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -96,7 +103,26 @@ function DatabasePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#080a13] text-slate-100">
+    <div className="flex min-h-screen bg-[#080a13] text-slate-100">
+      <aside className={`flex min-h-screen shrink-0 flex-col border-r border-white/10 bg-[#0b0e19] transition-[width] duration-200 ${sidebarExpanded ? "w-52" : "w-16"}`}>
+        <div className="flex h-[73px] items-center justify-center border-b border-white/10">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400">
+            <AudioLines className="h-5 w-5 text-white" />
+          </span>
+        </div>
+        <nav className="flex flex-1 flex-col gap-2 p-2 pt-4">
+          <Link to="/dashboard" title="Início" aria-label="Início" className={`flex h-11 items-center rounded-lg text-slate-300 transition hover:bg-white/5 hover:text-white ${sidebarExpanded ? "gap-3 px-3" : "justify-center"}`}>
+            <House className="h-5 w-5 shrink-0" />{sidebarExpanded && <span className="text-sm font-semibold">Início</span>}
+          </Link>
+          <Link to="/dashboard/banco" title="Banco de dados" aria-label="Banco de dados" className={`flex h-11 items-center rounded-lg bg-violet-500/15 text-violet-200 transition hover:bg-white/5 ${sidebarExpanded ? "gap-3 px-3" : "justify-center"}`}>
+            <Database className="h-5 w-5 shrink-0" />{sidebarExpanded && <span className="text-sm font-semibold">Banco de dados</span>}
+          </Link>
+        </nav>
+        <button type="button" onClick={() => setSidebarExpanded((expanded) => !expanded)} aria-label={sidebarExpanded ? "Recolher menu" : "Estender menu"} title={sidebarExpanded ? "Recolher menu" : "Estender menu"} className="m-2 flex h-10 items-center justify-center rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 hover:text-white">
+          {sidebarExpanded ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
+        </button>
+      </aside>
+      <main className="min-w-0 flex-1">
       <header className="border-b border-white/10 bg-[#0d1120]/80">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
           <Link to="/dashboard" className="flex items-center gap-3">
@@ -112,17 +138,6 @@ function DatabasePage() {
           </Link>
         </div>
       </header>
-
-      <nav className="border-b border-white/10 bg-[#0b0e19]">
-        <div className="mx-auto flex max-w-7xl gap-2 px-5 py-3 sm:px-8">
-          <Link to="/dashboard" className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white">
-            Início
-          </Link>
-          <Link to="/dashboard/banco" className="rounded-lg bg-violet-500/15 px-4 py-2 text-sm font-semibold text-violet-200">
-            Banco de dados
-          </Link>
-        </div>
-      </nav>
 
       <section className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -185,11 +200,11 @@ function DatabasePage() {
                   const editing = editingId === row.user_id && draft !== null;
                   return (
                     <tr key={row.user_id} className="align-top hover:bg-white/[0.02]">
-                      <td className="max-w-44 break-all px-4 py-4 font-mono text-xs text-slate-500">{row.user_id}</td>
+                      <td className="max-w-44 px-4 py-4 font-mono text-xs text-slate-500" title={row.user_id}>{displayValue(row.user_id)}</td>
                       <td className="px-4 py-4">
                         {editing ? (
                           <input value={draft.user} onChange={(event) => setDraft({ ...draft, user: event.target.value })} minLength={3} maxLength={32} className="w-40 rounded-lg border border-white/15 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400" aria-label="Nome de usuário" />
-                        ) : <span className="font-semibold text-white">{row.user}</span>}
+                        ) : <span className="font-semibold text-white" title={row.user}>{displayValue(row.user)}</span>}
                       </td>
                       <td className="px-4 py-4">
                         {editing ? (
@@ -197,15 +212,15 @@ function DatabasePage() {
                             <option value="user">user</option>
                             <option value="admin">admin</option>
                           </select>
-                        ) : <span className="rounded-md bg-white/[0.06] px-2 py-1 text-xs text-slate-300">{row.role ?? "—"}</span>}
+                        ) : <span className="rounded-md bg-white/[0.06] px-2 py-1 text-xs text-slate-300" title={row.role ?? "—"}>{displayValue(row.role)}</span>}
                       </td>
                       <td className="px-4 py-4">
                         {editing ? (
                           <input value={draft.imagen} onChange={(event) => setDraft({ ...draft, imagen: event.target.value })} className="w-48 rounded-lg border border-white/15 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400" placeholder="URL opcional" aria-label="URL da imagem" />
-                        ) : <span className="max-w-48 break-all text-slate-400">{row.imagen || "—"}</span>}
+                        ) : <span className="max-w-48 text-slate-400" title={row.imagen || "—"}>{displayValue(row.imagen)}</span>}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-4 text-xs text-slate-400">{formatDate(row.data_criacao)}</td>
-                      <td className="whitespace-nowrap px-4 py-4 text-xs text-slate-400">{formatDate(row.data_atualizacao)}</td>
+                      <td className="whitespace-nowrap px-4 py-4 text-xs text-slate-400" title={formatDate(row.data_criacao)}>{displayValue(formatDate(row.data_criacao))}</td>
+                      <td className="whitespace-nowrap px-4 py-4 text-xs text-slate-400" title={formatDate(row.data_atualizacao)}>{displayValue(formatDate(row.data_atualizacao))}</td>
                       <td className="px-4 py-4">
                         {editing ? (
                           <div className="flex items-center gap-2">
@@ -233,6 +248,7 @@ function DatabasePage() {
           Senhas e hashes não são exibidos na tabela. As alterações são gravadas no arquivo JSON pelo servidor.
         </p>
       </section>
-    </main>
+      </main>
+    </div>
   );
 }
