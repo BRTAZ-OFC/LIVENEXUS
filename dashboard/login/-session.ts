@@ -55,6 +55,10 @@ export function readSession(request: Request): Session | null {
   }
 }
 
+export function clearSessionCookie() {
+  return `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
+}
+
 export function adminOnlyResponse() {
   return Response.json({ ok: false, message: "Acesso permitido somente para administradores." }, { status: 403 });
 }
