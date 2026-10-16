@@ -211,8 +211,8 @@ function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
                       <td className="whitespace-nowrap px-2.5 py-2 text-[10px] text-slate-400" title={formatDate(row.data_atualizacao)}>{displayValue(formatDate(row.data_atualizacao))}</td>
                       <td className="px-2.5 py-2">
                         {editing ? (
-                          <div className="flex items-center gap-2">
-                            <button type="button" onClick={() => void saveRow(row.user_id)} disabled={saving} className="inline-flex items-center gap-1 rounded-lg bg-cyan-500/15 px-3 py-2 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/25 disabled:opacity-50">
+                          <div className="flex flex-wrap items-center gap-1">
+                            <button type="button" onClick={() => void saveRow(row.user_id)} disabled={saving} className="inline-flex max-w-full items-center justify-center gap-1 rounded-md bg-cyan-500/15 px-1.5 py-1 text-[9px] font-semibold text-cyan-200 hover:bg-cyan-500/25 disabled:opacity-50">
                               <Save className="h-3.5 w-3.5" /> {saving ? "Salvando" : "Salvar"}
                             </button>
                             <button type="button" onClick={() => { setEditingId(null); setDraft(null); }} disabled={saving} className="rounded-lg border border-white/10 p-2 text-slate-400 hover:text-white" aria-label="Cancelar edição">
@@ -220,7 +220,7 @@ function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
                             </button>
                           </div>
                         ) : (
-                          <button type="button" onClick={() => startEditing(row)} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-slate-300 hover:border-violet-400/40 hover:text-white">
+                          <button type="button" onClick={() => startEditing(row)} className="inline-flex max-w-full items-center justify-center gap-1 rounded-md border border-white/10 px-1.5 py-1 text-[9px] font-semibold text-slate-300 hover:border-violet-400/40 hover:text-white">
                             <Pencil className="h-3.5 w-3.5" /> Editar
                           </button>
                         )}
