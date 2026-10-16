@@ -1,0 +1,11 @@
+[
+  {
+    "user_id": "5f7ebab6-992c-44fa-85ae-2d0012632d91",
+    "user": "teste",
+    "role": "user",
+    "password": "scrypt:496c75123eada9bb9b5a806b652a85d5:65d35b9cab4ace52d9009be490ad75ad066e996276b3d4cd606d18dd95e5ab04046b313197bef82b773a98dbee24780c6c6dfcdd9118c7518906b056f046f47b",
+    "imagen": null,
+    "data_criacao": "2026-10-16T13:40:09.418Z",
+    "data_atualizacao": "2026-10-16T13:40:09.418Z"
+  }
+]
