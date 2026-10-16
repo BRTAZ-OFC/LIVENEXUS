@@ -58,8 +58,11 @@ function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
   }
 
   useEffect(() => {
-    void loadUsers();
-  }, []);
+    const admin = embedded || sessionStorage.getItem("livenexus_role") === "admin";
+    setIsAdmin(admin);
+    if (admin) void loadUsers();
+    else setLoading(false);
+  }, [embedded]);
 
   function startEditing(row: UserRow) {
     setEditingId(row.user_id);
