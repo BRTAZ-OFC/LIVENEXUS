@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { adminOnlyResponse, readSession } from "../../login/-session";
 
 export const Route = createFileRoute("/api/database/users")({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
+        if (readSession(request)?.role !== "admin") return adminOnlyResponse();
         try {
           const { listUsers } = await import("../../admin/banco/-crud.js");
           const users = await listUsers();
@@ -16,6 +18,7 @@ export const Route = createFileRoute("/api/database/users")({
         }
       },
       PATCH: async ({ request }) => {
+        if (readSession(request)?.role !== "admin") return adminOnlyResponse();
         try {
           const body = await request.json();
           const userId = typeof body.user_id === "string" ? body.user_id : "";
