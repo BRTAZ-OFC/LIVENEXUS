@@ -191,12 +191,12 @@ function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
                       <td className="max-w-44 px-2.5 py-2 font-mono text-[10px] text-slate-500" title={row.user_id}>{displayValue(row.user_id)}</td>
                       <td className="px-2.5 py-2">
                         {editing ? (
-                          <input value={draft.user} onChange={(event) => setDraft({ ...draft, user: event.target.value })} minLength={3} maxLength={32} className="w-40 rounded-lg border border-white/15 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400" aria-label="Nome de usuário" />
+                          <input value={draft.user} onChange={(event) => setDraft({ ...draft, user: event.target.value })} minLength={3} maxLength={32} className="w-full min-w-0 rounded-md border border-white/15 bg-black/20 px-1 py-1 text-[10px] text-white outline-none focus:border-cyan-400" aria-label="Nome de usuário" />
                         ) : <span className="font-semibold text-white" title={row.user}>{displayValue(row.user)}</span>}
                       </td>
                       <td className="px-2.5 py-2">
                         {editing ? (
-                          <select value={draft.role} onChange={(event) => setDraft({ ...draft, role: event.target.value })} className="rounded-lg border border-white/15 bg-[#101525] px-3 py-2 text-sm text-white outline-none focus:border-cyan-400" aria-label="Role">
+                          <select value={draft.role} onChange={(event) => setDraft({ ...draft, role: event.target.value })} className="w-full min-w-0 rounded-md border border-white/15 bg-[#101525] px-1 py-1 text-[10px] text-white outline-none focus:border-cyan-400" aria-label="Role">
                             <option value="user">user</option>
                             <option value="admin">admin</option>
                           </select>
@@ -204,8 +204,8 @@ function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
                       </td>
                       <td className="px-2.5 py-2">
                         {editing ? (
-                          <input value={draft.imagen} onChange={(event) => setDraft({ ...draft, imagen: event.target.value })} className="w-48 rounded-lg border border-white/15 bg-black/20 px-3 py-2 text-sm text-white outline-none focus:border-cyan-400" placeholder="URL opcional" aria-label="URL da imagem" />
-                        ) : <span className="max-w-48 text-[11px] text-slate-400" title={row.imagen || "—"}>{displayValue(row.imagen)}</span>}
+                          <input value={draft.imagen} onChange={(event) => setDraft({ ...draft, imagen: event.target.value })} className="w-full min-w-0 rounded-md border border-white/15 bg-black/20 px-1 py-1 text-[10px] text-white outline-none focus:border-cyan-400" placeholder="URL opcional" aria-label="URL da imagem" />
+                        ) : <span className="break-all text-[9px] text-slate-400" title={row.imagen || "—"}>{displayValue(row.imagen)}</span>}
                       </td>
                       <td className="whitespace-nowrap px-2.5 py-2 text-[10px] text-slate-400" title={formatDate(row.data_criacao)}>{displayValue(formatDate(row.data_criacao))}</td>
                       <td className="whitespace-nowrap px-2.5 py-2 text-[10px] text-slate-400" title={formatDate(row.data_atualizacao)}>{displayValue(formatDate(row.data_atualizacao))}</td>
