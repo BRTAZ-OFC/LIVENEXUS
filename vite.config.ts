@@ -15,7 +15,6 @@ export default defineConfig(({ command }) => ({
         entry: "../router",
         routesDirectory: ".",
         generatedRouteTree: "../routeTree.gen.ts",
-        routeFileIgnorePattern: "((^|/)(admin|css|json).*)",
       },
       start: { entry: "../start" },
       server: { entry: "../server" },
