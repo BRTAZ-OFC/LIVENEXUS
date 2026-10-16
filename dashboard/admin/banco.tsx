@@ -164,8 +164,8 @@ function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
         {error && <p role="alert" className="mt-5 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] p-3 text-sm text-amber-100">{error}</p>}
 
         <div className="mt-3 overflow-hidden rounded-lg border border-white/10 bg-[#0d1120]">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] border-collapse text-left text-[11px]">
+          <div className="overflow-x-hidden">
+            <table className="w-full min-w-0 table-fixed border-collapse text-left text-[10px]">
               <thead className="border-b border-white/10 bg-white/[0.03] text-[9px] uppercase tracking-wide text-slate-400">
                 <tr>
                   <th className="px-2.5 py-2 font-semibold">ID</th>
