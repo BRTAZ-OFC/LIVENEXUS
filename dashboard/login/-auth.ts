@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { setResponseHeader } from "@tanstack/react-start/server";
 
 type Credentials = {
   user: string;
@@ -29,5 +30,7 @@ export const loginUser = createServerFn({ method: "POST" })
     if (!user) {
       return { ok: false as const, message: "Usuário ou senha incorretos." };
     }
+    const { createSessionCookie } = await import("./-session");
+    setResponseHeader("Set-Cookie", createSessionCookie(user));
     return { ok: true as const, user, message: "Login validado com sucesso." };
   });
