@@ -46,12 +46,18 @@ function DashboardPage() {
               LIVE<span className="text-cyan-300">NEXUS</span>
             </span>
           </a>
-          <Link
-            to="/login"
+          <button
+            type="button"
+            onClick={async () => {
+              try { await fetch("/api/auth/logout", { method: "POST" }); } finally {
+                sessionStorage.removeItem("livenexus_role");
+                window.location.href = "/login";
+              }
+            }}
             className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:border-white/25 hover:text-white"
           >
             <LogOut className="h-4 w-4" /> Sair
-          </Link>
+          </button>
         </div>
       </header>
       {activeSection === "overview" ? (
