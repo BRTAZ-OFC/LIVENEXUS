@@ -18,7 +18,7 @@ function DashboardPage() {
           <Link to="/dashboard" title="Início" aria-label="Início" className={`flex h-11 items-center rounded-lg text-violet-200 transition hover:bg-white/5 ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} bg-violet-500/15`}>
             <House className="h-5 w-5 shrink-0" />{sidebarExpanded && <span className="text-sm font-semibold">Início</span>}
           </Link>
-          <Link to="/dashboard/banco" title="Banco de dados" aria-label="Banco de dados" className={`flex h-11 items-center rounded-lg text-slate-300 transition hover:bg-white/5 hover:text-white ${sidebarExpanded ? "gap-3 px-3" : "justify-center"}`}>
+          <Link to="/admin/banco" title="Banco de dados" aria-label="Banco de dados" className={`flex h-11 items-center rounded-lg text-slate-300 transition hover:bg-white/5 hover:text-white ${sidebarExpanded ? "gap-3 px-3" : "justify-center"}`}>
             <Database className="h-5 w-5 shrink-0" />{sidebarExpanded && <span className="text-sm font-semibold">Banco de dados</span>}
           </Link>
         </nav>
