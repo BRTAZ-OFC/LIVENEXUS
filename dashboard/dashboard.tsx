@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import DatabasePage from "./admin/banco";
 import { useEffect, useState } from "react";
 import { AudioLines, Radio, Settings2, UserRound, LogOut, ArrowRight, House, Database, ChevronRight, ChevronLeft } from "lucide-react";
