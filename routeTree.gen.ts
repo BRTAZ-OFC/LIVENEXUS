@@ -18,7 +18,7 @@ import { Route as LoginIndexRouteImport } from './dashboard/login/index'
 import { Route as LoginRegistroRouteImport } from './dashboard/login/registro'
 
 const IndexRoute = IndexRouteImport.update({
-  id: '/', | '/api/database/users' | '/admin/banco'
+  id: '/'
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
@@ -83,8 +83,8 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: | '/api/database/users' | '/admin/banco'
-    '/' | '/dashboard' | '/api/check-username' | '/login/registro' | '/login/'
+  fullPaths:
+    '/' | '/dashboard' | '/api/check-username' | '/api/database/users' | '/admin/banco' | '/login/registro' | '/login/'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/dashboard' | '/api/check-username' | '/login/registro' | '/login' | '/api/database/users' | '/admin/banco'
   id:
@@ -92,6 +92,8 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/api/check-username'
+    | '/api/database/users'
+    | '/admin/banco'
     | '/login/registro'
     | '/login/'
   fileRoutesById: FileRoutesById
