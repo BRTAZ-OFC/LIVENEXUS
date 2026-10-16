@@ -106,6 +106,10 @@ function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
     }
   }
 
+  if (!embedded && !isAdmin) {
+    return <main className="flex min-h-screen items-center justify-center bg-[#080a13] p-6 text-slate-100"><section className="rounded-xl border border-white/10 bg-[#0d1120] p-6 text-center"><h1 className="text-lg font-bold">Acesso restrito</h1><p className="mt-2 text-sm text-slate-400">O banco de dados está disponível somente para administradores.</p><Link to="/dashboard" className="mt-4 inline-block text-sm font-semibold text-cyan-300">Voltar ao dashboard</Link></section></main>;
+  }
+
   return (
     <div className={embedded ? "flex min-h-0 w-full bg-[#080a13] text-slate-100" : "flex min-h-screen bg-[#080a13] text-slate-100"}>
       {!embedded && (
