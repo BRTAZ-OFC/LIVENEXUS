@@ -18,8 +18,16 @@ export const Route = createFileRoute("/dashboard")({ component: DashboardPage })
 
 function DashboardPage() {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("livenexus_role") === "admin";
+    }
+    return false;
+  });
   const [activeSection, setActiveSection] = useState<"overview" | "database">(() => {
     if (typeof window !== "undefined") {
+      const admin = sessionStorage.getItem("livenexus_role") === "admin";
+      if (!admin) return "overview";
       const params = new URLSearchParams(window.location.search);
       const tabParam = params.get("tab");
       if (tabParam === "database" || tabParam === "overview") return tabParam;
@@ -28,7 +36,6 @@ function DashboardPage() {
     }
     return "overview";
   });
-  const [isAdmin, setIsAdmin] = useState(false);
 
   function handleSelectSection(section: "overview" | "database") {
     setActiveSection(section);
@@ -50,21 +57,8 @@ function DashboardPage() {
     if (!admin) {
       setActiveSection("overview");
       sessionStorage.setItem("livenexus_active_tab", "overview");
-    } else {
-      const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get("tab");
-      const stored = sessionStorage.getItem("livenexus_active_tab");
-      const target =
-        tabParam === "database" || tabParam === "overview"
-          ? tabParam
-          : stored === "database" || stored === "overview"
-            ? stored
-            : null;
-      if (target && target !== activeSection) {
-        setActiveSection(target);
-      }
     }
-  }, [activeSection]);
+  }, []);
   return (
     <div className="flex min-h-screen bg-[#080a13] text-slate-100">
       <aside
