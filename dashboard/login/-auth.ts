@@ -30,7 +30,8 @@ export const loginUser = createServerFn({ method: "POST" })
     if (!user) {
       return { ok: false as const, message: "Usuário ou senha incorretos." };
     }
-    const { createSessionCookie } = await import("./-session");
+    const { createSessionCookie, createSessionToken } = await import("./-session");
+    const token = createSessionToken(user);
     setResponseHeader("Set-Cookie", createSessionCookie(user));
-    return { ok: true as const, user, message: "Login validado com sucesso." };
+    return { ok: true as const, user, token, message: "Login validado com sucesso." };
   });

@@ -6,7 +6,9 @@
 import { randomBytes, randomUUID, scryptSync, timingSafeEqual } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
-const USERS_FILE = resolve(process.cwd(), "dashboard", "admin", "banco", "json", "usuario.json");
+import { fileURLToPath } from "node:url";
+
+const USERS_FILE = resolve(dirname(fileURLToPath(import.meta.url)), "json", "usuario.json");
 
 async function readUsers() {
   try {
@@ -24,6 +26,7 @@ async function writeUsers(users) {
   await writeFile(USERS_FILE, JSON.stringify(users, null, 2) + "\n", {
     encoding: "utf8",
     mode: 0o644,
+    flush: true,
   });
 }
 
@@ -137,7 +140,8 @@ export async function updateUser(user_id, changes = {}) {
 
 export async function deleteUser(user_id) {
   const users = await readUsers();
-  const index = users.findIndex((item) => item.user_id === user_id);
+  const targetId = String(user_id ?? "").trim();
+  const index = users.findIndex((item) => String(item.user_id ?? "").trim() === targetId);
   if (index < 0) return false;
   if (users[index].role === "admin") {
     const adminCount = users.filter((item) => item.role === "admin").length;

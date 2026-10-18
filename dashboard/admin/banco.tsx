@@ -42,9 +42,34 @@ function formatDate(value?: string) {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString("pt-BR");
 }
 
+function getAuthHeaders(): HeadersInit {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (typeof window !== "undefined") {
+    const token = sessionStorage.getItem("livenexus_token");
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+  }
+  return headers;
+}
+
 export default function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
-  const [selectedTable, setSelectedTable] = useState("usuarios");
+  const [selectedTable, setSelectedTable] = useState(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("livenexus_selected_table") || "usuarios";
+    }
+    return "usuarios";
+  });
   const [isAdmin, setIsAdmin] = useState(embedded);
+
+  function handleSelectTable(table: string) {
+    setSelectedTable(table);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("livenexus_selected_table", table);
+    }
+  }
   const [users, setUsers] = useState<UserRow[]>([]);
   const [draft, setDraft] = useState<UserDraft | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -55,6 +80,26 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  async function loadUsers() {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch("/api/database/users", {
+        headers: getAuthHeaders(),
+        credentials: "include",
+        cache: "no-store",
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok)
+        throw new Error(result.message || "Falha ao carregar a tabela.");
+      setUsers(result.users);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível carregar a tabela.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function confirmDelete(userId: string) {
     if (deleting) return;
     setDeleting(true);
@@ -63,7 +108,9 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     try {
       const response = await fetch("/api/database/users", {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
+        credentials: "include",
+        cache: "no-store",
         body: JSON.stringify({ user_id: userId }),
       });
       const result = await response.json();
@@ -73,26 +120,11 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
       setUsers((current) => current.filter((row) => row.user_id !== userId));
       setUserToDelete(null);
       setMessage(result.message || "Usuário excluído com sucesso.");
+      void loadUsers();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Falha ao excluir o usuário.");
     } finally {
       setDeleting(false);
-    }
-  }
-
-  async function loadUsers() {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await fetch("/api/database/users");
-      const result = await response.json();
-      if (!response.ok || !result.ok)
-        throw new Error(result.message || "Falha ao carregar a tabela.");
-      setUsers(result.users);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Não foi possível carregar a tabela.");
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -122,7 +154,9 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     try {
       const response = await fetch("/api/database/users", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
+        credentials: "include",
+        cache: "no-store",
         body: JSON.stringify({
           user_id: userId,
           changes: {
@@ -138,6 +172,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
       setEditingId(null);
       setDraft(null);
       setMessage("Registro atualizado.");
+      void loadUsers();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Não foi possível salvar as alterações.");
     } finally {
@@ -202,7 +237,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
         <nav className="p-2">
           <button
             type="button"
-            onClick={() => setSelectedTable("usuarios")}
+            onClick={() => handleSelectTable("usuarios")}
             className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left transition ${selectedTable === "usuarios" ? "bg-violet-500/15 text-violet-200" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}
           >
             <Table2 className="h-3.5 w-3.5 shrink-0" />

@@ -21,7 +21,7 @@ function signature(payload: string) {
   return createHmac("sha256", secret()).update(payload).digest("base64url");
 }
 
-export function createSessionCookie(user: { user_id: string; role?: string }) {
+export function createSessionToken(user: { user_id: string; role?: string }) {
   if (user.role !== "admin" && user.role !== "user") {
     throw new Error("Papel de usuário inválido.");
   }
@@ -31,19 +31,16 @@ export function createSessionCookie(user: { user_id: string; role?: string }) {
     exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
   };
   const payload = Buffer.from(JSON.stringify(session)).toString("base64url");
-  const value = `${payload}.${signature(payload)}`;
-  return `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_TTL_SECONDS}`;
+  return `${payload}.${signature(payload)}`;
 }
 
-export function readSession(request: Request): Session | null {
+export function createSessionCookie(user: { user_id: string; role?: string }) {
+  const value = createSessionToken(user);
+  return `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=${SESSION_TTL_SECONDS}`;
+}
+
+export function parseToken(value: string): Session | null {
   try {
-    const cookieHeader = request.headers.get("cookie") ?? "";
-    const entry = cookieHeader
-      .split(";")
-      .map((part) => part.trim())
-      .find((part) => part.startsWith(`${COOKIE_NAME}=`));
-    if (!entry) return null;
-    const value = entry.slice(COOKIE_NAME.length + 1);
     const separator = value.lastIndexOf(".");
     if (separator < 1) return null;
     const payload = value.slice(0, separator);
@@ -58,6 +55,31 @@ export function readSession(request: Request): Session | null {
     )
       return null;
     return session;
+  } catch {
+    return null;
+  }
+}
+
+export function readSession(request: Request): Session | null {
+  try {
+    const authHeader = request.headers.get("authorization") ?? "";
+    if (authHeader.startsWith("Bearer ")) {
+      const parsed = parseToken(authHeader.slice(7).trim());
+      if (parsed) return parsed;
+    }
+
+    const cookieHeader = request.headers.get("cookie") ?? "";
+    const entry = cookieHeader
+      .split(";")
+      .map((part) => part.trim())
+      .find((part) => part.startsWith(`${COOKIE_NAME}=`));
+    if (entry) {
+      const value = entry.slice(COOKIE_NAME.length + 1);
+      const parsed = parseToken(value);
+      if (parsed) return parsed;
+    }
+
+    return null;
   } catch {
     return null;
   }

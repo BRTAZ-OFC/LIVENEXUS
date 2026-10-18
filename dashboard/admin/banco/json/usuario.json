@@ -1,14 +1,5 @@
 [
   {
-    "user_id": "5f7ebab6-992c-44fa-85ae-2d0012632d91",
-    "user": "teste",
-    "role": "user",
-    "password": "scrypt:496c75123eada9bb9b5a806b652a85d5:65d35b9cab4ace52d9009be490ad75ad066e996276b3d4cd606d18dd95e5ab04046b313197bef82b773a98dbee24780c6c6dfcdd9118c7518906b056f046f47b",
-    "imagen": null,
-    "data_criacao": "2026-10-16T13:40:09.418Z",
-    "data_atualizacao": "2026-10-18T22:03:05.342Z"
-  },
-  {
     "user_id": "ca10f56b-571e-4418-8ecf-65192e7d6695",
     "user": "brtaz",
     "role": "admin",
@@ -16,5 +7,23 @@
     "imagen": null,
     "data_criacao": "2026-10-18T22:02:28.327Z",
     "data_atualizacao": "2026-10-18T22:25:47.618Z"
+  },
+  {
+    "user_id": "30637a7b-234d-4c22-abbb-cfce39c796bf",
+    "user": "teste",
+    "role": "user",
+    "password": "scrypt:5b7c16f20cf26f063b69d866b8dd0818:4b6e562c42656b69600dd2a5c3e1e401cb5caa7e21289f40b7b944ab559193ac3a9d039fb34f1dcfc6430a45cc802a72615a1b214515a46af0d68a75ae4367d6",
+    "imagen": null,
+    "data_criacao": "2026-10-18T22:54:47.551Z",
+    "data_atualizacao": "2026-10-18T22:54:47.551Z"
+  },
+  {
+    "user_id": "04bd65cd-566a-4185-b2ef-523da5b49ab3",
+    "user": "teste_debug",
+    "role": "user",
+    "password": "scrypt:7f2e5e7029ef648ea6642ecba4dc69dc:0507575c77054e9efe427bd2f45ef18e596e8d75ae3fe851693c81e12258c03b1d79eadde003238ba63407318a2673289694eeedc483754eb71f83861a263f54",
+    "imagen": null,
+    "data_criacao": "2026-10-18T23:04:51.536Z",
+    "data_atualizacao": "2026-10-18T23:04:51.536Z"
   }
 ]

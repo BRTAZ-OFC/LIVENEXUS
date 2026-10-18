@@ -17,8 +17,15 @@ function LoginPage() {
     try {
       const result = await loginUser({ data: { user, password } });
       if (result.ok) {
-        if (typeof window !== "undefined")
+        if (typeof window !== "undefined") {
           sessionStorage.setItem("livenexus_role", result.user.role ?? "user");
+          if ("token" in result && typeof result.token === "string") {
+            sessionStorage.setItem("livenexus_token", result.token);
+          }
+          if (result.user.user_id) {
+            sessionStorage.setItem("livenexus_user_id", result.user.user_id);
+          }
+        }
         setPassword("");
         await navigate({ to: "/dashboard" });
         return;

@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { adminOnlyResponse, readSession } from "../../login/-session";
 
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate",
+  Pragma: "no-cache",
+};
+
 export const Route = createFileRoute("/api/database/users")({
   server: {
     handlers: {
@@ -9,11 +14,11 @@ export const Route = createFileRoute("/api/database/users")({
         try {
           const { listUsers } = await import("../../admin/banco/-crud.js");
           const users = await listUsers();
-          return Response.json({ ok: true, users });
+          return Response.json({ ok: true, users }, { headers: NO_CACHE_HEADERS });
         } catch {
           return Response.json(
             { ok: false, message: "Não foi possível carregar a tabela de usuários." },
-            { status: 500 },
+            { status: 500, headers: NO_CACHE_HEADERS },
           );
         }
       },
@@ -44,12 +49,12 @@ export const Route = createFileRoute("/api/database/users")({
 
           const { updateUser } = await import("../../admin/banco/-crud.js");
           const user = await updateUser(userId, changes);
-          return Response.json({ ok: true, user });
+          return Response.json({ ok: true, user }, { headers: NO_CACHE_HEADERS });
         } catch (error) {
           const message =
             error instanceof Error ? error.message : "Não foi possível salvar as alterações.";
           const status = message === "Usuário não encontrado." ? 404 : 400;
-          return Response.json({ ok: false, message }, { status });
+          return Response.json({ ok: false, message }, { status, headers: NO_CACHE_HEADERS });
         }
       },
       DELETE: async ({ request }) => {
@@ -61,7 +66,7 @@ export const Route = createFileRoute("/api/database/users")({
           if (!userId) {
             return Response.json(
               { ok: false, message: "ID do usuário não fornecido." },
-              { status: 400 },
+              { status: 400, headers: NO_CACHE_HEADERS },
             );
           }
           if (session.user_id === userId) {
@@ -70,7 +75,7 @@ export const Route = createFileRoute("/api/database/users")({
                 ok: false,
                 message: "Não é permitido excluir o usuário atualmente autenticado.",
               },
-              { status: 400 },
+              { status: 400, headers: NO_CACHE_HEADERS },
             );
           }
           const { deleteUser } = await import("../../admin/banco/-crud.js");
@@ -78,14 +83,17 @@ export const Route = createFileRoute("/api/database/users")({
           if (!deleted) {
             return Response.json(
               { ok: false, message: "Usuário não encontrado." },
-              { status: 404 },
+              { status: 404, headers: NO_CACHE_HEADERS },
             );
           }
-          return Response.json({ ok: true, message: "Usuário excluído com sucesso." });
+          return Response.json(
+            { ok: true, message: "Usuário excluído com sucesso." },
+            { headers: NO_CACHE_HEADERS },
+          );
         } catch (error) {
           const message =
             error instanceof Error ? error.message : "Não foi possível excluir o usuário.";
-          return Response.json({ ok: false, message }, { status: 400 });
+          return Response.json({ ok: false, message }, { status: 400, headers: NO_CACHE_HEADERS });
         }
       },
     },

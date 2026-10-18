@@ -18,14 +18,53 @@ export const Route = createFileRoute("/dashboard")({ component: DashboardPage })
 
 function DashboardPage() {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const [activeSection, setActiveSection] = useState<"overview" | "database">("overview");
+  const [activeSection, setActiveSection] = useState<"overview" | "database">(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (tabParam === "database" || tabParam === "overview") return tabParam;
+      const stored = sessionStorage.getItem("livenexus_active_tab");
+      if (stored === "database" || stored === "overview") return stored;
+    }
+    return "overview";
+  });
   const [isAdmin, setIsAdmin] = useState(false);
+
+  function handleSelectSection(section: "overview" | "database") {
+    setActiveSection(section);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("livenexus_active_tab", section);
+      const url = new URL(window.location.href);
+      if (section === "database") {
+        url.searchParams.set("tab", "database");
+      } else {
+        url.searchParams.delete("tab");
+      }
+      window.history.replaceState({}, "", url.toString());
+    }
+  }
 
   useEffect(() => {
     const admin = sessionStorage.getItem("livenexus_role") === "admin";
     setIsAdmin(admin);
-    if (!admin) setActiveSection("overview");
-  }, []);
+    if (!admin) {
+      setActiveSection("overview");
+      sessionStorage.setItem("livenexus_active_tab", "overview");
+    } else {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      const stored = sessionStorage.getItem("livenexus_active_tab");
+      const target =
+        tabParam === "database" || tabParam === "overview"
+          ? tabParam
+          : stored === "database" || stored === "overview"
+            ? stored
+            : null;
+      if (target && target !== activeSection) {
+        setActiveSection(target);
+      }
+    }
+  }, [activeSection]);
   return (
     <div className="flex min-h-screen bg-[#080a13] text-slate-100">
       <aside
@@ -39,7 +78,7 @@ function DashboardPage() {
         <nav className="flex flex-1 flex-col gap-2 p-2 pt-4">
           <button
             type="button"
-            onClick={() => setActiveSection("overview")}
+            onClick={() => handleSelectSection("overview")}
             title="Início"
             aria-label="Início"
             className={`flex h-11 items-center rounded-lg transition hover:bg-white/5 ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} ${activeSection === "overview" ? "bg-violet-500/15 text-violet-200" : "text-slate-300 hover:text-white"}`}
@@ -50,7 +89,7 @@ function DashboardPage() {
           {isAdmin && (
             <button
               type="button"
-              onClick={() => setActiveSection("database")}
+              onClick={() => handleSelectSection("database")}
               title="Banco de dados"
               aria-label="Banco de dados"
               className={`flex h-11 items-center rounded-lg transition hover:bg-white/5 ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} ${activeSection === "database" ? "bg-violet-500/15 text-violet-200" : "text-slate-300 hover:text-white"}`}
