@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
+/* BLOCO 1 — Nome do cookie e duração máxima de uma sessão autenticada. */
 const COOKIE_NAME = "livenexus_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 8;
 
@@ -9,6 +10,7 @@ type Session = {
   exp: number;
 };
 
+/* BLOCO 2 — Lê e valida o segredo privado usado para assinar sessões. */
 function secret() {
   const value = process.env.SESSION_SECRET;
   if (!value || value.length < 32) {
@@ -17,10 +19,12 @@ function secret() {
   return value;
 }
 
+/* BLOCO 3 — Gera a assinatura criptográfica HMAC-SHA256 do token. */
 function signature(payload: string) {
   return createHmac("sha256", secret()).update(payload).digest("base64url");
 }
 
+/* BLOCO 4 — Monta o token com ID do usuário, papel e horário de expiração. */
 export function createSessionToken(user: { user_id: string; role?: string }) {
   if (user.role !== "admin" && user.role !== "user") {
     throw new Error("Papel de usuário inválido.");
@@ -34,11 +38,13 @@ export function createSessionToken(user: { user_id: string; role?: string }) {
   return `${payload}.${signature(payload)}`;
 }
 
+/* BLOCO 5 — Define o cookie HttpOnly da sessão autenticada. */
 export function createSessionCookie(user: { user_id: string; role?: string }) {
   const value = createSessionToken(user);
   return `${COOKIE_NAME}=${value}; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=${SESSION_TTL_SECONDS}`;
 }
 
+/* BLOCO 6 — Confere assinatura, formato, papel e vencimento do token. */
 export function parseToken(value: string): Session | null {
   try {
     const separator = value.lastIndexOf(".");
@@ -60,6 +66,7 @@ export function parseToken(value: string): Session | null {
   }
 }
 
+/* BLOCO 7 — Recupera a sessão por Bearer token ou cookie de autenticação. */
 export function readSession(request: Request): Session | null {
   try {
     const authHeader = request.headers.get("authorization") ?? "";
@@ -85,6 +92,7 @@ export function readSession(request: Request): Session | null {
   }
 }
 
+/* BLOCO 8 — Expira o cookie e padroniza a resposta para acesso de admin. */
 export function clearSessionCookie() {
   return `${COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`;
 }

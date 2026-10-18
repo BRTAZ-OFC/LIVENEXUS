@@ -1,14 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { adminOnlyResponse, readSession } from "../../login/-session";
 
+/* BLOCO 1 — Cabeçalhos que impedem cache das respostas com dados de usuários. */
 const NO_CACHE_HEADERS = {
   "Cache-Control": "no-store, no-cache, must-revalidate",
   Pragma: "no-cache",
 };
 
+/* BLOCO 2 — Registra os endpoints administrativos de leitura e alteração do JSON. */
 export const Route = createFileRoute("/api/database/users")({
   server: {
     handlers: {
+      /* BLOCO 3 — Exige papel admin e retorna a lista sem o campo password. */
       GET: async ({ request }) => {
         if (readSession(request)?.role !== "admin") return adminOnlyResponse();
         try {
@@ -22,6 +25,7 @@ export const Route = createFileRoute("/api/database/users")({
           );
         }
       },
+      /* BLOCO 4 — Valida o ID e os campos editáveis antes de atualizar o registro. */
       PATCH: async ({ request }) => {
         if (readSession(request)?.role !== "admin") return adminOnlyResponse();
         try {
@@ -57,6 +61,7 @@ export const Route = createFileRoute("/api/database/users")({
           return Response.json({ ok: false, message }, { status, headers: NO_CACHE_HEADERS });
         }
       },
+      /* BLOCO 5 — Protege a conta autenticada e executa a exclusão solicitada. */
       DELETE: async ({ request }) => {
         const session = readSession(request);
         if (session?.role !== "admin") return adminOnlyResponse();

@@ -1,10 +1,13 @@
+/* BLOCO 1 — Imports de rota, navegação, estados, ícones e cadastro do servidor. */
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AudioLines, ArrowRight, LockKeyhole, UserRound } from "lucide-react";
 import { useState } from "react";
 import { registerUser } from "./-auth";
 
+/* BLOCO 2 — Registra a rota de cadastro. */
 export const Route = createFileRoute("/login/registro")({ component: RegisterPage });
 
+/* BLOCO 3 — Armazena usuário, senha, confirmação e mensagens. */
 function RegisterPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState("");
@@ -12,6 +15,7 @@ function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
 
+  // BLOCO 4 — Confere senhas, verifica duplicidade e envia o cadastro.
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
@@ -41,33 +45,36 @@ function RegisterPage() {
     }
   }
 
+  /* BLOCO 5 — Monta a tela de cadastro; os estilos ficam em css/auth.css. */
+
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#080a13] px-4 py-12 text-slate-100">
+    <main className="auth-page">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-cyan-600/15 blur-[120px]"
+        className="auth-pointer-events-none-abso-kxfgfw"
       />
-      <section className="relative w-full max-w-md rounded-3xl border border-white/10 bg-[#0d1120]/90 p-7 shadow-2xl shadow-black/40 sm:p-9">
-        <a href="/" className="mb-8 flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400">
-            <AudioLines className="h-5 w-5 text-white" />
+      <section className="auth-card">
+        <a href="/" className="auth-brand">
+          <span className="auth-brand-mark">
+            <AudioLines className="auth-h-5-w-5-8794lx" />
           </span>
-          <span className="text-lg font-extrabold text-white">
-            LIVE<span className="text-cyan-300">NEXUS</span>
+          <span className="auth-text-lg-font-extrabold-1h5z3qk">
+            LIVE<span className="auth-text-cyan-300-bbfjjq">NEXUS</span>
           </span>
         </a>
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-300">
+        <p className="auth-eyebrow-register">
           Comece por aqui
         </p>
-        <h1 className="mt-2 text-3xl font-extrabold text-white">Criar conta</h1>
-        <p className="mt-3 text-sm leading-6 text-slate-400">
+        <h1 className="auth-title">Criar conta</h1>
+        <p className="auth-description">
           Preencha os dados para criar seu acesso.
         </p>
-        <form className="mt-7 space-y-5" onSubmit={submit}>
-          <label className="block text-sm font-medium text-slate-200">
+        {/* BLOCO 6 — Campos do cadastro, aviso de senha exclusiva e mensagens. */}
+        <form className="auth-form" onSubmit={submit}>
+          <label className="auth-field-label">
             Nome de usuário
-            <span className="mt-2 flex items-center gap-3 rounded-xl border border-white/10 bg-black/20 px-3">
-              <UserRound className="h-4 w-4 text-slate-500" />
+            <span className="auth-field-shell">
+              <UserRound className="auth-h-4-w-4-f89m3f" />
               <input
                 autoComplete="username"
                 minLength={3}
@@ -75,15 +82,15 @@ function RegisterPage() {
                 required
                 value={user}
                 onChange={(e) => setUser(e.target.value)}
-                className="w-full bg-transparent py-3 text-sm outline-none placeholder:text-slate-600"
+                className="auth-input"
                 placeholder="Escolha um usuário"
               />
             </span>
           </label>
-          <label className="block text-sm font-medium text-slate-200">
+          <label className="auth-field-label">
             Senha
-            <span className="mt-2 flex items-center gap-3 rounded-xl border border-white/10 bg-black/20 px-3">
-              <LockKeyhole className="h-4 w-4 text-slate-500" />
+            <span className="auth-field-shell">
+              <LockKeyhole className="auth-h-4-w-4-f89m3f" />
               <input
                 type="password"
                 autoComplete="new-password"
@@ -91,15 +98,15 @@ function RegisterPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-transparent py-3 text-sm outline-none placeholder:text-slate-600"
+                className="auth-input"
                 placeholder="Use uma senha forte e exclusiva"
               />
             </span>
           </label>
-          <label className="block text-sm font-medium text-slate-200">
+          <label className="auth-field-label">
             Confirmar senha
-            <span className="mt-2 flex items-center gap-3 rounded-xl border border-white/10 bg-black/20 px-3">
-              <LockKeyhole className="h-4 w-4 text-slate-500" />
+            <span className="auth-field-shell">
+              <LockKeyhole className="auth-h-4-w-4-f89m3f" />
               <input
                 type="password"
                 autoComplete="new-password"
@@ -107,37 +114,37 @@ function RegisterPage() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full bg-transparent py-3 text-sm outline-none placeholder:text-slate-600"
+                className="auth-input"
                 placeholder="Digite a senha novamente"
               />
             </span>
           </label>
-          <p className="text-xs leading-5 text-amber-200/90">
+          <p className="auth-text-xs-leading-5-vfygoe">
             Não use senhas padrão, repetidas ou utilizadas em outros serviços. Use uma senha
             exclusiva com pelo menos 8 caracteres.
           </p>
           <button
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-3.5 text-sm font-bold text-white transition hover:brightness-110"
+            className="auth-submit"
             type="submit"
           >
-            Cadastrar <ArrowRight className="h-4 w-4" />
+            Cadastrar <ArrowRight className="auth-h-4-w-4-3ulyf2" />
           </button>
           {message && (
             <p
               role="status"
-              className="rounded-xl border border-amber-300/20 bg-amber-300/[0.06] p-3 text-xs leading-5 text-amber-100"
+              className="auth-message"
             >
               {message}
             </p>
           )}
         </form>
-        <p className="mt-6 text-center text-sm text-slate-400">
+        <p className="auth-footer">
           Já tem conta?{" "}
-          <a href="/login" className="font-semibold text-cyan-300 hover:text-white">
+          <a href="/login" className="auth-link">
             Entrar
           </a>
         </p>
-        <a href="/" className="mt-5 block text-center text-xs text-slate-500 hover:text-slate-300">
+        <a href="/" className="auth-back-link">
           Voltar à página inicial
         </a>
       </section>

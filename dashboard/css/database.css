@@ -1,0 +1,496 @@
+/* RESPONSABILIDADE: navegação da tabela de usuários JSON e controles CRUD. */
+
+/* BLOCO 001 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-flex-w-full-oi8986 {
+  @apply flex w-full items-center gap-2 rounded-md px-2 py-2 text-left transition;
+}
+
+/* BLOCO 003 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-bg-violet-500-15-text-vi-1xm6n2h {
+  @apply bg-violet-500/15 text-violet-200;
+}
+
+/* BLOCO 004 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-bg-white-5-sdteeg {
+  @apply text-slate-300;
+
+  @variant hover {
+    @apply bg-white/5 text-white;
+  }
+}
+
+/* BLOCO 005 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-h-3-w-3-1s0lck6 {
+  @apply h-3 w-3;
+}
+
+/* BLOCO 006 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-animate-spin-1steumz {
+  @apply animate-spin;
+}
+
+/* BLOCO 007 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-flex-min-h-screen-ejpwfw {
+  @apply flex min-h-screen items-center justify-center bg-[#080a13] p-6 text-slate-100;
+}
+
+/* BLOCO 008 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-rounded-xl-border-1yymjbi {
+  @apply rounded-xl border border-white/10 bg-[#0d1120] p-6 text-center;
+}
+
+/* BLOCO 009 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-text-lg-font-bold-15tkl3f {
+  @apply text-lg font-bold;
+}
+
+/* BLOCO 010 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-mt-2-text-sm-1qgs8fd {
+  @apply mt-2 text-sm text-slate-400;
+}
+
+/* BLOCO 011 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-mt-4-inline-block-uyxz30 {
+  @apply mt-4 inline-block text-sm font-semibold text-cyan-300;
+}
+
+/* BLOCO 012 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-flex-min-h-screen-18ufx4p {
+  @apply flex min-h-screen w-44 shrink-0 flex-col border-r border-white/10 bg-[#0b0e19];
+}
+
+/* BLOCO 013 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-flex-h-11-1nokrch {
+  @apply flex h-11 items-center gap-2 border-b border-white/10 px-3;
+}
+
+/* BLOCO 014 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-flex-h-6-rvwoa7 {
+  @apply flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-violet-500 to-cyan-400;
+}
+
+/* BLOCO 015 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-h-3-w-3-16c88sp {
+  @apply h-3 w-3 text-white;
+}
+
+/* BLOCO 016 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-text-11px-font-extrabold-1tiyd6b {
+  @apply text-[11px] font-extrabold text-white;
+}
+
+/* BLOCO 017 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-flex-flex-col-1vt2mhw {
+  @apply flex flex-col gap-1 border-b border-white/10 p-2;
+}
+
+/* BLOCO 018 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-flex-h-7-1jvyogy {
+  @apply flex h-7 items-center gap-2 rounded-md px-2 text-[10px] text-slate-300 transition;
+
+  @variant hover {
+    @apply bg-white/5 text-white;
+  }
+}
+
+/* BLOCO 019 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-h-3-w-3-92ylou {
+  @apply h-3 w-3 shrink-0;
+}
+
+/* BLOCO 020 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-flex-h-7-1yq75cr {
+  @apply flex h-7 items-center gap-2 rounded-md bg-violet-500/15 px-2 text-[10px] font-semibold text-violet-200;
+}
+
+/* BLOCO 021 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-flex-w-32-qdsh3g {
+  @apply flex w-32 shrink-0 flex-col border-r border-white/10 bg-[#0b0e19];
+}
+
+/* BLOCO 022 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-border-b-border-white-10-15zrj3l {
+  @apply border-b border-white/10 px-3 py-3;
+}
+
+/* BLOCO 023 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-text-9px-font-bold-14dl39j {
+  @apply text-[9px] font-bold tracking-[0.16em] text-slate-500;
+}
+
+/* BLOCO 024 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-p-2-178lum4 {
+  @apply p-2;
+}
+
+/* BLOCO 025 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-h-3-5-w-3-5-l2ap6m {
+  @apply h-3.5 w-3.5 shrink-0;
+}
+
+/* BLOCO 026 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-text-9px-font-medium-18gwz7j {
+  @apply text-[9px] font-medium;
+}
+
+/* BLOCO 027 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-min-w-0-flex-1-1g3oh63 {
+  @apply min-w-0 flex-1;
+}
+
+/* BLOCO 028 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-border-b-border-white-10-7389gy {
+  @apply border-b border-white/10 bg-[#0d1120]/80;
+}
+
+/* BLOCO 029 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-flex-w-full-1bum737 {
+  @apply flex w-full items-center justify-between px-6 py-3;
+
+  @variant sm {
+    @apply px-8;
+  }
+}
+
+/* BLOCO 030 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-flex-items-center-1bpln9w {
+  @apply flex items-center gap-3;
+}
+
+/* BLOCO 031 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-text-sm-font-extrabold-26vlbx {
+  @apply text-sm font-extrabold text-white;
+}
+
+/* BLOCO 032 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-text-cyan-300-bbfjjq {
+  @apply text-cyan-300;
+}
+
+/* BLOCO 033 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-inline-flex-items-center-1h04382 {
+  @apply inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-300;
+
+  @variant hover {
+    @apply text-white;
+  }
+}
+
+/* BLOCO 034 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-flex-flex-wrap-qlnoif {
+  @apply flex flex-wrap items-center justify-between gap-3;
+}
+
+/* BLOCO 035 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-text-9px-font-bold-ukmi15 {
+  @apply text-[9px] font-bold uppercase tracking-[0.18em] text-cyan-300;
+}
+
+/* BLOCO 036 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-mt-1-flex-590iju {
+  @apply mt-1 flex items-center gap-2 text-xl font-extrabold tracking-tight text-white;
+}
+
+/* BLOCO 037 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-h-5-w-5-36nguv {
+  @apply h-5 w-5 text-cyan-300;
+}
+
+/* BLOCO 038 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-mt-1-text-11px-fgeh1h {
+  @apply mt-1 text-[11px] leading-4 text-slate-400;
+}
+
+/* BLOCO 039 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-inline-flex-items-center-39j1c2 {
+  @apply inline-flex items-center gap-1.5 rounded-md border border-white/10 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300;
+
+  @variant hover {
+    @apply border-white/25 text-white;
+  }
+
+  @variant disabled {
+    @apply opacity-50;
+  }
+}
+
+/* BLOCO 040 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-mt-5-rounded-xl-3ntd3c {
+  @apply mt-5 rounded-xl border border-emerald-300/20 bg-emerald-300/[0.06] p-3 text-sm text-emerald-200;
+}
+
+/* BLOCO 041 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-mt-5-rounded-xl-13l52ky {
+  @apply mt-5 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] p-3 text-sm text-amber-100;
+}
+
+/* BLOCO 042 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-mt-3-overflow-hidden-1sbx6fp {
+  @apply mt-3 overflow-hidden rounded-lg border border-white/10 bg-[#0d1120];
+}
+
+/* BLOCO 043 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-overflow-x-auto-1ytsssi {
+  @apply overflow-x-auto;
+}
+
+/* BLOCO 044 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-w-full-min-w-0-ldzfuq {
+  @apply w-full min-w-0 table-fixed border-collapse text-left text-[10px];
+}
+
+/* BLOCO 045 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-border-b-border-white-10-1134gff {
+  @apply border-b border-white/10 bg-white/[0.03] text-[9px] uppercase tracking-wide text-slate-400;
+}
+
+/* BLOCO 046 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-w-13-break-words-1g87fub {
+  @apply w-[13%] break-words px-1.5 py-1.5 font-semibold;
+}
+
+/* BLOCO 047 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-px-2-5-py-2-4bicug {
+  @apply px-2.5 py-2 font-semibold;
+}
+
+/* BLOCO 048 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-divide-y-divide-white-0--11j827l {
+  @apply divide-y divide-white/[0.07];
+}
+
+/* BLOCO 049 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-px-4-py-10-sxzx56 {
+  @apply px-4 py-10 text-center text-slate-400;
+}
+
+/* BLOCO 050 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-bg-white-0-02-lcbolw {
+  @apply align-middle;
+
+  @variant hover {
+    @apply bg-white/[0.02];
+  }
+}
+
+/* BLOCO 051 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-max-w-44-px-2-5-1uhmtbx {
+  @apply max-w-44 px-2.5 py-2 font-mono text-[10px] text-slate-500;
+}
+
+/* BLOCO 052 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-px-2-5-py-2-1not5md {
+  @apply px-2.5 py-2;
+}
+
+/* BLOCO 053 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-w-full-min-w-0-1o9jto {
+  @apply w-full min-w-0 rounded-md border border-white/15 bg-black/20 px-1 py-1 text-[10px] text-white outline-none;
+
+  @variant focus {
+    @apply border-cyan-400;
+  }
+}
+
+/* BLOCO 054 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-font-semibold-text-white-19kgctp {
+  @apply font-semibold text-white;
+}
+
+/* BLOCO 055 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-w-full-min-w-0-133veqv {
+  @apply w-full min-w-0 rounded-md border border-white/15 bg-[#101525] px-1 py-1 text-[10px] text-white outline-none;
+
+  @variant focus {
+    @apply border-cyan-400;
+  }
+}
+
+/* BLOCO 056 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-rounded-md-bg-white-0-06-sgt1ga {
+  @apply rounded-md bg-white/[0.06] px-2 py-1 text-xs text-slate-300;
+}
+
+/* BLOCO 057 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-break-all-text-9px-ol3zkz {
+  @apply break-all text-[9px] text-slate-400;
+}
+
+/* BLOCO 058 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-whitespace-nowrap-px-2-5-8kbajn {
+  @apply whitespace-nowrap px-2.5 py-2 text-[10px] text-slate-400;
+}
+
+/* BLOCO 059 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-flex-flex-wrap-1k8awxs {
+  @apply flex flex-wrap items-center gap-1;
+}
+
+/* BLOCO 060 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-inline-flex-max-w-full-108qdn7 {
+  @apply inline-flex max-w-full items-center justify-center gap-1 rounded-md bg-cyan-500/15 px-1.5 py-1 text-[9px] font-semibold text-cyan-200;
+
+  @variant hover {
+    @apply bg-cyan-500/25;
+  }
+
+  @variant disabled {
+    @apply opacity-50;
+  }
+}
+
+/* BLOCO 061 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-h-3-5-w-3-5-mho9dy {
+  @apply h-3.5 w-3.5;
+}
+
+/* BLOCO 062 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-rounded-lg-border-ffggg6 {
+  @apply rounded-lg border border-white/10 p-2 text-slate-400;
+
+  @variant hover {
+    @apply text-white;
+  }
+}
+
+/* BLOCO 063 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-h-4-w-4-3ulyf2 {
+  @apply h-4 w-4;
+}
+
+/* BLOCO 064 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-flex-flex-wrap-agiabx {
+  @apply flex flex-wrap items-center gap-1.5;
+}
+
+/* BLOCO 065 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-inline-flex-max-w-full-1710mde {
+  @apply inline-flex max-w-full items-center justify-center gap-1 rounded-md border border-white/10 px-2 py-1 text-[9px] font-semibold text-slate-300;
+
+  @variant hover {
+    @apply border-violet-400/40 text-white;
+  }
+
+  @variant disabled {
+    @apply opacity-50;
+  }
+}
+
+/* BLOCO 066 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-inline-flex-max-w-full-13vi12l {
+  @apply inline-flex max-w-full items-center justify-center gap-1 rounded-md border border-rose-500/25 bg-rose-500/10 px-2 py-1 text-[9px] font-semibold text-rose-300;
+
+  @variant hover {
+    @apply border-rose-500/40 bg-rose-500/20;
+  }
+
+  @variant disabled {
+    @apply opacity-50;
+  }
+}
+
+/* BLOCO 067 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-mt-2-text-10px-15p4c0e {
+  @apply mt-2 text-[10px] leading-4 text-slate-500;
+}
+
+/* BLOCO 068 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-fixed-inset-0-cet2d5 {
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs;
+}
+
+/* BLOCO 069 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-w-full-max-w-md-9gxz7l {
+  @apply w-full max-w-md rounded-2xl border border-white/10 bg-[#0d1120] p-6 shadow-2xl;
+}
+
+/* BLOCO 070 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-flex-h-10-s20i5t {
+  @apply flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400;
+}
+
+/* BLOCO 071 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-h-5-w-5-sv0uoi {
+  @apply h-5 w-5;
+}
+
+/* BLOCO 072 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-text-base-font-bold-1au4nai {
+  @apply text-base font-bold text-white;
+}
+
+/* BLOCO 073 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-text-xs-text-slate-400-1qmab5e {
+  @apply text-xs text-slate-400;
+}
+
+/* BLOCO 074 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-mt-4-text-xs-1p2vnyp {
+  @apply mt-4 text-xs leading-5 text-slate-300;
+}
+
+/* BLOCO 075 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-font-mono-text-slate-400-2q6jsq {
+  @apply font-mono text-slate-400;
+}
+
+/* BLOCO 076 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-mt-6-flex-t4d3go {
+  @apply mt-6 flex justify-end gap-2.5;
+}
+
+/* BLOCO 077 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-rounded-lg-border-8ndnc {
+  @apply rounded-lg border border-white/10 px-3.5 py-2 text-xs font-semibold text-slate-300;
+
+  @variant hover {
+    @apply border-white/20 bg-white/5 text-white;
+  }
+
+  @variant disabled {
+    @apply opacity-50;
+  }
+}
+
+/* BLOCO 078 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-inline-flex-items-center-i4nxas {
+  @apply inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3.5 py-2 text-xs font-semibold text-white;
+
+  @variant hover {
+    @apply bg-rose-500;
+  }
+
+  @variant disabled {
+    @apply opacity-50;
+  }
+}
+
+/* BLOCO 079 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-h-3-5-w-3-5-172mrj8 {
+  @apply h-3.5 w-3.5 animate-spin;
+}
+
+/* BLOCO 080 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-flex-min-h-0-1yrwjzw {
+  @apply flex min-h-0 w-full bg-[#080a13] text-slate-100;
+}
+
+/* BLOCO 081 — tipografia e aparência; origem dashboard/admin/banco.tsx. */
+.db-flex-min-h-screen-axmrk9 {
+  @apply flex min-h-screen bg-[#080a13] text-slate-100;
+}
+
+/* BLOCO 082 — estrutura, alinhamento e dimensões; origem dashboard/admin/banco.tsx. */
+.db-min-w-0-flex-1-1pl9mdh {
+  @apply min-w-0 flex-1 px-1 py-2;
+}
+
+/* BLOCO 083 — estilo de elemento; origem dashboard/admin/banco.tsx. */
+.db-w-full-px-6-5ebeye {
+  @apply w-full px-6 py-6;
+
+  @variant sm {
+    @apply px-8;
+  }
+}
+

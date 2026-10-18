@@ -1,3 +1,4 @@
+/* BLOCO 1 — Imports de rota, estados React, ícones e painel de dados. */
 import { createFileRoute } from "@tanstack/react-router";
 import DatabasePage from "./admin/banco";
 import { useEffect, useState } from "react";
@@ -14,9 +15,12 @@ import {
   ChevronLeft,
 } from "lucide-react";
 
+/* BLOCO 2 — Registra a rota do dashboard autenticado. */
 export const Route = createFileRoute("/dashboard")({ component: DashboardPage });
 
+/* BLOCO 3 — Controla menu lateral, seção ativa e acesso administrativo. */
 function DashboardPage() {
+  // BLOCO 4 — Inicializa o menu e recupera o papel antes de restaurar a aba ativa.
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [isAdmin, setIsAdmin] = useState(() => {
     if (typeof window !== "undefined") {
@@ -37,6 +41,7 @@ function DashboardPage() {
     return "overview";
   });
 
+  // BLOCO 5 — Atualiza a seção selecionada e persiste a escolha.
   function handleSelectSection(section: "overview" | "database") {
     setActiveSection(section);
     if (typeof window !== "undefined") {
@@ -51,6 +56,7 @@ function DashboardPage() {
     }
   }
 
+  // BLOCO 6 — Confirma o papel no cliente e força a aba inicial para usuários comuns.
   useEffect(() => {
     const admin = sessionStorage.getItem("livenexus_role") === "admin";
     setIsAdmin(admin);
@@ -59,26 +65,29 @@ function DashboardPage() {
       sessionStorage.setItem("livenexus_active_tab", "overview");
     }
   }, []);
+  // BLOCO 7 — Renderiza o layout do menu lateral e da área de conteúdo.
+
   return (
-    <div className="flex min-h-screen bg-[#080a13] text-slate-100">
+    <div className="dash-flex-min-h-screen-axmrk9">
+      {/* BLOCO 8 — Menu lateral recolhível com atalhos das seções. */}
       <aside
-        className={`flex min-h-screen shrink-0 flex-col border-r border-white/10 bg-[#0b0e19] transition-[width] duration-200 ${sidebarExpanded ? "w-52" : "w-16"}`}
+        className={`dash-flex-min-h-screen-16w20hu ${sidebarExpanded ? "dash-w-52-p3mf56" : "dash-w-16-1j20ogi"}`}
       >
-        <div className="flex h-[73px] items-center justify-center border-b border-white/10">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400">
-            <AudioLines className="h-5 w-5 text-white" />
+        <div className="dash-flex-h-73px-1rxqrjy">
+          <span className="dash-flex-h-9-y3vg7y">
+            <AudioLines className="dash-h-5-w-5-8794lx" />
           </span>
         </div>
-        <nav className="flex flex-1 flex-col gap-2 p-2 pt-4">
+        <nav className="dash-flex-flex-1-xgledq">
           <button
             type="button"
             onClick={() => handleSelectSection("overview")}
             title="Início"
             aria-label="Início"
-            className={`flex h-11 items-center rounded-lg transition hover:bg-white/5 ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} ${activeSection === "overview" ? "bg-violet-500/15 text-violet-200" : "text-slate-300 hover:text-white"}`}
+            className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "overview" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
           >
-            <House className="h-2.5 w-2.5 shrink-0" />
-            {sidebarExpanded && <span className="text-[7px] font-semibold">Início</span>}
+            <House className="dash-h-2-5-w-2-5-16znhny" />
+            {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Início</span>}
           </button>
           {isAdmin && (
             <button
@@ -86,10 +95,10 @@ function DashboardPage() {
               onClick={() => handleSelectSection("database")}
               title="Banco de dados"
               aria-label="Banco de dados"
-              className={`flex h-11 items-center rounded-lg transition hover:bg-white/5 ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} ${activeSection === "database" ? "bg-violet-500/15 text-violet-200" : "text-slate-300 hover:text-white"}`}
+              className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "database" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
             >
-              <Database className="h-2.5 w-2.5 shrink-0" />
-              {sidebarExpanded && <span className="text-[7px] font-semibold">Banco de dados</span>}
+              <Database className="dash-h-2-5-w-2-5-16znhny" />
+              {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Banco de dados</span>}
             </button>
           )}
         </nav>
@@ -98,24 +107,25 @@ function DashboardPage() {
           onClick={() => setSidebarExpanded((expanded) => !expanded)}
           aria-label={sidebarExpanded ? "Recolher menu" : "Estender menu"}
           title={sidebarExpanded ? "Recolher menu" : "Estender menu"}
-          className="m-2 flex h-10 items-center justify-center rounded-lg border border-white/10 text-slate-300 hover:bg-white/5 hover:text-white"
+          className="dash-m-2-flex-16sm6c8"
         >
           {sidebarExpanded ? (
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="dash-h-5-w-5-sv0uoi" />
           ) : (
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="dash-h-5-w-5-sv0uoi" />
           )}
         </button>
       </aside>
-      <main className="min-w-0 flex-1">
-        <header className="border-b border-white/10 bg-[#0d1120]/80">
-          <div className="flex w-full items-center justify-between px-6 py-4 sm:px-8">
-            <a href="/" className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400">
-                <AudioLines className="h-5 w-5 text-white" />
+      {/* BLOCO 9 — Painel principal ao lado do menu, sem centralização forçada. */}
+      <main className="dash-min-w-0-flex-1-1g3oh63">
+        <header className="dash-border-b-border-white-10-7389gy">
+          <div className="dash-flex-w-full-1h42rcq">
+            <a href="/" className="dash-flex-items-center-1bpln9w">
+              <span className="dash-flex-h-10-8puoho">
+                <AudioLines className="dash-h-5-w-5-8794lx" />
               </span>
-              <span className="text-lg font-extrabold text-white">
-                LIVE<span className="text-cyan-300">NEXUS</span>
+              <span className="dash-text-lg-font-extrabold-1h5z3qk">
+                LIVE<span className="dash-text-cyan-300-bbfjjq">NEXUS</span>
               </span>
             </a>
             <button
@@ -128,64 +138,64 @@ function DashboardPage() {
                   window.location.href = "/login";
                 }
               }}
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:border-white/25 hover:text-white"
+              className="dash-inline-flex-items-center-11vpqzb"
             >
-              <LogOut className="h-4 w-4" /> Sair
+              <LogOut className="dash-h-4-w-4-3ulyf2" /> Sair
             </button>
           </div>
         </header>
         {activeSection === "overview" ? (
-          <section className="w-full px-6 py-8 sm:px-8">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-300">
+          <section className="dash-w-full-px-6-n4tgk">
+            <p className="dash-text-xs-font-bold-1eh0cdm">
               Área do usuário
             </p>
-            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+            <h1 className="dash-mt-3-text-3xl-1fv0i93">
               Dashboard
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400">
+            <p className="dash-mt-3-max-w-2xl-1oz8868">
               Bem-vindo ao LiveNexus. Este é o painel inicial da sua conta.
             </p>
-            <div className="mt-9 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              <article className="rounded-2xl border border-white/10 bg-[#0d1120] p-6">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-400/10 text-violet-300">
-                  <Radio className="h-5 w-5" />
+            <div className="dash-mt-9-grid-dk8xjy">
+              <article className="dash-rounded-2xl-border-la2jyp">
+                <span className="dash-flex-h-11-w12n1q">
+                  <Radio className="dash-h-5-w-5-sv0uoi" />
                 </span>
-                <h2 className="mt-5 text-lg font-bold text-white">Conexões</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-400">
+                <h2 className="dash-mt-5-text-lg-1wxow0h">Conexões</h2>
+                <p className="dash-mt-2-text-sm-n1yf0y">
                   Acesse os recursos de conexão das suas plataformas de transmissão.
                 </p>
-                <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-500">
-                  Em preparação <ArrowRight className="h-4 w-4" />
+                <span className="dash-mt-5-inline-flex-1wra89i">
+                  Em preparação <ArrowRight className="dash-h-4-w-4-3ulyf2" />
                 </span>
               </article>
-              <article className="rounded-2xl border border-white/10 bg-[#0d1120] p-6">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300">
-                  <UserRound className="h-5 w-5" />
+              <article className="dash-rounded-2xl-border-la2jyp">
+                <span className="dash-flex-h-11-a0p84e">
+                  <UserRound className="dash-h-5-w-5-sv0uoi" />
                 </span>
-                <h2 className="mt-5 text-lg font-bold text-white">Minha conta</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-400">
+                <h2 className="dash-mt-5-text-lg-1wxow0h">Minha conta</h2>
+                <p className="dash-mt-2-text-sm-n1yf0y">
                   Área reservada para informações e dados da conta.
                 </p>
-                <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-500">
-                  Em preparação <ArrowRight className="h-4 w-4" />
+                <span className="dash-mt-5-inline-flex-1wra89i">
+                  Em preparação <ArrowRight className="dash-h-4-w-4-3ulyf2" />
                 </span>
               </article>
-              <article className="rounded-2xl border border-white/10 bg-[#0d1120] p-6">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-fuchsia-400/10 text-fuchsia-300">
-                  <Settings2 className="h-5 w-5" />
+              <article className="dash-rounded-2xl-border-la2jyp">
+                <span className="dash-flex-h-11-r1ook6">
+                  <Settings2 className="dash-h-5-w-5-sv0uoi" />
                 </span>
-                <h2 className="mt-5 text-lg font-bold text-white">Configurações</h2>
-                <p className="mt-2 text-sm leading-6 text-slate-400">
+                <h2 className="dash-mt-5-text-lg-1wxow0h">Configurações</h2>
+                <p className="dash-mt-2-text-sm-n1yf0y">
                   Espaço para as configurações do LiveNexus.
                 </p>
-                <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-500">
-                  Em preparação <ArrowRight className="h-4 w-4" />
+                <span className="dash-mt-5-inline-flex-1wra89i">
+                  Em preparação <ArrowRight className="dash-h-4-w-4-3ulyf2" />
                 </span>
               </article>
             </div>
           </section>
         ) : isAdmin ? (
-          <section className="w-full px-6 py-6 sm:px-8">
+          <section className="dash-w-full-px-6-5ebeye">
             <DatabasePage embedded />
           </section>
         ) : null}

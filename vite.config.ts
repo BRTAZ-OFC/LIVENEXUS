@@ -5,6 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { nitro } from "nitro/vite";
 
+/* BLOCO 1 — Evita recarregamento automático da aplicação ao alterar arquivos JSON. */
 function preventJsonReloadPlugin() {
   return {
     name: "prevent-json-reload",
@@ -16,6 +17,7 @@ function preventJsonReloadPlugin() {
   };
 }
 
+/* BLOCO 2 — Configura plugins, diretórios de rotas e servidor de desenvolvimento. */
 export default defineConfig(({ command }) => ({
   plugins: [
     tailwindcss(),

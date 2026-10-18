@@ -1,0 +1,768 @@
+/* RESPONSABILIDADE: página pública — navegação, apresentação, cards e rodapé. */
+
+/* BLOCO 001 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-relative-min-h-screen-1rsop7t {
+  @apply relative min-h-screen overflow-hidden bg-[#080a13] text-slate-100;
+}
+
+/* BLOCO 002 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-pointer-events-none-abso-1gul6oz {
+  @apply pointer-events-none absolute inset-0 overflow-hidden;
+}
+
+/* BLOCO 003 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-absolute-top-64-donjhn {
+  @apply absolute -top-64 left-[18%] h-[620px] w-[620px] rounded-full bg-violet-700/20 blur-[150px];
+}
+
+/* BLOCO 004 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-absolute-right-12rem-wo0q8j {
+  @apply absolute right-[-12rem] top-[28rem] h-[540px] w-[540px] rounded-full bg-cyan-500/10 blur-[140px];
+}
+
+/* BLOCO 005 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-absolute-bottom-8rem-1vjn2vz {
+  @apply absolute bottom-[8rem] left-[-12rem] h-[480px] w-[480px] rounded-full bg-fuchsia-600/10 blur-[140px];
+}
+
+/* BLOCO 006 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-sticky-top-0-hehs4o {
+  @apply sticky top-0 z-50 border-b border-white/[0.08] bg-[#080a13]/75 backdrop-blur-2xl;
+}
+
+/* BLOCO 007 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-mx-auto-flex-1i0mnsl {
+  @apply mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4;
+
+  @variant sm {
+    @apply px-8;
+  }
+}
+
+/* BLOCO 008 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-flex-shrink-0-1mc3xk4 {
+  @apply flex shrink-0 items-center gap-3;
+}
+
+/* BLOCO 009 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-flex-h-10-1qydtod {
+  @apply flex h-10 w-10 items-center justify-center rounded-xl border border-violet-300/20 bg-gradient-to-br from-violet-500 to-cyan-400 shadow-lg shadow-violet-500/25;
+}
+
+/* BLOCO 010 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-h-5-w-5-8794lx {
+  @apply h-5 w-5 text-white;
+}
+
+/* BLOCO 011 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-lg-font-extrabold-18415w6 {
+  @apply text-lg font-extrabold tracking-tight text-white;
+}
+
+/* BLOCO 012 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-cyan-300-bbfjjq {
+  @apply text-cyan-300;
+}
+
+/* BLOCO 013 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-ml-2-hidden-u7wz9r {
+  @apply ml-2 hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-500;
+
+  @variant sm {
+    @apply inline;
+  }
+}
+
+/* BLOCO 014 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-hidden-items-center-vc0i0m {
+  @apply hidden items-center gap-8;
+
+  @variant md {
+    @apply flex;
+  }
+}
+
+/* BLOCO 015 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-sm-text-slate-300-q5welq {
+  @apply text-sm text-slate-300 transition;
+
+  @variant hover {
+    @apply text-white;
+  }
+}
+
+/* BLOCO 016 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-flex-shrink-0-1mm3j93 {
+  @apply flex shrink-0 items-center gap-2;
+}
+
+/* BLOCO 017 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-rounded-xl-border-bnh4rt {
+  @apply rounded-xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-slate-100 transition;
+
+  @variant hover {
+    @apply border-violet-300/50 bg-white/[0.06];
+  }
+}
+
+/* BLOCO 018 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-rounded-xl-bg-gradient-t-iu534x {
+  @apply rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-violet-600/20 transition;
+
+  @variant hover {
+    @apply brightness-110;
+  }
+}
+
+/* BLOCO 019 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-relative-z-10-1prrylz {
+  @apply relative z-10;
+}
+
+/* BLOCO 020 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-mx-auto-grid-14zvftt {
+  @apply mx-auto grid max-w-7xl items-center gap-14 px-5 pb-20 pt-16;
+
+  @variant sm {
+    @apply px-8 pb-28 pt-24;
+  }
+
+  @variant lg {
+    @apply grid-cols-[1fr_0.95fr] gap-10;
+  }
+}
+
+/* BLOCO 021 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-relative-z-10-74v9y0 {
+  @apply relative z-10 text-center;
+
+  @variant lg {
+    @apply text-left;
+  }
+}
+
+/* BLOCO 022 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mb-7-inline-flex-1c0wnp8 {
+  @apply mb-7 inline-flex items-center gap-2 rounded-full border border-violet-300/20 bg-violet-300/[0.07] px-4 py-2 text-xs font-semibold text-violet-200;
+}
+
+/* BLOCO 023 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-relative-flex-1yqctjd {
+  @apply relative flex h-2 w-2;
+}
+
+/* BLOCO 024 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-absolute-inline-flex-1sxl4z3 {
+  @apply absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-300 opacity-50;
+}
+
+/* BLOCO 025 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-relative-inline-flex-eez7e5 {
+  @apply relative inline-flex h-2 w-2 rounded-full bg-cyan-300;
+}
+
+/* BLOCO 026 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mx-auto-max-w-3xl-1bmda6p {
+  @apply mx-auto max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-tight text-white;
+
+  @variant sm {
+    @apply text-6xl;
+  }
+
+  @variant lg {
+    @apply mx-0 text-7xl;
+  }
+}
+
+/* BLOCO 027 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-2-block-zi3mod {
+  @apply mt-2 block bg-gradient-to-r from-violet-300 via-fuchsia-300 to-cyan-300 bg-clip-text pb-2 text-transparent;
+}
+
+/* BLOCO 028 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mx-auto-mt-6-1o5j63p {
+  @apply mx-auto mt-6 max-w-xl text-base leading-8 text-slate-400;
+
+  @variant sm {
+    @apply text-lg;
+  }
+
+  @variant lg {
+    @apply mx-0;
+  }
+}
+
+/* BLOCO 029 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-mt-8-flex-18lpy6w {
+  @apply mt-8 flex flex-col justify-center gap-3;
+
+  @variant sm {
+    @apply flex-row;
+  }
+
+  @variant lg {
+    @apply justify-start;
+  }
+}
+
+/* BLOCO 030 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-inline-flex-items-center-1a3j2x0 {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-violet-600/25 transition;
+
+  @variant hover {
+    @apply brightness-110;
+  }
+}
+
+/* BLOCO 031 — estilo de elemento; origem dashboard/index.tsx. */
+.home-h-4-w-4-3ulyf2 {
+  @apply h-4 w-4;
+}
+
+/* BLOCO 032 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-inline-flex-items-center-1c8e949 {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.035] px-6 py-3.5 text-sm font-semibold text-slate-200 transition;
+
+  @variant hover {
+    @apply bg-white/[0.08];
+  }
+}
+
+/* BLOCO 033 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-8-flex-ek0djd {
+  @apply mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-3 text-xs text-slate-500;
+
+  @variant lg {
+    @apply justify-start;
+  }
+}
+
+/* BLOCO 034 — estilo de elemento; origem dashboard/index.tsx. */
+.home-inline-flex-items-center-661mzx {
+  @apply inline-flex items-center gap-2;
+}
+
+/* BLOCO 035 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-h-4-w-4-tk2x2g {
+  @apply h-4 w-4 text-emerald-300;
+}
+
+/* BLOCO 036 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-relative-mx-auto-mhxt4s {
+  @apply relative mx-auto w-full max-w-[600px];
+}
+
+/* BLOCO 037 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-absolute-inset-8-1m8xhuc {
+  @apply absolute -inset-8 rounded-[3rem] bg-gradient-to-br from-violet-600/20 via-fuchsia-500/10 to-cyan-500/20 blur-3xl;
+}
+
+/* BLOCO 038 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-relative-overflow-hidden-li6lbx {
+  @apply relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#0d1120]/95 p-3 shadow-2xl shadow-black/50;
+
+  @variant sm {
+    @apply p-4;
+  }
+}
+
+/* BLOCO 039 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-flex-items-center-nxanuk {
+  @apply flex items-center justify-between border-b border-white/[0.08] px-2 pb-4 pt-2;
+}
+
+/* BLOCO 040 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-flex-items-center-8gxtq2 {
+  @apply flex items-center gap-2.5;
+}
+
+/* BLOCO 041 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-flex-h-9-o2xuxg {
+  @apply flex h-9 w-9 items-center justify-center rounded-xl bg-violet-500/15 text-violet-300;
+}
+
+/* BLOCO 042 — estilo de elemento; origem dashboard/index.tsx. */
+.home-h-5-w-5-sv0uoi {
+  @apply h-5 w-5;
+}
+
+/* BLOCO 043 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-sm-font-bold-guh8mp {
+  @apply text-sm font-bold text-white;
+}
+
+/* BLOCO 044 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-0-5-text-11px-q8tnex {
+  @apply mt-0.5 text-[11px] text-slate-500;
+}
+
+/* BLOCO 045 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-inline-flex-items-center-1lhvok6 {
+  @apply inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-3 py-1.5 text-[10px] font-semibold text-emerald-300;
+}
+
+/* BLOCO 046 — estilo de elemento; origem dashboard/index.tsx. */
+.home-h-1-5-w-1-5-1oi5mm2 {
+  @apply h-1.5 w-1.5 rounded-full bg-emerald-400;
+}
+
+/* BLOCO 047 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-grid-grid-cols-3-1zl9b0 {
+  @apply grid grid-cols-3 gap-2 py-4;
+}
+
+/* BLOCO 048 — estilo de elemento; origem dashboard/index.tsx. */
+.home-rounded-xl-border-179z4ba {
+  @apply rounded-xl border border-white/[0.07] bg-white/[0.025] p-3;
+}
+
+/* BLOCO 049 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mb-3-h-4-l3bwym {
+  @apply mb-3 h-4 w-4 text-violet-300;
+}
+
+/* BLOCO 050 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-xs-font-semibold-17knspg {
+  @apply text-xs font-semibold text-white;
+}
+
+/* BLOCO 051 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-1-text-10px-2y7gov {
+  @apply mt-1 text-[10px] text-emerald-300;
+}
+
+/* BLOCO 052 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mb-3-h-4-1lv675i {
+  @apply mb-3 h-4 w-4 text-cyan-300;
+}
+
+/* BLOCO 053 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mb-3-h-4-oy41du {
+  @apply mb-3 h-4 w-4 text-rose-300;
+}
+
+/* BLOCO 054 — estilo de elemento; origem dashboard/index.tsx. */
+.home-rounded-2xl-border-p3l5d7 {
+  @apply rounded-2xl border border-white/[0.08] bg-[#080b14] p-4;
+}
+
+/* BLOCO 055 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-mb-4-flex-u7wj19 {
+  @apply mb-4 flex items-center justify-between;
+}
+
+/* BLOCO 056 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-flex-items-center-1bzl8yv {
+  @apply flex items-center gap-2;
+}
+
+/* BLOCO 057 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-h-4-w-4-g44w5v {
+  @apply h-4 w-4 text-cyan-300;
+}
+
+/* BLOCO 058 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-xs-font-bold-uzvt0p {
+  @apply text-xs font-bold text-slate-200;
+}
+
+/* BLOCO 059 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-10px-text-slate-500-1eumgoz {
+  @apply text-[10px] text-slate-500;
+}
+
+/* BLOCO 060 — estilo de elemento; origem dashboard/index.tsx. */
+.home-space-y-3-1o1kk97 {
+  @apply space-y-3;
+}
+
+/* BLOCO 061 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-flex-gap-3-gwr3e {
+  @apply flex gap-3;
+}
+
+/* BLOCO 062 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-flex-h-8-1ylm08o {
+  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-500/15 text-[10px] font-bold text-violet-200;
+}
+
+/* BLOCO 063 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-min-w-0-flex-1-1hdapse {
+  @apply min-w-0 flex-1 rounded-xl bg-white/[0.04] px-3 py-2.5;
+}
+
+/* BLOCO 064 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-11px-font-semibold-1bx9li4 {
+  @apply text-[11px] font-semibold text-violet-200;
+}
+
+/* BLOCO 065 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-ml-1-font-normal-rkrvrr {
+  @apply ml-1 font-normal text-slate-600;
+}
+
+/* BLOCO 066 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-1-text-xs-1pqlyn8 {
+  @apply mt-1 text-xs text-slate-300;
+}
+
+/* BLOCO 067 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-flex-h-8-nt9194 {
+  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15 text-[10px] font-bold text-cyan-200;
+}
+
+/* BLOCO 068 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-11px-font-semibold-1gw7i7s {
+  @apply text-[11px] font-semibold text-cyan-200;
+}
+
+/* BLOCO 069 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-flex-h-8-srqwnc {
+  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rose-500/15 text-[10px] font-bold text-rose-200;
+}
+
+/* BLOCO 070 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-11px-font-semibold-yatb1c {
+  @apply text-[11px] font-semibold text-rose-200;
+}
+
+/* BLOCO 071 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-mt-4-flex-82gd13 {
+  @apply mt-4 flex items-center gap-3 rounded-xl border border-violet-400/15 bg-violet-400/[0.06] p-3;
+}
+
+/* BLOCO 072 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-flex-h-8-q7qbs0 {
+  @apply flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/15 text-violet-200;
+}
+
+/* BLOCO 073 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-min-w-0-flex-1-1g3oh63 {
+  @apply min-w-0 flex-1;
+}
+
+/* BLOCO 074 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-1-text-10px-1opehuv {
+  @apply mt-1 text-[10px] text-slate-400;
+}
+
+/* BLOCO 075 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-absolute-bottom-5-1dd5p1l {
+  @apply absolute -bottom-5 -left-4 hidden items-center gap-3 rounded-2xl border border-white/10 bg-[#121628]/95 p-3 shadow-xl;
+
+  @variant sm {
+    @apply flex;
+  }
+}
+
+/* BLOCO 076 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-flex-h-10-hrzw8s {
+  @apply flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300;
+}
+
+/* BLOCO 077 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-xs-font-bold-lffhti {
+  @apply text-xs font-bold text-white;
+}
+
+/* BLOCO 078 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-1-text-10px-p8jfb0 {
+  @apply mt-1 text-[10px] text-slate-500;
+}
+
+/* BLOCO 079 — estilo de elemento; origem dashboard/index.tsx. */
+.home-border-y-border-white-0--xoeo62 {
+  @apply border-y border-white/[0.07] bg-white/[0.018];
+}
+
+/* BLOCO 080 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-mx-auto-flex-acefjp {
+  @apply mx-auto flex max-w-7xl flex-col items-center justify-between gap-5 px-5 py-7;
+
+  @variant sm {
+    @apply px-8;
+  }
+
+  @variant md {
+    @apply flex-row;
+  }
+}
+
+/* BLOCO 081 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-left-1kw6lmg {
+  @apply text-center;
+
+  @variant md {
+    @apply text-left;
+  }
+}
+
+/* BLOCO 082 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-10px-font-bold-1vu79y6 {
+  @apply text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500;
+}
+
+/* BLOCO 083 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-1-text-sm-1pppyln {
+  @apply mt-1 text-sm font-semibold text-slate-200;
+}
+
+/* BLOCO 084 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-flex-items-center-1aln8i0 {
+  @apply flex items-center gap-7;
+}
+
+/* BLOCO 085 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-flex-items-center-v1xch9 {
+  @apply flex items-center gap-2 text-sm font-bold text-slate-300;
+}
+
+/* BLOCO 086 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-h-5-w-5-18wa6a3 {
+  @apply h-5 w-5 text-violet-300;
+}
+
+/* BLOCO 087 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-h-5-w-5-wspts4 {
+  @apply h-5 w-5 text-emerald-300;
+}
+
+/* BLOCO 088 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-h-5-w-5-laydjb {
+  @apply h-5 w-5 text-rose-300;
+}
+
+/* BLOCO 089 — estilo de elemento; origem dashboard/index.tsx. */
+.home-mx-auto-max-w-7xl-1gxcbf9 {
+  @apply mx-auto max-w-7xl scroll-mt-24 px-5 py-20;
+
+  @variant sm {
+    @apply px-8 py-28;
+  }
+}
+
+/* BLOCO 090 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mx-auto-max-w-2xl-105m6zu {
+  @apply mx-auto max-w-2xl text-center;
+}
+
+/* BLOCO 091 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-inline-flex-items-center-h4sp8n {
+  @apply inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/[0.06] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-200;
+}
+
+/* BLOCO 092 — estilo de elemento; origem dashboard/index.tsx. */
+.home-h-3-5-w-3-5-mho9dy {
+  @apply h-3.5 w-3.5;
+}
+
+/* BLOCO 093 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-5-text-3xl-1i9zgxq {
+  @apply mt-5 text-3xl font-extrabold tracking-tight text-white;
+
+  @variant sm {
+    @apply text-5xl;
+  }
+}
+
+/* BLOCO 094 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-5-text-sm-1ega81p {
+  @apply mt-5 text-sm leading-7 text-slate-400;
+
+  @variant sm {
+    @apply text-base;
+  }
+}
+
+/* BLOCO 095 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-mt-12-grid-fygkd8 {
+  @apply mt-12 grid gap-4;
+
+  @variant sm {
+    @apply grid-cols-2;
+  }
+
+  @variant lg {
+    @apply grid-cols-4;
+  }
+}
+
+/* BLOCO 096 — estilo de elemento; origem dashboard/index.tsx. */
+.home-rounded-2xl-border-49lope {
+  @apply rounded-2xl border border-white/[0.08] bg-white/[0.025] p-6 transition duration-300;
+
+  @variant hover {
+    @apply -translate-y-1 border-violet-300/25 bg-violet-300/[0.04];
+  }
+}
+
+/* BLOCO 097 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mb-5-flex-1pgn79f {
+  @apply mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-violet-300/15 bg-violet-300/[0.08] text-violet-200 transition;
+
+  @variant group-hover {
+    @apply bg-violet-300/[0.14];
+  }
+}
+
+/* BLOCO 098 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-3-text-xs-12ug7gs {
+  @apply mt-3 text-xs leading-6 text-slate-400;
+}
+
+/* BLOCO 099 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-14-overflow-hidden-lnie0g {
+  @apply mt-14 overflow-hidden rounded-3xl border border-violet-300/15 bg-gradient-to-r from-violet-600/15 via-fuchsia-500/[0.07] to-cyan-500/10 p-7 text-center;
+
+  @variant sm {
+    @apply p-10;
+  }
+}
+
+/* BLOCO 100 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mx-auto-flex-14fa954 {
+  @apply mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] text-cyan-200;
+}
+
+/* BLOCO 101 — estilo de elemento; origem dashboard/index.tsx. */
+.home-h-6-w-6-1wr5v1u {
+  @apply h-6 w-6;
+}
+
+/* BLOCO 102 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-5-text-2xl-11qds3j {
+  @apply mt-5 text-2xl font-extrabold text-white;
+
+  @variant sm {
+    @apply text-3xl;
+  }
+}
+
+/* BLOCO 103 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mx-auto-mt-3-lxs9o4 {
+  @apply mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-400;
+}
+
+/* BLOCO 104 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-6-inline-flex-1bvzh69 {
+  @apply mt-6 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-violet-600/20 transition;
+
+  @variant hover {
+    @apply brightness-110;
+  }
+}
+
+/* BLOCO 105 — estilo de elemento; origem dashboard/index.tsx. */
+.home-border-t-border-white-0--qlvhak {
+  @apply border-t border-white/[0.07] bg-black/20;
+}
+
+/* BLOCO 106 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-mx-auto-grid-s02tki {
+  @apply mx-auto grid max-w-7xl gap-10 px-5 py-16;
+
+  @variant sm {
+    @apply px-8;
+  }
+
+  @variant md {
+    @apply grid-cols-[0.9fr_1.1fr] items-center py-20;
+  }
+}
+
+/* BLOCO 107 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-xs-font-bold-12oqxjo {
+  @apply text-xs font-bold uppercase tracking-[0.2em] text-violet-300;
+}
+
+/* BLOCO 108 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-4-text-3xl-5odoxq {
+  @apply mt-4 text-3xl font-extrabold tracking-tight text-white;
+}
+
+/* BLOCO 109 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-4-max-w-lg-1ywodtv {
+  @apply mt-4 max-w-lg text-sm leading-7 text-slate-400;
+}
+
+/* BLOCO 110 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-grid-gap-3-1w78q0i {
+  @apply grid gap-3;
+
+  @variant sm {
+    @apply grid-cols-2;
+  }
+}
+
+/* BLOCO 111 — estilo de elemento; origem dashboard/index.tsx. */
+.home-rounded-2xl-border-1gl0rtt {
+  @apply rounded-2xl border border-white/[0.08] bg-white/[0.025] p-5;
+}
+
+/* BLOCO 112 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-h-5-w-5-36nguv {
+  @apply h-5 w-5 text-cyan-300;
+}
+
+/* BLOCO 113 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-4-text-sm-j7xluf {
+  @apply mt-4 text-sm font-bold text-white;
+}
+
+/* BLOCO 114 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mt-2-text-xs-20ha15 {
+  @apply mt-2 text-xs leading-6 text-slate-400;
+}
+
+/* BLOCO 115 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-relative-z-10-7w0ncw {
+  @apply relative z-10 border-t border-white/[0.08] bg-[#070910]/80;
+}
+
+/* BLOCO 116 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-mx-auto-flex-14ua9uj {
+  @apply mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-7 text-center;
+
+  @variant sm {
+    @apply px-8;
+  }
+
+  @variant md {
+    @apply flex-row text-left;
+  }
+}
+
+/* BLOCO 117 — estrutura, posicionamento e espaçamento; origem dashboard/index.tsx. */
+.home-flex-h-8-1uzhtbn {
+  @apply flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-cyan-400;
+}
+
+/* BLOCO 118 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-h-4-w-4-1si52f5 {
+  @apply h-4 w-4 text-white;
+}
+
+/* BLOCO 119 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-sm-font-extrabold-1rixhqp {
+  @apply text-sm font-extrabold text-slate-300;
+}
+
+/* BLOCO 120 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-text-xs-text-slate-500-qpnrbx {
+  @apply text-xs text-slate-500;
+}
+
+/* BLOCO 121 — tipografia e aparência; origem dashboard/index.tsx. */
+.home-flex-items-center-yqfmxc {
+  @apply flex items-center gap-4 text-xs text-slate-400;
+}
+
+/* BLOCO 122 — estilo de elemento; origem dashboard/index.tsx. */
+.home-text-white-1j10sj9 {
+  @apply transition;
+
+  @variant hover {
+    @apply text-white;
+  }
+}
+

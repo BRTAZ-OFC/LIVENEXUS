@@ -1,3 +1,4 @@
+/* BLOCO 1 — Gera HTML mínimo para responder a erros inesperados do servidor. */
 function renderErrorPage(): string {
   return `<!doctype html>
 <html lang="pt-BR">
@@ -7,12 +8,15 @@ function renderErrorPage(): string {
 </body></html>`;
 }
 
+/* BLOCO 2 — Define o formato esperado do ponto de entrada TanStack Start. */
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
+/* BLOCO 3 — Guarda a importação do servidor para reutilizar a mesma promessa. */
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
+/* BLOCO 4 — Carrega o módulo de servidor sob demanda. */
 async function getServerEntry(): Promise<ServerEntry> {
   if (!serverEntryPromise) {
     serverEntryPromise = import("@tanstack/react-start/server-entry").then(
@@ -22,6 +26,7 @@ async function getServerEntry(): Promise<ServerEntry> {
   return serverEntryPromise;
 }
 
+/* BLOCO 5 — Encaminha as requisições e devolve resposta de erro em caso de falha. */
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
