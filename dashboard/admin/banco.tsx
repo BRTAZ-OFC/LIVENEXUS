@@ -1,3 +1,4 @@
+/* BLOCO 1 — Imports de rota, ícones e estados da tabela JSON. */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AudioLines,
@@ -13,8 +14,10 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
+/* BLOCO 2 — Registra a rota da tabela administrativa. */
 export const Route = createFileRoute("/admin/banco")({ component: DatabasePage });
 
+/* BLOCO 3 — Tipos dos campos que podem aparecer na tabela de usuários. */
 type UserRow = {
   user_id: string;
   user: string;
@@ -30,6 +33,7 @@ type UserDraft = {
   imagen: string;
 };
 
+/* BLOCO 4 — Helpers para formatar valores, datas e cabeçalhos de autenticação. */
 function displayValue(value: unknown) {
   if (value === null || value === undefined || value === "") return "—";
   const text = String(value);
@@ -55,6 +59,7 @@ function getAuthHeaders(): HeadersInit {
   return headers;
 }
 
+/* BLOCO 5 — Controla seleção de tabelas, registros, edição, exclusão e carregamento. */
 export default function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
   const [selectedTable, setSelectedTable] = useState(() => {
     if (typeof window !== "undefined") {
@@ -80,6 +85,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  // BLOCO 6 — Busca os usuários pela API administrativa sem usar cache.
   async function loadUsers() {
     setLoading(true);
     setError("");
@@ -100,6 +106,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     }
   }
 
+  // BLOCO 7 — Solicita a exclusão e atualiza os registros exibidos.
   async function confirmDelete(userId: string) {
     if (deleting) return;
     setDeleting(true);
@@ -135,6 +142,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     else setLoading(false);
   }, [embedded]);
 
+  // BLOCO 8 — Prepara os valores temporários para editar uma linha.
   function startEditing(row: UserRow) {
     setEditingId(row.user_id);
     setDraft({
@@ -146,6 +154,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     setError("");
   }
 
+  // BLOCO 9 — Envia os campos editados para a API do CRUD.
   async function saveRow(userId: string) {
     if (!draft) return;
     setSaving(true);
@@ -182,13 +191,13 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
 
   if (!embedded && !isAdmin) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#080a13] p-6 text-slate-100">
-        <section className="rounded-xl border border-white/10 bg-[#0d1120] p-6 text-center">
-          <h1 className="text-lg font-bold">Acesso restrito</h1>
-          <p className="mt-2 text-sm text-slate-400">
+      <main className="db-flex-min-h-screen-ejpwfw">
+        <section className="db-rounded-xl-border-1yymjbi">
+          <h1 className="db-text-lg-font-bold-15tkl3f">Acesso restrito</h1>
+          <p className="db-mt-2-text-sm-1qgs8fd">
             O banco de dados está disponível somente para administradores.
           </p>
-          <Link to="/dashboard" className="mt-4 inline-block text-sm font-semibold text-cyan-300">
+          <Link to="/dashboard" className="db-mt-4-inline-block-uyxz30">
             Voltar ao dashboard
           </Link>
         </section>
@@ -200,84 +209,86 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     <div
       className={
         embedded
-          ? "flex min-h-0 w-full bg-[#080a13] text-slate-100"
-          : "flex min-h-screen bg-[#080a13] text-slate-100"
+          ? "db-flex-min-h-0-1yrwjzw"
+          : "db-flex-min-h-screen-axmrk9"
       }
     >
       {!embedded && (
-        <aside className="flex min-h-screen w-44 shrink-0 flex-col border-r border-white/10 bg-[#0b0e19]">
-          <div className="flex h-11 items-center gap-2 border-b border-white/10 px-3">
-            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-violet-500 to-cyan-400">
-              <AudioLines className="h-3 w-3 text-white" />
+        <aside className="db-flex-min-h-screen-18ufx4p">
+          <div className="db-flex-h-11-1nokrch">
+            <span className="db-flex-h-6-rvwoa7">
+              <AudioLines className="db-h-3-w-3-16c88sp" />
             </span>
-            <span className="text-[11px] font-extrabold text-white">LIVENEXUS</span>
+            <span className="db-text-11px-font-extrabold-1tiyd6b">LIVENEXUS</span>
           </div>
-          <nav className="flex flex-col gap-1 border-b border-white/10 p-2">
+            {/* BLOCO 11 — Links de navegação da tabela independente. */}
+        <nav className="db-flex-flex-col-1vt2mhw">
             <Link
               to="/dashboard"
               title="Início"
-              className="flex h-7 items-center gap-2 rounded-md px-2 text-[10px] text-slate-300 transition hover:bg-white/5 hover:text-white"
+              className="db-flex-h-7-1jvyogy"
             >
-              <House className="h-3 w-3 shrink-0" /> Início
+              <House className="db-h-3-w-3-92ylou" /> Início
             </Link>
             <Link
               to="/admin/banco"
               title="Banco de dados"
-              className="flex h-7 items-center gap-2 rounded-md bg-violet-500/15 px-2 text-[10px] font-semibold text-violet-200"
+              className="db-flex-h-7-1yq75cr"
             >
-              <Database className="h-3 w-3 shrink-0" /> Banco de dados
+              <Database className="db-h-3-w-3-92ylou" /> Banco de dados
             </Link>
           </nav>
         </aside>
       )}
-      <aside className="flex w-32 shrink-0 flex-col border-r border-white/10 bg-[#0b0e19]">
-        <div className="border-b border-white/10 px-3 py-3">
-          <p className="text-[9px] font-bold tracking-[0.16em] text-slate-500">TABELAS JSON</p>
+      <aside className="db-flex-w-32-qdsh3g">
+        <div className="db-border-b-border-white-10-15zrj3l">
+          <p className="db-text-9px-font-bold-14dl39j">TABELAS JSON</p>
         </div>
-        <nav className="p-2">
+        <nav className="db-p-2-178lum4">
           <button
             type="button"
             onClick={() => handleSelectTable("usuarios")}
-            className={`flex w-full items-center gap-2 rounded-md px-2 py-2 text-left transition ${selectedTable === "usuarios" ? "bg-violet-500/15 text-violet-200" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}
+            className={`db-flex-w-full-oi8986 ${selectedTable === "usuarios" ? "db-bg-violet-500-15-text-vi-1xm6n2h" : "db-bg-white-5-sdteeg"}`}
           >
-            <Table2 className="h-3.5 w-3.5 shrink-0" />
-            <span className="text-[9px] font-medium">Usuários</span>
+            <Table2 className="db-h-3-5-w-3-5-l2ap6m" />
+            <span className="db-text-9px-font-medium-18gwz7j">Usuários</span>
           </button>
         </nav>
       </aside>
 
-      <main className="min-w-0 flex-1">
+      {/* BLOCO 12 — Área principal da tabela, da edição e das ações CRUD. */}
+      <main className="db-min-w-0-flex-1-1g3oh63">
         {!embedded && (
-          <header className="border-b border-white/10 bg-[#0d1120]/80">
-            <div className="flex w-full items-center justify-between px-6 py-3 sm:px-8">
-              <Link to="/dashboard" className="flex items-center gap-3">
-                <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-violet-500 to-cyan-400">
-                  <AudioLines className="h-3 w-3 text-white" />
+          <header className="db-border-b-border-white-10-7389gy">
+            <div className="db-flex-w-full-1bum737">
+              <Link to="/dashboard" className="db-flex-items-center-1bpln9w">
+                <span className="db-flex-h-6-rvwoa7">
+                  <AudioLines className="db-h-3-w-3-16c88sp" />
                 </span>
-                <span className="text-sm font-extrabold text-white">
-                  LIVE<span className="text-cyan-300">NEXUS</span>
+                <span className="db-text-sm-font-extrabold-26vlbx">
+                  LIVE<span className="db-text-cyan-300-bbfjjq">NEXUS</span>
                 </span>
               </Link>
               <Link
                 to="/dashboard"
-                className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-slate-300 hover:text-white"
+                className="db-inline-flex-items-center-1h04382"
               >
-                <ArrowLeft className="h-3 w-3" /> Voltar ao início
+                <ArrowLeft className="db-h-3-w-3-1s0lck6" /> Voltar ao início
               </Link>
             </div>
           </header>
         )}
 
-        <section className={embedded ? "min-w-0 flex-1 px-1 py-2" : "w-full px-6 py-6 sm:px-8"}>
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <section className={embedded ? "db-min-w-0-flex-1-1pl9mdh" : "db-w-full-px-6-5ebeye"}>
+          <div className="db-flex-flex-wrap-qlnoif">
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-cyan-300">
+              <p className="db-text-9px-font-bold-ukmi15">
                 TABELA SELECIONADA
               </p>
-              <h1 className="mt-1 flex items-center gap-2 text-xl font-extrabold tracking-tight text-white">
-                <Table2 className="h-5 w-5 text-cyan-300" /> Usuários
+              <h1 className="db-mt-1-flex-590iju">
+                <Table2 className="db-h-5-w-5-36nguv" /> Usuários
               </h1>
-              <p className="mt-1 text-[11px] leading-4 text-slate-400">
+              <p className="db-mt-1-text-11px-fgeh1h">
                 Registros da tabela Usuários. Edite os campos na linha e salve as alterações.
               </p>
             </div>
@@ -285,16 +296,16 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
               type="button"
               onClick={() => void loadUsers()}
               disabled={loading || deleting}
-              className="inline-flex items-center gap-1.5 rounded-md border border-white/10 px-2.5 py-1.5 text-[11px] font-semibold text-slate-300 hover:border-white/25 hover:text-white disabled:opacity-50"
+              className="db-inline-flex-items-center-39j1c2"
             >
-              <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} /> Atualizar
+              <RefreshCw className={`db-h-3-w-3-1s0lck6 ${loading ? "db-animate-spin-1steumz" : ""}`} /> Atualizar
             </button>
           </div>
 
           {message && (
             <p
               role="status"
-              className="mt-5 rounded-xl border border-emerald-300/20 bg-emerald-300/[0.06] p-3 text-sm text-emerald-200"
+              className="db-mt-5-rounded-xl-3ntd3c"
             >
               {message}
             </p>
@@ -302,73 +313,74 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
           {error && (
             <p
               role="alert"
-              className="mt-5 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] p-3 text-sm text-amber-100"
+              className="db-mt-5-rounded-xl-13l52ky"
             >
               {error}
             </p>
           )}
 
-          <div className="mt-3 overflow-hidden rounded-lg border border-white/10 bg-[#0d1120]">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-0 table-fixed border-collapse text-left text-[10px]">
-                <thead className="border-b border-white/10 bg-white/[0.03] text-[9px] uppercase tracking-wide text-slate-400">
+          <div className="db-mt-3-overflow-hidden-1sbx6fp">
+            <div className="db-overflow-x-auto-1ytsssi">
+              <table className="db-w-full-min-w-0-ldzfuq">
+                <thead className="db-border-b-border-white-10-1134gff">
                   <tr>
-                    <th className="w-[13%] break-words px-1.5 py-1.5 font-semibold">ID</th>
-                    <th className="px-2.5 py-2 font-semibold">Usuário</th>
-                    <th className="px-2.5 py-2 font-semibold">Role</th>
-                    <th className="px-2.5 py-2 font-semibold">Imagem (URL)</th>
-                    <th className="px-2.5 py-2 font-semibold">Criado em</th>
-                    <th className="px-2.5 py-2 font-semibold">Atualizado em</th>
-                    <th className="px-2.5 py-2 font-semibold">Ações</th>
+                    <th className="db-w-13-break-words-1g87fub">ID</th>
+                    <th className="db-px-2-5-py-2-4bicug">Usuário</th>
+                    <th className="db-px-2-5-py-2-4bicug">Role</th>
+                    <th className="db-px-2-5-py-2-4bicug">Imagem (URL)</th>
+                    <th className="db-px-2-5-py-2-4bicug">Criado em</th>
+                    <th className="db-px-2-5-py-2-4bicug">Atualizado em</th>
+                    <th className="db-px-2-5-py-2-4bicug">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.07]">
+                <tbody className="db-divide-y-divide-white-0--11j827l">
                   {loading && users.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-4 py-10 text-center text-slate-400">
+                      <td colSpan={7} className="db-px-4-py-10-sxzx56">
                         Carregando registros…
                       </td>
                     </tr>
                   )}
                   {!loading && users.length === 0 && !error && (
                     <tr>
-                      <td colSpan={7} className="px-4 py-10 text-center text-slate-400">
+                      <td colSpan={7} className="db-px-4-py-10-sxzx56">
                         A tabela ainda não possui registros.
                       </td>
                     </tr>
                   )}
                   {users.map((row) => {
                     const editing = editingId === row.user_id && draft !== null;
-                    return (
-                      <tr key={row.user_id} className="align-middle hover:bg-white/[0.02]">
+                    // BLOCO 10 — Monta os painéis de dados e os controles CRUD.
+  return (
+                      <tr key={row.user_id} className="db-bg-white-0-02-lcbolw">
                         <td
-                          className="max-w-44 px-2.5 py-2 font-mono text-[10px] text-slate-500"
+                          className="db-max-w-44-px-2-5-1uhmtbx"
                           title={row.user_id}
                         >
                           {displayValue(row.user_id)}
                         </td>
-                        <td className="px-2.5 py-2">
+                        <td className="db-px-2-5-py-2-1not5md">
                           {editing ? (
                             <input
                               value={draft.user}
                               onChange={(event) => setDraft({ ...draft, user: event.target.value })}
                               minLength={3}
                               maxLength={32}
-                              className="w-full min-w-0 rounded-md border border-white/15 bg-black/20 px-1 py-1 text-[10px] text-white outline-none focus:border-cyan-400"
+                              className="db-w-full-min-w-0-1o9jto"
                               aria-label="Nome de usuário"
                             />
                           ) : (
-                            <span className="font-semibold text-white" title={row.user}>
+                            <span className="db-font-semibold-text-white-19kgctp" title={row.user}>
                               {displayValue(row.user)}
                             </span>
                           )}
                         </td>
-                        <td className="px-2.5 py-2">
+                        <td className="db-px-2-5-py-2-1not5md">
                           {editing ? (
                             <select
                               value={draft.role}
                               onChange={(event) => setDraft({ ...draft, role: event.target.value })}
-                              className="w-full min-w-0 rounded-md border border-white/15 bg-[#101525] px-1 py-1 text-[10px] text-white outline-none focus:border-cyan-400"
+                              className="db-w-full-min-w-0-133veqv"
                               aria-label="Role"
                             >
                               <option value="user">user</option>
@@ -376,27 +388,27 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                             </select>
                           ) : (
                             <span
-                              className="rounded-md bg-white/[0.06] px-2 py-1 text-xs text-slate-300"
+                              className="db-rounded-md-bg-white-0-06-sgt1ga"
                               title={row.role ?? "—"}
                             >
                               {displayValue(row.role)}
                             </span>
                           )}
                         </td>
-                        <td className="px-2.5 py-2">
+                        <td className="db-px-2-5-py-2-1not5md">
                           {editing ? (
                             <input
                               value={draft.imagen}
                               onChange={(event) =>
                                 setDraft({ ...draft, imagen: event.target.value })
                               }
-                              className="w-full min-w-0 rounded-md border border-white/15 bg-black/20 px-1 py-1 text-[10px] text-white outline-none focus:border-cyan-400"
+                              className="db-w-full-min-w-0-1o9jto"
                               placeholder="URL opcional"
                               aria-label="URL da imagem"
                             />
                           ) : (
                             <span
-                              className="break-all text-[9px] text-slate-400"
+                              className="db-break-all-text-9px-ol3zkz"
                               title={row.imagen || "—"}
                             >
                               {displayValue(row.imagen)}
@@ -404,27 +416,27 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                           )}
                         </td>
                         <td
-                          className="whitespace-nowrap px-2.5 py-2 text-[10px] text-slate-400"
+                          className="db-whitespace-nowrap-px-2-5-8kbajn"
                           title={formatDate(row.data_criacao)}
                         >
                           {displayValue(formatDate(row.data_criacao))}
                         </td>
                         <td
-                          className="whitespace-nowrap px-2.5 py-2 text-[10px] text-slate-400"
+                          className="db-whitespace-nowrap-px-2-5-8kbajn"
                           title={formatDate(row.data_atualizacao)}
                         >
                           {displayValue(formatDate(row.data_atualizacao))}
                         </td>
-                        <td className="px-2.5 py-2">
+                        <td className="db-px-2-5-py-2-1not5md">
                           {editing ? (
-                            <div className="flex flex-wrap items-center gap-1">
+                            <div className="db-flex-flex-wrap-1k8awxs">
                               <button
                                 type="button"
                                 onClick={() => void saveRow(row.user_id)}
                                 disabled={saving}
-                                className="inline-flex max-w-full items-center justify-center gap-1 rounded-md bg-cyan-500/15 px-1.5 py-1 text-[9px] font-semibold text-cyan-200 hover:bg-cyan-500/25 disabled:opacity-50"
+                                className="db-inline-flex-max-w-full-108qdn7"
                               >
-                                <Save className="h-3.5 w-3.5" /> {saving ? "Salvando" : "Salvar"}
+                                <Save className="db-h-3-5-w-3-5-mho9dy" /> {saving ? "Salvando" : "Salvar"}
                               </button>
                               <button
                                 type="button"
@@ -433,21 +445,21 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                                   setDraft(null);
                                 }}
                                 disabled={saving}
-                                className="rounded-lg border border-white/10 p-2 text-slate-400 hover:text-white"
+                                className="db-rounded-lg-border-ffggg6"
                                 aria-label="Cancelar edição"
                               >
-                                <X className="h-4 w-4" />
+                                <X className="db-h-4-w-4-3ulyf2" />
                               </button>
                             </div>
                           ) : (
-                            <div className="flex flex-wrap items-center gap-1.5">
+                            <div className="db-flex-flex-wrap-agiabx">
                               <button
                                 type="button"
                                 onClick={() => startEditing(row)}
                                 disabled={deleting}
-                                className="inline-flex max-w-full items-center justify-center gap-1 rounded-md border border-white/10 px-2 py-1 text-[9px] font-semibold text-slate-300 hover:border-violet-400/40 hover:text-white disabled:opacity-50"
+                                className="db-inline-flex-max-w-full-1710mde"
                               >
-                                <Pencil className="h-3.5 w-3.5" /> Editar
+                                <Pencil className="db-h-3-5-w-3-5-mho9dy" /> Editar
                               </button>
                               <button
                                 type="button"
@@ -457,10 +469,10 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                                   setUserToDelete(row);
                                 }}
                                 disabled={deleting}
-                                className="inline-flex max-w-full items-center justify-center gap-1 rounded-md border border-rose-500/25 bg-rose-500/10 px-2 py-1 text-[9px] font-semibold text-rose-300 hover:border-rose-500/40 hover:bg-rose-500/20 disabled:opacity-50"
+                                className="db-inline-flex-max-w-full-13vi12l"
                                 title={`Excluir usuário ${row.user}`}
                               >
-                                <Trash2 className="h-3.5 w-3.5" /> Excluir
+                                <Trash2 className="db-h-3-5-w-3-5-mho9dy" /> Excluir
                               </button>
                             </div>
                           )}
@@ -472,7 +484,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
               </table>
             </div>
           </div>
-          <p className="mt-2 text-[10px] leading-4 text-slate-500">
+          <p className="db-mt-2-text-10px-15p4c0e">
             Senhas e hashes não são exibidos na tabela. As alterações são gravadas no arquivo JSON
             pelo servidor.
           </p>
@@ -482,32 +494,32 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
               role="dialog"
               aria-modal="true"
               aria-labelledby="delete-dialog-title"
-              className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-xs"
+              className="db-fixed-inset-0-cet2d5"
             >
-              <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0d1120] p-6 shadow-2xl">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400">
-                    <Trash2 className="h-5 w-5" />
+              <div className="db-w-full-max-w-md-9gxz7l">
+                <div className="db-flex-items-center-1bpln9w">
+                  <span className="db-flex-h-10-s20i5t">
+                    <Trash2 className="db-h-5-w-5-sv0uoi" />
                   </span>
                   <div>
-                    <h2 id="delete-dialog-title" className="text-base font-bold text-white">
+                    <h2 id="delete-dialog-title" className="db-text-base-font-bold-1au4nai">
                       Confirmar exclusão
                     </h2>
-                    <p className="text-xs text-slate-400">Esta ação não poderá ser desfeita.</p>
+                    <p className="db-text-xs-text-slate-400-1qmab5e">Esta ação não poderá ser desfeita.</p>
                   </div>
                 </div>
-                <p className="mt-4 text-xs leading-5 text-slate-300">
+                <p className="db-mt-4-text-xs-1p2vnyp">
                   Deseja realmente excluir o usuário{" "}
-                  <strong className="font-semibold text-white">"{userToDelete.user}"</strong> (ID:{" "}
-                  <span className="font-mono text-slate-400">{userToDelete.user_id}</span>)? O
+                  <strong className="db-font-semibold-text-white-19kgctp">"{userToDelete.user}"</strong> (ID:{" "}
+                  <span className="db-font-mono-text-slate-400-2q6jsq">{userToDelete.user_id}</span>)? O
                   registro será removido permanentemente do arquivo JSON.
                 </p>
-                <div className="mt-6 flex justify-end gap-2.5">
+                <div className="db-mt-6-flex-t4d3go">
                   <button
                     type="button"
                     onClick={() => setUserToDelete(null)}
                     disabled={deleting}
-                    className="rounded-lg border border-white/10 px-3.5 py-2 text-xs font-semibold text-slate-300 hover:border-white/20 hover:bg-white/5 hover:text-white disabled:opacity-50"
+                    className="db-rounded-lg-border-8ndnc"
                   >
                     Cancelar
                   </button>
@@ -515,15 +527,15 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     type="button"
                     onClick={() => void confirmDelete(userToDelete.user_id)}
                     disabled={deleting}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-rose-500 disabled:opacity-50"
+                    className="db-inline-flex-items-center-i4nxas"
                   >
                     {deleting ? (
                       <>
-                        <RefreshCw className="h-3.5 w-3.5 animate-spin" /> Excluindo...
+                        <RefreshCw className="db-h-3-5-w-3-5-172mrj8" /> Excluindo...
                       </>
                     ) : (
                       <>
-                        <Trash2 className="h-3.5 w-3.5" /> Excluir usuário
+                        <Trash2 className="db-h-3-5-w-3-5-mho9dy" /> Excluir usuário
                       </>
                     )}
                   </button>

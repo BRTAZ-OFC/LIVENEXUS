@@ -1,0 +1,82 @@
+/* RESPONSABILIDADE: shell global, aparência do documento e página 404. */
+
+/* BLOCO 001 — tipografia e aparência; origem dashboard/__root.tsx. */
+.app-body {
+  @apply min-h-screen bg-[#090d16] text-slate-100 antialiased;
+
+  @variant selection {
+    @apply bg-indigo-500 text-white;
+  }
+}
+
+/* BLOCO 002 — tipografia e aparência; origem dashboard/__root.tsx. */
+.not-found-page {
+  @apply flex min-h-screen items-center justify-center bg-[#080a13] p-6 text-slate-100;
+}
+
+/* BLOCO 003 — tipografia e aparência; origem dashboard/__root.tsx. */
+.not-found-card {
+  @apply w-full max-w-md rounded-2xl border border-white/10 bg-[#0d1120] p-8 text-center shadow-2xl;
+}
+
+/* BLOCO 004 — estrutura e estilo da página; origem dashboard/__root.tsx. */
+.not-found-brand-mark {
+  @apply mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400;
+}
+
+/* BLOCO 005 — tipografia e aparência; origem dashboard/__root.tsx. */
+.shell-h-7-w-7-13cuvnl {
+  @apply h-7 w-7 text-white;
+}
+
+/* BLOCO 006 — tipografia e aparência; origem dashboard/__root.tsx. */
+.not-found-eyebrow {
+  @apply mt-6 text-xs font-bold uppercase tracking-[0.2em] text-cyan-400;
+}
+
+/* BLOCO 007 — tipografia e aparência; origem dashboard/__root.tsx. */
+.not-found-title {
+  @apply mt-2 text-2xl font-extrabold text-white;
+
+  @variant sm {
+    @apply text-3xl;
+  }
+}
+
+/* BLOCO 008 — tipografia e aparência; origem dashboard/__root.tsx. */
+.not-found-description {
+  @apply mt-3 text-sm leading-6 text-slate-400;
+}
+
+/* BLOCO 009 — estrutura e estilo da página; origem dashboard/__root.tsx. */
+.not-found-actions {
+  @apply mt-6 flex flex-col gap-3;
+
+  @variant sm {
+    @apply flex-row justify-center;
+  }
+}
+
+/* BLOCO 010 — tipografia e aparência; origem dashboard/__root.tsx. */
+.button-primary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition;
+
+  @variant hover {
+    @apply bg-violet-500;
+  }
+}
+
+/* BLOCO 011 — estrutura e estilo da página; origem dashboard/__root.tsx. */
+.shell-h-4-w-4-3ulyf2 {
+  @apply h-4 w-4;
+}
+
+/* BLOCO 012 — tipografia e aparência; origem dashboard/__root.tsx. */
+.button-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-slate-300 transition;
+
+  @variant hover {
+    @apply bg-white/10 text-white;
+  }
+}
+

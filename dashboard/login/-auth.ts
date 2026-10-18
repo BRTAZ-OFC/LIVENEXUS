@@ -1,11 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { setResponseHeader } from "@tanstack/react-start/server";
 
+/* BLOCO 1 — Estrutura dos dados enviados às funções seguras de autenticação. */
 type Credentials = {
   user: string;
   password: string;
 };
 
+/* BLOCO 2 — Cadastro no servidor: grava usuário via CRUD JSON e omite senha no retorno. */
 export const registerUser = createServerFn({ method: "POST" })
   .validator((data: Credentials) => data)
   .handler(async ({ data }) => {
@@ -22,6 +24,7 @@ export const registerUser = createServerFn({ method: "POST" })
     }
   });
 
+/* BLOCO 3 — Login no servidor: valida credenciais, cria token e define cookie de sessão. */
 export const loginUser = createServerFn({ method: "POST" })
   .validator((data: Credentials) => data)
   .handler(async ({ data }) => {

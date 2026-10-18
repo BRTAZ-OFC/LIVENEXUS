@@ -1,5 +1,6 @@
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
 
+/* BLOCO 1 — Monta uma página HTML de contingência para erros. */
 function renderErrorPage(): string {
   return `<!doctype html>
 <html lang="pt-BR">
@@ -9,6 +10,7 @@ function renderErrorPage(): string {
 </body></html>`;
 }
 
+/* BLOCO 2 — Trata exceções ocorridas durante o processamento da requisição. */
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
     return await next();
@@ -24,10 +26,12 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   }
 });
 
+/* BLOCO 3 — Ativa a proteção CSRF nas funções do servidor. */
 const csrfMiddleware = createCsrfMiddleware({
   filter: (context) => context.handlerType === "serverFn",
 });
 
+/* BLOCO 4 — Exporta a configuração de middleware da aplicação. */
 export const startInstance = createStart(() => ({
   requestMiddleware: [errorMiddleware, csrfMiddleware],
 }));

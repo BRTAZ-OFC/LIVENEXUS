@@ -8,8 +8,10 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+// BLOCO 1 — Resolve o caminho físico do arquivo JSON de usuários.
 const USERS_FILE = resolve(dirname(fileURLToPath(import.meta.url)), "json", "usuario.json");
 
+// BLOCO 2 — Lê usuario.json e valida que o conteúdo é uma lista.
 async function readUsers() {
   try {
     const parsed = JSON.parse(await readFile(USERS_FILE, "utf8"));
@@ -21,6 +23,7 @@ async function readUsers() {
   }
 }
 
+// BLOCO 3 — Cria a pasta, quando necessário, e persiste a lista no JSON.
 async function writeUsers(users) {
   await mkdir(dirname(USERS_FILE), { recursive: true });
   await writeFile(USERS_FILE, JSON.stringify(users, null, 2) + "\n", {
@@ -30,12 +33,14 @@ async function writeUsers(users) {
   });
 }
 
+// BLOCO 4 — Armazena senha como hash scrypt com salt, nunca em texto puro.
 function hashPassword(password) {
   const salt = randomBytes(16).toString("hex");
   const hash = scryptSync(password, salt, 64).toString("hex");
   return `scrypt:${salt}:${hash}`;
 }
 
+// BLOCO 5 — Compara a senha enviada ao hash salvo sem comparação insegura de strings.
 export function verifyPassword(password, storedHash) {
   if (typeof password !== "string" || typeof storedHash !== "string") return false;
   const parts = storedHash.split(":");
@@ -49,10 +54,12 @@ export function verifyPassword(password, storedHash) {
   }
 }
 
+// BLOCO 6 — Lista registros removendo password antes de devolver os dados.
 export async function listUsers() {
   return (await readUsers()).map(({ password, ...user }) => user);
 }
 
+// BLOCO 7 — Busca um usuário por ID sem revelar sua senha.
 export async function getUserById(user_id) {
   const user = (await readUsers()).find((item) => item.user_id === user_id);
   if (!user) return null;
@@ -60,6 +67,7 @@ export async function getUserById(user_id) {
   return safeUser;
 }
 
+// BLOCO 8 — Confere se o nome já existe ignorando espaços externos e maiúsculas.
 export async function usernameExists(user) {
   if (typeof user !== "string") return false;
   const normalized = user.trim().toLowerCase();
@@ -67,6 +75,7 @@ export async function usernameExists(user) {
   return (await readUsers()).some((item) => item.user.toLowerCase() === normalized);
 }
 
+// BLOCO 9 — Valida campos, evita nomes duplicados e grava um usuário novo.
 export async function createUser({ user, password, imagen = null, role = "user" }) {
   if (typeof user !== "string" || user.trim().length < 3 || user.trim().length > 32) {
     throw new Error("O usuário deve ter entre 3 e 32 caracteres.");
@@ -97,6 +106,7 @@ export async function createUser({ user, password, imagen = null, role = "user" 
   return safeUser;
 }
 
+// BLOCO 10 — Valida campos permitidos e atualiza a data de alteração.
 export async function updateUser(user_id, changes = {}) {
   const users = await readUsers();
   const index = users.findIndex((item) => item.user_id === user_id);
@@ -138,6 +148,7 @@ export async function updateUser(user_id, changes = {}) {
   return safeUser;
 }
 
+// BLOCO 11 — Remove o registro e impede apagar o único administrador.
 export async function deleteUser(user_id) {
   const users = await readUsers();
   const targetId = String(user_id ?? "").trim();
@@ -154,6 +165,7 @@ export async function deleteUser(user_id) {
   return true;
 }
 
+// BLOCO 12 — Localiza o usuário e verifica a senha para liberar o login.
 export async function authenticateUser(user, password) {
   const record = (await readUsers()).find(
     (item) => item.user.toLowerCase() === String(user).trim().toLowerCase(),

@@ -1,3 +1,4 @@
+/* BLOCO 1 — Imports do roteador, ícones e folha de estilos global. */
 import {
   Outlet,
   createRootRouteWithContext,
@@ -9,6 +10,7 @@ import type { ReactNode } from "react";
 import { AudioLines, ArrowLeft, House } from "lucide-react";
 import appCss from "./css/styles.css?url";
 
+/* BLOCO 2 — Define metadados, CSS global e componentes raiz da aplicação. */
 export const Route = createRootRouteWithContext()({
   head: () => ({
     meta: [
@@ -35,13 +37,14 @@ export const Route = createRootRouteWithContext()({
   notFoundComponent: NotFoundComponent,
 });
 
+/* BLOCO 3 — Cria documento HTML em pt-BR e aplica o shell compartilhado. */
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR" className="dark">
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen bg-[#090d16] text-slate-100 antialiased selection:bg-indigo-500 selection:text-white">
+      <body className="app-body">
         {children}
         <Scripts />
       </body>
@@ -49,36 +52,39 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+/* BLOCO 4 — Renderiza a rota atual dentro do documento raiz. */
 function RootComponent() {
   return <Outlet />;
 }
 
+/* BLOCO 5 — Renderiza uma tela de erro quando a rota não existe. */
 function NotFoundComponent() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#080a13] p-6 text-slate-100">
-      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#0d1120] p-8 text-center shadow-2xl">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-400">
-          <AudioLines className="h-7 w-7 text-white" />
+    <main className="not-found-page">
+      <div className="not-found-card">
+        {/* BLOCO 6 — Marca, mensagem e navegação de retorno da página 404. */}
+        <div className="not-found-brand-mark">
+          <AudioLines className="shell-h-7-w-7-13cuvnl" />
         </div>
-        <p className="mt-6 text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">Erro 404</p>
-        <h1 className="mt-2 text-2xl font-extrabold text-white sm:text-3xl">
+        <p className="not-found-eyebrow">Erro 404</p>
+        <h1 className="not-found-title">
           Página não encontrada
         </h1>
-        <p className="mt-3 text-sm leading-6 text-slate-400">
+        <p className="not-found-description">
           A rota solicitada não existe ou foi movida. Verifique o endereço e tente novamente.
         </p>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+        <div className="not-found-actions">
           <Link
             to="/dashboard"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-500"
+            className="button-primary"
           >
-            <House className="h-4 w-4" /> Ir para o Início
+            <House className="shell-h-4-w-4-3ulyf2" /> Ir para o Início
           </Link>
           <Link
             to="/"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
+            className="button-secondary"
           >
-            <ArrowLeft className="h-4 w-4" /> Voltar
+            <ArrowLeft className="shell-h-4-w-4-3ulyf2" /> Voltar
           </Link>
         </div>
       </div>
