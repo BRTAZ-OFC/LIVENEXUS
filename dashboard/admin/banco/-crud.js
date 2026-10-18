@@ -139,6 +139,12 @@ export async function deleteUser(user_id) {
   const users = await readUsers();
   const index = users.findIndex((item) => item.user_id === user_id);
   if (index < 0) return false;
+  if (users[index].role === "admin") {
+    const adminCount = users.filter((item) => item.role === "admin").length;
+    if (adminCount <= 1) {
+      throw new Error("Não é possível excluir o único administrador do sistema.");
+    }
+  }
   users.splice(index, 1);
   await writeUsers(users);
   return true;

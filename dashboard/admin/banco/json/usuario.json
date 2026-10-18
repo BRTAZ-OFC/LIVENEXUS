@@ -6,6 +6,15 @@
     "password": "scrypt:496c75123eada9bb9b5a806b652a85d5:65d35b9cab4ace52d9009be490ad75ad066e996276b3d4cd606d18dd95e5ab04046b313197bef82b773a98dbee24780c6c6dfcdd9118c7518906b056f046f47b",
     "imagen": null,
     "data_criacao": "2026-10-16T13:40:09.418Z",
-    "data_atualizacao": "2026-10-16T13:40:09.418Z"
+    "data_atualizacao": "2026-10-18T22:03:05.342Z"
+  },
+  {
+    "user_id": "ca10f56b-571e-4418-8ecf-65192e7d6695",
+    "user": "brtaz",
+    "role": "admin",
+    "password": "scrypt:1fd58217189f9eab2219f75e6cffe6e9:7e2a5ab2d90f5e934658ca570002ae564e1519fc1559a85ca645a659db755d862847730c43bb614973b1fe58e891d626606441eaf5258ba510070cb41f1de3fd",
+    "imagen": null,
+    "data_criacao": "2026-10-18T22:02:28.327Z",
+    "data_atualizacao": "2026-10-18T22:25:47.618Z"
   }
 ]

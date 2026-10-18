@@ -38,7 +38,10 @@ export function createSessionCookie(user: { user_id: string; role?: string }) {
 export function readSession(request: Request): Session | null {
   try {
     const cookieHeader = request.headers.get("cookie") ?? "";
-    const entry = cookieHeader.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${COOKIE_NAME}=`));
+    const entry = cookieHeader
+      .split(";")
+      .map((part) => part.trim())
+      .find((part) => part.startsWith(`${COOKIE_NAME}=`));
     if (!entry) return null;
     const value = entry.slice(COOKIE_NAME.length + 1);
     const separator = value.lastIndexOf(".");
@@ -48,7 +51,12 @@ export function readSession(request: Request): Session | null {
     const expected = Buffer.from(signature(payload));
     if (supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) return null;
     const session = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as Session;
-    if (!session.user_id || (session.role !== "admin" && session.role !== "user") || session.exp <= Math.floor(Date.now() / 1000)) return null;
+    if (
+      !session.user_id ||
+      (session.role !== "admin" && session.role !== "user") ||
+      session.exp <= Math.floor(Date.now() / 1000)
+    )
+      return null;
     return session;
   } catch {
     return null;
@@ -60,5 +68,8 @@ export function clearSessionCookie() {
 }
 
 export function adminOnlyResponse() {
-  return Response.json({ ok: false, message: "Acesso permitido somente para administradores." }, { status: 403 });
+  return Response.json(
+    { ok: false, message: "Acesso permitido somente para administradores." },
+    { status: 403 },
+  );
 }

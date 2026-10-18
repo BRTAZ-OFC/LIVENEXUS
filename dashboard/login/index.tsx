@@ -17,7 +17,8 @@ function LoginPage() {
     try {
       const result = await loginUser({ data: { user, password } });
       if (result.ok) {
-        if (typeof window !== "undefined") sessionStorage.setItem("livenexus_role", result.user.role ?? "user");
+        if (typeof window !== "undefined")
+          sessionStorage.setItem("livenexus_role", result.user.role ?? "user");
         setPassword("");
         await navigate({ to: "/dashboard" });
         return;
@@ -26,7 +27,11 @@ function LoginPage() {
     } catch (error) {
       console.error("[LiveNexus] Falha no login:", error);
       const detail =
-        error instanceof Error ? error.message : typeof error === "string" ? error : JSON.stringify(error);
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : JSON.stringify(error);
       setMessage(`Diagnóstico do login: ${detail || "Erro sem mensagem retornada pelo servidor."}`);
     }
   }
