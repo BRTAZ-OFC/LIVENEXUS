@@ -29,6 +29,7 @@ import {
   validateBioProof,
   revokeBioProof,
   listBioConnections,
+  getBioConnectionStatus,
 } from "./dashboard/conexao/Connection_channel-verify.js";
 
 /* Configure SESSION_SECRET na hospedagem para preservar as sessões entre reinicializações. */
@@ -471,11 +472,102 @@ app.get("/api/channel-verify/connections", async (req: Request, res: Response) =
   }
 });
 
+/* Compatibilidade com as rotas de verificação já existentes no LIVENEXUS. */
+app.get("/api/channel-verify", (_req: Request, res: Response) => {
+  return res.set(NO_CACHE).json({
+    ok: true,
+    service: "channel-verify",
+    storage: "json",
+    endpoints: [
+      "POST /api/channel-verify/challenge",
+      "POST /api/channel-verify/challenge/reemit",
+      "POST /api/channel-verify/verify/twitch",
+      "POST /api/channel-verify/verify/kick",
+      "POST /api/channel-verify/verify/youtube",
+      "POST /api/channel-verify/validate-proof",
+      "POST /api/channel-verify/revoke",
+      "GET /api/channel-verify/connections",
+    ],
+  });
+});
+
+/* Rotas antigas continuam aceitas, mas agora usam o mesmo JSON. */
+app.post("/api/connections/bio/challenge", async (req: Request, res: Response) => {
+  const userId = getAuthenticatedBioUser(req, res);
+  if (!userId) return;
+  try {
+    const result = await createBioChallenge(
+      userId,
+      req.body?.["platform"],
+      req.body?.["channel"],
+    );
+    return res.set(NO_CACHE).json({
+      ok: true,
+      challengeId: result.challengeId,
+      challengeKey: result.challengeKey,
+      code: result.verificationCode,
+      verificationCode: result.verificationCode,
+      channelIdentifier: result.channelIdentifier,
+      expiresInSeconds: 1800,
+      message: "Publique o código na bio/descrição pública do canal.",
+    });
+  } catch (error) {
+    return sendBioVerifyError(res, error, "Não foi possível gerar o código de verificação.");
+  }
+});
+
+app.post("/api/connections/bio/verify", async (req: Request, res: Response) => {
+  const userId = getAuthenticatedBioUser(req, res);
+  if (!userId) return;
+  try {
+    const platform = String(req.body?.["platform"] ?? "");
+    const channel = typeof req.body?.["channel"] === "string" ? req.body["channel"] : undefined;
+    const result = await verifyBioChallenge(
+      userId,
+      platform,
+      String(req.body?.["challengeId"] ?? ""),
+      channel,
+    );
+    return res.set(NO_CACHE).json({
+      ok: true,
+      verified: true,
+      platform: result.platform,
+      channel: result.channelIdentifier,
+      channelIdentifier: result.channelIdentifier,
+      channelUrl: result.channelUrl,
+      verifiedAt: result.verifiedAt,
+      verificationProof: result.verificationProof,
+      challengeKey: result.challengeKey,
+      message: "Propriedade do canal confirmada.",
+    });
+  } catch (error) {
+    return sendBioVerifyError(res, error, "Não foi possível validar a plataforma agora.");
+  }
+});
+
+app.post("/api/connections/bio/status", async (req: Request, res: Response) => {
+  const userId = getAuthenticatedBioUser(req, res);
+  if (!userId) return;
+  try {
+    const result = await getBioConnectionStatus(
+      userId,
+      req.body?.["platform"],
+      String(req.body?.["channel"] ?? ""),
+    );
+    return res.set(NO_CACHE).json({ ok: true, ...result });
+  } catch (error) {
+    return sendBioVerifyError(res, error, "Não foi possível consultar a verificação do canal.");
+  }
+});
+
 /* API desconhecida retorna JSON em vez da página HTML. */
-app.all(/^\/api(?:\/.*)?$/, (_req: Request, res: Response) => {
-  return res.status(404).json({
+app.all(/^\/api(?:\/.*)?$/, (req: Request, res: Response) => {
+  console.warn(`[API 404] ${req.method} ${req.originalUrl}`);
+  return res.status(404).set(NO_CACHE).json({
     ok: false,
     message: "Endpoint da API não encontrado.",
+    method: req.method,
+    endpoint: req.originalUrl,
   });
 });
 

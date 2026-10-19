@@ -326,7 +326,7 @@ export async function reemitBioChallenge(userId, challengeKey) {
   return challengeResponse(challenge);
 }
 
-export async function verifyBioChallenge(userId, platformInput, challengeId) {
+export async function verifyBioChallenge(userId, platformInput, challengeId, channelInput) {
   const platform = normalizePlatform(platformInput);
   if (typeof challengeId !== "string" || !challengeId.trim()) {
     throw new ChannelVerifyError("Tentativa inválida.", 400);
@@ -351,6 +351,13 @@ export async function verifyBioChallenge(userId, platformInput, challengeId) {
     row.attempts = Number(row.attempts || 0) + 1;
     return { ...row };
   });
+
+  if (typeof channelInput === "string" && channelInput.trim()) {
+    const requestedProfile = resolveBioProfile(platform, channelInput);
+    if (requestedProfile.channelIdentifier.toLowerCase() !== challenge.channelIdentifier.toLowerCase()) {
+      throw new ChannelVerifyError("O canal informado não corresponde ao código gerado.", 400);
+    }
+  }
 
   let bio;
   try {
@@ -473,6 +480,24 @@ export async function revokeBioProof(userId, verificationProof, challengeKey) {
   });
 
   return { ok: true };
+}
+
+export async function getBioConnectionStatus(userId, platformInput, channelInput) {
+  const profile = resolveBioProfile(platformInput, channelInput);
+  const rows = await readRows();
+  const connection = rows.find(
+    (row) => row?.recordType === "connection" &&
+      row.user_id === userId &&
+      row.platform === profile.platform &&
+      row.channelIdentifier.toLowerCase() === profile.channelIdentifier.toLowerCase() &&
+      row.status === "verified",
+  );
+  return {
+    verified: Boolean(connection),
+    platform: profile.platform,
+    channel: profile.channelIdentifier,
+    channelIdentifier: profile.channelIdentifier,
+  };
 }
 
 export async function listBioConnections(userId) {
