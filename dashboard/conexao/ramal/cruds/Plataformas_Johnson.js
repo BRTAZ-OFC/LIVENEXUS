@@ -9,92 +9,165 @@ const CONNECTIONS_FILE = resolve(
   "json",
   "conect-plataform.json",
 );
-const ALLOWED_PLATFORMS = new Set(["youtube", "twitch", "kick"]);
 
-async function readConnections() {
+function validateUserId(userId) {
+  if (typeof userId !== "string" || !userId.trim()) {
+    throw new Error("Usuário não identificado.");
+  }
+  return userId.trim();
+}
+
+async function readDatabase() {
   try {
     const parsed = JSON.parse(await readFile(CONNECTIONS_FILE, "utf8"));
-    if (!Array.isArray(parsed)) {
-      throw new Error("conect-plataform.json precisa conter uma lista de conexões.");
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("Formato inválido em conect-plataform.json; esperado objeto indexado por user_id.");
     }
     return parsed;
   } catch (error) {
-    if (error?.code === "ENOENT") return [];
+    if (error?.code === "ENOENT") return {};
     throw error;
   }
 }
 
-export async function listUserPlatforms(user_id) {
-  const ownerId = String(user_id ?? "").trim();
-  if (!ownerId) return [];
-  return (await readConnections()).filter((item) => item.user_id === ownerId);
+function consolidatedRecord(records, userId) {
+  if (!Array.isArray(records) || records.length === 0) return null;
+  const source = records.find((record) => record && typeof record === "object") || null;
+  if (!source) return null;
+  return {
+    id: source.id || randomUUID(),
+    user_id: userId,
+    youtube: source.youtube ?? null,
+    youtube_code: source.youtube_code ?? null,
+    youtube_status: source.youtube_status ?? null,
+    twitch: source.twitch ?? null,
+    twitch_code: source.twitch_code ?? null,
+    twitch_status: source.twitch_status ?? null,
+    kick: source.kick ?? null,
+    kick_code: source.kick_code ?? null,
+    kick_status: source.kick_status ?? null,
+    ...Object.fromEntries(
+      Object.entries(source).filter(([key]) =>
+        !["id", "user_id", "youtube", "youtube_code", "youtube_status", "twitch", "twitch_code", "twitch_status", "kick", "kick_code", "kick_status"].includes(key),
+      ),
+    ),
+  };
 }
 
-export async function saveUserPlatform(user_id, input = {}) {
-  const ownerId = String(user_id ?? "").trim();
-  const platform = String(input.platform ?? "").trim().toLowerCase();
-  const channelId = String(input.channel_id ?? "").trim();
-  const channelName = String(input.channel_name ?? "").trim();
-  const channelUrl = String(input.channel_url ?? "").trim();
+function upsertRecord(existing, userId, data = {}) {
+  const record = existing || {
+    id: randomUUID(),
+    user_id: userId,
+    youtube: null,
+    youtube_code: null,
+    youtube_status: null,
+    twitch: null,
+    twitch_code: null,
+    twitch_status: null,
+    kick: null,
+    kick_code: null,
+    kick_status: null,
+  };
+  record.user_id = userId;
+  const platform = String(data.platform ?? "").trim().toLowerCase();
+  const channel = data.channel_name ?? data.channel_id ?? data.channel_handle ?? data.channel;
+  const code = data.verification_code ?? data.bio_link_code ?? data.code;
 
-  if (!ownerId) throw new Error("Usuário autenticado inválido.");
-  if (!ALLOWED_PLATFORMS.has(platform)) throw new Error("Plataforma inválida.");
-  if (!channelId || channelId.length > 256) throw new Error("Identificador do canal inválido.");
-  if (!channelName || channelName.length > 120) throw new Error("Nome do canal inválido.");
-  if (channelUrl.length > 2048) throw new Error("URL do canal inválida.");
-
-  return withFileQueue(CONNECTIONS_FILE, async () => {
-    const connections = await readConnections();
-    const now = new Date().toISOString();
-    const index = connections.findIndex(
-      (item) =>
-        item.user_id === ownerId &&
-        item.platform === platform &&
-        item.channel_id.toLowerCase() === channelId.toLowerCase(),
-    );
-
-    if (index >= 0) {
-      const updated = {
-        ...connections[index],
-        channel_name: channelName,
-        channel_url: channelUrl,
-        updated_at: now,
-      };
-      connections[index] = updated;
-      await writeJsonAtomically(CONNECTIONS_FILE, connections);
-      return updated;
+  if (platform === "youtube" || platform === "yt") {
+    if (channel !== undefined) record.youtube = channel || null;
+    if (code !== undefined) record.youtube_code = code || null;
+    if (data.status !== undefined) record.youtube_status = data.status;
+  } else if (platform === "twitch") {
+    if (channel !== undefined) record.twitch = channel || null;
+    if (code !== undefined) record.twitch_code = code || null;
+    if (data.status !== undefined) record.twitch_status = data.status;
+  } else if (platform === "kick") {
+    if (channel !== undefined) record.kick = channel || null;
+    if (code !== undefined) record.kick_code = code || null;
+    if (data.status !== undefined) record.kick_status = data.status;
+  } else {
+    for (const field of ["youtube", "youtube_code", "youtube_status", "twitch", "twitch_code", "twitch_status", "kick", "kick_code", "kick_status"]) {
+      if (data[field] !== undefined) record[field] = data[field];
     }
+  }
 
-    const record = {
-      connection_id: randomUUID(),
-      user_id: ownerId,
-      platform,
-      channel_id: channelId,
-      channel_name: channelName,
-      channel_url: channelUrl,
-      status: "pending",
-      created_at: now,
-      updated_at: now,
-    };
-    connections.push(record);
-    await writeJsonAtomically(CONNECTIONS_FILE, connections);
-    return record;
-  });
+  for (const [field, value] of Object.entries(data)) {
+    if (["id", "user_id", "platform", "channel_name", "channel_id", "channel_handle", "verification_code", "bio_link_code", "code"].includes(field)) continue;
+    if (value !== undefined && !["youtube", "youtube_code", "youtube_status", "twitch", "twitch_code", "twitch_status", "kick", "kick_code", "kick_status"].includes(field)) {
+      record[field] = value;
+    }
+  }
+  return record;
 }
 
-export async function deleteUserPlatform(user_id, connection_id) {
-  const ownerId = String(user_id ?? "").trim();
-  const connectionId = String(connection_id ?? "").trim();
-  if (!ownerId || !connectionId) return false;
+export const PlataformasJohnson = {
+  async list(userId) {
+    const ownerId = validateUserId(userId);
+    const db = await readDatabase();
+    const record = consolidatedRecord(db[ownerId], ownerId);
+    return record ? [record] : [];
+  },
 
-  return withFileQueue(CONNECTIONS_FILE, async () => {
-    const connections = await readConnections();
-    const index = connections.findIndex(
-      (item) => item.user_id === ownerId && item.connection_id === connectionId,
-    );
-    if (index < 0) return false;
-    connections.splice(index, 1);
-    await writeJsonAtomically(CONNECTIONS_FILE, connections);
-    return true;
-  });
-}
+  async get(userId, id) {
+    const records = await this.list(userId);
+    if (!records.length) return null;
+    return id && String(records[0].id) !== String(id) ? null : records[0];
+  },
+
+  create(userId, data = {}) {
+    const ownerId = validateUserId(userId);
+    return withFileQueue(CONNECTIONS_FILE, async () => {
+      const db = await readDatabase();
+      const current = consolidatedRecord(db[ownerId], ownerId);
+      const record = upsertRecord(current, ownerId, data);
+      db[ownerId] = [record];
+      await writeJsonAtomically(CONNECTIONS_FILE, db);
+      return record;
+    });
+  },
+
+  update(userId, id, changes = {}) {
+    const ownerId = validateUserId(userId);
+    return withFileQueue(CONNECTIONS_FILE, async () => {
+      const db = await readDatabase();
+      const current = consolidatedRecord(db[ownerId], ownerId);
+      if (id && current && String(current.id) !== String(id)) {
+        throw new Error("Não é permitido alterar o identificador principal do registro.");
+      }
+      const record = upsertRecord(current, ownerId, changes);
+      db[ownerId] = [record];
+      await writeJsonAtomically(CONNECTIONS_FILE, db);
+      return record;
+    });
+  },
+
+  delete(userId, id) {
+    const ownerId = validateUserId(userId);
+    return withFileQueue(CONNECTIONS_FILE, async () => {
+      const db = await readDatabase();
+      const current = consolidatedRecord(db[ownerId], ownerId);
+      if (!current || (id && String(current.id) !== String(id))) return false;
+      delete db[ownerId];
+      await writeJsonAtomically(CONNECTIONS_FILE, db);
+      return true;
+    });
+  },
+
+  replace(userId, items) {
+    const ownerId = validateUserId(userId);
+    return withFileQueue(CONNECTIONS_FILE, async () => {
+      const db = await readDatabase();
+      const item = Array.isArray(items) ? items[0] : items;
+      if (!item) {
+        delete db[ownerId];
+        await writeJsonAtomically(CONNECTIONS_FILE, db);
+        return [];
+      }
+      const record = upsertRecord(consolidatedRecord([item], ownerId), ownerId, item);
+      record.user_id = ownerId;
+      db[ownerId] = [record];
+      await writeJsonAtomically(CONNECTIONS_FILE, db);
+      return db[ownerId];
+    });
+  },
+};
