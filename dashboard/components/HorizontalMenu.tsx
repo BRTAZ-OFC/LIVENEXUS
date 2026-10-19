@@ -97,7 +97,8 @@ export default function HorizontalMenu({
         <button
           type="button"
           onClick={() => move("left")}
-          className="lnx-horizontal-menu-arrow mr-1 shrink-0 rounded-xl border border-white/10 bg-slate-800/90 p-2 text-slate-300 shadow-md transition hover:bg-slate-700 hover:text-white"
+          style={{ marginRight: "4px" }}
+          className="lnx-horizontal-menu-arrow shrink-0 rounded-xl border border-white/10 bg-slate-800/90 p-2 text-slate-300 shadow-md transition hover:bg-slate-700 hover:text-white"
           aria-label={`Rolar ${ariaLabel} para a esquerda`}
           title="Anterior"
         >
@@ -124,7 +125,8 @@ export default function HorizontalMenu({
         <button
           type="button"
           onClick={() => move("right")}
-          className="lnx-horizontal-menu-arrow ml-1 shrink-0 rounded-xl border border-white/10 bg-slate-800/90 p-2 text-slate-300 shadow-md transition hover:bg-slate-700 hover:text-white"
+          style={{ marginLeft: "4px" }}
+          className="lnx-horizontal-menu-arrow shrink-0 rounded-xl border border-white/10 bg-slate-800/90 p-2 text-slate-300 shadow-md transition hover:bg-slate-700 hover:text-white"
           aria-label={`Rolar ${ariaLabel} para a direita`}
           title="Próximo"
         >
