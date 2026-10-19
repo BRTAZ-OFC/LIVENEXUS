@@ -50,7 +50,7 @@ type OverlayRow = {
   user_id?: string;
 };
 
-const catalog = TWITCH_WIDGETS_CATALOG as WidgetDefinition[];
+const catalog = TWITCH_WIDGETS_CATALOG as unknown as WidgetDefinition[];
 const DEFAULT_SIZE = { width: 800, height: 480 };
 const EMPTY_BACKGROUND: CanvasBackground = { type: "transparent", opacity: 100 };
 
@@ -59,22 +59,22 @@ function isObject(value: unknown): value is JsonObject {
 }
 
 function getCanvasConfig(row: OverlayRow): CanvasConfig {
-  const source = isObject(row.settings)
+  const source = isObject(row.settings) && Object.keys(row.settings).length
     ? row.settings
-    : isObject(row.config)
+    : isObject(row.config) && Object.keys(row.config).length
       ? row.config
-      : isObject(row.data)
+      : isObject(row.data) && Object.keys(row.data).length
         ? row.data
-        : {};
+        : row as unknown as JsonObject;
   return {
     ...source,
-    name: String(source.name ?? row.name ?? "Overlay"),
-    visualizerSize: isObject(source.visualizerSize)
-      ? source.visualizerSize as CanvasConfig["visualizerSize"]
+    name: String(source["name"] ?? row.name ?? "Overlay"),
+    visualizerSize: isObject(source["visualizerSize"])
+      ? source["visualizerSize"] as CanvasConfig["visualizerSize"]
       : DEFAULT_SIZE,
-    instances: Array.isArray(source.instances) ? source.instances as CanvasInstance[] : [],
-    background: isObject(source.background)
-      ? source.background as CanvasBackground
+    instances: Array.isArray(source["instances"]) ? source["instances"] as CanvasInstance[] : [],
+    background: isObject(source["background"])
+      ? source["background"] as CanvasBackground
       : EMPTY_BACKGROUND,
   };
 }
@@ -146,10 +146,8 @@ export default function OverlayCanvas() {
           throw new Error(payload.message || "Não foi possível carregar as overlays.");
         }
         const rows = payload.overlays as OverlayRow[];
-        const firstConfigured = rows.find((row) => {
-          const data = getCanvasConfig(row);
-          return data.instances.length > 0 || Boolean(data.background);
-        });
+        const firstConfigured =
+          rows.find((row) => getCanvasConfig(row).instances.length > 0) || rows[0];
         if (!cancelled && firstConfigured) setConfig(getCanvasConfig(firstConfigured));
         else if (!cancelled) setConfig({
           name: "Overlay",
@@ -218,9 +216,9 @@ export default function OverlayCanvas() {
               const height = Math.max(1, Number(instance.height) || definition.defaultHeight || 120);
               const widgetConfig = { ...(definition.defaultConfig || {}), ...(instance.config || {}) };
               const transform = [
-                widgetConfig.rotation ? `rotate(${Number(widgetConfig.rotation)}deg)` : "",
-                widgetConfig.flipH ? "scaleX(-1)" : "",
-                widgetConfig.flipV ? "scaleY(-1)" : "",
+                widgetConfig["rotation"] ? `rotate(${Number(widgetConfig["rotation"])}deg)` : "",
+                widgetConfig["flipH"] ? "scaleX(-1)" : "",
+                widgetConfig["flipV"] ? "scaleY(-1)" : "",
               ].filter(Boolean).join(" ");
               const instanceStyle: CSSProperties = {
                 position: "absolute",
@@ -230,7 +228,7 @@ export default function OverlayCanvas() {
                 height,
                 zIndex: Number(instance.zIndex) || index + 1,
                 overflow: "hidden",
-                opacity: Math.max(0, Math.min(100, Number(widgetConfig.opacity ?? 100))) / 100,
+                opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100,
                 transform: transform || undefined,
               };
               return (
