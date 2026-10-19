@@ -72,6 +72,8 @@ export default function OverlayEditorSidebar(props: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("widget");
   const [showWidgetPicker, setShowWidgetPicker] = useState(false);
   const [libraryQuery, setLibraryQuery] = useState("");
+  const [libraryFavorites, setLibraryFavorites] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const selected = props.instances.find((item, index) =>
     (item.id || `${item.widgetId}-${index}`) === props.selectedInstanceId
   );
@@ -182,10 +184,15 @@ export default function OverlayEditorSidebar(props: Props) {
           <div className="space-y-3">
             <h4 className="text-xs font-semibold">Biblioteca</h4>
             {field("Pesquisar widgets", libraryQuery, setLibraryQuery)}
-            <p className="text-[10px] text-slate-500">Itens do catálogo que correspondem à pesquisa.</p>
+            <label className="flex items-center gap-2 text-[10px] text-slate-400"><input type="checkbox" checked={showFavoritesOnly} onChange={event => setShowFavoritesOnly(event.target.checked)}/> Mostrar apenas favoritos</label>
+            <p className="text-[10px] text-slate-500">Marque itens para criar sua lista de favoritos nesta sessão.</p>
             <div className="space-y-1">
-              {widgetOptions.filter(widget => widget.name.toLowerCase().includes(libraryQuery.toLowerCase())).map(widget => (
-                <button key={widget.id} type="button" onClick={() => props.onAddWidget(widget)} className="w-full rounded border border-white/10 px-2 py-2 text-left text-xs hover:bg-white/5">{widget.name}<span className="float-right text-violet-300">＋</span></button>
+              {widgetOptions.filter(widget => widget.name.toLowerCase().includes(libraryQuery.toLowerCase()) && (!showFavoritesOnly || libraryFavorites.includes(widget.id))).map(widget => (
+                <div key={widget.id} className="flex items-center gap-1 rounded border border-white/10 px-2 py-2">
+                  <button type="button" onClick={() => setLibraryFavorites(current => current.includes(widget.id) ? current.filter(id => id !== widget.id) : [...current, widget.id])} aria-label={libraryFavorites.includes(widget.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"} className={`px-1 text-sm ${libraryFavorites.includes(widget.id) ? "text-amber-300" : "text-slate-500"}`}>{libraryFavorites.includes(widget.id) ? "★" : "☆"}</button>
+                  <button type="button" onClick={() => props.onAddWidget(widget)} className="min-w-0 flex-1 truncate text-left text-xs hover:text-violet-200">{widget.name}</button>
+                  <button type="button" title="Adicionar ao canvas" onClick={() => props.onAddWidget(widget)} className="px-1 text-violet-300">＋</button>
+                </div>
               ))}
             </div>
           </div>
