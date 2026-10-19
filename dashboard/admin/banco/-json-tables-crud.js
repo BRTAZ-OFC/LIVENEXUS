@@ -38,6 +38,13 @@ const DEFINITIONS = Object.freeze({
     keyField: "id",
     ownerScoped: false,
   },
+  galeria_usuarios: {
+    id: "galeria_usuarios",
+    title: "Galeria de usuários",
+    file: "galeria-usuarios.json",
+    shape: "userList",
+    ownerScoped: true,
+  },
   image_store: {
     id: "image_store",
     title: "Armazenamento de imagens",
@@ -58,6 +65,13 @@ const DEFINITIONS = Object.freeze({
     id: "metricas",
     title: "Métricas",
     file: "metricas.json",
+    shape: "userList",
+    ownerScoped: true,
+  },
+  vods: {
+    id: "vods",
+    title: "VODs e sessões",
+    file: "vods.json",
     shape: "userList",
     ownerScoped: true,
   },
@@ -435,9 +449,11 @@ export const authActivationJohnson = createJsonTableCrud("auth_activation");
 export const bibliotecaJohnson = createJsonTableCrud("biblioteca");
 export const scenarioJohnson = createJsonTableCrud("cenarios");
 export const galleryJohnson = createJsonTableCrud("galeria");
+export const userGalleryJohnson = createJsonTableCrud("galeria_usuarios");
 export const imageStoreJohnson = createJsonTableCrud("image_store");
 export const messagesJohnson = createJsonTableCrud("messages");
 export const metricasJohnson = createJsonTableCrud("metricas");
+export const vodsJohnson = createJsonTableCrud("vods");
 export const overlayJohnson = createJsonTableCrud("overlays");
 export const rtcIdentityJohnson = createJsonTableCrud("rtc_registry");
 export const schemasJohnson = createJsonTableCrud("schemas");
