@@ -62,7 +62,7 @@ function resolveBioProfile(platformInput, input) {
       value = value.replace(platform === "Twitch" ? /^(?:www\.)?twitch\.tv\//i : /^(?:www\.)?kick\.com\//i, "");
     }
 
-    value = value.split(/[/?#]/)[0].replace(/^@/, "").trim().toLowerCase();
+    value = value.replace(/^\/+/, "").split(/[/?#]/)[0].replace(/^@/, "").trim().toLowerCase();
     const allowed = platform === "Twitch" ? /^[a-z0-9_]{1,25}$/ : /^[a-z0-9_-]{1,25}$/;
     if (!allowed.test(value)) {
       throw new ChannelVerifyError("Nome de canal inválido para essa plataforma.", 400);

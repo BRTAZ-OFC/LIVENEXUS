@@ -43,7 +43,7 @@ export function normalizeChannelInput(platform, input) {
   } else {
     slug = slug.replace(hostPattern, "");
   }
-  slug = slug.split(/[/?#]/)[0].replace(/^@/, "").toLowerCase();
+  slug = slug.replace(/^\/+/, "").split(/[/?#]/)[0].replace(/^@/, "").toLowerCase();
   const pattern = lowerPlatform === "twitch" ? /^[a-z0-9_]{1,25}$/ : /^[a-z0-9_-]{1,25}$/;
   return pattern.test(slug) ? slug : "";
 }
