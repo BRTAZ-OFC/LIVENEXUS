@@ -69,14 +69,14 @@ export default function TTSPage() {
 
   useEffect(() => subscribeTtsMessages((message) => {
     if (!autoReadChatRef.current) return;
-    const text = `${message.platform}: ${message.author}: ${message.text}`.trim().slice(0, settingsRef.current.maxChars > 0 ? settingsRef.current.maxChars : 1000);
+    const text = (message.eventType ? message.eventType : `${message.author} enviou uma mensagem: ${message.text}`).trim().slice(0, settingsRef.current.maxChars > 0 ? settingsRef.current.maxChars : 1000);
     if (!text) return;
     const roles = message.roles.map((role) => role.toLowerCase());
     const tier: QueueItem["tier"] = roles.includes("broadcaster") ? "broadcaster"
       : roles.includes("moderator") ? "moderator"
       : roles.includes("vip") ? "vip"
       : roles.includes("subscriber") ? "subscriber" : "normal";
-    const item: QueueItem = { id: ++idRef.current, text, author: `${message.author} · ${message.platform}`, tier, queuedAt: Date.now() };
+    const item: QueueItem = { id: ++idRef.current, text, author: message.author, tier, queuedAt: Date.now() };
     setQueue((old) => {
       const next = [...old, item];
       if (next.length > 200) {
@@ -87,7 +87,7 @@ export default function TTSPage() {
       queueRef.current = next;
       return next;
     });
-    setNotice(`Mensagem recebida do ${message.platform}; adicionada à fila de leitura.`);
+    setNotice(message.eventType ? `Evento recebido: ${message.eventType}; adicionado à fila de leitura.` : `Mensagem de ${message.author} adicionada à fila de leitura.`);
   }), []);
 
   useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch {} }, [settings]);
