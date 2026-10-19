@@ -36,7 +36,6 @@ type Diagnostic = { id: string; time: number; platform: ChatPlatform; author: st
 type DiagnosticState = { received: number; accepted: number; blocked: number; reasons: Record<string, number>; events: Diagnostic[] };
 
 const STORAGE_KEY = "livenexus:tts-filters-v1";
-const ROLE_KEYS = ["broadcaster", "moderator", "vip", "subscriber", "normal"];
 const EVENT_KEYS = [
   "twitch_sub", "twitch_resub", "twitch_subgift", "twitch_bits", "twitch_raid",
   "kick_sub", "kick_gift", "kick_raid", "youtube_membership", "youtube_superchat",
@@ -73,7 +72,6 @@ function loadConfig(): TtsFilterConfig {
       bannedWords: Array.isArray(value?.bannedWords) ? value.bannedWords.map(String) : [],
       triggers: Array.isArray(value?.triggers) ? value.triggers : [],
     });
-    const base = defaultConfig();
     return {
       mode: parsed.mode === "custom" ? "custom" : "free",
       scope: parsed.scope === "perPlatform" ? "perPlatform" : "shared",
@@ -129,7 +127,7 @@ function matchesTrigger(text: string, trigger: RuleSet["triggers"][number]) {
   const source = text.toLowerCase().trim();
   const value = trigger.value.toLowerCase().trim();
   if (!value) return false;
-  if (trigger.matchType === "exact") return source.split(/\\s+/).includes(value) || source === value;
+  if (trigger.matchType === "exact") return source.split(/\s+/).includes(value) || source === value;
   if (trigger.matchType === "contains") return source.includes(value);
   if (trigger.matchType === "starts") return source.startsWith(value);
   if (trigger.matchType === "ends") return source.endsWith(value);
@@ -170,12 +168,12 @@ function removePlatformEmotes(text: string, platform: ChatPlatform, emotes: unkn
     result = output + text.slice(cursor);
   }
   if (platform === "YouTube") result = result.replace(/:[a-zA-Z0-9_]+:/g, " ");
-  return result.replace(/\\s+/g, " ").trim();
+  return result.replace(/\s+/g, " ").trim();
 }
-const URL_RE = /\\bhttps?:\\/\\/\\S+|www\\.\\S+/gi;
-const URL_TEST = /\\bhttps?:\\/\\/\\S+|www\\.\\S+/i;
+const URL_RE = /\bhttps?:\/\/\S+|www\.\S+/gi;
+const URL_TEST = /\bhttps?:\/\/\S+|www\.\S+/i;
 const MENTION_RE = /@[a-zA-Z0-9_.-]+/g;
-const EMOJI_RE = /[\\u{1F000}-\\u{1FAFF}\\u2600-\\u27BF\\u2190-\\u21FF\\u2B00-\\u2BFF\\uFE0F]/gu;
+const EMOJI_RE = /[\u{1F000}-\u{1FAFF}\u2600-\u27BF\u2190-\u21FF\u2B00-\u2BFF\uFE0F]/gu;
 export function applyTtsFilters(message: MultiChatMessage): MultiChatMessage | null {
   if (config.mode === "free") { record(message, true, "Modo Livre", message.text); return message; }
   const rules = config.scope === "perPlatform" ? config.perPlatform[message.platform] : config.shared;
@@ -194,29 +192,29 @@ export function applyTtsFilters(message: MultiChatMessage): MultiChatMessage | n
   }
   if (!rules.content.messages) return fail("Mensagens comuns desativadas");
   let text = message.text;
-  if (/^!\\s*[a-z]/i.test(text.trim()) && !rules.content.commands) return fail("Comando bloqueado");
+  if (/^!\s*[a-z]/i.test(text.trim()) && !rules.content.commands) return fail("Comando bloqueado");
   if (URL_TEST.test(text)) {
     if (!rules.content.links || rules.links === "block") return fail("Link bloqueado");
-    if (rules.links === "remove") text = text.replace(URL_RE, " ").replace(/\\s+/g, " ").trim();
+    if (rules.links === "remove") text = text.replace(URL_RE, " ").replace(/\s+/g, " ").trim();
   }
   if (/@[a-zA-Z0-9_.-]+/.test(text)) {
-    if (!rules.content.mentions) text = text.replace(MENTION_RE, " ").replace(/\\s+/g, " ").trim();
+    if (!rules.content.mentions) text = text.replace(MENTION_RE, " ").replace(/\s+/g, " ").trim();
   }
   if (!text.trim()) return fail("Mensagem vazia após filtros");
   if (rules.emotes !== "allow") {
     const withoutPlatformEmotes = removePlatformEmotes(text, platform, message.emotes);
     const matches = text.match(EMOJI_RE) || [];
     const platformEmoteCount = typeof message.emotes === "string"
-      ? (message.emotes.match(/\\d+:\\d+-\\d+/g) || []).length
+      ? (message.emotes.match(/\d+:\d+-\d+/g) || []).length
       : Array.isArray(message.emotes) ? message.emotes.length : 0;
     if (rules.emotes === "block_only" && withoutPlatformEmotes.replace(EMOJI_RE, "").trim() === "") return fail("Mensagem contém apenas emotes/emojis");
     if (rules.emotes === "block_over" && matches.length + platformEmoteCount > rules.emoteLimit) return fail("Limite de emotes excedido");
-    if (rules.emotes === "remove") text = withoutPlatformEmotes.replace(EMOJI_RE, "").replace(/\\s+/g, " ").trim();
+    if (rules.emotes === "remove") text = withoutPlatformEmotes.replace(EMOJI_RE, "").replace(/\s+/g, " ").trim();
   }
   if (rules.bannedWords.some((word) => word && text.toLowerCase().includes(word.toLowerCase()))) return fail("Palavra proibida");
   if (rules.triggersEnabled && rules.triggers.some((trigger) => matchesTrigger(text, trigger))) return fail("Gatilho bloqueado");
   const now = Date.now();
-  const normalized = text.toLowerCase().trim().replace(/\\s+/g, " ");
+  const normalized = text.toLowerCase().trim().replace(/\s+/g, " ");
   if (rules.repeatEnabled && rules.repeatMax > 0) {
     const key = userKey + ":" + normalized;
     const previous = repeats.get(key);
