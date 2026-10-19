@@ -33,7 +33,7 @@ export type TtsFilterConfig = {
   perPlatform: Record<ChatPlatform, RuleSet>;
 };
 type Diagnostic = { id: string; time: number; platform: ChatPlatform; author: string; decision: "ACEITA" | "BLOQUEADA"; reason: string; text: string };
-type DiagnosticState = { received: number; accepted: number; blocked: number; reasons: Record<string, number>; events: Diagnostic[] };
+type DiagnosticState = { received: number; accepted: number; blocked: number; dropped: number; reasons: Record<string, number>; events: Diagnostic[] };
 
 const STORAGE_KEY = "livenexus:tts-filters-v1";
 const EVENT_KEYS = [
@@ -86,7 +86,7 @@ function loadConfig(): TtsFilterConfig {
 }
 let config = loadConfig();
 const configListeners = new Set<() => void>();
-let diag: DiagnosticState = { received: 0, accepted: 0, blocked: 0, reasons: {}, events: [] };
+let diag: DiagnosticState = { received: 0, accepted: 0, blocked: 0, dropped: 0, reasons: {}, events: [] };
 const diagListeners = new Set<() => void>();
 const repeats = new Map<string, { text: string; count: number; firstAt: number }>();
 const cooldowns = new Map<string, number>();
@@ -115,7 +115,7 @@ export function useTtsFilterConfig() { return useSyncExternalStore((fn) => { con
 export function getTtsFilterDiagnostics() { return diag; }
 export function useTtsFilterDiagnostics() { return useSyncExternalStore((fn) => { diagListeners.add(fn); return () => diagListeners.delete(fn); }, () => diagRevision); }
 export function resetTtsFilterDiagnostics() {
-  diag = { received: 0, accepted: 0, blocked: 0, reasons: {}, events: [] };
+  diag = { received: 0, accepted: 0, blocked: 0, dropped: 0, reasons: {}, events: [] };
   emitDiag();
 }
 function record(message: MultiChatMessage, allowed: boolean, reason: string, text: string) {
@@ -268,7 +268,7 @@ export function recordTtsQueueBlock(message: Pick<MultiChatMessage, "id" | "plat
   emitDiag();
 }
 export function recordTtsQueueDrop(message: { id: string | number; platform: ChatPlatform; author: string; text: string }, reason: string) {
-  diag.blocked++;
+  diag.dropped++;
   diag.reasons[reason] = (diag.reasons[reason] || 0) + 1;
   diag.events.unshift({ id: message.id + "-dropped", time: Date.now(), platform: message.platform, author: message.author, decision: "BLOQUEADA", reason, text: message.text });
   if (diag.events.length > 100) diag.events.length = 100;
@@ -353,7 +353,7 @@ export function TtsFiltersPanel() {
     </div>
     <div className="tts-filter-diagnostics">
       <div className="tts-filter-diagnostic-heading"><h3>Diagnóstico dos filtros</h3><button onClick={resetTtsFilterDiagnostics}><RotateCcw size={13} /> Limpar diagnóstico</button></div>
-      <div className="tts-filter-stats"><span>Recebidas <b>{diagState.received}</b></span><span>Aceitas <b>{diagState.accepted}</b></span><span>Bloqueadas <b>{diagState.blocked}</b></span></div>
+      <div className="tts-filter-stats"><span>Recebidas <b>{diagState.received}</b></span><span>Aceitas <b>{diagState.accepted}</b></span><span>Bloqueadas <b>{diagState.blocked}</b></span><span>Descartadas da fila <b>{diagState.dropped}</b></span></div>
       <div className="tts-filter-reasons">{Object.entries(diagState.reasons).sort((a, b) => b[1] - a[1]).map(([reason, count]) => <span key={reason}>{reason}: <b>{count}</b></span>)}</div>
       <div className="tts-filter-events">{diagState.events.slice(0, 30).map((event) => <article key={event.id + event.time}><time>{new Date(event.time).toLocaleTimeString("pt-BR")}</time><b className={event.decision === "ACEITA" ? "accepted" : "blocked"}>{event.decision}</b><span>{event.platform} · {event.author}</span><small>{event.reason}</small><p>{event.text}</p></article>)}</div>
       <div className="tts-filter-flagged"><h3>Usuários sinalizados por repetição</h3>{getFlaggedUsers().length === 0 ? <p>Nenhum usuário sinalizado.</p> : getFlaggedUsers().map((user) => <div key={user.key}><label><input type="checkbox" checked={user.blocked} onChange={() => toggleFlaggedUser(user.key)} /> <span>{user.author} · {user.platform}</span></label><small>{user.reason}</small><button onClick={() => clearFlaggedUser(user.key)} aria-label={"Limpar " + user.author}><Trash2 size={12} /></button></div>)}</div>
