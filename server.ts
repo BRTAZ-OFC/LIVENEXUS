@@ -11,11 +11,7 @@ import {
   deleteUser,
   getUserById,
 } from "./dashboard/admin/banco/-crud.js";
-import {
-  listUserPlatforms,
-  saveUserPlatform,
-  deleteUserPlatform,
-} from "./dashboard/conexao/ramal/cruds/Plataformas_Johnson.js";
+import { PlataformasJohnson } from "./dashboard/conexao/ramal/cruds/Plataformas_Johnson.js";
 import {
   listAvaliacoes,
   createAvaliacao,
@@ -332,74 +328,102 @@ app.delete("/api/database/avaliacoes", async (req: Request, res: Response) => {
   }
 });
 
-/* Conexões de plataformas persistidas em JSON e isoladas pelo user_id autenticado. */
+/* Conexões de plataformas: o user_id vem da sessão e é validado no JSON de usuários. */
 async function getAuthenticatedJsonUser(req: Request, res: Response) {
   const session = readSession(req) as SessionData | null;
   if (!session?.user_id) {
-    res.status(401).set(NO_CACHE).json({ ok: false, message: "Faça login para acessar as conexões." });
+    res.status(401).set(NO_CACHE).json({ ok: false, error: "Autenticação necessária." });
     return null;
   }
 
   const user = await getUserById(session.user_id);
   if (!user) {
-    res.status(401).set(NO_CACHE).json({ ok: false, message: "A conta desta sessão não existe mais." });
+    res.status(401).set(NO_CACHE).json({ ok: false, error: "A conta desta sessão não existe mais." });
     return null;
   }
   return user;
 }
 
-app.get("/api/platforms", async (req: Request, res: Response) => {
+app.get("/api/plataformas", async (req: Request, res: Response) => {
   try {
     const user = await getAuthenticatedJsonUser(req, res);
     if (!user) return;
-    const connections = await listUserPlatforms(user.user_id);
-    return res.set(NO_CACHE).json({ ok: true, connections });
+    const id = typeof req.query["id"] === "string" ? req.query["id"] : "";
+    const plataformas = id
+      ? await PlataformasJohnson.get(user.user_id, id)
+      : await PlataformasJohnson.list(user.user_id);
+    if (id && !plataformas) {
+      return res.status(404).set(NO_CACHE).json({ ok: false, error: "Plataforma não encontrada." });
+    }
+    return res.set(NO_CACHE).json({
+      ok: true,
+      ...(id ? { plataforma: plataformas } : { plataformas }),
+    });
   } catch (error) {
     return res.status(500).set(NO_CACHE).json({
       ok: false,
-      message: errorMessage(error, "Não foi possível carregar as conexões."),
+      error: errorMessage(error, "Não foi possível carregar as conexões."),
     });
   }
 });
 
-app.post("/api/platforms", async (req: Request, res: Response) => {
+app.post("/api/plataformas", async (req: Request, res: Response) => {
   try {
     const user = await getAuthenticatedJsonUser(req, res);
     if (!user) return;
-    const connection = await saveUserPlatform(user.user_id, {
-      platform: req.body?.["platform"],
-      channel_id: req.body?.["channel_id"],
-      channel_name: req.body?.["channel_name"],
-      channel_url: req.body?.["channel_url"],
+    const existing = await PlataformasJohnson.list(user.user_id);
+    const plataforma = existing.length
+      ? await PlataformasJohnson.update(user.user_id, existing[0].id, req.body ?? {})
+      : await PlataformasJohnson.create(user.user_id, req.body ?? {});
+    return res.status(existing.length ? 200 : 201).set(NO_CACHE).json({
+      ok: true,
+      plataforma,
+      plataformas: [plataforma],
     });
-    return res.status(200).set(NO_CACHE).json({ ok: true, connection });
   } catch (error) {
     return res.status(400).set(NO_CACHE).json({
       ok: false,
-      message: errorMessage(error, "Não foi possível salvar a conexão."),
+      error: errorMessage(error, "Não foi possível salvar a conexão."),
     });
   }
 });
 
-app.delete("/api/platforms", async (req: Request, res: Response) => {
+app.patch("/api/plataformas", async (req: Request, res: Response) => {
   try {
     const user = await getAuthenticatedJsonUser(req, res);
     if (!user) return;
-    const connectionId = typeof req.body?.["connection_id"] === "string"
-      ? req.body["connection_id"]
-      : "";
-    if (!connectionId) {
-      return res.status(400).set(NO_CACHE).json({ ok: false, message: "ID da conexão não fornecido." });
+    const existing = await PlataformasJohnson.list(user.user_id);
+    const id = typeof req.query["id"] === "string" ? req.query["id"] : existing[0]?.id;
+    if (!id) {
+      return res.status(404).set(NO_CACHE).json({ ok: false, error: "Plataforma não encontrada." });
     }
-    const deleted = await deleteUserPlatform(user.user_id, connectionId);
+    const plataforma = await PlataformasJohnson.update(user.user_id, id, req.body ?? {});
+    return res.set(NO_CACHE).json({ ok: true, plataforma, plataformas: [plataforma] });
+  } catch (error) {
+    const message = errorMessage(error, "Não foi possível atualizar a conexão.");
+    const status = message === "Não é permitido alterar o identificador principal do registro." ? 400 : 500;
+    return res.status(status).set(NO_CACHE).json({ ok: false, error: message });
+  }
+});
+
+app.delete("/api/plataformas", async (req: Request, res: Response) => {
+  try {
+    const user = await getAuthenticatedJsonUser(req, res);
+    if (!user) return;
+    const existing = await PlataformasJohnson.list(user.user_id);
+    if (!existing.length) {
+      return res.status(404).set(NO_CACHE).json({ ok: false, error: "Plataforma não encontrada." });
+    }
+    const id = typeof req.query["id"] === "string" ? req.query["id"] : existing[0].id;
+    const deleted = await PlataformasJohnson.delete(user.user_id, id);
     if (!deleted) {
-      return res.status(404).set(NO_CACHE).json({ ok: false, message: "Conexão não encontrada para este usuário." });
+      return res.status(404).set(NO_CACHE).json({ ok: false, error: "Plataforma não encontrada." });
     }
-    return res.set(NO_CACHE).json({ ok: true, message: "Conexão removida." });
+    return res.set(NO_CACHE).json({ ok: true });
   } catch (error) {
     return res.status(500).set(NO_CACHE).json({
       ok: false,
-      message: errorMessage(error, "Não foi possível remover a conexão."),
+      error: errorMessage(error, "Não foi possível remover a conexão."),
     });
   }
 });
