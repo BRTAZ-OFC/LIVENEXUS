@@ -31,6 +31,47 @@ if (!sessionSecret || sessionSecret.length < 32) {
 
 const rootDir = dirname(fileURLToPath(import.meta.url));
 const distDir = resolve(rootDir, "dist");
+
+type BioPlatform = "Twitch" | "Kick" | "YouTube";
+type BioChallenge = { userId: string; platform: BioPlatform; channel: string; code: string; expiresAt: number };
+const bioChallenges = new Map<string, BioChallenge>();
+const verifiedBioChannels = new Map<string, { verifiedAt: number }>();
+function bioChannelKey(userId: string, platform: BioPlatform, channel: string) {
+  return `${userId}:${platform.toLowerCase()}:${channel.toLowerCase()}`;
+}
+function resolveBioProfile(platform: BioPlatform, input: string): { channel: string; url: string } | null {
+  const raw = input.trim();
+  if (!raw || raw.length > 300) return null;
+  if (platform === "Twitch") {
+    const channel = raw.replace(/^https?:\/\/(www\.)?twitch\.tv\//i, "").replace(/\/about\/?$/i, "").replace(/^@/, "").replace(/\/$/, "");
+    if (!/^[a-zA-Z0-9_]{1,25}$/.test(channel)) return null;
+    return { channel, url: `https://www.twitch.tv/${channel}/about` };
+  }
+  if (platform === "Kick") {
+    const channel = raw.replace(/^https?:\/\/(www\.)?kick\.com\//i, "").replace(/\/$/, "");
+    if (!/^[a-zA-Z0-9_-]{1,25}$/.test(channel)) return null;
+    return { channel, url: `https://kick.com/${channel}` };
+  }
+  let channel = raw;
+  if (/^https?:\/\//i.test(raw)) {
+    try {
+      const parsed = new URL(raw);
+      if (!["youtube.com", "www.youtube.com", "m.youtube.com"].includes(parsed.hostname.toLowerCase())) return null;
+      const handleMatch = parsed.pathname.match(/^\/@([a-zA-Z0-9._-]{1,100})(?:\/|$)/);
+      const idMatch = parsed.pathname.match(/^\/channel\/(UC[a-zA-Z0-9_-]{22})(?:\/|$)/);
+      if (handleMatch) channel = `@${handleMatch[1]}`;
+      else if (idMatch) channel = idMatch[1];
+      else return null;
+    } catch { return null; }
+  }
+  channel = channel.replace(/^@/, "");
+  if (/^UC[a-zA-Z0-9_-]{22}$/.test(channel)) {
+    return { channel: `UC${channel.slice(2)}`, url: `https://www.youtube.com/channel/${channel}/about` };
+  }
+  if (!/^[a-zA-Z0-9._-]{1,100}$/.test(channel)) return null;
+  return { channel: `@${channel}`, url: `https://www.youtube.com/@${channel}/about` };
+}
+
 const NO_CACHE = {
   "Cache-Control": "no-store, no-cache, must-revalidate",
   Pragma: "no-cache",
@@ -347,6 +388,75 @@ app.get("/api/admin/lab/youtube-test1/bootstrap", async (req: Request, res: Resp
       error: errorMessage(error, "Falha ao preparar o chat do YouTube."),
     });
   }
+});
+
+
+/* Verificação de propriedade do canal por código temporário publicado na bio. */
+app.post("/api/connections/bio/challenge", (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) return res.status(401).set(NO_CACHE).json({ ok: false, message: "Faça login para verificar um canal." });
+  const platform = req.body?.["platform"] as BioPlatform;
+  if (!["Twitch", "Kick", "YouTube"].includes(platform)) {
+    return res.status(400).set(NO_CACHE).json({ ok: false, message: "Plataforma inválida." });
+  }
+  const profile = resolveBioProfile(platform, String(req.body?.["channel"] ?? ""));
+  if (!profile) return res.status(400).set(NO_CACHE).json({ ok: false, message: "Informe um canal válido para essa plataforma." });
+  const challengeId = randomBytes(18).toString("hex");
+  const code = `LN-${randomBytes(3).toString("hex").toUpperCase()}`;
+  bioChallenges.set(challengeId, { userId: session.user_id, platform, channel: profile.channel, code, expiresAt: Date.now() + 15 * 60 * 1000 });
+  return res.set(NO_CACHE).json({ ok: true, challengeId, code, expiresInSeconds: 900, message: "Publique o código na bio/descrição pública do canal." });
+});
+
+app.post("/api/connections/bio/verify", async (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) return res.status(401).set(NO_CACHE).json({ ok: false, verified: false, message: "Faça login para verificar um canal." });
+  const challengeId = String(req.body?.["challengeId"] ?? "");
+  const challenge = bioChallenges.get(challengeId);
+  if (!challenge || challenge.userId !== session.user_id) {
+    return res.status(400).set(NO_CACHE).json({ ok: false, verified: false, message: "Código de verificação inválido. Gere outro código." });
+  }
+  if (challenge.expiresAt < Date.now()) {
+    bioChallenges.delete(challengeId);
+    return res.status(400).set(NO_CACHE).json({ ok: false, verified: false, message: "O código expirou. Gere outro código." });
+  }
+  const platform = req.body?.["platform"] as BioPlatform;
+  const profile = resolveBioProfile(platform, String(req.body?.["channel"] ?? ""));
+  if (!profile || platform !== challenge.platform || profile.channel.toLowerCase() !== challenge.channel.toLowerCase()) {
+    return res.status(400).set(NO_CACHE).json({ ok: false, verified: false, message: "A plataforma ou o canal não corresponde ao código gerado." });
+  }
+  try {
+    const response = await fetch(profile.url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+      },
+      redirect: "follow",
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!response.ok) {
+      return res.status(502).set(NO_CACHE).json({ ok: false, verified: false, message: `Não foi possível consultar o perfil público (HTTP ${response.status}). Tente novamente.` });
+    }
+    const html = await response.text();
+    if (!html.toLowerCase().includes(challenge.code.toLowerCase())) {
+      return res.status(400).set(NO_CACHE).json({ ok: false, verified: false, message: "Código não encontrado no perfil público. Confira a bio e tente novamente." });
+    }
+    verifiedBioChannels.set(bioChannelKey(session.user_id, platform, profile.channel), { verifiedAt: Date.now() });
+    bioChallenges.delete(challengeId);
+    return res.set(NO_CACHE).json({ ok: true, verified: true, platform, channel: profile.channel, message: "Propriedade do canal confirmada." });
+  } catch (error) {
+    return res.status(502).set(NO_CACHE).json({ ok: false, verified: false, message: errorMessage(error, "Falha ao consultar a bio pública.") });
+  }
+});
+
+app.post("/api/connections/bio/status", (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) return res.status(401).set(NO_CACHE).json({ ok: false, verified: false, message: "Faça login para consultar a verificação." });
+  const platform = req.body?.["platform"] as BioPlatform;
+  if (!["Twitch", "Kick", "YouTube"].includes(platform)) return res.status(400).set(NO_CACHE).json({ ok: false, verified: false });
+  const profile = resolveBioProfile(platform, String(req.body?.["channel"] ?? ""));
+  if (!profile) return res.status(400).set(NO_CACHE).json({ ok: false, verified: false });
+  const verified = verifiedBioChannels.has(bioChannelKey(session.user_id, platform, profile.channel));
+  return res.set(NO_CACHE).json({ ok: true, verified, channel: profile.channel });
 });
 
 /* API desconhecida retorna JSON em vez da página HTML. */
