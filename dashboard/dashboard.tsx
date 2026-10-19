@@ -27,6 +27,7 @@ import {
 function DashboardPage() {
   // BLOCO 4 — Inicializa o menu e recupera o papel antes de restaurar a aba ativa.
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [chatSoundEnabled, setChatSoundEnabled] = useState(false);
   const [isAdmin, setIsAdmin] = useState(() => {
     if (typeof window !== "undefined") {
       return sessionStorage.getItem("livenexus_role") === "admin";
@@ -215,30 +216,12 @@ function DashboardPage() {
                   <button
                     type="button"
                     className="dash-icon-button"
-                    aria-label="Ativar ou desativar som do chat (visual)"
+                    aria-label={chatSoundEnabled ? "Desativar som do chat (visual)" : "Ativar som do chat (visual)"}
                     title="Som do chat (visual)"
-                    onClick={(event) => {
-                      const button = event.currentTarget;
-                      const enabled = button.dataset.sound !== "on";
-                      button.dataset.sound = enabled ? "on" : "off";
-                      button.setAttribute("aria-pressed", String(enabled));
-                      button.innerHTML = "";
-                      const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                      icon.setAttribute("width", "18");
-                      icon.setAttribute("height", "18");
-                      icon.setAttribute("viewBox", "0 0 24 24");
-                      icon.setAttribute("fill", "none");
-                      icon.setAttribute("stroke", "currentColor");
-                      icon.setAttribute("stroke-width", "2");
-                      icon.innerHTML = enabled
-                        ? '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>'
-                        : '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
-                      button.appendChild(icon);
-                    }}
-                    data-sound="off"
-                    aria-pressed="false"
+                    onClick={() => setChatSoundEnabled((enabled) => !enabled)}
+                    aria-pressed={chatSoundEnabled}
                   >
-                    <VolumeX />
+                    {chatSoundEnabled ? <Volume2 /> : <VolumeX />}
                   </button>
                 </header>
                 <div className="dash-chat-toolbar">
