@@ -203,11 +203,11 @@ function DashboardPage() {
 
             <div className="dash-live-stats">
               <article className="dash-stat-card">
-                <div className="dash-stat-label"><Radio /> Plataformas conectadas</div>
+                <div className="dash-stat-label"><Radio /> Espectadores por plataforma</div>
                 <div className="dash-platform-counts">
-                  <span><i className="dash-platform-dot twitch" /> Twitch <b>{["connected", "open"].includes(chatState.statuses.Twitch.status.toLowerCase()) ? 1 : 0}</b></span>
-                  <span><i className="dash-platform-dot youtube" /> YouTube <b>{["connected", "open"].includes(chatState.statuses.YouTube.status.toLowerCase()) ? 1 : 0}</b></span>
-                  <span><i className="dash-platform-dot kick" /> KICK <b>{["connected", "open"].includes(chatState.statuses.Kick.status.toLowerCase()) ? 1 : 0}</b></span>
+                  <span><i className="dash-platform-dot twitch" /> Twitch <b>{(chatState.statuses.Twitch.viewers ?? 0).toLocaleString("pt-BR")}</b></span>
+                  <span><i className="dash-platform-dot youtube" /> YouTube <b>{(chatState.statuses.YouTube.viewers ?? 0).toLocaleString("pt-BR")}</b></span>
+                  <span><i className="dash-platform-dot kick" /> KICK <b>{(chatState.statuses.Kick.viewers ?? 0).toLocaleString("pt-BR")}</b></span>
                 </div>
               </article>
               <article className="dash-stat-card">
@@ -237,24 +237,19 @@ function DashboardPage() {
                   </div>
                   <UserRound className="dash-panel-heading-icon" />
                 </header>
-                {speakerCounts.length === 0 ? (
-                  <div className="dash-speakers-empty">
-                    <div className="dash-speakers-empty-icon"><UserRound /></div>
-                    <strong>Ranking aguardando mensagens</strong>
-                    <span>Os 10 usuários mais ativos aparecerão aqui conforme o multichat receber mensagens.</span>
-                  </div>
-                ) : (
-                  <ol className="dash-speakers-list" aria-label="Top 10 falantes">
-                    {speakerCounts.map((speaker, index) => (
-                      <li key={speaker.author.toLowerCase()}>
+                <ol className="dash-speakers-list" aria-label="Top 10 falantes">
+                  {Array.from({ length: 10 }, (_, index) => {
+                    const speaker = speakerCounts[index];
+                    return (
+                      <li key={index} className={speaker ? "" : "is-empty"}>
                         <span className="dash-speaker-rank">{index + 1}</span>
-                        <span className="dash-speaker-avatar">{speaker.author.slice(0, 2).toUpperCase()}</span>
-                        <span className="dash-speaker-placeholder">{speaker.author}</span>
-                        <b>{speaker.count}</b>
+                        <span className="dash-speaker-avatar">{speaker ? speaker.author.slice(0, 2).toUpperCase() : "—"}</span>
+                        <span className="dash-speaker-placeholder">{speaker?.author ?? "Aguardando usuário"}</span>
+                        <b>{speaker?.count ?? 0}</b>
                       </li>
-                    ))}
-                  </ol>
-                )}
+                    );
+                  })}
+                </ol>
               </section>
             </div>
           </section>
