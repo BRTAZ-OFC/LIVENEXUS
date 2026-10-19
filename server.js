@@ -363,7 +363,9 @@ app.use((error, _req, res, _next) => {
 });
 
 const isDevServer = process.argv.includes("--dev");
-const PORT = Number(process.env.PORT || (isDevServer ? 3001 : 3000));
+const PORT = isDevServer
+  ? Number(process.env.API_PORT || 3001)
+  : Number(process.env.PORT || 3000);
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log("LiveNexus Express server listening on port " + PORT);
