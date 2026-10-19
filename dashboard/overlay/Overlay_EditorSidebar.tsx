@@ -93,7 +93,7 @@ export default function OverlayEditorSidebar(props: Props) {
   );
 
   return (
-    <aside className="absolute right-2 top-2 bottom-2 z-[80] flex w-[min(340px,calc(100%-16px))] min-w-0 flex-col overflow-hidden rounded-xl border border-white/15 bg-slate-950/95 text-slate-100 shadow-2xl backdrop-blur-md">
+    <aside className="absolute right-2 top-2 bottom-2 z-[80] flex w-[340px] max-w-[calc(100%_-_16px)] min-w-0 flex-col overflow-hidden rounded-xl border border-white/15 bg-slate-950/95 text-slate-100 shadow-2xl backdrop-blur-md">
       <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-3 py-2">
         <div>
           <p className="text-[10px] uppercase tracking-[.18em] text-violet-300">Opção</p>
