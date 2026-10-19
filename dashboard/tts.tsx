@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AudioLines, Clock3, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
+import { AudioLines, Clock3, Filter, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
 import "./css/tts.css";
 import { playProcessedSpeech, type PlaybackHandle } from "./ttsAudioEngine";
 import { subscribeTtsMessages, type ChatPlatform } from "./multichat";
@@ -69,6 +69,7 @@ export default function TTSPage() {
   const [notice, setNotice] = useState("O modelo da voz selecionada será carregado na primeira reprodução.");
   const [preset, setPreset] = useState("padrao");
   const [autoReadChat, setAutoReadChat] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const queueRef = useRef<QueueItem[]>([]);
   const activeRef = useRef<PlaybackHandle | null>(null);
   const playTokenRef = useRef(0);
@@ -298,8 +299,10 @@ export default function TTSPage() {
     <section className="tts-page">
       <header className="tts-page-heading">
         <div><p className="tts-eyebrow">CENTRAL DE TRANSMISSÃO</p><h1>Voz &amp; TTS</h1><p>Motor de voz local do navegador · sem créditos de API</p></div>
-        <span className={speaking ? "tts-status active" : "tts-status"}>{speaking ? "Falando" : paused ? "Fila pausada" : "Pronto"}</span>
+        <div className="tts-heading-actions"><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => setShowFilters((open) => !open)} aria-expanded={showFilters}><Filter size={14} />Filtros</button><span className={speaking ? "tts-status active" : "tts-status"}>{speaking ? "Falando" : paused ? "Fila pausada" : "Pronto"}</span></div>
       </header>
+
+      {showFilters && <TtsFiltersPanel />}
 
       <section className="tts-card">
         <div className="tts-card-title"><span className="tts-title-icon"><Volume2 /></span><div><h2>Configurações do motor de voz</h2><p>Escolha a voz e ajuste os parâmetros de leitura</p></div></div>
@@ -355,8 +358,6 @@ export default function TTSPage() {
           <button className={preset === "grave" ? "selected" : ""} onClick={() => applyPreset("grave", { rate: 0.85, pitch: 0.55, volume: 1 })}>Grave <small>0.85x · tom 0.55 · 100%</small></button>
         </div>
       </section>
-
-      <TtsFiltersPanel />
 
       <section className="tts-card">
         <div className="tts-card-title"><span className="tts-title-icon"><AudioLines /></span><div><h2>Fila geral de leitura</h2><p>Mensagens recebidas pelo multichat e testes manuais, ordenadas por prioridade</p></div></div>
