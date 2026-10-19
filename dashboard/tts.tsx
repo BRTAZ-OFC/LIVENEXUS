@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AudioLines, Clock3, Filter, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
+import { Filter, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
 import "./css/tts.css";
 import { playProcessedSpeech, type PlaybackHandle } from "./ttsAudioEngine";
 import { subscribeTtsMessages, type ChatPlatform } from "./multichat";
@@ -67,9 +67,9 @@ export default function TTSPage() {
   const [paused, setPaused] = useState(false);
   const [currentText, setCurrentText] = useState("");
   const [notice, setNotice] = useState("O modelo da voz selecionada será carregado na primeira reprodução.");
-  const [preset, setPreset] = useState("padrao");
   const [autoReadChat, setAutoReadChat] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [showEffects, setShowEffects] = useState(false);
   const queueRef = useRef<QueueItem[]>([]);
   const activeRef = useRef<PlaybackHandle | null>(null);
   const playTokenRef = useRef(0);
@@ -291,15 +291,11 @@ export default function TTSPage() {
     setNotice("Fila e fala atual limpas.");
   }
 
-  function applyPreset(id: string, values: Partial<TtsSettings>) {
-    setPreset(id); setSettings((old) => ({ ...old, ...values }));
-  }
-
   return (
     <section className="tts-page">
       <header className="tts-page-heading">
         <div><p className="tts-eyebrow">CENTRAL DE TRANSMISSÃO</p><h1>Voz &amp; TTS</h1><p>Motor de voz local do navegador · sem créditos de API</p></div>
-        <div className="tts-heading-actions"><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => setShowFilters((open) => !open)} aria-expanded={showFilters}><Filter size={14} />Filtros</button><span className={speaking ? "tts-status active" : "tts-status"}>{speaking ? "Falando" : paused ? "Fila pausada" : "Pronto"}</span></div>
+        <div className="tts-heading-actions"><button type="button" className={showEffects ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => setShowEffects((open) => !open)} aria-expanded={showEffects}><Star size={14} />Efeitos</button><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => setShowFilters((open) => !open)} aria-expanded={showFilters}><Filter size={14} />Filtros</button><span className={speaking ? "tts-status active" : "tts-status"}>{speaking ? "Falando" : paused ? "Fila pausada" : "Pronto"}</span></div>
       </header>
 
       {showFilters && <TtsFiltersPanel />}
@@ -339,7 +335,7 @@ export default function TTSPage() {
         </div>
       </section>
 
-      <section className="tts-card">
+      {showEffects && <section className="tts-card">
         <div className="tts-card-title"><span className="tts-title-icon amber"><Star /></span><div><h2>Efeitos de voz do TTS</h2><p>Selecione um personagem e ajuste a intensidade</p></div></div>
         <div className="tts-voice-effects">
           {VOICE_EFFECTS.map((effect) => <button key={effect.id} className={settings.effect === effect.id ? "selected" : ""} onClick={() => update("effect", effect.id)}><strong>{effect.label}</strong><small>{effect.description}</small></button>)}
@@ -348,32 +344,10 @@ export default function TTSPage() {
         <p className="tts-effect-note">Os efeitos são aplicados ao áudio gerado pelo motor neural: filtros de frequência, modulação, compressão, saturação, delay e reverberação. Esquilo, Monstro e Gigante também combinam mudança de velocidade com equalização; não é um algoritmo de pitch-shift independente da velocidade.</p>
       </section>
 
-      <section className="tts-card">
-        <div className="tts-card-title"><span className="tts-title-icon amber"><Star /></span><div><h2>Presets de voz</h2><p>Combinações rápidas de velocidade, tom e volume</p></div></div>
-        <div className="tts-presets">
-          <button className={preset === "padrao" ? "selected" : ""} onClick={() => applyPreset("padrao", DEFAULTS)}>Padrão <small>1.00x · tom 1.00 · 100%</small></button>
-          <button className={preset === "narrador" ? "selected" : ""} onClick={() => applyPreset("narrador", { rate: 0.9, pitch: 0.85, volume: 1 })}>Narrador <small>0.90x · tom 0.85 · 100%</small></button>
-          <button className={preset === "rapido" ? "selected" : ""} onClick={() => applyPreset("rapido", { rate: 1.45, pitch: 1.05, volume: 1 })}>Rápido <small>1.45x · tom 1.05 · 100%</small></button>
-          <button className={preset === "agudo" ? "selected" : ""} onClick={() => applyPreset("agudo", { rate: 1.1, pitch: 1.6, volume: 1 })}>Agudo <small>1.10x · tom 1.60 · 100%</small></button>
-          <button className={preset === "grave" ? "selected" : ""} onClick={() => applyPreset("grave", { rate: 0.85, pitch: 0.55, volume: 1 })}>Grave <small>0.85x · tom 0.55 · 100%</small></button>
-        </div>
-      </section>
 
-      <section className="tts-card">
-        <div className="tts-card-title"><span className="tts-title-icon"><AudioLines /></span><div><h2>Fila geral de leitura</h2><p>Mensagens recebidas pelo multichat e testes manuais, ordenadas por prioridade</p></div></div>
-        <div className="tts-queue-toolbar">
-          <span className="tts-notice">{notice}</span>
-          <div><button className={autoReadChat ? "selected" : ""} onClick={() => { setAutoReadChat((enabled) => !enabled); setNotice(autoReadChat ? "Leitura automática do multichat desativada." : "Leitura automática do multichat ativada."); }}><Volume2 size={14} />{autoReadChat ? "Leitura automática ligada" : "Leitura automática desligada"}</button><button onClick={toggleQueue}>{paused ? <Play size={14} /> : <Pause size={14} />}{paused ? "Retomar fila" : "Pausar fila"}</button><button onClick={skipCurrent}><SkipForward size={14} /> Pular</button><button onClick={clearQueue}><RotateCcw size={14} /> Limpar</button></div>
-        </div>
-        <div className="tts-now-speaking"><span className={speaking ? "tts-pulse on" : "tts-pulse"} /> <div><small>FALA ATUAL</small><strong>{currentText || "Nenhuma fala em reprodução"}</strong></div></div>
-        <div className="tts-queue-add">
-          <span>Adicionar teste à fila com prioridade:</span>
-          <button onClick={() => addDemoMessage("broadcaster")}>Transmissor</button><button onClick={() => addDemoMessage("moderator")}>Moderador</button><button onClick={() => addDemoMessage("vip")}>VIP</button><button onClick={() => addDemoMessage("normal")}>Normal</button>
-        </div>
-        <div className="tts-queue-list">
-          {queueByPriority.length ? queueByPriority.map((item) => <article key={item.id}><span className={"tts-tier " + item.tier}>{item.tier}</span><strong>{item.author}</strong><p>{item.text}</p><small>{item.expired ? "Expirada — será removida" : "Aguardando"}</small></article>) : <div className="tts-empty">A fila está vazia. Conecte uma plataforma no Chat ao vivo ou adicione uma mensagem de teste.</div>}
-        </div>
-      </section>
+      </section>}
+
+
     </section>
   );
 }
