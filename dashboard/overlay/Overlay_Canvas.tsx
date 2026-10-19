@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState, type ComponentType, type CSSPrope
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
 import HorizontalMenu from "../components/HorizontalMenu";
-import OverlayEditorSidebar from "./Overlay_EditorSidebar";
 
 type JsonObject = Record<string, unknown>;
 type CanvasInstance = {
@@ -129,7 +128,6 @@ export default function OverlayCanvas() {
   const [scale, setScale] = useState(1);
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
-  const [editorOpen, setEditorOpen] = useState(true);
   const [gridSettings, setGridSettings] = useState<Record<string, any>>({ showGrid: false, snapToGrid: false, gridSize: 20, showSafeAreas: false, verticalGuides: [], horizontalGuides: [] });
   const widgetPointer = useRef<{ instanceId: string; mode: "move" | "resize"; x: number; y: number; left: number; top: number; width: number; height: number } | null>(null);
   const [config, setConfig] = useState<CanvasConfig>({
@@ -264,57 +262,6 @@ export default function OverlayCanvas() {
       config: { ...(definition.defaultConfig || {}) },
     };
     setConfig((current) => ({ ...current, instances: [...(current.instances || []), nextInstance] }));
-  }
-
-  function addEditorInstance(input: Record<string, unknown>) {
-    const definition = catalog.find((item) => item.id === String(input.widgetId || ""));
-    const index = config.instances?.length || 0;
-    const width = Number(input.width) || definition?.defaultWidth || 280;
-    const height = Number(input.height) || definition?.defaultHeight || 120;
-    const id = `overlay-widget-${Date.now()}-${index}`;
-    const nextInstance: CanvasInstance = {
-      id,
-      widgetId: String(input.widgetId || ""),
-      elementKey: "full_widget",
-      isFullWidget: input.isFullWidget !== false,
-      name: String(input.name || definition?.name || input.widgetId || "Widget"),
-      x: Math.max(0, Math.min(size.width - width, 24 + (index % 5) * 28)),
-      y: Math.max(0, Math.min(size.height - height, 24 + (index % 5) * 28)),
-      width,
-      height,
-      zIndex: index + 1,
-      visible: true,
-      config: {
-        ...(definition?.defaultConfig || {}),
-        ...(isObject(input.defaultConfig) ? input.defaultConfig : {}),
-        ...(isObject(input.config) ? input.config : {}),
-      },
-    };
-    setConfig((current) => ({ ...current, instances: [...(current.instances || []), nextInstance] }));
-    setSelectedInstanceId(id);
-  }
-
-  function updateEditorInstance(id: string, patch: Record<string, unknown>) {
-    setConfig((current) => ({
-      ...current,
-      instances: (current.instances || []).map((instance) => {
-        if (instance.id !== id) return instance;
-        const patchConfig = isObject(patch.config) ? patch.config : {};
-        return {
-          ...instance,
-          ...patch,
-          config: { ...(instance.config || {}), ...patchConfig },
-        } as CanvasInstance;
-      }),
-    }));
-  }
-
-  function deleteEditorInstance(id: string) {
-    setConfig((current) => ({
-      ...current,
-      instances: (current.instances || []).filter((instance) => instance.id !== id),
-    }));
-    setSelectedInstanceId((current) => current === id ? null : current);
   }
 
   const canvasBackground = useMemo(
@@ -559,30 +506,7 @@ export default function OverlayCanvas() {
         />
       </div>
       </div>
-      <OverlayEditorSidebar
-        isOpen={editorOpen}
-        onToggleOpen={() => setEditorOpen((current) => !current)}
-        selectedWidgetId={config.instances?.find((instance) => instance.id === selectedInstanceId)?.widgetId}
-        instances={config.instances || []}
-        selectedInstanceId={selectedInstanceId || undefined}
-        onSelectInstance={(id: string) => setSelectedInstanceId(id)}
-        onAddInstance={addEditorInstance}
-        onUpdateInstance={updateEditorInstance}
-        onDeleteInstance={deleteEditorInstance}
-        overlayName={config.name || "Overlay"}
-        visualizerSize={size}
-        onUpdateVisualizerSize={(patch: { width?: number; height?: number }) => setConfig((current) => ({
-          ...current,
-          visualizerSize: { ...(current.visualizerSize || DEFAULT_SIZE), ...patch },
-        }))}
-        gridSettings={gridSettings}
-        onUpdateGridSettings={(patch: Record<string, unknown>) => setGridSettings((current) => ({ ...current, ...patch }))}
-        background={config.background || EMPTY_BACKGROUND}
-        onUpdateBackground={(patch: Partial<CanvasBackground>) => setConfig((current) => ({
-          ...current,
-          background: { ...(current.background || EMPTY_BACKGROUND), ...patch },
-        }))}
-      />
+
     </section>
   );
 }
