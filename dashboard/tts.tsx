@@ -23,18 +23,6 @@ const VOICE_EFFECTS: { id: VoiceEffect; label: string; description: string; rate
 ];
 const STORAGE_KEY = "livenexus:tts-settings-v1";
 type TtsPanel = "main" | "effects" | "filters";
-const TTS_PANEL_KEY = "livenexus:tts-panel-v1";
-
-function loadTtsPanel(): TtsPanel {
-  if (typeof window === "undefined") return "main";
-  try {
-    const saved = sessionStorage.getItem(TTS_PANEL_KEY);
-    if (saved === "connections") { sessionStorage.removeItem(TTS_PANEL_KEY); return "main"; }
-    return saved === "effects" || saved === "filters" ? saved : "main";
-  } catch {
-    return "main";
-  }
-}
 const DEFAULTS: TtsSettings = { voice: "pt_BR-faber-medium", rate: 1, volume: 1, pitch: 1, delay: 0, maxChars: 200, speakInterval: 0, effect: "normal", intensity: 1 };
 const SAMPLES = ["Olá, seja bem-vindo à live!", "Obrigado pela mensagem e por acompanhar a transmissão.", "Atenção, mensagem importante no chat."];
 
@@ -81,8 +69,8 @@ export default function TTSPage() {
   const [currentText, setCurrentText] = useState("");
   const [notice, setNotice] = useState("O modelo da voz selecionada será carregado na primeira reprodução.");
   const [autoReadChat, setAutoReadChat] = useState(true);
-  const [showFilters, setShowFilters] = useState(() => loadTtsPanel() === "filters");
-  const [showEffects, setShowEffects] = useState(() => loadTtsPanel() === "effects");
+  const [showFilters, setShowFilters] = useState(false);
+  const [showEffects, setShowEffects] = useState(false);
   const queueRef = useRef<QueueItem[]>([]);
   const activeRef = useRef<PlaybackHandle | null>(null);
   const playTokenRef = useRef(0);
@@ -307,10 +295,6 @@ export default function TTSPage() {
   function selectTtsPanel(panel: TtsPanel) {
     setShowEffects(panel === "effects");
     setShowFilters(panel === "filters");
-    try {
-      if (panel === "main") sessionStorage.removeItem(TTS_PANEL_KEY);
-      else sessionStorage.setItem(TTS_PANEL_KEY, panel);
-    } catch {}
   }
 
   return (
