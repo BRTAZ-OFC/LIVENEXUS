@@ -137,36 +137,6 @@ export default function MultiChatPanel() {
         <div><h2>Chat ao vivo</h2><p>Multichat unificado · Twitch, Kick e YouTube</p></div>
         <span className="text-[10px] text-slate-400">{state.messages.length} mensagens</span>
       </header>
-      <div className="grid grid-cols-1 gap-2 border-b border-white/10 p-3 md:grid-cols-3">
-        {PLATFORMS.map((platform) => {
-          const Icon = platformIcons[platform];
-          const item = state.statuses[platform];
-          const connected = ["connected", "open"].includes(item.status.toLowerCase());
-          const busy = item.status.toLowerCase() === "connecting" || item.status.toLowerCase() === "reconnecting";
-          return (
-            <div key={platform} className="min-w-0 rounded-xl border border-white/10 bg-black/20 p-2.5">
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-white"><Icon size={14} />{platform}</span>
-                <span className={`h-2 w-2 rounded-full ${connected ? "bg-emerald-400" : busy ? "animate-pulse bg-amber-400" : item.status === "error" ? "bg-red-400" : "bg-slate-600"}`} />
-              </div>
-              <input
-                value={state.channels[platform]}
-                onChange={(event) => setMultiChatChannel(platform, event.target.value)}
-                disabled={Boolean(handles[platform])}
-                placeholder={placeholders[platform]}
-                aria-label={`Canal ${platform}`}
-                className="mb-2 w-full min-w-0 rounded-lg border border-white/10 bg-slate-950 px-2 py-1.5 text-[11px] text-white outline-none focus:border-violet-400 disabled:opacity-60"
-              />
-              <div className="mb-2 min-h-8 text-[10px] text-slate-400">{item.detail}{item.viewers !== null ? ` · ${item.viewers} espectadores` : ""}{item.meta ? ` · ${item.meta}` : ""}</div>
-              {handles[platform] ? (
-                <button type="button" onClick={() => disconnectMultiChatPlatform(platform)} className="flex w-full items-center justify-center gap-1 rounded-lg border border-red-500/30 bg-red-500/10 px-2 py-1.5 text-[10px] font-semibold text-red-300"><WifiOff size={12} /> Desconectar</button>
-              ) : (
-                <button type="button" onClick={() => connectMultiChatPlatform(platform)} disabled={!state.channels[platform].trim()} className="flex w-full items-center justify-center gap-1 rounded-lg bg-violet-600 px-2 py-1.5 text-[10px] font-semibold text-white disabled:opacity-40"><Wifi size={12} /> Conectar</button>
-              )}
-            </div>
-          );
-        })}
-      </div>
       <div className="dash-chat-toolbar">
         <span className={`dash-chat-status-dot ${PLATFORMS.some((p) => ["connected", "open"].includes(state.statuses[p].status.toLowerCase())) ? "is-connected" : ""}`} />
         {PLATFORMS.filter((p) => ["connected", "open"].includes(state.statuses[p].status.toLowerCase())).length} de 3 plataformas conectadas
@@ -174,7 +144,7 @@ export default function MultiChatPanel() {
       </div>
       <div className="dash-chat-messages" role="log" aria-label="Mensagens reais do multichat">
         {state.messages.length === 0 ? (
-          <div className="dash-chat-empty"><MessageSquare /><strong>Nenhuma mensagem recebida</strong><span>Informe o canal em cada plataforma e clique em Conectar.</span></div>
+          <div className="dash-chat-empty"><MessageSquare /><strong>Nenhuma mensagem recebida</strong><span>As mensagens aparecerão aqui quando o administrador conectar os canais no Painel Admin.</span></div>
         ) : state.messages.map((message) => (
           <article key={message.id} className="flex gap-2 border-b border-white/5 px-3 py-2.5 text-xs">
             <time className="shrink-0 text-[10px] text-slate-500">{new Date(message.timestamp).toLocaleTimeString("pt-BR")}</time>
