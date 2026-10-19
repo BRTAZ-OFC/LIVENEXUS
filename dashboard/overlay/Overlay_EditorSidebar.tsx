@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { getWidgetInternalElements } from "./Overlay_widgetElements";
 
 type WidgetDefinition = {
   id: string;
@@ -44,6 +45,7 @@ type Props = {
   selectedInstanceId: string | null;
   onSelectInstance: (id: string | null) => void;
   onAddWidget: (widget: WidgetDefinition) => void;
+  onAddComponent: (widget: WidgetDefinition, elementKey: string, label: string) => void;
   onUpdateInstance: (id: string, patch: Partial<Instance>) => void;
   onDeleteInstance: (id: string) => void;
   gridSettings: GridSettings;
@@ -137,9 +139,20 @@ export default function OverlayEditorSidebar(props: Props) {
             <div className="space-y-3">
               <div><p className="text-[10px] uppercase tracking-wide text-violet-300">Widget selecionada</p><h4 className="mt-1 text-sm font-semibold">{selectedDefinition.name}</h4></div>
               <div className="rounded-lg border border-white/10 bg-slate-900/70 p-2">
-                <p className="mb-2 text-[10px] font-semibold uppercase text-slate-400">Componentes</p>
-                <p className="text-[10px] leading-relaxed text-slate-400">A widget completa está selecionada. Selecione a camada no canvas para editar suas propriedades.</p>
+                <p className="mb-2 text-[10px] font-semibold uppercase text-slate-400">Widget completa</p>
+                <p className="text-[10px] leading-relaxed text-slate-400">A widget completa está no canvas. Você também pode adicionar componentes individuais abaixo, quando disponíveis.</p>
                 <button type="button" onClick={() => setActiveTab("config")} className="mt-2 rounded border border-violet-400/30 px-2 py-1.5 text-[10px] text-violet-200 hover:bg-violet-500/10">Configurar widget</button>
+              </div>
+              <div className="space-y-1.5">
+                <p className="text-[10px] font-semibold uppercase text-slate-400">Componentes disponíveis</p>
+                {getWidgetInternalElements(selected.widgetId || "").length === 0 ? (
+                  <p className="text-[10px] text-slate-500">Esta widget não possui componentes separados no catálogo.</p>
+                ) : getWidgetInternalElements(selected.widgetId || "").map(element => (
+                  <button key={element.key} type="button" onClick={() => props.onAddComponent(selectedDefinition, element.key, element.label)}
+                    className="flex w-full items-center justify-between gap-2 rounded border border-white/10 px-2 py-2 text-left text-[10px] hover:border-violet-400/50 hover:bg-violet-500/10">
+                    <span>{element.label}</span><span className="text-violet-300">＋</span>
+                  </button>
+                ))}
               </div>
             </div>
           )
