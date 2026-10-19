@@ -7,7 +7,7 @@
 //   offline: sinal de que a live ativa foi encerrada (debounce de 2 leituras nulas)
 import { diag, pushError, pushKickRawEvent } from '../painel-admin/Admin_streamingDiagnostics';
 
-const PUSHER_KEY = '32cbd69e4b950bf97679';
+const PUSHER_KEY = '34bf7a0ff419a2a775b9';
 const PUSHER_URL = `wss://ws-us2.pusher.com/app/${PUSHER_KEY}?protocol=7&client=js&version=8.4.0-rc2&flash=false`;
 
 // Normaliza entrada do usuário (nome, @nome, URL) para slug puro.
