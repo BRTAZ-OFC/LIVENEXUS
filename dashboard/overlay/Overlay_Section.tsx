@@ -4,7 +4,7 @@ type OverlayUser = {
   role?: string;
 };
 
-export default function OverlaySection({ users }: { users: OverlayUser[] }) {
+export default function OverlaySection({ users }: { users?: OverlayUser[] }) {
   return (
     <div className="space-y-6">
       <div>
@@ -14,32 +14,36 @@ export default function OverlaySection({ users }: { users: OverlayUser[] }) {
         </p>
       </div>
 
-      <div className="p-4 rounded-xl bg-slate-950/60 border border-white/10 space-y-4">
-        <p className="text-xs text-slate-300">
-          Usuários cadastrados e suas funções na plataforma:
-        </p>
-        {users.length === 0 ? (
-          <p className="py-4 text-xs text-slate-400">
-            Nenhum usuário cadastrado encontrado.
+      {users !== undefined && (
+        <div className="p-4 rounded-xl bg-slate-950/60 border border-white/10 space-y-4">
+          <p className="text-xs text-slate-300">
+            Usuários cadastrados e suas funções na plataforma:
           </p>
-        ) : (
-          <div className="divide-y divide-white/5">
-            {users.map((user) => (
-              <div key={user.user_id} className="py-3 flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-white truncate">{user.user}</p>
-                  <p className="text-[10px] text-slate-400">
-                    Papel: <span className="text-violet-300 font-semibold">{user.role || "user"}</span>
-                  </p>
+          {users.length === 0 ? (
+            <p className="py-4 text-xs text-slate-400">
+              Nenhum usuário cadastrado encontrado.
+            </p>
+          ) : (
+            <div className="divide-y divide-white/5">
+              {users.map((user) => (
+                <div key={user.user_id} className="py-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold text-white truncate">{user.user}</p>
+                    <p className="text-[10px] text-slate-400">
+                      Papel: <span className="text-violet-300 font-semibold">{user.role || "user"}</span>
+                    </p>
+                  </div>
+                  <span className="px-2 py-1 rounded text-[10px] font-semibold bg-violet-500/10 text-violet-300 border border-violet-500/20 shrink-0">
+                    Área de Overlay
+                  </span>
                 </div>
-                <span className="px-2 py-1 rounded text-[10px] font-semibold bg-violet-500/10 text-violet-300 border border-violet-500/20 shrink-0">
-                  Área de Overlay
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+        </div>
+  
+  
+      )}
 
       <div className="rounded-xl border border-dashed border-white/15 bg-slate-950/30 p-5">
         <h3 className="text-xs font-semibold text-white">Contêiner de overlays</h3>
