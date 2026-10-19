@@ -28,6 +28,7 @@ type WidgetDefinition = {
   category?: string;
   implemented?: boolean;
 };
+type CanvasGridSettings = { showGrid: boolean; snapToGrid: boolean; gridSize: number; showSafeAreas: boolean; verticalGuides: { id: string; x: number }[]; horizontalGuides: { id: string; y: number }[] };
 type CanvasBackground = {
   type?: string;
   color?: string;
@@ -128,7 +129,7 @@ export default function OverlayCanvas() {
   const [scale, setScale] = useState(1);
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
-  const [gridSettings, setGridSettings] = useState<Record<string, any>>({ showGrid: false, snapToGrid: false, gridSize: 20, showSafeAreas: false, verticalGuides: [], horizontalGuides: [] });
+  const [gridSettings, setGridSettings] = useState<CanvasGridSettings>({ showGrid: false, snapToGrid: false, gridSize: 20, showSafeAreas: false, verticalGuides: [], horizontalGuides: [] });
   const widgetPointer = useRef<{ instanceId: string; mode: "move" | "resize"; x: number; y: number; left: number; top: number; width: number; height: number } | null>(null);
   const [config, setConfig] = useState<CanvasConfig>({
     name: "Overlay",
@@ -284,7 +285,7 @@ export default function OverlayCanvas() {
     setSelectedInstanceId((current) => current === instanceId ? null : current);
   }
 
-  function updateGridSettings(patch: Record<string, any>) {
+  function updateGridSettings(patch: Partial<CanvasGridSettings>) {
     setGridSettings((current) => ({ ...current, ...patch }));
   }
 
