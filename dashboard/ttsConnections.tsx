@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CheckCircle2, Copy, LoaderCircle, RadioTower, ShieldCheck, Unplug, Youtube } from "lucide-react";
 import { connectMultiChatPlatform, disconnectMultiChatPlatform, getMultiChatSnapshot, setMultiChatChannel, useMultiChatSnapshot, type ChatPlatform } from "./multichat";
 
@@ -10,26 +10,60 @@ const INFO: Record<Platform, PlatformInfo> = {
   Kick: { label: "Kick", hint: "Nome/slug do canal", placeholder: "ex.: xqc", accent: "kick", Icon: RadioTower },
   YouTube: { label: "YouTube", hint: "Handle, URL do canal ou ID", placeholder: "ex.: @canal", accent: "youtube", Icon: Youtube },
 };
-type ConnectionState = { channel: string; code: string; challenge: string; verified: boolean; busy: boolean; message: string };
-const emptyState = (): ConnectionState => ({ channel: "", code: "", challenge: "", verified: false, busy: false, message: "" });
+type ConnectionState = { channel: string; code: string; challenge: string; challengeExpiresAt: number; verified: boolean; busy: boolean; message: string };
+const CONNECTION_STATE_KEY = "livenexus:tts-bio-state-v1";
+const emptyState = (): ConnectionState => ({ channel: "", code: "", challenge: "", challengeExpiresAt: 0, verified: false, busy: false, message: "" });
+
+function loadConnectionItems(): Record<Platform, ConnectionState> {
+  let saved: Partial<Record<Platform, Partial<ConnectionState>>> = {};
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(CONNECTION_STATE_KEY) || "{}") as Partial<Record<Platform, Partial<ConnectionState>>>;
+    saved = parsed && typeof parsed === "object" ? parsed : {};
+  } catch {}
+
+  const current = getMultiChatSnapshot();
+  return Object.fromEntries(PLATFORMS.map((platform) => {
+    let savedChannel = current.channels[platform];
+    try { savedChannel = localStorage.getItem(`livenexus:tts-channel:${platform}`) || savedChannel; } catch {}
+
+    const item = saved[platform] || {};
+    const expiresAt = Number(item.challengeExpiresAt) || 0;
+    const challengeValid = typeof item.code === "string" && !!item.code &&
+      typeof item.challenge === "string" && !!item.challenge && expiresAt > Date.now();
+
+    return [platform, {
+      ...emptyState(),
+      channel: typeof item.channel === "string" ? item.channel : savedChannel,
+      code: challengeValid ? item.code! : "",
+      challenge: challengeValid ? item.challenge! : "",
+      challengeExpiresAt: challengeValid ? expiresAt : 0,
+      verified: item.verified === true,
+      busy: false,
+      message: !challengeValid && !!item.code && item.verified !== true
+        ? "O código expirou. Gere outro código para continuar."
+        : typeof item.message === "string" ? item.message : "",
+    }];
+  })) as Record<Platform, ConnectionState>;
+}
 
 export default function TtsConnectionsPanel() {
   const snapshot = useMultiChatSnapshot();
-  const [items, setItems] = useState<Record<Platform, ConnectionState>>(() => {
-    const current = getMultiChatSnapshot();
-    return Object.fromEntries(PLATFORMS.map((platform) => {
-      let savedChannel = current.channels[platform];
-      try { savedChannel = localStorage.getItem(`livenexus:tts-channel:${platform}`) || savedChannel; } catch {}
-      return [platform, { ...emptyState(), channel: savedChannel }];
-    })) as Record<Platform, ConnectionState>;
-  });
+  const [items, setItems] = useState<Record<Platform, ConnectionState>>(loadConnectionItems);
+  const itemsRef = useRef(items);
   const [copied, setCopied] = useState(false);
 
   function patch(platform: Platform, changes: Partial<ConnectionState>) {
     if (typeof changes.channel === "string") {
       try { localStorage.setItem(`livenexus:tts-channel:${platform}`, changes.channel); } catch {}
     }
-    setItems((old) => ({ ...old, [platform]: { ...old[platform], ...changes } }));
+    const next = {
+      ...itemsRef.current,
+      [platform]: { ...itemsRef.current[platform], ...changes },
+    };
+    itemsRef.current = next;
+    // Salva sincronamente para que um reload inesperado não apague o código recém-gerado.
+    try { sessionStorage.setItem(CONNECTION_STATE_KEY, JSON.stringify(next)); } catch {}
+    setItems(next);
   }
 
   useEffect(() => {
@@ -57,9 +91,9 @@ export default function TtsConnectionsPanel() {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ platform, channel: item.channel.trim() }),
       });
-      const result = await response.json() as { ok?: boolean; code?: string; challengeId?: string; message?: string };
+      const result = await response.json() as { ok?: boolean; code?: string; challengeId?: string; expiresInSeconds?: number; message?: string };
       if (!response.ok || !result.ok || !result.code || !result.challengeId) throw new Error(result.message || "Não foi possível gerar o código.");
-      patch(platform, { challenge: result.challengeId, code: result.code, verified: false, message: "Coloque o código na bio/descrição pública do canal e depois confirme a verificação." });
+      patch(platform, { challenge: result.challengeId, code: result.code, challengeExpiresAt: Date.now() + Math.max(1, Number(result.expiresInSeconds) || 1800) * 1000, verified: false, message: "Coloque o código na bio/descrição pública do canal e depois confirme a verificação." });
     } catch (error) {
       patch(platform, { message: error instanceof Error ? error.message : "Falha ao gerar o código." });
     } finally { patch(platform, { busy: false }); }
@@ -117,7 +151,7 @@ export default function TtsConnectionsPanel() {
                 <span className={active ? "tts-user-connect-dot active" : item.verified ? "tts-user-connect-dot verified" : "tts-user-connect-dot"} />
               </div>
               <label className="tts-connection-label">Canal
-                <input value={item.channel} placeholder={info.placeholder} disabled={active} onChange={(event) => patch(platform, { channel: event.target.value, verified: false, challenge: "", code: "", message: "" })} />
+                <input value={item.channel} placeholder={info.placeholder} disabled={active} onChange={(event) => patch(platform, { channel: event.target.value, verified: false, challenge: "", code: "", challengeExpiresAt: 0, message: "" })} />
               </label>
               {!item.verified ? (
                 <>
