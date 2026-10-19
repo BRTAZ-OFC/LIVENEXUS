@@ -5,7 +5,7 @@ import TTSPage from "./tts";
 import PlatformBioConnections from "./conexao/PlatformBioConnections";
 import OverlayCanvas from "./overlay/Overlay_Canvas";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import {
   AudioLines,
   Radio,
@@ -22,6 +22,9 @@ import {
   Eye,
   Volume2,
 } from "lucide-react";
+
+const MemoPlatformBioConnections = memo(PlatformBioConnections);
+const MemoOverlayCanvas = memo(OverlayCanvas);
 
 /* BLOCO 2 — O dashboard é registrado em dashboard/App.tsx. */
 /* BLOCO 3 — Controla menu lateral, seção ativa e acesso administrativo. */
@@ -249,12 +252,14 @@ function DashboardPage() {
         <div className={activeSection === "voice" ? "dash-w-full-px-6-5ebeye" : "hidden"}>
           <TTSPage />
         </div>
-        <div className={activeSection === "connections" ? "dash-w-full-px-6-5ebeye" : "hidden"}>
-          <PlatformBioConnections />
-        </div>
+        {activeSection === "connections" && (
+          <div className="dash-w-full-px-6-5ebeye">
+            <MemoPlatformBioConnections />
+          </div>
+        )}
         {activeSection === "overlay" && (
           <div className="dash-w-full-px-6-5ebeye">
-            <OverlayCanvas />
+            <MemoOverlayCanvas />
           </div>
         )}
         {activeSection === "overview" ? (
