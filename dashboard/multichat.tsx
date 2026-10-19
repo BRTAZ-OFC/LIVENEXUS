@@ -72,6 +72,18 @@ export function useMultiChatSnapshot() {
   useEffect(() => subscribeMultiChat(setValue), []);
   return value;
 }
+
+// Assinatura seletiva para telas que só precisam do estado dos canais, não das mensagens.
+export function useMultiChatStatusSnapshot() {
+  const [value, setValue] = useState(() => ({ channels: snapshot.channels, statuses: snapshot.statuses }));
+  useEffect(() => subscribeMultiChat((next) => {
+    setValue((current) => {
+      if (current.channels === next.channels && current.statuses === next.statuses) return current;
+      return { channels: next.channels, statuses: next.statuses };
+    });
+  }), []);
+  return value;
+}
 export function setMultiChatChannel(platform: ChatPlatform, channel: string) {
   snapshot = { ...snapshot, channels: { ...snapshot.channels, [platform]: channel } };
   notify();
