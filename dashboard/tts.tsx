@@ -42,7 +42,7 @@ export default function TTSPage() {
   const [speaking, setSpeaking] = useState(false);
   const [paused, setPaused] = useState(false);
   const [currentText, setCurrentText] = useState("");
-  const [notice, setNotice] = useState("Motor neural pt-BR será carregado na primeira reprodução.");
+  const [notice, setNotice] = useState("O modelo da voz selecionada será carregado na primeira reprodução.");
   const [preset, setPreset] = useState("padrao");
   const queueRef = useRef<QueueItem[]>([]);
   const activeRef = useRef<PlaybackHandle | null>(null);
@@ -84,7 +84,7 @@ export default function TTSPage() {
     };
     activeRef.current = placeholder;
     try {
-      const handle = await playProcessedSpeech(text, settingsRef.current, {
+      const handle = await playProcessedSpeech(text, { ...settingsRef.current, voice: settingsRef.current.voice }, {
         onProgress: (message) => setNotice(message),
         onStart: () => {
           if (token !== playTokenRef.current || cancelled) return;
@@ -226,9 +226,13 @@ export default function TTSPage() {
           <div className="tts-input-column">
             <label>Voz neural
               <select value={settings.voice} onChange={(e) => update("voice", e.target.value)}>
-                <option value="pt_BR-faber-medium">Português brasileiro · Faber (Piper)</option>
+                <option value="pt_BR-dii">Dii · Feminina · Português brasileiro (Piper)</option>
+                <option value="pt_BR-faber-medium">Faber · Masculina · Português brasileiro (Piper)</option>
+                <option value="pt_BR-edresson-low">Edresson · Masculina · Português brasileiro (Piper · leve)</option>
+                <option value="pt_BR-cadu-medium">Cadu · Masculina · Português brasileiro (Piper)</option>
+                <option value="pt_BR-jeff-medium">Jeff · Masculina · Português brasileiro (Piper)</option>
               </select>
-              <small className="tts-engine-caption">{engineReady ? "Motor neural carregado nesta sessão" : "O modelo será baixado na primeira reprodução e ficará em cache"}</small>
+              <small className="tts-engine-caption">{engineReady ? "Motor neural carregado nesta sessão; ao trocar de voz, o novo modelo será carregado sob demanda." : "A voz selecionada será baixada na primeira reprodução e ficará em cache. Modelos alternativos podem ter cerca de 60 MB."}</small>
             </label>
             <label>Texto de teste <span className="tts-char-count">{testText.length} / {settings.maxChars || "sem limite"}</span>
               <textarea rows={4} value={testText} onChange={(e) => setTestText(e.target.value)} maxLength={settings.maxChars > 0 ? settings.maxChars : undefined} placeholder="Digite um texto para testar a voz..." />
