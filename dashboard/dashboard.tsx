@@ -203,7 +203,7 @@ function DashboardPage() {
 
             <div className="dash-live-stats">
               <article className="dash-stat-card">
-                <div className="dash-stat-label"><Radio /> Espectadores por plataforma</div>
+                <div className="dash-stat-label"><Radio /> Quantidade de espectadores por plataforma</div>
                 <div className="dash-platform-counts">
                   <span><i className="dash-platform-dot twitch" /> Twitch <b>{(chatState.statuses.Twitch.viewers ?? 0).toLocaleString("pt-BR")}</b></span>
                   <span><i className="dash-platform-dot youtube" /> YouTube <b>{(chatState.statuses.YouTube.viewers ?? 0).toLocaleString("pt-BR")}</b></span>
