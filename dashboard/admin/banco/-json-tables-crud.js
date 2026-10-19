@@ -213,7 +213,7 @@ function rowsFromTable(definition, data, users) {
 
   const validIds = users;
   for (const [ownerId, value] of Object.entries(data)) {
-    // Orphaned D1-era IDs are intentionally not treated as local user identities.
+    // Só são exibidos registros pertencentes a user_id existentes em usuario.json.
     if (!validIds.has(ownerId)) continue;
 
     if (definition.shape === "userObject") {
