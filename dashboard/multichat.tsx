@@ -105,9 +105,10 @@ export function connectMultiChatPlatform(platform: ChatPlatform) {
   const onMeta = (raw: unknown) => {
     if (!raw || typeof raw !== "object") return;
     const meta = raw as Record<string, unknown>;
+    const details = meta.meta && typeof meta.meta === "object" ? meta.meta as Record<string, unknown> : meta;
     patchPlatform(platform, {
       viewers: typeof meta.viewers === "number" ? meta.viewers : snapshot.statuses[platform].viewers,
-      meta: String(meta.title ?? meta.channelName ?? (meta.offline ? "Live offline" : meta.meta ?? "")),
+      meta: String(details.title ?? details.channelName ?? (meta.offline ? "Live offline" : "")),
     });
   };
   try {
