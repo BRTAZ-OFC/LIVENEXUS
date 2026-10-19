@@ -6,7 +6,7 @@ import { defineConfig } from "vite";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
-/* Base do LIVENEXUS-CONSEPT: Vite + React, com proxy para a API Express. */
+/* Vite integrado ao servidor HTTP do Express, seguindo o padrão do BACKUP01. */
 export default defineConfig(() => ({
   plugins: [react(), tailwindcss()],
   resolve: {
@@ -17,14 +17,11 @@ export default defineConfig(() => ({
   server: {
     host: "0.0.0.0",
     port: 3000,
-    allowedHosts: ["localhost", ".run.app"],
-    // Ambientes hospedados que não encaminham WebSocket devem manter o HMR desligado.
-    // Para habilitá-lo explicitamente em um ambiente compatível, defina ENABLE_HMR=true.
-    hmr: process.env["ENABLE_HMR"] === "true" ? {} : false,
-    watch: process.env["ENABLE_HMR"] === "true" ? {} : null,
+    allowedHosts: true,
   },
   preview: {
     host: "0.0.0.0",
     port: 3000,
+    allowedHosts: true,
   },
 }));
