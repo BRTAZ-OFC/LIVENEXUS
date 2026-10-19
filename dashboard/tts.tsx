@@ -2,11 +2,24 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AudioLines, Clock3, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
 import "./css/tts.css";
 
+type VoiceEffect = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
 type TtsSettings = {
   voice: string; rate: number; volume: number; pitch: number; delay: number; maxChars: number; speakInterval: number;
+  effect: VoiceEffect; intensity: number;
 };
+const VOICE_EFFECTS: { id: VoiceEffect; label: string; description: string; rate: number; pitch: number }[] = [
+  { id: "normal", label: "Normal", description: "Voz original", rate: 1, pitch: 1 },
+  { id: "squirrel", label: "Esquilo", description: "Aguda e acelerada", rate: 1.25, pitch: 1.85 },
+  { id: "monster", label: "Monstro", description: "Grave e lenta", rate: 0.78, pitch: 0.48 },
+  { id: "robot", label: "Robô", description: "Tom sintético", rate: 0.92, pitch: 0.72 },
+  { id: "radio", label: "Rádio", description: "Voz de transmissão", rate: 0.98, pitch: 0.92 },
+  { id: "megaphone", label: "Megafone", description: "Voz projetada", rate: 1, pitch: 0.9 },
+  { id: "alien", label: "Alienígena", description: "Tom estranho e oscilante", rate: 1.08, pitch: 1.55 },
+  { id: "giant", label: "Gigante", description: "Muito grave e pesada", rate: 0.68, pitch: 0.3 },
+  { id: "ghost", label: "Fantasma", description: "Voz lenta e etérea", rate: 0.82, pitch: 1.3 },
+];
 const STORAGE_KEY = "livenexus:tts-settings-v1";
-const DEFAULTS: TtsSettings = { voice: "", rate: 1, volume: 1, pitch: 1, delay: 0, maxChars: 200, speakInterval: 0 };
+const DEFAULTS: TtsSettings = { voice: "", rate: 1, volume: 1, pitch: 1, delay: 0, maxChars: 200, speakInterval: 0, effect: "normal", intensity: 1 };
 const SAMPLES = ["Olá, seja bem-vindo à live!", "Obrigado pela mensagem e por acompanhar a transmissão.", "Atenção, mensagem importante no chat."];
 
 type QueueItem = { id: number; text: string; author: string; tier: "broadcaster" | "moderator" | "vip" | "subscriber" | "normal"; queuedAt: number };
@@ -65,7 +78,13 @@ export default function TTSPage() {
     const s = settingsRef.current;
     const voice = voices.find((v) => v.name === s.voice);
     if (voice) u.voice = voice;
-    u.rate = s.rate; u.volume = s.volume; u.pitch = s.pitch;
+    const effect = VOICE_EFFECTS.find((item) => item.id === s.effect) ?? VOICE_EFFECTS[0];
+    // Web Speech exposes pitch/rate, but not the rendered audio stream for EQ, distortion or echo.
+    // These presets therefore shape the synthesis parameters without claiming full DSP effects.
+    const blend = Math.max(0, Math.min(1.5, s.intensity));
+    u.rate = Math.max(0.2, Math.min(3, s.rate * (1 + (effect.rate - 1) * blend)));
+    u.volume = s.volume;
+    u.pitch = Math.max(0.1, Math.min(2, s.pitch * (1 + (effect.pitch - 1) * blend)));
     return u;
   }
 
@@ -207,6 +226,15 @@ export default function TTSPage() {
             <RangeControl label="Intervalo" value={settings.speakInterval} min={0} max={5} step={0.1} suffix="s" onChange={(v) => update("speakInterval", v)} />
           </div>
         </div>
+      </section>
+
+      <section className="tts-card">
+        <div className="tts-card-title"><span className="tts-title-icon amber"><Star /></span><div><h2>Efeitos de voz do TTS</h2><p>Selecione um personagem e ajuste a intensidade</p></div></div>
+        <div className="tts-voice-effects">
+          {VOICE_EFFECTS.map((effect) => <button key={effect.id} className={settings.effect === effect.id ? "selected" : ""} onClick={() => update("effect", effect.id)}><strong>{effect.label}</strong><small>{effect.description}</small></button>)}
+        </div>
+        <div className="tts-effect-intensity"><RangeControl label="Intensidade do efeito" value={settings.intensity} min={0} max={1.5} step={0.05} suffix="x" display={`${Math.round(settings.intensity * 100)}%`} onChange={(v) => update("intensity", v)} /></div>
+        <p className="tts-effect-note">Limitação técnica: o sintetizador nativo do navegador permite ajustar tom e velocidade, mas não entrega o áudio gerado para aplicar filtros reais de rádio, megafone, distorção robótica ou eco. Esses efeitos precisam de um motor TTS que gere áudio processável ou de uma fonte de áudio dedicada.</p>
       </section>
 
       <section className="tts-card">
