@@ -60,3 +60,12 @@
 .tts-filter-flagged label input { accent-color: #ef4444; }
 .tts-filter-flagged small { color: #9ca3af; font-size: 10px; }
 .tts-filter-flagged button { display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: #fca5a5; }
+
+/* Botão de filtros junto ao estado Pronto */
+.tts-heading-actions{display:flex;align-items:center;gap:8px;flex:none}
+.tts-filter-open-button{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #37304d;border-radius:999px;padding:7px 12px;background:#171225;color:#ddd6fe;font-size:11px;font-weight:700;cursor:pointer}
+.tts-filter-open-button:hover,.tts-filter-open-button.selected{border-color:#8b5cf6;background:#2e1065;color:#fff}
+.multichat-tts-status{display:inline-flex;align-items:center;justify-content:center;flex:none;margin-top:1px}
+.multichat-tts-status.allowed{color:#22c55e}
+.multichat-tts-status.muted{color:#ef4444}
+@media(max-width:520px){.tts-heading-actions{gap:5px}.tts-filter-open-button{padding:6px 9px}}
