@@ -21,7 +21,10 @@ export default defineConfig(() => ({
     // Ambientes hospedados que não encaminham WebSocket devem manter o HMR desligado.
     // Para habilitá-lo explicitamente em um ambiente compatível, defina ENABLE_HMR=true.
     hmr: process.env["ENABLE_HMR"] === "true" ? undefined : false,
-    watch: process.env["ENABLE_HMR"] === "true" ? {} : null,
+    // JSON mutável do armazenamento não deve disparar atualização da interface no modo de desenvolvimento.
+    watch: process.env["ENABLE_HMR"] === "true"
+      ? { ignored: ["**/dashboard/admin/banco/json/**"] }
+      : null,
     proxy: {
       "/api": {
         target: "http://127.0.0.1:3001",
