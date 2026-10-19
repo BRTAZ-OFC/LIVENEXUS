@@ -181,7 +181,7 @@ export default function OverlayCanvas() {
     const updateScale = () => {
       const widthScale = frame.clientWidth / size.width;
       const heightScale = frame.clientHeight / size.height;
-      setScale(Math.min(1, widthScale, heightScale));
+      setScale(Math.max(0.01, Math.min(widthScale, heightScale)));
     };
     updateScale();
     const observer = new ResizeObserver(updateScale);
