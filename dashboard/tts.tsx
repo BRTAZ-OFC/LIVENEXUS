@@ -33,6 +33,7 @@ export default function TTSPage() {
   const queueRef = useRef<QueueItem[]>([]);
   const activeRef = useRef<SpeechSynthesisUtterance | null>(null);
   const idRef = useRef(0);
+  const selectionCountRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pausedRef = useRef(false);
   const settingsRef = useRef(settings);
@@ -93,12 +94,16 @@ export default function TTSPage() {
     const valid = queueRef.current.filter((item) => now - item.queuedAt <= TTL[item.tier]);
     if (valid.length !== queueRef.current.length) { setQueue(valid); queueRef.current = valid; }
     if (!valid.length) { setSpeaking(false); setCurrentText(""); return; }
-    const agedIndex = valid.findIndex((item) => item.tier === "normal" && now - item.queuedAt >= 20000);
-    const selected = valid.slice().sort((a, b) => {
-      if (agedIndex >= 0 && a.id === valid[agedIndex].id) return -1;
-      if (agedIndex >= 0 && b.id === valid[agedIndex].id) return 1;
-      return PRIORITY[a.tier] - PRIORITY[b.tier] || a.queuedAt - b.queuedAt;
-    })[0];
+    selectionCountRef.current += 1;
+    const normalItems = valid.filter((item) => item.tier === "normal");
+    const fairnessSlot = selectionCountRef.current % 5 === 0 && normalItems.length > 0;
+    const agedNormal = normalItems.find((item) => now - item.queuedAt >= 20000);
+    const hasPrivileged = valid.some((item) => PRIORITY[item.tier] < 4);
+    const selected = fairnessSlot
+      ? normalItems[0]
+      : (!hasPrivileged && agedNormal
+          ? agedNormal
+          : valid.slice().sort((a, b) => PRIORITY[a.tier] - PRIORITY[b.tier] || a.queuedAt - b.queuedAt)[0]);
     setQueue((old) => old.filter((item) => item.id !== selected.id));
     queueRef.current = queueRef.current.filter((item) => item.id !== selected.id);
     const u = makeUtterance(selected.text);
@@ -121,7 +126,17 @@ export default function TTSPage() {
     const text = testText.trim().slice(0, settings.maxChars > 0 ? settings.maxChars : undefined);
     if (!text) { setNotice("Digite o texto de teste antes de adicionar à fila."); return; }
     const item = { id: ++idRef.current, text, author: tier === "normal" ? "Teste" : tier, tier, queuedAt: Date.now() } satisfies QueueItem;
-    setQueue((old) => [...old, item]);
+    setQueue((old) => {
+      let next = [...old, item];
+      if (next.length > 200) {
+        const discardIndex = next.findIndex((entry) => entry.tier === "normal");
+        const fallbackIndex = next.findIndex((entry) => entry.tier === "vip" || entry.tier === "subscriber");
+        const index = discardIndex >= 0 ? discardIndex : fallbackIndex >= 0 ? fallbackIndex : next.findIndex((entry) => entry.tier !== "broadcaster" && entry.tier !== "moderator");
+        if (index >= 0) next.splice(index, 1);
+      }
+      queueRef.current = next;
+      return next;
+    });
     setNotice("Mensagem de teste adicionada à fila.");
   }
 
