@@ -205,6 +205,13 @@ export function toggleFlaggedUser(key: string) {
   if (user) { flaggedUsers.set(key, { ...user, blocked: !user.blocked }); emitDiag(); }
 }
 export function clearFlaggedUser(key: string) { flaggedUsers.delete(key); emitDiag(); }
+export function recordTtsQueueBlock(message: MultiChatMessage, reason: string) {
+  diag.blocked++;
+  diag.reasons[reason] = (diag.reasons[reason] || 0) + 1;
+  diag.events.unshift({ id: message.id + "-queue", time: Date.now(), platform: message.platform, author: message.author, decision: "BLOQUEADA", reason, text: message.text });
+  if (diag.events.length > 100) diag.events.length = 100;
+  emitDiag();
+}
 
 const roleLabels: Record<string, string> = { broadcaster: "Streamer/dono", moderator: "Moderador", vip: "VIP", subscriber: "Inscrito/membro", normal: "Usuário comum" };
 const eventLabels: Record<string, string> = {
@@ -287,6 +294,7 @@ export function TtsFiltersPanel() {
       <div className="tts-filter-stats"><span>Recebidas <b>{diagState.received}</b></span><span>Aceitas <b>{diagState.accepted}</b></span><span>Bloqueadas <b>{diagState.blocked}</b></span></div>
       <div className="tts-filter-reasons">{Object.entries(diagState.reasons).sort((a, b) => b[1] - a[1]).map(([reason, count]) => <span key={reason}>{reason}: <b>{count}</b></span>)}</div>
       <div className="tts-filter-events">{diagState.events.slice(0, 30).map((event) => <article key={event.id + event.time}><time>{new Date(event.time).toLocaleTimeString("pt-BR")}</time><b className={event.decision === "ACEITA" ? "accepted" : "blocked"}>{event.decision}</b><span>{event.platform} · {event.author}</span><small>{event.reason}</small><p>{event.text}</p></article>)}</div>
+      <div className="tts-filter-flagged"><h3>Usuários sinalizados por repetição</h3>{getFlaggedUsers().length === 0 ? <p>Nenhum usuário sinalizado.</p> : getFlaggedUsers().map((user) => <div key={user.key}><label><input type="checkbox" checked={user.blocked} onChange={() => toggleFlaggedUser(user.key)} /> <span>{user.author} · {user.platform}</span></label><small>{user.reason}</small><button onClick={() => clearFlaggedUser(user.key)} aria-label={"Limpar " + user.author}><Trash2 size={12} /></button></div>)}</div>
     </div>
     <p className="tts-filter-footer">Configurações salvas localmente neste navegador. As regras só filtram a leitura TTS; o chat visual continua recebendo as mensagens.</p>
   </section>;
