@@ -43,6 +43,7 @@ type CanvasBackground = {
   borderRadius?: string;
 };
 type CanvasConfig = {
+  id?: string;
   name?: string;
   visualizerSize?: { width?: number; height?: number };
   instances?: CanvasInstance[];
@@ -75,6 +76,7 @@ function getCanvasConfig(row: OverlayRow): CanvasConfig {
         : row as unknown as JsonObject;
   return {
     ...source,
+    id: typeof row.id === "string" ? row.id : undefined,
     name: String(source["name"] ?? row.name ?? "Overlay"),
     visualizerSize: isObject(source["visualizerSize"])
       ? source["visualizerSize"] as CanvasConfig["visualizerSize"]
@@ -139,6 +141,7 @@ export default function OverlayCanvas() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -177,6 +180,43 @@ export default function OverlayCanvas() {
     void loadOverlay();
     return () => { cancelled = true; };
   }, []);
+
+  // Persiste a composição no JSON com debounce para não gravar a cada movimento do mouse.
+  useEffect(() => {
+    if (loading || error) return;
+    let cancelled = false;
+    const timeout = window.setTimeout(async () => {
+      try {
+        const headers: Record<string, string> = { "Content-Type": "application/json", Accept: "application/json" };
+        const token = sessionStorage.getItem("livenexus_token");
+        if (token) headers.Authorization = `Bearer ${token}`;
+        const response = await fetch("/api/overlay/canvas", {
+          method: "PUT",
+          headers,
+          credentials: "include",
+          cache: "no-store",
+          body: JSON.stringify({ overlay: config }),
+        });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) {
+          throw new Error(payload.message || "Não foi possível salvar o canvas de Overlay.");
+        }
+        if (!cancelled) {
+          setSaveError("");
+          const savedId = payload.overlay?.id;
+          if (typeof savedId === "string" && savedId && config.id !== savedId) {
+            setConfig((current) => current.id === savedId ? current : { ...current, id: savedId });
+          }
+        }
+      } catch (cause) {
+        if (!cancelled) setSaveError(cause instanceof Error ? cause.message : "Erro ao salvar o canvas.");
+      }
+    }, 650);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+    };
+  }, [config, loading, error]);
 
   const size = useMemo(() => ({
     width: Math.max(320, Number(config.visualizerSize?.width) || DEFAULT_SIZE.width),
@@ -292,6 +332,11 @@ export default function OverlayCanvas() {
           ))}
         </HorizontalMenu>
       </div>
+      {saveError && (
+        <p role="alert" className="w-full rounded border border-rose-500/30 bg-rose-950/40 px-2 py-1 text-[10px] text-rose-200">
+          Falha ao salvar o canvas: {saveError}
+        </p>
+      )}
       <div className="flex w-full min-w-0 justify-center overflow-hidden">
       <div
         ref={frameRef}
