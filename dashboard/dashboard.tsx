@@ -2,7 +2,7 @@
 import DatabasePage from "./admin/banco";
 import AdminPanel from "./admin/panel";
 import TTSPage from "./tts";
-import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
+import MultiChatPanel, { disconnectAllMultiChat, useMultiChatSnapshot } from "./multichat";
 import { useEffect, useState } from "react";
 import {
   AudioLines,
@@ -14,9 +14,6 @@ import {
   ChevronRight,
   ChevronLeft,
   Layers,
-  Volume2,
-  VolumeX,
-  Send,
   Clock3,
   MessageSquare,
   Eye,
@@ -36,6 +33,8 @@ function DashboardPage() {
     acc[key].count += 1;
     return acc;
   }, {})).sort((a, b) => b.count - a.count).slice(0, 10);
+  useEffect(() => () => disconnectAllMultiChat(), []);
+
   const [isAdmin, setIsAdmin] = useState(() => {
     if (typeof window !== "undefined") {
       return sessionStorage.getItem("livenexus_role") === "admin";
@@ -254,7 +253,8 @@ function DashboardPage() {
                 )}
               </section>
             </div>
-          </section>        ) : activeSection === "voice" ? (
+          </section>
+        ) : activeSection === "voice" ? (
           <section className="dash-w-full-px-6-5ebeye">
             <TTSPage />
           </section>
