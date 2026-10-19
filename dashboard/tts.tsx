@@ -24,6 +24,28 @@ const STORAGE_KEY = "livenexus:tts-settings-v1";
 const DEFAULTS: TtsSettings = { voice: "pt_BR-faber-medium", rate: 1, volume: 1, pitch: 1, delay: 0, maxChars: 200, speakInterval: 0, effect: "normal", intensity: 1 };
 const SAMPLES = ["Olá, seja bem-vindo à live!", "Obrigado pela mensagem e por acompanhar a transmissão.", "Atenção, mensagem importante no chat."];
 
+const EVENT_NAMES: Record<string, string> = {
+  twitch_bits: "Bits recebidos",
+  twitch_sub: "Nova inscrição",
+  twitch_resub: "Renovação de inscrição",
+  twitch_subgift: "Inscrição presenteada",
+  twitch_raid: "Raid recebida",
+  twitch_announcement: "Anúncio do canal",
+  kick_sub: "Nova inscrição no Kick",
+  kick_gift: "Presente de inscrição no Kick",
+  kick_raid: "Raid recebida no Kick",
+  youtube_superchat: "Super Chat recebido",
+  youtube_supersticker: "Super Sticker recebido",
+  youtube_membership: "Novo membro do canal",
+  youtube_membership_gifting: "Presente de membresia",
+  youtube_gift_membership_received: "Membresia de presente recebida",
+  youtube_poll: "Enquete do YouTube",
+};
+
+function formatEventName(eventType: string) {
+  return EVENT_NAMES[eventType.toLowerCase()] ?? eventType.replace(/^(twitch|kick|youtube)_/, "").replace(/_/g, " ");
+}
+
 type QueueItem = { id: number; text: string; author: string; tier: "broadcaster" | "moderator" | "vip" | "subscriber" | "normal"; queuedAt: number };
 const PRIORITY: Record<QueueItem["tier"], number> = { broadcaster: 1, moderator: 2, vip: 3, subscriber: 3, normal: 4 };
 const TTL: Record<QueueItem["tier"], number> = { broadcaster: 120000, moderator: 90000, vip: 45000, subscriber: 45000, normal: 30000 };
@@ -69,7 +91,7 @@ export default function TTSPage() {
 
   useEffect(() => subscribeTtsMessages((message) => {
     if (!autoReadChatRef.current) return;
-    const text = (message.eventType ? message.eventType : `${message.author} enviou uma mensagem: ${message.text}`).trim().slice(0, settingsRef.current.maxChars > 0 ? settingsRef.current.maxChars : 1000);
+    const text = (message.eventType ? formatEventName(message.eventType) : `${message.author} enviou uma mensagem: ${message.text}`).trim().slice(0, settingsRef.current.maxChars > 0 ? settingsRef.current.maxChars : 1000);
     if (!text) return;
     const roles = message.roles.map((role) => role.toLowerCase());
     const tier: QueueItem["tier"] = roles.includes("broadcaster") ? "broadcaster"
