@@ -54,9 +54,146 @@ const features = [
     color: "emerald",
   },
 ];
+type AvaliacaoPublica = {
+  avaliacao_id: string;
+  nome: string;
+  nota: number;
+  mensagem: string;
+  resposta_admin: string | null;
+  respondido_por: string | null;
+  data_criacao: string;
+  data_atualizacao: string;
+};
 
 /* BLOCO 4 — Monta navegação, apresentação da plataforma, recursos e rodapé. */
 function HomePage() {
+  // Estados do formulário de avaliação
+  const [nota, setNota] = useState(0);
+  const [nome, setNome] = useState("");
+  const [mensagem, setMensagem] = useState("");
+  const [hoverNota, setHoverNota] = useState(0);
+  const [formError, setFormError] = useState("");
+  const [formSuccess, setFormSuccess] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // Estados da lista de avaliações
+  const [avaliacoes, setAvaliacoes] = useState<AvaliacaoPublica[]>([]);
+  const [loadingAvaliacoes, setLoadingAvaliacoes] = useState(true);
+
+  // Carrega as avaliações já registradas no servidor
+  useEffect(() => {
+    let ativo = true;
+
+    async function carregarAvaliacoes() {
+      try {
+        const response = await fetch("/api/avaliacoes");
+        const data = (await response.json()) as {
+          ok?: boolean;
+          avaliacoes?: AvaliacaoPublica[];
+          message?: string;
+        };
+
+        if (!response.ok || !data.ok) {
+          throw new Error(
+            data.message || "Não foi possível carregar as avaliações.",
+          );
+        }
+
+        if (ativo) {
+          setAvaliacoes(
+            Array.isArray(data.avaliacoes) ? data.avaliacoes : [],
+          );
+        }
+      } catch (error) {
+        if (ativo) {
+          setFormError(
+            error instanceof Error
+              ? error.message
+              : "Erro ao carregar as avaliações.",
+          );
+        }
+      } finally {
+        if (ativo) setLoadingAvaliacoes(false);
+      }
+    }
+
+    void carregarAvaliacoes();
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  // Envia a avaliação para a API e atualiza a lista
+  async function handleReviewSubmit(
+    event: React.FormEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
+    setFormError("");
+    setFormSuccess("");
+
+    if (nota < 1 || nota > 5) {
+      setFormError("Selecione uma nota de 1 a 5 estrelas.");
+      return;
+    }
+
+    if (!nome.trim() || !mensagem.trim()) {
+      setFormError("Preencha o nome e a mensagem.");
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const response = await fetch("/api/avaliacoes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nome: nome.trim(),
+          nota,
+          mensagem: mensagem.trim(),
+        }),
+      });
+
+      const data = (await response.json()) as {
+        ok?: boolean;
+        avaliacao?: AvaliacaoPublica;
+        message?: string;
+      };
+
+      if (!response.ok || !data.ok || !data.avaliacao) {
+        throw new Error(
+          data.message || "Não foi possível enviar a avaliação.",
+        );
+      }
+
+      const novaAvaliacao = data.avaliacao;
+
+      setAvaliacoes((atuais) => [
+        novaAvaliacao,
+        ...atuais.filter(
+          (item) => item.avaliacao_id !== novaAvaliacao.avaliacao_id,
+        ),
+      ]);
+
+      setNome("");
+      setMensagem("");
+      setNota(0);
+      setHoverNota(0);
+      setFormSuccess(data.message || "Avaliação enviada com sucesso!");
+    } catch (error) {
+      setFormError(
+        error instanceof Error
+          ? error.message
+          : "Erro ao enviar a avaliação.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <div className="home-relative-min-h-screen-1rsop7t">
       <div aria-hidden="true" className="home-pointer-events-none-abso-1gul6oz">
