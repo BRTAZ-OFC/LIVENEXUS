@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AudioLines, ArrowRight, LockKeyhole, UserRound } from "lucide-react";
 import { useState } from "react";
 import { loginUser } from "./auth-client";
+import { reportRealError } from "../ErrorViewer";
 
 /* BLOCO 2 — A página de login é registrada em dashboard/App.tsx. */
 /* BLOCO 3 — Armazena credenciais e mensagens de retorno. */
@@ -34,14 +35,13 @@ function LoginPage() {
       }
       setMessage(result.message);
     } catch (error) {
-      console.error("[LiveNexus] Falha no login:", error);
-      const detail =
-        error instanceof Error
-          ? error.message
-          : typeof error === "string"
-            ? error
-            : JSON.stringify(error);
-      setMessage(`Diagnóstico do login: ${detail || "Erro sem mensagem retornada pelo servidor."}`);
+      reportRealError({
+        error,
+        message: error instanceof Error ? error.message : String(error),
+        type: "Erro do Sistema",
+      });
+      // O diagnóstico técnico aparece no painel vermelho fixo, não nesta página.
+      setMessage("");
     }
   }
 
