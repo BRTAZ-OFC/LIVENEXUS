@@ -200,7 +200,7 @@ function DashboardPage() {
 
             <div className="dash-live-stats">
               <article className="dash-stat-card">
-                <div className="dash-stat-label"><Radio /> Plataformas ao vivo</div>
+                <div className="dash-stat-label"><Radio /> Plataformas conectadas</div>
                 <div className="dash-platform-counts">
                   <span><i className="dash-platform-dot twitch" /> Twitch <b>{["connected", "open"].includes(chatState.statuses.Twitch.status.toLowerCase()) ? 1 : 0}</b></span>
                   <span><i className="dash-platform-dot youtube" /> YouTube <b>{["connected", "open"].includes(chatState.statuses.YouTube.status.toLowerCase()) ? 1 : 0}</b></span>
@@ -209,23 +209,24 @@ function DashboardPage() {
               </article>
               <article className="dash-stat-card">
                 <div className="dash-stat-label"><Eye /> Total de espectadores</div>
-                <strong className="dash-stat-number">0</strong>
-                <span className="dash-stat-caption">Soma de todas as plataformas</span>
+                <strong className="dash-stat-number">{totalViewers.toLocaleString("pt-BR")}</strong>
+                <span className="dash-stat-caption">Soma das plataformas conectadas</span>
               </article>
               <article className="dash-stat-card">
-                <div className="dash-stat-label"><Clock3 /> Tempo em live</div>
-                <strong className="dash-stat-number">00:00:00</strong>
-                <span className="dash-stat-caption">Aguardando transmissão</span>
+                <div className="dash-stat-label"><Clock3 /> Status da transmissão</div>
+                <strong className="dash-stat-number">{connectedPlatforms.length ? "Ativo" : "Offline"}</strong>
+                <span className="dash-stat-caption">{connectedPlatforms.length ? "Conectores recebendo status" : "Conecte um canal no chat ao vivo"}</span>
               </article>
               <article className="dash-stat-card">
-                <div className="dash-stat-label"><MessageSquare /> Fila de mensagens</div>
-                <strong className="dash-stat-number">0</strong>
-                <span className="dash-stat-caption">Mensagens aguardando</span>
+                <div className="dash-stat-label"><MessageSquare /> Mensagens recebidas</div>
+                <strong className="dash-stat-number">{chatState.messages.length}</strong>
+                <span className="dash-stat-caption">Mensagens recentes no multichat</span>
               </article>
             </div>
 
             <div className="dash-live-workspace">
-              <MultiChatPanel />\n\n              <section className="dash-speakers-panel">
+              <MultiChatPanel />
+              <section className="dash-speakers-panel">
                 <header className="dash-panel-header">
                   <div>
                     <h2>Top 10 falantes</h2>
@@ -250,11 +251,10 @@ function DashboardPage() {
                       </li>
                     ))}
                   </ol>
-                )}           </ol>
+                )}
               </section>
             </div>
-          </section>
-        ) : activeSection === "voice" ? (
+          </section>        ) : activeSection === "voice" ? (
           <section className="dash-w-full-px-6-5ebeye">
             <TTSPage />
           </section>
