@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties } from "react";
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
+import HorizontalMenu from "../components/HorizontalMenu";
 
 type JsonObject = Record<string, unknown>;
 type CanvasInstance = {
@@ -24,6 +25,8 @@ type WidgetDefinition = {
   defaultWidth?: number;
   defaultHeight?: number;
   defaultConfig?: JsonObject;
+  category?: string;
+  implemented?: boolean;
 };
 type CanvasBackground = {
   type?: string;
@@ -129,6 +132,7 @@ export default function OverlayCanvas() {
     instances: [],
     background: EMPTY_BACKGROUND,
   });
+  const [activeCategory, setActiveCategory] = useState("twitch");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -188,6 +192,45 @@ export default function OverlayCanvas() {
     observer.observe(frame);
     return () => observer.disconnect();
   }, [size.width, size.height, displaySize.width, displaySize.height]);
+
+  const categories = useMemo(() => {
+    const labels: Record<string, string> = {
+      twitch: "Twitch",
+      youtube: "YouTube",
+      manual: "Manuais",
+      multiplatform: "Multiplataforma",
+      other: "Outras",
+    };
+    const available = Array.from(new Set(catalog.filter((item) => item.implemented !== false).map((item) => item.category || "other")));
+    return available.map((id) => ({ id, label: labels[id] || id }));
+  }, []);
+
+  const categoryWidgets = useMemo(
+    () => catalog.filter((item) => (item.category || "other") === activeCategory && item.implemented !== false),
+    [activeCategory],
+  );
+
+  function addWidget(definition: WidgetDefinition) {
+    const existing = config.instances || [];
+    const index = existing.length;
+    const width = definition.defaultWidth || 280;
+    const height = definition.defaultHeight || 120;
+    const nextInstance: CanvasInstance = {
+      id: `overlay-widget-${Date.now()}-${index}`,
+      widgetId: definition.id,
+      elementKey: "full_widget",
+      isFullWidget: true,
+      name: definition.name,
+      x: Math.max(0, Math.min(size.width - width, 24 + (index % 5) * 28)),
+      y: Math.max(0, Math.min(size.height - height, 24 + (index % 5) * 28)),
+      width,
+      height,
+      zIndex: index + 1,
+      visible: true,
+      config: { ...(definition.defaultConfig || {}) },
+    };
+    setConfig((current) => ({ ...current, instances: [...(current.instances || []), nextInstance] }));
+  }
 
   const canvasBackground = useMemo(
     () => backgroundStyle(config.background || EMPTY_BACKGROUND),
