@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties } from "react";
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
+import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
 
 type JsonObject = Record<string, unknown>;
 type CanvasInstance = {
   id?: string;
   widgetId?: string;
+  elementKey?: string;
+  isFullWidget?: boolean;
   name?: string;
   x?: number;
   y?: number;
@@ -210,8 +213,7 @@ export default function OverlayCanvas() {
             .sort((a, b) => (Number(a.zIndex) || 0) - (Number(b.zIndex) || 0))
             .map((instance, index) => {
               const definition = catalog.find((item) => item.id === instance.widgetId);
-              const Widget = definition?.component;
-              if (!Widget) return null;
+              if (!definition) return null;
               const width = Math.max(1, Number(instance.width) || definition.defaultWidth || 280);
               const height = Math.max(1, Number(instance.height) || definition.defaultHeight || 120);
               const widgetConfig = { ...(definition.defaultConfig || {}), ...(instance.config || {}) };
@@ -234,7 +236,17 @@ export default function OverlayCanvas() {
               return (
                 <div key={instance.id || `${instance.widgetId}-${index}`} style={instanceStyle}>
                   <div className="h-full w-full overflow-hidden">
-                    <Widget config={widgetConfig} />
+                    <OverlayWidgetElementRenderer
+                      widgetId={instance.widgetId}
+                      elementKey={instance.elementKey || "full_widget"}
+                      isFullWidget={instance.isFullWidget !== false}
+                      config={widgetConfig}
+                      isEditing={false}
+                      onUpdateConfig={() => undefined}
+                      onFinishEditing={() => undefined}
+                      instanceId={instance.id}
+                      instanceName={instance.name}
+                    />
                   </div>
                 </div>
               );
