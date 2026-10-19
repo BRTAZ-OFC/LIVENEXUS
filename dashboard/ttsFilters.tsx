@@ -135,6 +135,43 @@ function matchesTrigger(text: string, trigger: RuleSet["triggers"][number]) {
   if (trigger.matchType === "ends") return source.endsWith(value);
   try { return new RegExp(trigger.value, "i").test(text); } catch { return false; }
 }
+function removePlatformEmotes(text: string, platform: ChatPlatform, emotes: unknown) {
+  const ranges: { start: number; end: number }[] = [];
+  if (platform === "Twitch" && typeof emotes === "string") {
+    for (const group of emotes.split("/")) {
+      const parts = group.split(":");
+      for (const position of (parts[1] || "").split(",")) {
+        const [start, end] = position.split("-").map(Number);
+        if (Number.isFinite(start) && Number.isFinite(end)) ranges.push({ start, end });
+      }
+    }
+  } else if (platform === "Kick" && Array.isArray(emotes)) {
+    for (const item of emotes as Array<Record<string, unknown>>) {
+      if (Array.isArray(item?.positions)) {
+        for (const position of item.positions as Array<Record<string, unknown>>) {
+          const start = Number(position?.start), end = Number(position?.end);
+          if (Number.isFinite(start) && Number.isFinite(end)) ranges.push({ start, end });
+        }
+      } else {
+        const start = Number(item?.start), end = Number(item?.end);
+        if (Number.isFinite(start) && Number.isFinite(end)) ranges.push({ start, end });
+      }
+    }
+  }
+  let result = text;
+  if (ranges.length) {
+    let cursor = 0;
+    let output = "";
+    for (const range of ranges.sort((a, b) => a.start - b.start)) {
+      if (range.start < cursor || range.start < 0 || range.end >= text.length) continue;
+      output += text.slice(cursor, range.start) + " ";
+      cursor = range.end + 1;
+    }
+    result = output + text.slice(cursor);
+  }
+  if (platform === "YouTube") result = result.replace(/:[a-zA-Z0-9_]+:/g, " ");
+  return result.replace(/\\s+/g, " ").trim();
+}
 const URL_RE = /\\bhttps?:\\/\\/\\S+|www\\.\\S+/gi;
 const URL_TEST = /\\bhttps?:\\/\\/\\S+|www\\.\\S+/i;
 const MENTION_RE = /@[a-zA-Z0-9_.-]+/g;
@@ -167,10 +204,14 @@ export function applyTtsFilters(message: MultiChatMessage): MultiChatMessage | n
   }
   if (!text.trim()) return fail("Mensagem vazia após filtros");
   if (rules.emotes !== "allow") {
+    const withoutPlatformEmotes = removePlatformEmotes(text, platform, message.emotes);
     const matches = text.match(EMOJI_RE) || [];
-    if (rules.emotes === "block_only" && text.replace(EMOJI_RE, "").trim() === "") return fail("Mensagem contém apenas emotes/emojis");
-    if (rules.emotes === "block_over" && matches.length > rules.emoteLimit) return fail("Limite de emotes excedido");
-    if (rules.emotes === "remove") text = text.replace(EMOJI_RE, "").replace(/\\s+/g, " ").trim();
+    const platformEmoteCount = typeof message.emotes === "string"
+      ? (message.emotes.match(/\\d+:\\d+-\\d+/g) || []).length
+      : Array.isArray(message.emotes) ? message.emotes.length : 0;
+    if (rules.emotes === "block_only" && withoutPlatformEmotes.replace(EMOJI_RE, "").trim() === "") return fail("Mensagem contém apenas emotes/emojis");
+    if (rules.emotes === "block_over" && matches.length + platformEmoteCount > rules.emoteLimit) return fail("Limite de emotes excedido");
+    if (rules.emotes === "remove") text = withoutPlatformEmotes.replace(EMOJI_RE, "").replace(/\\s+/g, " ").trim();
   }
   if (rules.bannedWords.some((word) => word && text.toLowerCase().includes(word.toLowerCase()))) return fail("Palavra proibida");
   if (rules.triggersEnabled && rules.triggers.some((trigger) => matchesTrigger(text, trigger))) return fail("Gatilho bloqueado");
@@ -192,6 +233,7 @@ export function applyTtsFilters(message: MultiChatMessage): MultiChatMessage | n
     if (last && now - last < rules.cooldownSec * 1000) return fail("Cooldown do usuário");
     cooldowns.set(userKey, now);
   }
+  if (URL_TEST.test(message.text) && rules.content.links && rules.links === "allow") flaggedUsers.set(userKey, { author, platform, reason: "Link detectado", blocked: false });
   if (rules.maxChars > 0 && text.length > rules.maxChars) {
     if (rules.longMessage === "block") return fail("Limite de caracteres excedido");
     if (rules.longMessage === "cut") text = text.slice(0, rules.maxChars);
@@ -233,6 +275,7 @@ export function TtsFiltersPanel() {
   const [word, setWord] = useState("");
   const [trigger, setTrigger] = useState("");
   const [triggerType, setTriggerType] = useState<MatchType>("contains");
+  const [selectedPreset, setSelectedPreset] = useState("custom");
   const [platform, setPlatform] = useState<ChatPlatform>("Twitch");
   const rules = cfg.scope === "perPlatform" ? cfg.perPlatform[platform] : cfg.shared;
   const updateRules = (patch: Partial<RuleSet>) => {
@@ -249,7 +292,7 @@ export function TtsFiltersPanel() {
       <Field label="Modo"><select value={cfg.mode} onChange={(e) => setTtsFilterConfig({ ...cfg, mode: e.target.value as TtsFilterConfig["mode"] })}><option value="free">Livre — sem bloqueios</option><option value="custom">Personalizado — aplicar filtros</option></select></Field>
       <Field label="Aplicação"><select value={cfg.scope} onChange={(e) => setTtsFilterConfig({ ...cfg, scope: e.target.value as TtsFilterConfig["scope"] })}><option value="shared">Mesmas regras para todas</option><option value="perPlatform">Regras por plataforma</option></select></Field>
       {cfg.scope === "perPlatform" && <Field label="Plataforma"><select value={platform} onChange={(e) => setPlatform(e.target.value as ChatPlatform)}><option>Twitch</option><option>Kick</option><option>YouTube</option></select></Field>}
-      <Field label="Preset"><select value="custom" onChange={(e) => { const next = e.target.value; if (next === "free") setTtsFilterConfig(defaultConfig()); else if (next !== "custom") { const nextRules = defaultRules(); if (next === "leve") { nextRules.cooldownEnabled = true; nextRules.cooldownSec = 5; nextRules.links = "remove"; } if (next === "moderado") { nextRules.repeatEnabled = true; nextRules.repeatMax = 3; nextRules.cooldownEnabled = true; nextRules.cooldownSec = 10; nextRules.links = "block"; nextRules.emotes = "remove"; nextRules.longMessage = "cut"; } if (next === "restrito") { nextRules.repeatEnabled = true; nextRules.repeatMax = 2; nextRules.repeatWindowSec = 120; nextRules.cooldownEnabled = true; nextRules.cooldownSec = 30; nextRules.links = "block"; nextRules.emotes = "block_only"; nextRules.longMessage = "block"; nextRules.maxChars = 150; nextRules.queueLimitEnabled = true; nextRules.queueMax = 5; } setTtsFilterConfig({ ...cfg, mode: "custom", shared: nextRules }); } }}><option value="custom">Sem preset</option><option value="free">Livre</option><option value="leve">Leve</option><option value="moderado">Moderado</option><option value="restrito">Restrito</option></select></Field>
+      <Field label="Preset"><select value={selectedPreset} onChange={(e) => { const next = e.target.value; setSelectedPreset(next); if (next === "free") setTtsFilterConfig(defaultConfig()); else if (next !== "custom") { const nextRules = defaultRules(); if (next === "leve") { nextRules.cooldownEnabled = true; nextRules.cooldownSec = 5; nextRules.links = "remove"; } if (next === "moderado") { nextRules.repeatEnabled = true; nextRules.repeatMax = 3; nextRules.cooldownEnabled = true; nextRules.cooldownSec = 10; nextRules.links = "block"; nextRules.emotes = "remove"; nextRules.longMessage = "cut"; } if (next === "restrito") { nextRules.repeatEnabled = true; nextRules.repeatMax = 2; nextRules.repeatWindowSec = 120; nextRules.cooldownEnabled = true; nextRules.cooldownSec = 30; nextRules.links = "block"; nextRules.emotes = "block_only"; nextRules.longMessage = "block"; nextRules.maxChars = 150; nextRules.queueLimitEnabled = true; nextRules.queueMax = 5; } setTtsFilterConfig({ ...cfg, mode: "custom", shared: nextRules }); } }}><option value="custom">Sem preset</option><option value="free">Livre</option><option value="leve">Leve</option><option value="moderado">Moderado</option><option value="restrito">Restrito</option></select></Field>
     </div>
     {cfg.mode === "free" && <p className="tts-filter-free">Modo Livre ativo: as mensagens seguem para o TTS sem bloqueios, como no BACKUP01.</p>}
     <div className="tts-filter-grid">
@@ -286,7 +329,7 @@ export function TtsFiltersPanel() {
         <Field label="Máximo na fila"><input type="number" min={1} max={200} value={rules.queueMax} onChange={(e) => updateRules({ queueMax: Math.max(1, Number(e.target.value)) })} /></Field>
         <Field label="Quando a fila encher"><select value={rules.queuePolicy} onChange={(e) => updateRules({ queuePolicy: e.target.value as RuleSet["queuePolicy"] })}><option value="reject">Rejeitar novas</option><option value="drop_oldest">Remover a mais antiga</option><option value="preserve_priority">Preservar prioridade</option></select></Field>
         <Toggle checked={rules.priorityEnabled} onChange={(v) => updateRules({ priorityEnabled: v })} label="Ativar prioridade por cargo" />
-        {Object.entries(roleLabels).map(([key, label]) => key !== "normal" && <Field key={key} label={label}><input type="number" min={1} max={10} value={rules.priorities[key] || 1} onChange={(e) => updateNested("priorities", key, Math.max(1, Number(e.target.value)))} /></Field>)}
+        {Object.entries(roleLabels).map(([key, label]) => <Field key={key} label={label}><input type="number" min={1} max={10} value={rules.priorities[key] || 1} onChange={(e) => updateNested("priorities", key, Math.max(1, Number(e.target.value)))} /></Field>)}
       </div>
     </div>
     <div className="tts-filter-diagnostics">
