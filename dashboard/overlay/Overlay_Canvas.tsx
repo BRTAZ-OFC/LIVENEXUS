@@ -132,7 +132,6 @@ export default function OverlayCanvas() {
     instances: [],
     background: EMPTY_BACKGROUND,
   });
-  const [activeCategory, setActiveCategory] = useState("twitch");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -193,23 +192,6 @@ export default function OverlayCanvas() {
     return () => observer.disconnect();
   }, [size.width, size.height, displaySize.width, displaySize.height]);
 
-  const categories = useMemo(() => {
-    const labels: Record<string, string> = {
-      twitch: "Twitch",
-      youtube: "YouTube",
-      manual: "Manuais",
-      multiplatform: "Multiplataforma",
-      other: "Outras",
-    };
-    const available = Array.from(new Set(catalog.filter((item) => item.implemented !== false).map((item) => item.category || "other")));
-    return available.map((id) => ({ id, label: labels[id] || id }));
-  }, []);
-
-  const categoryWidgets = useMemo(
-    () => catalog.filter((item) => (item.category || "other") === activeCategory && item.implemented !== false),
-    [activeCategory],
-  );
-
   function addWidget(definition: WidgetDefinition) {
     const existing = config.instances || [];
     const index = existing.length;
@@ -240,21 +222,8 @@ export default function OverlayCanvas() {
   return (
     <section className="flex w-full min-w-0 flex-col items-center gap-2 overflow-hidden">
       <div className="w-full min-w-0">
-        <HorizontalMenu ariaLabel="Categorias de widgets" className="w-full">
-          {categories.map((category) => (
-            <button
-              key={category.id}
-              type="button"
-              onClick={() => setActiveCategory(category.id)}
-              aria-pressed={activeCategory === category.id}
-              className={`shrink-0 rounded-md border px-3 py-1.5 text-xs transition ${activeCategory === category.id ? "border-violet-400/60 bg-violet-500/20 text-violet-200" : "border-white/10 bg-slate-900/70 text-slate-300 hover:bg-slate-800"}`}
-            >
-              {category.label}
-            </button>
-          ))}
-        </HorizontalMenu>
-        <HorizontalMenu ariaLabel={`Widgets de ${activeCategory}`} className="mt-1 w-full">
-          {categoryWidgets.map((widget) => (
+        <HorizontalMenu ariaLabel="Widgets de Overlay" className="w-full">
+          {catalog.filter((widget) => widget.implemented !== false).map((widget) => (
             <button
               key={widget.id}
               type="button"
