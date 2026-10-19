@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AudioLines, ArrowRight, LockKeyhole, UserRound } from "lucide-react";
 import { useState } from "react";
 import { registerUser } from "./auth-client";
+import { reportRealError } from "../ErrorViewer";
 
 /* BLOCO 2 — A página de cadastro é registrada em dashboard/App.tsx. */
 /* BLOCO 3 — Armazena usuário, senha, confirmação e mensagens. */
@@ -38,8 +39,9 @@ function RegisterPage() {
         return;
       }
       setMessage(result.message);
-    } catch {
-      setMessage("Não foi possível concluir o cadastro. Tente novamente.");
+    } catch (error) {
+      reportRealError({ error, message: error instanceof Error ? error.message : String(error), type: "Erro do Sistema" });
+      setMessage("");
     }
   }
 
