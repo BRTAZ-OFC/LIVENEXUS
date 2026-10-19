@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties } from "react";
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
-import HorizontalMenu from "../components/HorizontalMenu";
+import OverlayEditorSidebar from "./Overlay_EditorSidebar";
 
 type JsonObject = Record<string, unknown>;
 type CanvasInstance = {
@@ -262,6 +262,34 @@ export default function OverlayCanvas() {
       config: { ...(definition.defaultConfig || {}) },
     };
     setConfig((current) => ({ ...current, instances: [...(current.instances || []), nextInstance] }));
+    setSelectedInstanceId(nextInstance.id || null);
+  }
+
+  function updateInstance(instanceId: string, patch: Partial<CanvasInstance>) {
+    setConfig((current) => ({
+      ...current,
+      instances: (current.instances || []).map((item, index) =>
+        (item.id || `${item.widgetId}-${index}`) === instanceId ? { ...item, ...patch } : item
+      ),
+    }));
+  }
+
+  function deleteInstance(instanceId: string) {
+    setConfig((current) => ({
+      ...current,
+      instances: (current.instances || []).filter((item, index) =>
+        (item.id || `${item.widgetId}-${index}`) !== instanceId
+      ),
+    }));
+    setSelectedInstanceId((current) => current === instanceId ? null : current);
+  }
+
+  function updateGridSettings(patch: Record<string, any>) {
+    setGridSettings((current) => ({ ...current, ...patch }));
+  }
+
+  function updateBackground(patch: Partial<CanvasBackground>) {
+    setConfig((current) => ({ ...current, background: { ...(current.background || EMPTY_BACKGROUND), ...patch } }));
   }
 
   const canvasBackground = useMemo(
@@ -271,27 +299,12 @@ export default function OverlayCanvas() {
 
   return (
     <section className="flex w-full min-w-0 flex-col items-center gap-2 overflow-hidden">
-      <div className="w-full min-w-0">
-        <HorizontalMenu ariaLabel="Widgets de Overlay" className="w-full">
-          {catalog.filter((widget) => widget.implemented !== false).map((widget) => (
-            <button
-              key={widget.id}
-              type="button"
-              onClick={() => addWidget(widget)}
-              title={`Adicionar ${widget.name} ao canvas`}
-              className="shrink-0 rounded-md border border-white/10 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"
-            >
-              {widget.name}
-            </button>
-          ))}
-        </HorizontalMenu>
-      </div>
       {saveError && (
         <p role="alert" className="w-full rounded border border-rose-500/30 bg-rose-950/40 px-2 py-1 text-[10px] text-rose-200">
           Falha ao salvar o canvas: {saveError}
         </p>
       )}
-      <div className="flex w-full min-w-0 justify-center overflow-hidden">
+      <div className="relative flex w-full min-w-0 justify-center overflow-hidden">
       <div
         ref={frameRef}
         className="relative mx-auto shrink-0 overflow-hidden bg-transparent"
@@ -505,6 +518,19 @@ export default function OverlayCanvas() {
           onPointerCancel={() => { resizeStart.current = null; }}
         />
       </div>
+        <OverlayEditorSidebar
+          catalog={catalog}
+          instances={config.instances || []}
+          selectedInstanceId={selectedInstanceId}
+          onSelectInstance={setSelectedInstanceId}
+          onAddWidget={addWidget}
+          onUpdateInstance={updateInstance}
+          onDeleteInstance={deleteInstance}
+          gridSettings={gridSettings}
+          onUpdateGridSettings={updateGridSettings}
+          background={config.background || EMPTY_BACKGROUND}
+          onUpdateBackground={updateBackground}
+        />
       </div>
 
     </section>
