@@ -74,15 +74,36 @@ function upsertRecord(existing, userId, data = {}) {
   const code = data.verification_code ?? data.bio_link_code ?? data.code;
 
   if (platform === "youtube" || platform === "yt") {
-    if (channel !== undefined) record.youtube = channel || null;
+    if (channel !== undefined) {
+      const nextChannel = channel || null;
+      if (record.youtube !== nextChannel && String(data.status ?? "").trim().toLowerCase() !== "verified") {
+        record.youtube_status = "pending";
+        record.youtube_code = null;
+      }
+      record.youtube = nextChannel;
+    }
     if (code !== undefined) record.youtube_code = code || null;
     if (data.status !== undefined) record.youtube_status = data.status;
   } else if (platform === "twitch") {
-    if (channel !== undefined) record.twitch = channel || null;
+    if (channel !== undefined) {
+      const nextChannel = channel || null;
+      if (record.twitch !== nextChannel && String(data.status ?? "").trim().toLowerCase() !== "verified") {
+        record.twitch_status = "pending";
+        record.twitch_code = null;
+      }
+      record.twitch = nextChannel;
+    }
     if (code !== undefined) record.twitch_code = code || null;
     if (data.status !== undefined) record.twitch_status = data.status;
   } else if (platform === "kick") {
-    if (channel !== undefined) record.kick = channel || null;
+    if (channel !== undefined) {
+      const nextChannel = channel || null;
+      if (record.kick !== nextChannel && String(data.status ?? "").trim().toLowerCase() !== "verified") {
+        record.kick_status = "pending";
+        record.kick_code = null;
+      }
+      record.kick = nextChannel;
+    }
     if (code !== undefined) record.kick_code = code || null;
     if (data.status !== undefined) record.kick_status = data.status;
   } else {
