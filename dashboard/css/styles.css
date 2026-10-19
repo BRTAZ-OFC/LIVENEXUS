@@ -9,6 +9,9 @@
 /* BLOCO 2 — Regras globais do documento. */
 @import "./base.css";
 
+/* BLOCO GLOBAL — menus e submenus horizontais. */
+@import "./horizontal-menus.css";
+
 /* BLOCO 3 — Página pública. */
 @import "./home.css";
 
