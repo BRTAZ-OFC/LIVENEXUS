@@ -54,7 +54,9 @@ export default function TTSPage() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pausedRef = useRef(false);
   const settingsRef = useRef(settings);
+  const autoReadChatRef = useRef(autoReadChat);
   settingsRef.current = settings;
+  autoReadChatRef.current = autoReadChat;
   queueRef.current = queue;
 
   useEffect(() => {
