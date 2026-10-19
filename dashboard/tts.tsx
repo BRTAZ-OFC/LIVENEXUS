@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Filter, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
+import { Filter, Play, Pause, RadioTower, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
 import "./css/tts.css";
 import { playProcessedSpeech, type PlaybackHandle } from "./ttsAudioEngine";
 import { subscribeTtsMessages, type ChatPlatform } from "./multichat";
 import { getTtsFilterConfig, recordTtsQueueBlock, recordTtsQueueDrop, TtsFiltersPanel } from "./ttsFilters";
+import TtsConnectionsPanel from "./ttsConnections";
 
 type VoiceEffect = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
 type TtsSettings = {
@@ -69,6 +70,7 @@ export default function TTSPage() {
   const [notice, setNotice] = useState("O modelo da voz selecionada será carregado na primeira reprodução.");
   const [autoReadChat, setAutoReadChat] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [showConnections, setShowConnections] = useState(false);
   const [showEffects, setShowEffects] = useState(false);
   const queueRef = useRef<QueueItem[]>([]);
   const activeRef = useRef<PlaybackHandle | null>(null);
@@ -295,11 +297,12 @@ export default function TTSPage() {
     <section className="tts-page">
       <header className="tts-page-heading">
         <div><p className="tts-eyebrow">CENTRAL DE TRANSMISSÃO</p><h1>Voz &amp; TTS</h1><p>Motor de voz local do navegador · sem créditos de API</p></div>
-        <div className="tts-heading-actions"><button type="button" className={showEffects ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => { setShowEffects((open) => !open); setShowFilters(false); }} aria-expanded={showEffects}><Star size={14} />Efeitos</button><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => { setShowFilters((open) => !open); setShowEffects(false); }} aria-expanded={showFilters}><Filter size={14} />Filtros</button><span className={speaking ? "tts-status active" : "tts-status"}>{speaking ? "Falando" : paused ? "Fila pausada" : "Pronto"}</span></div>
+        <div className="tts-heading-actions"><button type="button" className={showConnections ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => { setShowConnections((open) => !open); setShowEffects(false); setShowFilters(false); }} aria-expanded={showConnections}><RadioTower size={14} />Conexão</button><button type="button" className={showEffects ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => { setShowEffects((open) => !open); setShowFilters(false); setShowConnections(false); }} aria-expanded={showEffects}><Star size={14} />Efeitos</button><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => { setShowFilters((open) => !open); setShowEffects(false); setShowConnections(false); }} aria-expanded={showFilters}><Filter size={14} />Filtros</button><span className={speaking ? "tts-status active" : "tts-status"}>{speaking ? "Falando" : paused ? "Fila pausada" : "Pronto"}</span></div>
       </header>
 
       {showFilters && <TtsFiltersPanel />}
-      {!showFilters && !showEffects && <>
+      {showConnections && <TtsConnectionsPanel />}
+      {!showFilters && !showEffects && !showConnections && <>
 
       <section className="tts-card">
         <div className="tts-card-title"><span className="tts-title-icon"><Volume2 /></span><div><h2>Configurações do motor de voz</h2><p>Escolha a voz e ajuste os parâmetros de leitura</p></div></div>
