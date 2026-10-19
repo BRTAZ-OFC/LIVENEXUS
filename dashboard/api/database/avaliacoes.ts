@@ -56,7 +56,7 @@ export const Route = createFileRoute("/api/database/avaliacoes")({
           }
 
           const { updateAvaliacao } = await import("../../admin/banco/-avaliacao-crud.js");
-          const adminUser = session.user_id ? String(session.user_id) : "Admin";
+          const adminUser = session.role;
           const avaliacao = await updateAvaliacao(avaliacaoId, changes, adminUser);
           return Response.json({ ok: true, avaliacao }, { headers: NO_CACHE_HEADERS });
         } catch (error) {

@@ -79,6 +79,8 @@ function HomePage() {
   // Estados da lista de avaliações
   const [avaliacoes, setAvaliacoes] = useState<AvaliacaoPublica[]>([]);
   const [loadingAvaliacoes, setLoadingAvaliacoes] = useState(true);
+  const [viewMode, setViewMode] = useState<"home" | "all">("home");
+  const [activeFilter, setActiveFilter] = useState<string>("recentes");
 
   // Carrega as avaliações já registradas no servidor
   useEffect(() => {
@@ -94,23 +96,15 @@ function HomePage() {
         };
 
         if (!response.ok || !data.ok) {
-          throw new Error(
-            data.message || "Não foi possível carregar as avaliações.",
-          );
+          throw new Error(data.message || "Não foi possível carregar as avaliações.");
         }
 
         if (ativo) {
-          setAvaliacoes(
-            Array.isArray(data.avaliacoes) ? data.avaliacoes : [],
-          );
+          setAvaliacoes(Array.isArray(data.avaliacoes) ? data.avaliacoes : []);
         }
       } catch (error) {
         if (ativo) {
-          setFormError(
-            error instanceof Error
-              ? error.message
-              : "Erro ao carregar as avaliações.",
-          );
+          setFormError(error instanceof Error ? error.message : "Erro ao carregar as avaliações.");
         }
       } finally {
         if (ativo) setLoadingAvaliacoes(false);
@@ -125,9 +119,7 @@ function HomePage() {
   }, []);
 
   // Envia a avaliação para a API e atualiza a lista
-  async function handleReviewSubmit(
-    event: React.FormEvent<HTMLFormElement>,
-  ) {
+  async function handleReviewSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setFormError("");
     setFormSuccess("");
@@ -164,18 +156,14 @@ function HomePage() {
       };
 
       if (!response.ok || !data.ok || !data.avaliacao) {
-        throw new Error(
-          data.message || "Não foi possível enviar a avaliação.",
-        );
+        throw new Error(data.message || "Não foi possível enviar a avaliação.");
       }
 
       const novaAvaliacao = data.avaliacao;
 
       setAvaliacoes((atuais) => [
         novaAvaliacao,
-        ...atuais.filter(
-          (item) => item.avaliacao_id !== novaAvaliacao.avaliacao_id,
-        ),
+        ...atuais.filter((item) => item.avaliacao_id !== novaAvaliacao.avaliacao_id),
       ]);
 
       setNome("");
@@ -184,14 +172,118 @@ function HomePage() {
       setHoverNota(0);
       setFormSuccess(data.message || "Avaliação enviada com sucesso!");
     } catch (error) {
-      setFormError(
-        error instanceof Error
-          ? error.message
-          : "Erro ao enviar a avaliação.",
-      );
+      setFormError(error instanceof Error ? error.message : "Erro ao enviar a avaliação.");
     } finally {
       setSubmitting(false);
     }
+  }
+
+  const filteredAvaliacoes = avaliacoes.filter((item) => {
+    if (activeFilter === "recentes") return true;
+    return item.nota === Number(activeFilter);
+  });
+
+  if (viewMode === "all") {
+    return (
+      <div className="home-relative-min-h-screen-1rsop7t py-12 px-5 md:px-12">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setViewMode("home")}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 border border-white/10 text-white text-xs font-semibold hover:bg-slate-700 transition"
+            >
+              <ArrowLeft className="h-4 w-4" /> Voltar
+            </button>
+            <h1 className="text-2xl font-extrabold text-white">Todas as avaliações</h1>
+            <div className="w-20" />
+          </div>
+
+          {/* Tags de filtragem */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveFilter("recentes")}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition ${
+                activeFilter === "recentes"
+                  ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/25"
+                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+              }`}
+            >
+              Mais recentes
+            </button>
+            {[5, 4, 3, 2, 1].map((stars) => (
+              <button
+                key={stars}
+                type="button"
+                onClick={() => setActiveFilter(String(stars))}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition ${
+                  activeFilter === String(stars)
+                    ? "bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/25"
+                    : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                }`}
+              >
+                {stars} {stars === 1 ? "estrela" : "estrelas"}
+              </button>
+            ))}
+          </div>
+
+          {filteredAvaliacoes.length === 0 ? (
+            <div className="text-center py-16 bg-slate-900/50 rounded-2xl border border-white/10">
+              <p className="text-sm text-slate-400">Não há avaliações com esta classificação.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredAvaliacoes.map((item) => (
+                <div
+                  key={item.avaliacao_id}
+                  className="p-5 rounded-2xl bg-slate-950/60 border border-white/10 space-y-3 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="h-8 w-8 rounded-full bg-violet-600/20 text-violet-300 flex items-center justify-center text-xs font-bold border border-violet-500/30">
+                          {item.nome.slice(0, 2).toUpperCase()}
+                        </span>
+                        <div>
+                          <p className="text-xs font-semibold text-white">{item.nome}</p>
+                          <p className="text-[10px] text-slate-500">
+                            {new Date(item.data_criacao).toLocaleDateString("pt-BR")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star
+                            key={s}
+                            className={`h-3.5 w-3.5 ${
+                              item.nota >= s ? "text-amber-400 fill-amber-400" : "text-slate-700"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-relaxed">{item.mensagem}</p>
+                  </div>
+
+                  {item.resposta_admin && (
+                    <div className="mt-3 pl-3 border-l-2 border-cyan-500/50 bg-cyan-950/20 py-2 pr-2 rounded-r-xl">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[10px] font-semibold text-cyan-300 flex items-center gap-1">
+                          <ShieldCheck className="h-3 w-3" /> Resposta (
+                          {item.respondido_por || "Admin"})
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-300">{item.resposta_admin}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -551,8 +643,8 @@ function HomePage() {
               </div>
             </form>
 
-            {/* Lista de Avaliações */}
-            <div className="max-w-3xl mx-auto">
+            {/* Lista de Avaliações na Página Inicial (máximo 6) */}
+            <div className="max-w-5xl mx-auto">
               <h4 className="text-sm font-semibold text-white mb-4">
                 Avaliações recentes ({avaliacoes.length})
               </h4>
@@ -563,56 +655,69 @@ function HomePage() {
                   Nenhuma avaliação registrada ainda. Seja o primeiro a avaliar!
                 </p>
               ) : (
-                <div className="space-y-4">
-                  {avaliacoes.map((item) => (
-                    <div
-                      key={item.avaliacao_id}
-                      className="p-5 rounded-2xl bg-slate-950/60 border border-white/10 space-y-3"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="h-8 w-8 rounded-full bg-violet-600/20 text-violet-300 flex items-center justify-center text-xs font-bold border border-violet-500/30">
-                            {item.nome.slice(0, 2).toUpperCase()}
-                          </span>
-                          <div>
-                            <p className="text-xs font-semibold text-white">{item.nome}</p>
-                            <p className="text-[10px] text-slate-500">
-                              {new Date(item.data_criacao).toLocaleDateString("pt-BR")}
-                            </p>
+                <div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {avaliacoes.slice(0, 6).map((item) => (
+                      <div
+                        key={item.avaliacao_id}
+                        className="p-5 rounded-2xl bg-slate-950/60 border border-white/10 space-y-3 flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="h-8 w-8 rounded-full bg-violet-600/20 text-violet-300 flex items-center justify-center text-xs font-bold border border-violet-500/30">
+                                {item.nome.slice(0, 2).toUpperCase()}
+                              </span>
+                              <div>
+                                <p className="text-xs font-semibold text-white">{item.nome}</p>
+                                <p className="text-[10px] text-slate-500">
+                                  {new Date(item.data_criacao).toLocaleDateString("pt-BR")}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((s) => (
+                                <Star
+                                  key={s}
+                                  className={`h-3.5 w-3.5 ${
+                                    item.nota >= s
+                                      ? "text-amber-400 fill-amber-400"
+                                      : "text-slate-700"
+                                  }`}
+                                />
+                              ))}
+                            </div>
                           </div>
+
+                          <p className="text-xs text-slate-300 leading-relaxed">{item.mensagem}</p>
                         </div>
-                        <div className="flex items-center gap-1">
-                          {[1, 2, 3, 4, 5].map((s) => (
-                            <Star
-                              key={s}
-                              className={`h-3.5 w-3.5 ${
-                                item.nota >= s ? "text-amber-400 fill-amber-400" : "text-slate-700"
-                              }`}
-                            />
-                          ))}
-                        </div>
+
+                        {item.resposta_admin && (
+                          <div className="mt-3 pl-3 border-l-2 border-cyan-500/50 bg-cyan-950/20 py-2 pr-2 rounded-r-xl">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[10px] font-semibold text-cyan-300 flex items-center gap-1">
+                                <ShieldCheck className="h-3 w-3" /> Resposta (
+                                {item.respondido_por || "Admin"})
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-300">{item.resposta_admin}</p>
+                          </div>
+                        )}
                       </div>
+                    ))}
+                  </div>
 
-                      <p className="text-xs text-slate-300 leading-relaxed">{item.mensagem}</p>
-
-                      {item.resposta_admin && (
-                        <div className="mt-3 pl-4 border-l-2 border-cyan-500/50 bg-cyan-950/20 py-2.5 pr-3 rounded-r-xl">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[11px] font-semibold text-cyan-300 flex items-center gap-1.5">
-                              <ShieldCheck className="h-3.5 w-3.5" /> Resposta Oficial (
-                              {item.respondido_por || "Administrador"})
-                            </span>
-                            <span className="text-[10px] text-slate-500">
-                              {item.data_atualizacao
-                                ? new Date(item.data_atualizacao).toLocaleDateString("pt-BR")
-                                : ""}
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-300">{item.resposta_admin}</p>
-                        </div>
-                      )}
+                  {avaliacoes.length > 6 && (
+                    <div className="mt-8 text-center">
+                      <button
+                        type="button"
+                        onClick={() => setViewMode("all")}
+                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-800 border border-white/10 text-white text-xs font-semibold hover:bg-slate-700 transition shadow-lg"
+                      >
+                        Ver mais avaliações <ArrowRight className="h-4 w-4" />
+                      </button>
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
