@@ -37,9 +37,9 @@ type DiagnosticState = { received: number; accepted: number; blocked: number; re
 
 const STORAGE_KEY = "livenexus:tts-filters-v1";
 const EVENT_KEYS = [
-  "twitch_sub", "twitch_resub", "twitch_subgift", "twitch_bits", "twitch_raid",
+  "twitch_sub", "twitch_resub", "twitch_subgift", "twitch_bits", "twitch_raid", "twitch_announcement",
   "kick_sub", "kick_gift", "kick_raid", "youtube_membership", "youtube_superchat",
-  "youtube_supersticker", "youtube_membership_gifting", "youtube_gift_membership_received",
+  "youtube_supersticker", "youtube_membership_gifting", "youtube_gift_membership_received", "youtube_poll",
 ];
 function defaultRules(): RuleSet {
   return {
@@ -256,10 +256,10 @@ export function recordTtsQueueBlock(message: MultiChatMessage, reason: string) {
 
 const roleLabels: Record<string, string> = { broadcaster: "Streamer/dono", moderator: "Moderador", vip: "VIP", subscriber: "Inscrito/membro", normal: "Usuário comum" };
 const eventLabels: Record<string, string> = {
-  twitch_sub: "Inscrição Twitch", twitch_resub: "Renovação Twitch", twitch_subgift: "Gift Sub Twitch", twitch_bits: "Bits Twitch", twitch_raid: "Raid Twitch",
+  twitch_sub: "Inscrição Twitch", twitch_resub: "Renovação Twitch", twitch_subgift: "Gift Sub Twitch", twitch_bits: "Bits Twitch", twitch_raid: "Raid Twitch", twitch_announcement: "Anúncio Twitch",
   kick_sub: "Inscrição Kick", kick_gift: "Gift Sub Kick", kick_raid: "Raid Kick",
   youtube_membership: "Novo membro YouTube", youtube_superchat: "Super Chat", youtube_supersticker: "Super Sticker",
-  youtube_membership_gifting: "Presente de membresia", youtube_gift_membership_received: "Membresia presente recebida",
+  youtube_membership_gifting: "Presente de membresia", youtube_gift_membership_received: "Membresia presente recebida", youtube_poll: "Enquete YouTube",
 };
 function Toggle({ checked, onChange, label, description }: { checked: boolean; onChange: (v: boolean) => void; label: string; description?: string }) {
   return <label className="tts-filter-toggle"><input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} /><span><b>{label}</b>{description && <small>{description}</small>}</span></label>;
@@ -281,7 +281,7 @@ export function TtsFiltersPanel() {
     if (cfg.scope === "perPlatform") setTtsFilterConfig({ ...cfg, perPlatform: { ...cfg.perPlatform, [platform]: { ...rules, ...patch } } });
     else setTtsFilterConfig({ ...cfg, shared: { ...rules, ...patch } });
   };
-  const updateNested = <K extends "roles" | "events" | "content" | "priorities",>(key: K, name: string, value: boolean | number) => updateRules({ [key]: { ...rules[key], [name]: value } } as Pick<RuleSet, K>);
+  const updateNested = (key: "roles" | "events" | "content" | "priorities", name: string, value: boolean | number) => updateRules({ [key]: { ...(rules[key] as Record<string, boolean | number>), [name]: value } } as Partial<RuleSet>);
   const addWord = () => { const value = word.trim(); if (value && !rules.bannedWords.some((v) => v.toLowerCase() === value.toLowerCase())) updateRules({ bannedWords: [...rules.bannedWords, value] }); setWord(""); };
   const addTrigger = () => { const value = trigger.trim(); if (value) updateRules({ triggers: [...rules.triggers, { id: Date.now().toString(36), value, matchType: triggerType }] }); setTrigger(""); };
   return <section className="tts-card tts-filters-card">
@@ -290,7 +290,7 @@ export function TtsFiltersPanel() {
       <Field label="Modo"><select value={cfg.mode} onChange={(e) => setTtsFilterConfig({ ...cfg, mode: e.target.value as TtsFilterConfig["mode"] })}><option value="free">Livre — sem bloqueios</option><option value="custom">Personalizado — aplicar filtros</option></select></Field>
       <Field label="Aplicação"><select value={cfg.scope} onChange={(e) => setTtsFilterConfig({ ...cfg, scope: e.target.value as TtsFilterConfig["scope"] })}><option value="shared">Mesmas regras para todas</option><option value="perPlatform">Regras por plataforma</option></select></Field>
       {cfg.scope === "perPlatform" && <Field label="Plataforma"><select value={platform} onChange={(e) => setPlatform(e.target.value as ChatPlatform)}><option>Twitch</option><option>Kick</option><option>YouTube</option></select></Field>}
-      <Field label="Preset"><select value={selectedPreset} onChange={(e) => { const next = e.target.value; setSelectedPreset(next); if (next === "free") setTtsFilterConfig(defaultConfig()); else if (next !== "custom") { const nextRules = defaultRules(); if (next === "leve") { nextRules.cooldownEnabled = true; nextRules.cooldownSec = 5; nextRules.links = "remove"; } if (next === "moderado") { nextRules.repeatEnabled = true; nextRules.repeatMax = 3; nextRules.cooldownEnabled = true; nextRules.cooldownSec = 10; nextRules.links = "block"; nextRules.emotes = "remove"; nextRules.longMessage = "cut"; } if (next === "restrito") { nextRules.repeatEnabled = true; nextRules.repeatMax = 2; nextRules.repeatWindowSec = 120; nextRules.cooldownEnabled = true; nextRules.cooldownSec = 30; nextRules.links = "block"; nextRules.emotes = "block_only"; nextRules.longMessage = "block"; nextRules.maxChars = 150; nextRules.queueLimitEnabled = true; nextRules.queueMax = 5; } setTtsFilterConfig({ ...cfg, mode: "custom", shared: nextRules }); } }}><option value="custom">Sem preset</option><option value="free">Livre</option><option value="leve">Leve</option><option value="moderado">Moderado</option><option value="restrito">Restrito</option></select></Field>
+      <Field label="Preset"><select value={selectedPreset} onChange={(e) => { const next = e.target.value; setSelectedPreset(next); if (next === "free") setTtsFilterConfig(defaultConfig()); else if (next !== "custom") { const nextRules = defaultRules(); if (next === "leve") { nextRules.cooldownEnabled = true; nextRules.cooldownSec = 5; nextRules.links = "remove"; } if (next === "moderado") { nextRules.repeatEnabled = true; nextRules.repeatMax = 3; nextRules.cooldownEnabled = true; nextRules.cooldownSec = 10; nextRules.links = "block"; nextRules.emotes = "remove"; nextRules.longMessage = "cut"; } if (next === "restrito") { nextRules.repeatEnabled = true; nextRules.repeatMax = 2; nextRules.repeatWindowSec = 120; nextRules.cooldownEnabled = true; nextRules.cooldownSec = 30; nextRules.links = "block"; nextRules.emotes = "block_only"; nextRules.longMessage = "block"; nextRules.maxChars = 150; nextRules.queueLimitEnabled = true; nextRules.queueMax = 5; } setTtsFilterConfig(cfg.scope === "perPlatform" ? { ...cfg, mode: "custom", perPlatform: { ...cfg.perPlatform, [platform]: nextRules } } : { ...cfg, mode: "custom", shared: nextRules }); } }}><option value="custom">Sem preset</option><option value="free">Livre</option><option value="leve">Leve</option><option value="moderado">Moderado</option><option value="restrito">Restrito</option></select></Field>
     </div>
     {cfg.mode === "free" && <p className="tts-filter-free">Modo Livre ativo: as mensagens seguem para o TTS sem bloqueios, como no BACKUP01.</p>}
     <div className="tts-filter-grid">
