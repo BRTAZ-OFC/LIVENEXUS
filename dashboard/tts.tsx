@@ -1,8 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Filter, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
+import { Filter, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2, RadioTower, Radio, Youtube, Wifi, WifiOff } from "lucide-react";
 import "./css/tts.css";
 import { playProcessedSpeech, type PlaybackHandle } from "./ttsAudioEngine";
-import { subscribeTtsMessages, type ChatPlatform } from "./multichat";
+import {
+  subscribeTtsMessages,
+  connectMultiChatPlatform,
+  disconnectMultiChatPlatform,
+  getMultiChatSnapshot,
+  setMultiChatChannel,
+  useMultiChatSnapshot,
+  type ChatPlatform,
+} from "./multichat";
 import { getTtsFilterConfig, recordTtsQueueBlock, recordTtsQueueDrop, TtsFiltersPanel } from "./ttsFilters";
 
 type VoiceEffect = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
@@ -22,7 +30,7 @@ const VOICE_EFFECTS: { id: VoiceEffect; label: string; description: string; rate
   { id: "ghost", label: "Fantasma", description: "Voz lenta e etérea", rate: 0.82, pitch: 1.3 },
 ];
 const STORAGE_KEY = "livenexus:tts-settings-v1";
-type TtsPanel = "main" | "effects" | "filters";
+type TtsPanel = "main" | "connections" | "effects" | "filters";
 const DEFAULTS: TtsSettings = { voice: "pt_BR-faber-medium", rate: 1, volume: 1, pitch: 1, delay: 0, maxChars: 200, speakInterval: 0, effect: "normal", intensity: 1 };
 const SAMPLES = ["Olá, seja bem-vindo à live!", "Obrigado pela mensagem e por acompanhar a transmissão.", "Atenção, mensagem importante no chat."];
 
@@ -71,6 +79,9 @@ export default function TTSPage() {
   const [autoReadChat, setAutoReadChat] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [showEffects, setShowEffects] = useState(false);
+  const [showConnections, setShowConnections] = useState(false);
+  const connectionState = useMultiChatSnapshot();
+  const [connectionChannels, setConnectionChannels] = useState(() => getMultiChatSnapshot().channels);
   const queueRef = useRef<QueueItem[]>([]);
   const activeRef = useRef<PlaybackHandle | null>(null);
   const playTokenRef = useRef(0);
@@ -293,20 +304,58 @@ export default function TTSPage() {
   }
 
   function selectTtsPanel(panel: TtsPanel) {
+    setShowConnections(panel === "connections");
     setShowEffects(panel === "effects");
     setShowFilters(panel === "filters");
+  }
+
+  function updateConnectionChannel(platform: ChatPlatform, channel: string) {
+    setConnectionChannels((old) => ({ ...old, [platform]: channel }));
+    setMultiChatChannel(platform, channel);
+  }
+
+  function togglePlatformConnection(platform: ChatPlatform) {
+    const status = connectionState.statuses[platform].status.toLowerCase();
+    if (["connected", "open", "connecting", "reconnecting"].includes(status)) {
+      disconnectMultiChatPlatform(platform);
+      return;
+    }
+    const channel = connectionChannels[platform].trim();
+    if (!channel) return;
+    setMultiChatChannel(platform, channel);
+    connectMultiChatPlatform(platform);
   }
 
   return (
     <section className="tts-page">
       <header className="tts-page-heading">
         <div><p className="tts-eyebrow">CENTRAL DE TRANSMISSÃO</p><h1>Voz &amp; TTS</h1><p>Motor de voz local do navegador · sem créditos de API</p></div>
-        <div className="tts-heading-actions"><button type="button" className={showEffects ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel(showEffects ? "main" : "effects")} aria-expanded={showEffects}><Star size={14} />Efeitos</button><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel(showFilters ? "main" : "filters")} aria-expanded={showFilters}><Filter size={14} />Filtros</button><button type="button" className="tts-filter-open-button" onClick={() => selectTtsPanel("main")} aria-label="Voltar para Voz & TTS"><Volume2 size={14} />Voz &amp; TTS</button></div>
+        <div className="tts-heading-actions"><button type="button" className={showConnections ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel(showConnections ? "main" : "connections")} aria-expanded={showConnections}><RadioTower size={14} />Conexão</button><button type="button" className={showEffects ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel(showEffects ? "main" : "effects")} aria-expanded={showEffects}><Star size={14} />Efeitos</button><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel(showFilters ? "main" : "filters")} aria-expanded={showFilters}><Filter size={14} />Filtros</button></div>
       </header>
 
+      {showConnections && <section className="tts-card tts-platform-connections">
+        <div className="tts-card-title"><span className="tts-title-icon"><RadioTower /></span><div><h2>Conexão de plataformas</h2><p>Informe o canal e conecte Twitch, Kick ou YouTube ao multichat.</p></div></div>
+        <div className="tts-platform-grid">
+          {(["Twitch", "Kick", "YouTube"] as ChatPlatform[]).map((platform) => {
+            const item = connectionState.statuses[platform];
+            const active = ["connected", "open", "connecting", "reconnecting"].includes(item.status.toLowerCase());
+            const online = ["connected", "open"].includes(item.status.toLowerCase());
+            const Icon = platform === "Twitch" ? RadioTower : platform === "Kick" ? Radio : Youtube;
+            const placeholder = platform === "Twitch" ? "Nome do canal (ex.: gaules)" : platform === "Kick" ? "Slug do canal (ex.: xqc)" : "@canal, URL ou ID do vídeo";
+            return <article key={platform} className="tts-platform-card">
+              <div className="tts-platform-card-heading"><span className={`tts-platform-icon ${platform.toLowerCase()}`}><Icon size={18} /></span><div><h3>{platform}</h3><p>Conector de plataforma</p></div><span className={`tts-platform-dot ${online ? "online" : active ? "pending" : item.status === "error" ? "error" : ""}`} /></div>
+              <label className="tts-platform-field">Canal
+                <input value={connectionChannels[platform]} onChange={(event) => updateConnectionChannel(platform, event.target.value)} disabled={active} placeholder={placeholder} />
+              </label>
+              <div className="tts-platform-status"><span>Status</span><p className={item.status === "error" ? "error" : online ? "online" : active ? "pending" : ""}>{item.detail}</p>{item.viewers !== null && <small>Espectadores: {item.viewers}</small>}{item.meta && <small>{item.meta}</small>}</div>
+              <button type="button" className={active ? "tts-platform-action disconnect" : "tts-platform-action"} disabled={!active && !connectionChannels[platform].trim()} onClick={() => togglePlatformConnection(platform)}>{active ? <><WifiOff size={14} />Desconectar</> : <><Wifi size={14} />Conectar canal</>}</button>
+            </article>;
+          })}
+        </div>
+      </section>}
       {showFilters && <TtsFiltersPanel />}
       
-      {!showFilters && !showEffects && <>
+      {!showConnections && !showFilters && !showEffects && <>
 
       <section className="tts-card">
         <div className="tts-card-title"><span className="tts-title-icon"><Volume2 /></span><div><h2>Configurações do motor de voz</h2><p>Escolha a voz e ajuste os parâmetros de leitura</p></div></div>
