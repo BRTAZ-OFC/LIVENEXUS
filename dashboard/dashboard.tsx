@@ -17,6 +17,7 @@ import {
   Clock3,
   MessageSquare,
   Eye,
+  Volume2,
 } from "lucide-react";
 
 /* BLOCO 2 — O dashboard é registrado em dashboard/App.tsx. */
