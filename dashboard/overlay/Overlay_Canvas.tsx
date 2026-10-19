@@ -127,7 +127,7 @@ export default function OverlayCanvas() {
   const [displaySize, setDisplaySize] = useState(DEFAULT_SIZE);
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
-  const widgetPointer = useRef<{ index: number; mode: "move" | "resize"; x: number; y: number; left: number; top: number; width: number; height: number } | null>(null);
+  const widgetPointer = useRef<{ instanceId: string; mode: "move" | "resize"; x: number; y: number; left: number; top: number; width: number; height: number } | null>(null);
   const [config, setConfig] = useState<CanvasConfig>({
     name: "Overlay",
     visualizerSize: DEFAULT_SIZE,
@@ -291,7 +291,7 @@ export default function OverlayCanvas() {
                     event.preventDefault();
                     event.stopPropagation();
                     widgetPointer.current = {
-                      index,
+                      instanceId,
                       mode: "move",
                       x: event.clientX,
                       y: event.clientY,
@@ -310,21 +310,24 @@ export default function OverlayCanvas() {
                   }}
                   onPointerMove={(event) => {
                     const drag = widgetPointer.current;
-                    if (!drag || drag.index !== index || !(event.buttons & 1)) return;
+                    if (!drag || drag.instanceId !== instanceId || !(event.buttons & 1)) return;
                     const dx = (event.clientX - drag.x) / scale;
                     const dy = (event.clientY - drag.y) / scale;
                     setConfig((current) => {
                       const instances = [...(current.instances || [])];
-                      const item = instances[index];
-                      if (!item) return current;
+                      const targetIndex = instances.findIndex((item, itemIndex) =>
+                        (item.id || `${item.widgetId}-${itemIndex}`) === drag.instanceId
+                      );
+                      if (targetIndex < 0) return current;
+                      const item = instances[targetIndex];
                       if (drag.mode === "move") {
-                        instances[index] = {
+                        instances[targetIndex] = {
                           ...item,
                           x: Math.max(0, Math.min(size.width - drag.width, drag.left + dx)),
                           y: Math.max(0, Math.min(size.height - drag.height, drag.top + dy)),
                         };
                       } else {
-                        instances[index] = {
+                        instances[targetIndex] = {
                           ...item,
                           width: Math.max(40, Math.min(size.width - drag.left, drag.width + dx)),
                           height: Math.max(20, Math.min(size.height - drag.top, drag.height + dy)),
@@ -360,7 +363,7 @@ export default function OverlayCanvas() {
                         event.preventDefault();
                         event.stopPropagation();
                         widgetPointer.current = {
-                          index,
+                          instanceId,
                           mode: "resize",
                           x: event.clientX,
                           y: event.clientY,
