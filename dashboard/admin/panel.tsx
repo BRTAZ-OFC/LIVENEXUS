@@ -25,6 +25,7 @@ import DatabasePage from "./banco";
 import ReviewsManager from "./reviews-manager";
 import AdminConnectionsPage from "./connections";
 import WidgetsSection from "../widget/Widget_Section";
+import OverlaySection from "../overlay/Overlay_Section";
 
 type UserRow = {
   user_id: string;
@@ -381,41 +382,9 @@ export default function AdminPanel() {
                     </div>
                   </div>
                 );
-              })}
-            </div>
-          </div>
-        )}
+                 {subTab === "overlay" && <OverlaySection users={users} />}
 
-        {subTab === "overlay" && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-base font-bold text-white">Configurações de Overlay</h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Parâmetros e dados de personalização de overlay associados aos usuários da
-                plataforma.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-xl bg-slate-950/60 border border-white/10 space-y-4">
-              <p className="text-xs text-slate-300">
-                Os overlays do LiveNexus utilizam as credenciais e conexões ativas de cada usuário.
-                Abaixo estão listados os usuários cadastrados e seus papéis na plataforma:
-              </p>
-              <div className="divide-y divide-white/5">
-                {users.map((u) => (
-                  <div key={u.user_id} className="py-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-semibold text-white">{u.user}</p>
-                      <p className="text-[10px] text-slate-400">
-                        Papel: <span className="text-violet-300 font-semibold">{u.role}</span>
-                      </p>
-                    </div>
-                    <span className="px-2 py-1 rounded text-[10px] font-semibold bg-violet-500/10 text-violet-300 border border-violet-500/20">
-                      Overlay Ativo
-                    </span>
-                  </div>
-                ))}
-              </div>
+  </div>
             </div>
           </div>
         )}
