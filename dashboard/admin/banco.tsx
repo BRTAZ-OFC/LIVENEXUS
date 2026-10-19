@@ -1141,8 +1141,8 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {loading && genericRows.length === 0 && <tr><td className="px-3 py-8 text-center text-slate-500" colSpan={2}>Carregando registros…</td></tr>}
-                    {!loading && genericRows.length === 0 && !error && <tr><td className="px-3 py-8 text-center text-slate-500" colSpan={2}>Esta tabela ainda não possui registros.</td></tr>}
+                    {loading && genericRows.length === 0 && <tr><td className="px-3 py-8 text-center text-slate-500" colSpan={genericColumns.length + 1}>Carregando registros…</td></tr>}
+                    {!loading && genericRows.length === 0 && !error && <tr><td className="px-3 py-8 text-center text-slate-500" colSpan={genericColumns.length + 1}>Esta tabela ainda não possui registros.</td></tr>}
                     {genericRows.map((row) => {
                       const fields = Object.keys(row).filter((key) => key !== "__rowKey");
                       const rowIsEditing = genericEditingKey === row.__rowKey;
@@ -1161,7 +1161,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                               {fields.map((field) => <td key={field} className="max-w-64 break-words px-3 py-2 align-top text-slate-300" title={String(row[field] ?? "")}>{jsonCellValue(row[field])}</td>)}
                               <td className="whitespace-nowrap px-3 py-2 align-top">
                                 <div className="flex gap-2">
-                                  <button type="button" onClick={() => { const { __rowKey: _rowKey, ...copy } = row; setGenericEditingKey(row.__rowKey); setGenericDraft(JSON.stringify(copy, null, 2)); }} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-200"><Pencil size={12} />Editar</button>
+                                  <button type="button" onClick={() => { const copy = Object.fromEntries(Object.entries(row).filter(([key]) => key !== "__rowKey")); setGenericEditingKey(row.__rowKey); setGenericDraft(JSON.stringify(copy, null, 2)); }} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-200"><Pencil size={12} />Editar</button>
                                   <button type="button" onClick={() => void deleteGenericRow(row.__rowKey)} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-red-500/20 px-2 py-1 text-[10px] text-red-300"><Trash2 size={12} />Excluir</button>
                                 </div>
                               </td>
