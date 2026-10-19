@@ -139,7 +139,8 @@ function removePlatformEmotes(text: string, platform: ChatPlatform, emotes: unkn
     for (const group of emotes.split("/")) {
       const parts = group.split(":");
       for (const position of (parts[1] || "").split(",")) {
-        const [start, end] = position.split("-").map(Number);
+        const start = Number(position.split("-")[0]);
+        const end = Number(position.split("-")[1]);
         if (Number.isFinite(start) && Number.isFinite(end)) ranges.push({ start, end });
       }
     }
@@ -293,7 +294,7 @@ export function TtsFiltersPanel() {
     </div>
     {cfg.mode === "free" && <p className="tts-filter-free">Modo Livre ativo: as mensagens seguem para o TTS sem bloqueios, como no BACKUP01.</p>}
     <div className="tts-filter-grid">
-      <div className="tts-filter-group"><h3>Cargos permitidos</h3>{Object.entries(roleLabels).map(([key, label]) => <Toggle key={key} checked={rules.roles[key]} onChange={(v) => updateNested("roles", key, v)} label={label} />)}</div>
+      <div className="tts-filter-group"><h3>Cargos permitidos</h3>{Object.entries(roleLabels).map(([key, label]) => <Toggle key={key} checked={rules.roles[key] !== false} onChange={(v) => updateNested("roles", key, v)} label={label} />)}</div>
       <div className="tts-filter-group"><h3>Conteúdo</h3>
         <Toggle checked={rules.content.messages} onChange={(v) => updateNested("content", "messages", v)} label="Mensagens comuns" />
         <Toggle checked={rules.content.links} onChange={(v) => updateNested("content", "links", v)} label="Links permitidos" />
