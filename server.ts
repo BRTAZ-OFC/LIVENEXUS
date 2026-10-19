@@ -841,7 +841,7 @@ app.all(/^\/api(?:\/.*)?$/, (req: Request, res: Response) => {
 if (isDevServer) {
   const { createServer } = await import("vite");
   const vite = await createServer({
-    server: { middlewareMode: true },
+    server: { middlewareMode: true, hmr: false },
     appType: "spa",
   });
   app.use(vite.middlewares);
