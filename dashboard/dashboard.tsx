@@ -2,7 +2,7 @@
 import DatabasePage from "./admin/banco";
 import AdminPanel from "./admin/panel";
 import TTSPage from "./tts";
-import MultiChatPanel, { disconnectAllMultiChat, useMultiChatSnapshot } from "./multichat";
+import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import { useEffect, useState } from "react";
 import {
   AudioLines,
@@ -34,7 +34,6 @@ function DashboardPage() {
     acc[key].count += 1;
     return acc;
   }, {})).sort((a, b) => b.count - a.count).slice(0, 10);
-  useEffect(() => () => disconnectAllMultiChat(), []);
 
   const [isAdmin, setIsAdmin] = useState(() => {
     if (typeof window !== "undefined") {
