@@ -265,7 +265,7 @@ function DashboardPage() {
               </section>
             </div>
           </section>
-        )
+        ) : activeSection === "admin-panel" && isAdmin ? (
           <section className="dash-w-full-px-6-5ebeye">
             <AdminPanel />
           </section>
