@@ -5,10 +5,8 @@ import { useEffect, useState } from "react";
 import {
   AudioLines,
   Radio,
-  Settings2,
   UserRound,
   LogOut,
-  ArrowRight,
   House,
   Database,
   ChevronRight,
