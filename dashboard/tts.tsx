@@ -46,7 +46,6 @@ const VOICE_EFFECTS: {
   { id: "giant", label: "Gigante", description: "Muito grave e pesada", rate: 0.68, pitch: 0.3 },
   { id: "ghost", label: "Fantasma", description: "Voz lenta e etérea", rate: 0.82, pitch: 1.3 },
 ];
-const STORAGE_KEY = "livenexus:tts-settings-v1";
 type TtsPanel = "main" | "effects" | "filters";
 const DEFAULTS: TtsSettings = {
   voice: "pt_BR-faber-medium",
@@ -113,17 +112,8 @@ const TTL: Record<QueueItem["tier"], number> = {
   normal: 30000,
 };
 
-function loadSettings(): TtsSettings {
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    return { ...DEFAULTS, ...saved, voice: saved.voice || DEFAULTS.voice };
-  } catch {
-    return DEFAULTS;
-  }
-}
-
 export default function TTSPage() {
-  const [settings, setSettings] = useState<TtsSettings>(loadSettings);
+  const [settings, setSettings] = useState<TtsSettings>(DEFAULTS);
   const [engineReady, setEngineReady] = useState(false);
   const [testText, setTestText] = useState(SAMPLES[0]);
   const [queue, setQueue] = useState<QueueItem[]>([]);
@@ -249,12 +239,6 @@ export default function TTSPage() {
       }),
     [],
   );
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    } catch {}
-  }, [settings]);
 
   const queueByPriority = useMemo(() => {
     const now = Date.now();
