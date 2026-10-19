@@ -39,7 +39,7 @@
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": [
-        "./dashboard/*"
+        "./*"
       ]
     }
   }
