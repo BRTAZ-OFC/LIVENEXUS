@@ -24,6 +24,7 @@ import {
 import DatabasePage from "./banco";
 import ReviewsManager from "./reviews-manager";
 import AdminConnectionsPage from "./connections";
+import WidgetsSection from "../widget/Widget_Section";
 
 type UserRow = {
   user_id: string;
@@ -47,7 +48,7 @@ type ReviewRow = {
 
 export default function AdminPanel() {
   const [subTab, setSubTab] = useState<
-    "inicial" | "galeria" | "overlay" | "cenarios" | "biblioteca" | "avaliacoes" | "suporte" | "conexoes"
+    "inicial" | "galeria" | "overlay" | "cenarios" | "biblioteca" | "avaliacoes" | "suporte" | "conexoes" | "widgets"
   >("inicial");
 
   // Submenu scroll & arrows state
@@ -159,6 +160,7 @@ export default function AdminPanel() {
     { id: "avaliacoes", label: "Avaliações", icon: Star },
     { id: "suporte", label: "Suporte", icon: HelpCircle },
     { id: "conexoes", label: "Conexão", icon: RadioTower },
+    { id: "widgets", label: "Widgets", icon: Tv },
   ] as const;
 
   return (
@@ -248,6 +250,7 @@ export default function AdminPanel() {
       {/* Conteúdo da sub-área selecionada */}
       <div className="rounded-2xl bg-slate-900/60 border border-white/10 p-6 backdrop-blur-xl">
         {subTab === "conexoes" && <AdminConnectionsPage />}
+        {subTab === "widgets" && <WidgetsSection />}
 
         {subTab === "inicial" && (
           <div className="space-y-6">
