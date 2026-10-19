@@ -20,7 +20,7 @@ const VOICE_EFFECTS: { id: VoiceEffect; label: string; description: string; rate
   { id: "ghost", label: "Fantasma", description: "Voz lenta e etérea", rate: 0.82, pitch: 1.3 },
 ];
 const STORAGE_KEY = "livenexus:tts-settings-v1";
-const DEFAULTS: TtsSettings = { voice: "", rate: 1, volume: 1, pitch: 1, delay: 0, maxChars: 200, speakInterval: 0, effect: "normal", intensity: 1 };
+const DEFAULTS: TtsSettings = { voice: "pt_BR-faber-medium", rate: 1, volume: 1, pitch: 1, delay: 0, maxChars: 200, speakInterval: 0, effect: "normal", intensity: 1 };
 const SAMPLES = ["Olá, seja bem-vindo à live!", "Obrigado pela mensagem e por acompanhar a transmissão.", "Atenção, mensagem importante no chat."];
 
 type QueueItem = { id: number; text: string; author: string; tier: "broadcaster" | "moderator" | "vip" | "subscriber" | "normal"; queuedAt: number };
@@ -30,7 +30,7 @@ const TTL: Record<QueueItem["tier"], number> = { broadcaster: 120000, moderator:
 function loadSettings(): TtsSettings {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    return { ...DEFAULTS, ...saved };
+    return { ...DEFAULTS, ...saved, voice: saved.voice || DEFAULTS.voice };
   } catch { return DEFAULTS; }
 }
 
