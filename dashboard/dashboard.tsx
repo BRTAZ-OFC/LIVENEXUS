@@ -360,7 +360,8 @@ function DashboardPage() {
           </div>
         )}
         {activeSection === "overview" ? (
-          <DashboardOverview />        ) : activeSection === "admin-panel" && isAdmin ? (
+          <DashboardOverview />
+        ) : activeSection === "admin-panel" && isAdmin ? (
           <section className="dash-w-full-px-6-5ebeye">
             <AdminPanel />
           </section>
