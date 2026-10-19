@@ -1,5 +1,4 @@
 /* BLOCO 1 — Imports de roteamento e ícones usados na página pública. */
-import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowLeft,
   ArrowRight,
@@ -19,11 +18,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
-/* BLOCO 2 — Associa a URL inicial ao componente HomePage. */
-export const Route = createFileRoute("/")({
-  component: HomePage,
-});
-
+/* BLOCO 2 — A página inicial é registrada em dashboard/App.tsx. */
 /* BLOCO 3 — Dados dos cards de recursos exibidos na página inicial. */
 const features = [
   {
@@ -782,3 +777,5 @@ function HomePage() {
     </div>
   );
 }
+
+export default HomePage;
