@@ -90,6 +90,46 @@ function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
 }
 
+/* Por padrão, todas as APIs do painel exigem uma sessão assinada válida.
+   Somente autenticação/cadastro, checagem de usuário e avaliações públicas ficam abertas. */
+const PUBLIC_API_ENDPOINTS = new Set([
+  "POST /api/auth/register",
+  "POST /api/auth/login",
+  "POST /api/auth/logout",
+  "GET /api/check-username",
+  "GET /api/avaliacoes",
+  "POST /api/avaliacoes",
+]);
+
+app.use(/^\\/api(?:\\/.*)?$/, async (req: Request, res: Response, next: NextFunction) => {
+  if (PUBLIC_API_ENDPOINTS.has(`${req.method} ${req.path}`)) return next();
+
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) {
+    return res.status(401).set(NO_CACHE).json({
+      ok: false,
+      message: "Faça login para acessar este recurso.",
+    });
+  }
+
+  try {
+    const user = await getUserById(session.user_id);
+    if (!user || user.role !== session.role) {
+      return res.status(401).set(NO_CACHE).json({
+        ok: false,
+        message: "Sessão inválida ou expirada. Entre novamente.",
+      });
+    }
+    return next();
+  } catch (error) {
+    console.error("[Auth API] Falha ao validar sessão:", error);
+    return res.status(503).set(NO_CACHE).json({
+      ok: false,
+      message: "Não foi possível validar a sessão.",
+    });
+  }
+});
+
 /* Cadastro e login. O CRUD JSON nunca é importado pelo frontend. */
 app.post("/api/auth/register", async (req: Request, res: Response) => {
   try {
@@ -406,8 +446,17 @@ app.delete("/api/database/plataformas", async (req: Request, res: Response) => {
 });
 
 /* Conexões de plataformas: o user_id vem da sessão e é validado no JSON de usuários. */
-async function getAuthenticatedJsonUser(req: Request, res: Response) {
+async function getAuthenticatedJsonUser(
+  req: Request,
+  res: Response,
+  allowAdminTarget = false,
+) {
   const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) {
+    res.status(401).set(NO_CACHE).json({ ok: false, error: "Autenticação necessária." });
+    return null;
+  }
+
   const headerUserId = req.headers["x-user-id"];
   const queryUserId = req.query["user_id"];
   const bodyUserId = req.body?.["user_id"];
@@ -420,18 +469,10 @@ async function getAuthenticatedJsonUser(req: Request, res: Response) {
           ? bodyUserId.trim()
           : null;
 
-  let targetUserId = session?.user_id;
-
-  if (session?.role === "admin" && candidate) {
-    targetUserId = candidate;
-  } else if (!targetUserId && candidate) {
-    targetUserId = candidate;
-  }
-
-  if (!targetUserId) {
-    res.status(401).set(NO_CACHE).json({ ok: false, error: "Autenticação necessária." });
-    return null;
-  }
+  const targetUserId =
+    allowAdminTarget && session.role === "admin" && candidate
+      ? candidate
+      : session.user_id;
 
   const user = await getUserById(targetUserId);
   if (!user) {
@@ -469,7 +510,7 @@ app.get("/api/auth/me", async (req: Request, res: Response) => {
 
 app.post("/api/channel-verify/challenge", async (req: Request, res: Response) => {
   try {
-    const user = await getAuthenticatedJsonUser(req, res);
+    const user = await getAuthenticatedJsonUser(req, res, true);
     if (!user) return;
     const challenge = await createChannelChallenge(
       user.user_id,
@@ -493,7 +534,7 @@ app.post("/api/channel-verify/challenge", async (req: Request, res: Response) =>
 
 app.post("/api/channel-verify/verify", async (req: Request, res: Response) => {
   try {
-    const user = await getAuthenticatedJsonUser(req, res);
+    const user = await getAuthenticatedJsonUser(req, res, true);
     if (!user) return;
     const result = await verifyChannelChallenge(user.user_id, req.body?.challengeId);
     return res.set(NO_CACHE).json({ ok: true, ...result });
@@ -511,7 +552,7 @@ app.post("/api/channel-verify/verify", async (req: Request, res: Response) => {
 
 app.get("/api/plataformas", async (req: Request, res: Response) => {
   try {
-    const user = await getAuthenticatedJsonUser(req, res);
+    const user = await getAuthenticatedJsonUser(req, res, true);
     if (!user) return;
     const id = typeof req.query["id"] === "string" ? req.query["id"] : "";
     const plataformas = id
@@ -537,7 +578,7 @@ app.get("/api/plataformas", async (req: Request, res: Response) => {
 
 app.post("/api/plataformas", async (req: Request, res: Response) => {
   try {
-    const user = await getAuthenticatedJsonUser(req, res);
+    const user = await getAuthenticatedJsonUser(req, res, true);
     if (!user) return;
     const requestedStatus = String(req.body?.status ?? "")
       .trim()
@@ -582,7 +623,7 @@ app.post("/api/plataformas", async (req: Request, res: Response) => {
 
 app.patch("/api/plataformas", async (req: Request, res: Response) => {
   try {
-    const user = await getAuthenticatedJsonUser(req, res);
+    const user = await getAuthenticatedJsonUser(req, res, true);
     if (!user) return;
     const requestedStatus = String(req.body?.status ?? "")
       .trim()
@@ -618,7 +659,7 @@ app.patch("/api/plataformas", async (req: Request, res: Response) => {
 
 app.delete("/api/plataformas", async (req: Request, res: Response) => {
   try {
-    const user = await getAuthenticatedJsonUser(req, res);
+    const user = await getAuthenticatedJsonUser(req, res, true);
     if (!user) return;
     const existing = await PlataformasJohnson.list(user.user_id);
     if (!existing.length) {
@@ -912,6 +953,45 @@ app.all(/^\/api(?:\/.*)?$/, (req: Request, res: Response) => {
     endpoint: req.originalUrl,
   });
 });
+
+/* Proteção no servidor: a verificação acontece antes do fallback do SPA e do Vite. */
+async function requirePageSession(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  requiredRole?: "admin",
+) {
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    return res.status(405).set(NO_CACHE).send("Método não permitido.");
+  }
+
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) {
+    return res.set(NO_CACHE).redirect(302, "/login");
+  }
+
+  try {
+    const user = await getUserById(session.user_id);
+    if (!user || user.role !== session.role) {
+      return res.set(NO_CACHE).redirect(302, "/login");
+    }
+    if (requiredRole === "admin" && user.role !== "admin") {
+      return res.set(NO_CACHE).redirect(302, "/dashboard");
+    }
+    res.set(NO_CACHE);
+    return next();
+  } catch (error) {
+    console.error("[Auth Page] Falha ao validar sessão:", error);
+    return res.status(503).set(NO_CACHE).send("Não foi possível validar a sessão.");
+  }
+}
+
+app.use(/^\\/dashboard\\/?$/, (req: Request, res: Response, next: NextFunction) =>
+  requirePageSession(req, res, next),
+);
+app.use(/^\\/admin\\/banco\\/?$/, (req: Request, res: Response, next: NextFunction) =>
+  requirePageSession(req, res, next, "admin"),
+);
 
 if (!isDevServer && !isApiOnly) {
   app.use(express.static(distDir));
