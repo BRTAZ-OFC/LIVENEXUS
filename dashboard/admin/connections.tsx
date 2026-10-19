@@ -57,7 +57,7 @@ export default function AdminConnectionsPage() {
     const onStatus = (nextStatus: string, detail?: string) => {
       setPlatformStatus(platform, { status: String(nextStatus || "unknown"), detail: detail || String(nextStatus || "Status atualizado") });
       if (["error", "closed", "disconnected", "idle"].includes(String(nextStatus).toLowerCase())) {
-        if (String(nextStatus).toLowerCase() !== "idle") handles.current[platform] = undefined;
+        handles.current[platform] = undefined;
       }
     };
     const onMeta = (meta: unknown) => {
