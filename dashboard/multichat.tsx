@@ -3,6 +3,7 @@ import { connectTwitch } from "./configuracao/Config_twitchChat";
 import { connectKick } from "./configuracao/Config_kickChat";
 import { connectYouTube } from "./configuracao/Config_youtubeLive";
 import { MessageSquare } from "lucide-react";
+import { applyTtsFilters } from "./ttsFilters";
 
 export type ChatPlatform = "Twitch" | "Kick" | "YouTube";
 export type MultiChatMessage = {
@@ -90,7 +91,8 @@ export function connectMultiChatPlatform(platform: ChatPlatform) {
     };
     snapshot = { ...snapshot, messages: [message, ...snapshot.messages].slice(0, 300) };
     notify();
-    publishTts(message);
+    const ttsMessage = applyTtsFilters(message);
+    if (ttsMessage) publishTts(ttsMessage);
   };
   const onStatus = (next: string, detail?: string) => {
     patchPlatform(platform, { status: String(next || "unknown"), detail: detail || String(next || "Status atualizado") });
