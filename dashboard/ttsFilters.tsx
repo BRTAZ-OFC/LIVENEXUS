@@ -185,21 +185,22 @@ const URL_RE = /\bhttps?:\/\/\S+|www\.\S+/gi;
 const URL_TEST = /\bhttps?:\/\/\S+|www\.\S+/i;
 const MENTION_RE = /@[a-zA-Z0-9_.-]+/g;
 const EMOJI_RE = /[\u{1F000}-\u{1FAFF}\u2600-\u27BF\u2190-\u21FF\u2B00-\u2BFF\uFE0F]/gu;
-export function applyTtsFilters(message: MultiChatMessage): MultiChatMessage | null {
-  if (config.mode === "free") { record(message, true, "Modo Livre", message.text); return message; }
+export type TtsFilterDecision = { message: MultiChatMessage | null; allowed: boolean; reason: string };
+export function evaluateTtsFilters(message: MultiChatMessage): TtsFilterDecision {
+  if (config.mode === "free") { record(message, true, "Modo Livre", message.text); return { message, allowed: true, reason: "Modo Livre" }; }
   const rules = config.scope === "perPlatform" ? config.perPlatform[message.platform] : config.shared;
   const platform = message.platform;
   const author = message.author || "Anônimo";
   const role = roleOf(message.roles);
   const userKey = platform + ":" + author.toLowerCase();
-  const fail = (reason: string): null => { record(message, false, reason, message.text); return null; };
+  const fail = (reason: string): TtsFilterDecision => { record(message, false, reason, message.text); return { message: null, allowed: false, reason }; };
   const manuallyBlocked = flaggedUsers.get(userKey);
   if (manuallyBlocked?.blocked) return fail("Usuário bloqueado manualmente");
   if (!rules.roles[role]) return fail("Cargo não permitido: " + role);
   if (message.eventType) {
     if (rules.events[message.eventType] === false) return fail("Evento desativado: " + message.eventType);
     record(message, true, "Evento permitido", message.text);
-    return message;
+    return { message, allowed: true, reason: "Evento permitido" };
   }
   if (!rules.content.messages) return fail("Mensagens comuns desativadas");
   let text = message.text;
@@ -252,7 +253,7 @@ export function applyTtsFilters(message: MultiChatMessage): MultiChatMessage | n
     if (rules.longMessage === "cut") text = text.slice(0, rules.maxChars);
   }
   record(message, true, "Aceita", text);
-  return { ...message, text };
+  return { message: { ...message, text }, allowed: true, reason: "Aceita" };
 }
 export function getFlaggedUsers() { return Array.from(flaggedUsers.entries()).map(([key, value]) => ({ key, ...value })); }
 export function toggleFlaggedUser(key: string) {
@@ -358,6 +359,6 @@ export function TtsFiltersPanel() {
       <div className="tts-filter-events">{diagState.events.slice(0, 30).map((event) => <article key={event.id + event.time}><time>{new Date(event.time).toLocaleTimeString("pt-BR")}</time><b className={event.decision === "ACEITA" ? "accepted" : "blocked"}>{event.decision}</b><span>{event.platform} · {event.author}</span><small>{event.reason}</small><p>{event.text}</p></article>)}</div>
       <div className="tts-filter-flagged"><h3>Usuários sinalizados por repetição</h3>{getFlaggedUsers().length === 0 ? <p>Nenhum usuário sinalizado.</p> : getFlaggedUsers().map((user) => <div key={user.key}><label><input type="checkbox" checked={user.blocked} onChange={() => toggleFlaggedUser(user.key)} /> <span>{user.author} · {user.platform}</span></label><small>{user.reason}</small><button onClick={() => clearFlaggedUser(user.key)} aria-label={"Limpar " + user.author}><Trash2 size={12} /></button></div>)}</div>
     </div>
-    <p className="tts-filter-footer">Configurações salvas localmente neste navegador. As regras só filtram a leitura TTS; o chat visual continua recebendo as mensagens.</p>
+    <p className="tts-filter-footer">Configurações salvas localmente neste navegador. As regras controlam a leitura TTS; o multichat mantém as mensagens visíveis e indica com alto-falante verde as liberadas e vermelho riscado as silenciadas.</p>
   </section>;
 }
