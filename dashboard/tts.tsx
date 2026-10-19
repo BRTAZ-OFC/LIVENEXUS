@@ -112,9 +112,12 @@ export default function TTSPage() {
         return;
       }
       if (filterConfig.mode === "custom" && filterRules.queueLimitEnabled && filterRules.queuePolicy === "preserve_priority") {
-        const rank = (entry: QueueItem) => filterRules.priorityEnabled
-          ? (filterRules.priorities[entry.tier] ?? 1)
-          : (5 - PRIORITY[entry.tier]);
+        const rank = (entry: QueueItem) => {
+          const entryRules = filterConfig.scope === "perPlatform" ? filterConfig.perPlatform[entry.platform] : filterConfig.shared;
+          return filterConfig.mode === "custom" && entryRules.priorityEnabled
+            ? (entryRules.priorities[entry.tier] ?? 1)
+            : (5 - PRIORITY[entry.tier]);
+        };
         const worstIndex = next.reduce((worst, entry, index, all) => rank(entry) < rank(all[worst]!) ? index : worst, 0);
         if (worstIndex === next.length - 1 && rank(item) <= rank(next[worstIndex]!)) {
           recordTtsQueueBlock(message, "Fila preservou mensagens de maior prioridade");
