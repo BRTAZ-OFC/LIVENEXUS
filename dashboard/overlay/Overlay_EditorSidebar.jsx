@@ -605,7 +605,6 @@ export default function OverlayEditorSidebar({
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
                 className={`flex-shrink-0 flex flex-col items-center py-1.5 px-2.5 rounded-lg text-[10px] font-medium transition-all ${
                   isActive 
                     ? 'bg-purple-600/30 text-purple-200 border border-purple-500/40' 
