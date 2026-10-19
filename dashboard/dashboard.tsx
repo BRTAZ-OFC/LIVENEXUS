@@ -3,6 +3,7 @@ import DatabasePage from "./admin/banco";
 import AdminPanel from "./admin/panel";
 import TTSPage from "./tts";
 import PlatformBioConnections from "./conexao/PlatformBioConnections";
+import OverlaySection from "./overlay/Overlay_Section";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import { useEffect, useState } from "react";
 import {
@@ -56,7 +57,7 @@ function DashboardPage() {
     return false;
   });
   const [activeSection, setActiveSection] = useState<
-    "overview" | "database" | "admin-panel" | "voice" | "connections"
+    "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay"
   >(() => {
     if (typeof window !== "undefined") {
       const admin = sessionStorage.getItem("livenexus_role") === "admin";
@@ -65,8 +66,9 @@ function DashboardPage() {
       const stored = sessionStorage.getItem("livenexus_active_tab");
       const candidate = tabParam || stored;
 
-      // A seção Conexão é de uso geral; as seções administrativas continuam restritas.
+      // Conexão e Overlay são áreas de uso geral; banco e painel admin exigem o papel admin.
       if (candidate === "connections") return "connections";
+      if (candidate === "overlay") return "overlay";
       if (
         admin &&
         (candidate === "database" ||
@@ -82,7 +84,7 @@ function DashboardPage() {
 
   // BLOCO 5 — Atualiza a seção selecionada e persiste a escolha.
   function handleSelectSection(
-    section: "overview" | "database" | "admin-panel" | "voice" | "connections",
+    section: "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay",
   ) {
     setActiveSection(section);
     if (typeof window !== "undefined") {
@@ -92,7 +94,8 @@ function DashboardPage() {
         section === "database" ||
         section === "admin-panel" ||
         section === "voice" ||
-        section === "connections"
+        section === "connections" ||
+        section === "overlay"
       ) {
         url.searchParams.set("tab", section);
       } else {
@@ -161,6 +164,16 @@ function DashboardPage() {
           >
             <RadioTower className="dash-h-2-5-w-2-5-16znhny" />
             {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Conexão</span>}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSelectSection("overlay")}
+            title="Overlay"
+            aria-label="Overlay"
+            className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "overlay" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
+          >
+            <Eye className="dash-h-2-5-w-2-5-16znhny" />
+            {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Overlay</span>}
           </button>
           {isAdmin && (
             <>
@@ -238,6 +251,9 @@ function DashboardPage() {
         </div>
         <div className={activeSection === "connections" ? "dash-w-full-px-6-5ebeye" : "hidden"}>
           <PlatformBioConnections />
+        </div>
+        <div className={activeSection === "overlay" ? "dash-w-full-px-6-5ebeye" : "hidden"}>
+          <OverlaySection />
         </div>
         {activeSection === "overview" ? (
           <section className="dash-overview">
