@@ -71,7 +71,6 @@ export default function PlatformConnection({ platform }) {
       platform,
       status: "verified",
     });
-    setLinkOpen(false);
     setError("");
   }
 
