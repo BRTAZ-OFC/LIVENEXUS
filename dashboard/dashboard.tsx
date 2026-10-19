@@ -150,12 +150,8 @@ function DashboardOverview() {
 function DashboardPage() {
   // BLOCO 4 — Inicializa o menu e recupera o papel antes de restaurar a aba ativa.
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(() => {
-    if (typeof window !== "undefined") {
-      return sessionStorage.getItem("livenexus_role") === "admin";
-    }
-    return false;
-  });
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<
     "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay"
   >(() => {
@@ -205,21 +201,67 @@ function DashboardPage() {
     }
   }
 
-  // BLOCO 6 — Confirma o papel no cliente e força a aba inicial para usuários comuns.
+  // BLOCO 6 — Valida a sessão real no servidor antes de exibir qualquer conteúdo protegido.
   useEffect(() => {
-    const admin = sessionStorage.getItem("livenexus_role") === "admin";
-    setIsAdmin(admin);
-    if (!admin) {
-      setActiveSection((section) =>
-        section === "database" || section === "admin-panel" ? "overview" : section,
-      );
-      const stored = sessionStorage.getItem("livenexus_active_tab");
-      if (stored === "database" || stored === "admin-panel") {
-        sessionStorage.setItem("livenexus_active_tab", "overview");
+    let active = true;
+
+    async function verifySession() {
+      try {
+        const response = await fetch("/api/auth/me", {
+          method: "GET",
+          credentials: "same-origin",
+          headers: { Accept: "application/json" },
+          cache: "no-store",
+        });
+        const result = await response.json() as {
+          ok?: boolean;
+          user?: { user_id?: string; user?: string; role?: string };
+        };
+
+        if (!response.ok || !result.ok || !result.user?.user_id) {
+          throw new Error("Sessão inválida.");
+        }
+        if (!active) return;
+
+        const admin = result.user.role === "admin";
+        setIsAdmin(admin);
+        sessionStorage.setItem("livenexus_role", admin ? "admin" : "user");
+        sessionStorage.setItem("livenexus_user_id", result.user.user_id);
+
+        if (!admin) {
+          setActiveSection((section) =>
+            section === "database" || section === "admin-panel" ? "overview" : section,
+          );
+          const stored = sessionStorage.getItem("livenexus_active_tab");
+          if (stored === "database" || stored === "admin-panel") {
+            sessionStorage.setItem("livenexus_active_tab", "overview");
+          }
+        }
+      } catch {
+        if (!active) return;
+        sessionStorage.removeItem("livenexus_role");
+        sessionStorage.removeItem("livenexus_token");
+        sessionStorage.removeItem("livenexus_user_id");
+        window.location.replace("/login");
+      } finally {
+        if (active) setAuthLoading(false);
       }
     }
+
+    void verifySession();
+    return () => {
+      active = false;
+    };
   }, []);
   // BLOCO 7 — Renderiza o layout do menu lateral e da área de conteúdo.
+
+  if (authLoading) {
+    return (
+      <main className="dash-flex-min-h-screen-axmrk9 items-center justify-center bg-slate-950 text-slate-300">
+        <p className="text-sm">Verificando sessão...</p>
+      </main>
+    );
+  }
 
   return (
     <div className="dash-flex-min-h-screen-axmrk9">
