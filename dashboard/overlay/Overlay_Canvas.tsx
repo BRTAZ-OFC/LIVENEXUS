@@ -181,7 +181,6 @@ export default function OverlayCanvas() {
   }, []);
 
   // Persiste a composição no JSON com debounce para não gravar a cada movimento do mouse.
-  /*
   useEffect(() => {
     if (loading || error) return;
     // A carga inicial é apenas leitura; só salvar depois de uma alteração do usuário.
@@ -222,7 +221,6 @@ export default function OverlayCanvas() {
       window.clearTimeout(timeout);
     };
   }, [config, loading, error]);
-  */
 
   const size = useMemo(() => ({
     width: Math.max(320, Number(config.visualizerSize?.width) || DEFAULT_SIZE.width),
