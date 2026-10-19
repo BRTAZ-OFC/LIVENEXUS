@@ -150,7 +150,6 @@ export async function verifyChannelChallenge(userId, challengeIdInput) {
         channel_id: challenge.channelIdentifier,
         verification_code: challenge.verificationCode,
         status: "verified",
-        verificationProof: `bio:${challenge.platform}:${challenge.channelIdentifier}:${verifiedAt}`,
         verifiedAt,
       })
     : await PlataformasJohnson.create(userId, {
@@ -159,7 +158,6 @@ export async function verifyChannelChallenge(userId, challengeIdInput) {
         channel_id: challenge.channelIdentifier,
         verification_code: challenge.verificationCode,
         status: "verified",
-        verificationProof: `bio:${challenge.platform}:${challenge.channelIdentifier}:${verifiedAt}`,
         verifiedAt,
       });
 
