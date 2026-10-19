@@ -136,9 +136,7 @@ export async function updateUser(user_id, changes = {}) {
 
       if (
         users.some(
-          (item, i) =>
-            i !== index &&
-            item.user.toLowerCase() === changes.user.trim().toLowerCase(),
+          (item, i) => i !== index && item.user.toLowerCase() === changes.user.trim().toLowerCase(),
         )
       ) {
         throw new Error("Esse nome de usuário já está em uso.");
@@ -183,21 +181,15 @@ export async function deleteUser(user_id) {
     const users = await readUsers();
     const targetId = String(user_id ?? "").trim();
 
-    const index = users.findIndex(
-      (item) => String(item.user_id ?? "").trim() === targetId,
-    );
+    const index = users.findIndex((item) => String(item.user_id ?? "").trim() === targetId);
 
     if (index < 0) return false;
 
     if (users[index].role === "admin") {
-      const adminCount = users.filter(
-        (item) => item.role === "admin",
-      ).length;
+      const adminCount = users.filter((item) => item.role === "admin").length;
 
       if (adminCount <= 1) {
-        throw new Error(
-          "Não é possível excluir o único administrador do sistema.",
-        );
+        throw new Error("Não é possível excluir o único administrador do sistema.");
       }
     }
 

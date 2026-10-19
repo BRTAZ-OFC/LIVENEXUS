@@ -32,9 +32,13 @@ export function createSessionToken(user) {
 
 export function createSessionCookie(user) {
   const token = createSessionToken(user);
-  return COOKIE_NAME + "=" + token +
+  return (
+    COOKIE_NAME +
+    "=" +
+    token +
     "; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=" +
-    SESSION_TTL_SECONDS;
+    SESSION_TTL_SECONDS
+  );
 }
 
 export function parseToken(value) {
@@ -73,7 +77,7 @@ function getHeader(source, name) {
   }
 
   const value = headers && (headers[name.toLowerCase()] ?? headers[name]);
-  return Array.isArray(value) ? (value[0] || "") : (value || "");
+  return Array.isArray(value) ? value[0] || "" : value || "";
 }
 
 export function readSession(source) {

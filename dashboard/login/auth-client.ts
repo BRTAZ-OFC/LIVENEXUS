@@ -6,8 +6,7 @@ type SafeUser = {
 };
 
 type AuthResult =
-  | { ok: true; user: SafeUser; token?: string; message: string }
-  | { ok: false; message: string };
+  { ok: true; user: SafeUser; token?: string; message: string } | { ok: false; message: string };
 
 async function postAuth(
   path: string,

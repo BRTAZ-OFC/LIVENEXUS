@@ -44,11 +44,7 @@ export async function createAvaliacao({ nome, nota, mensagem }) {
     throw new Error("A nota deve ser um número inteiro entre 1 e 5.");
   }
 
-  if (
-    typeof mensagem !== "string" ||
-    !mensagem.trim() ||
-    mensagem.trim().length > 1000
-  ) {
+  if (typeof mensagem !== "string" || !mensagem.trim() || mensagem.trim().length > 1000) {
     throw new Error("A mensagem deve ter entre 1 e 1000 caracteres.");
   }
 
@@ -74,17 +70,16 @@ export async function createAvaliacao({ nome, nota, mensagem }) {
   });
 }
 
-export async function updateAvaliacao(
-  avaliacao_id,
-  changes = {},
-  adminUser = null,
-) {
+/**
+ * @param {string} avaliacao_id
+ * @param {Record<string, unknown>} [changes]
+ * @param {string | null} [adminUser]
+ */
+export async function updateAvaliacao(avaliacao_id, changes = {}, adminUser = null) {
   return withFileQueue(AVALIACOES_FILE, async () => {
     const avaliacoes = await readAvaliacoes();
 
-    const index = avaliacoes.findIndex(
-      (item) => item.avaliacao_id === avaliacao_id,
-    );
+    const index = avaliacoes.findIndex((item) => item.avaliacao_id === avaliacao_id);
 
     if (index < 0) {
       throw new Error("Avaliação não encontrada.");
@@ -130,11 +125,7 @@ export async function updateAvaliacao(
     if (changes.resposta_admin !== undefined) {
       const resp = changes.resposta_admin;
 
-      if (
-        resp === null ||
-        resp === "" ||
-        (typeof resp === "string" && !resp.trim())
-      ) {
+      if (resp === null || resp === "" || (typeof resp === "string" && !resp.trim())) {
         next.resposta_admin = null;
         next.respondido_por = null;
       } else if (typeof resp === "string") {

@@ -11,10 +11,10 @@ function NotFoundPage() {
       <section className="not-found-card">
         <p className="not-found-eyebrow">Erro 404</p>
         <h1 className="not-found-title">Página não encontrada</h1>
-        <p className="not-found-description">
-          A página solicitada não existe ou foi movida.
-        </p>
-        <a className="button-primary" href="/">Voltar ao início</a>
+        <p className="not-found-description">A página solicitada não existe ou foi movida.</p>
+        <a className="button-primary" href="/">
+          Voltar ao início
+        </a>
       </section>
     </main>
   );
