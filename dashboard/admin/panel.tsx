@@ -382,12 +382,12 @@ export default function AdminPanel() {
                     </div>
                   </div>
                 );
-                 {subTab === "overlay" && <OverlaySection users={users} />}
-
-  </div>
+              })}
             </div>
           </div>
         )}
+
+        {subTab === "overlay" && <OverlaySection users={users} />}
 
         {subTab === "cenarios" && (
           <div className="space-y-4">
