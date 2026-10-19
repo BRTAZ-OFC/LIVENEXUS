@@ -102,7 +102,8 @@ const PUBLIC_API_ENDPOINTS = new Set([
 ]);
 
 app.use(/^\/api(?:\/.*)?$/, async (req: Request, res: Response, next: NextFunction) => {
-  if (PUBLIC_API_ENDPOINTS.has(`${req.method} ${req.path}`)) return next();
+  const requestPath = new URL(req.originalUrl, "http://localhost").pathname;
+  if (PUBLIC_API_ENDPOINTS.has(`${req.method} ${requestPath}`)) return next();
 
   const session = readSession(req) as SessionData | null;
   if (!session?.user_id) {
