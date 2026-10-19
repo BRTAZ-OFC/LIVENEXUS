@@ -2,15 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Filter, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2, RadioTower, Radio, Youtube, Wifi, WifiOff } from "lucide-react";
 import "./css/tts.css";
 import { playProcessedSpeech, type PlaybackHandle } from "./ttsAudioEngine";
-import {
-  subscribeTtsMessages,
-  connectMultiChatPlatform,
-  disconnectMultiChatPlatform,
-  getMultiChatSnapshot,
-  setMultiChatChannel,
-  useMultiChatSnapshot,
-  type ChatPlatform,
-} from "./multichat";
+import { subscribeTtsMessages } from "./multichat";
+import PlatformBioConnections from "./conexao/PlatformBioConnections";
 import { getTtsFilterConfig, recordTtsQueueBlock, recordTtsQueueDrop, TtsFiltersPanel } from "./ttsFilters";
 
 type VoiceEffect = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
@@ -80,8 +73,6 @@ export default function TTSPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [showEffects, setShowEffects] = useState(false);
   const [showConnections, setShowConnections] = useState(false);
-  const connectionState = useMultiChatSnapshot();
-  const [connectionChannels, setConnectionChannels] = useState(() => getMultiChatSnapshot().channels);
   const queueRef = useRef<QueueItem[]>([]);
   const activeRef = useRef<PlaybackHandle | null>(null);
   const playTokenRef = useRef(0);
@@ -309,23 +300,6 @@ export default function TTSPage() {
     setShowFilters(panel === "filters");
   }
 
-  function updateConnectionChannel(platform: ChatPlatform, channel: string) {
-    setConnectionChannels((old) => ({ ...old, [platform]: channel }));
-    setMultiChatChannel(platform, channel);
-  }
-
-  function togglePlatformConnection(platform: ChatPlatform) {
-    const status = connectionState.statuses[platform].status.toLowerCase();
-    if (["connected", "open", "connecting", "reconnecting"].includes(status)) {
-      disconnectMultiChatPlatform(platform);
-      return;
-    }
-    const channel = connectionChannels[platform].trim();
-    if (!channel) return;
-    setMultiChatChannel(platform, channel);
-    connectMultiChatPlatform(platform);
-  }
-
   return (
     <section className="tts-page">
       <header className="tts-page-heading">
@@ -333,26 +307,7 @@ export default function TTSPage() {
         <div className="tts-heading-actions"><button type="button" className={showConnections ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel("connections")} aria-expanded={showConnections}><RadioTower size={14} />Conexão</button><button type="button" className={showEffects ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel("effects")} aria-expanded={showEffects}><Star size={14} />Efeitos</button><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel("filters")} aria-expanded={showFilters}><Filter size={14} />Filtros</button><button type="button" className={!showConnections && !showEffects && !showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel("main")}><Volume2 size={14} />Voz &amp; TTS</button></div>
       </header>
 
-      {showConnections && <section className="tts-card tts-platform-connections">
-        <div className="tts-card-title"><span className="tts-title-icon"><RadioTower /></span><div><h2>Conexão de plataformas</h2><p>Informe o canal e conecte Twitch, Kick ou YouTube ao multichat.</p></div></div>
-        <div className="tts-platform-grid">
-          {(["Twitch", "Kick", "YouTube"] as ChatPlatform[]).map((platform) => {
-            const item = connectionState.statuses[platform];
-            const active = ["connected", "open", "connecting", "reconnecting"].includes(item.status.toLowerCase());
-            const online = ["connected", "open"].includes(item.status.toLowerCase());
-            const Icon = platform === "Twitch" ? RadioTower : platform === "Kick" ? Radio : Youtube;
-            const placeholder = platform === "Twitch" ? "Nome do canal (ex.: gaules)" : platform === "Kick" ? "Slug do canal (ex.: xqc)" : "@canal, URL ou ID do vídeo";
-            return <article key={platform} className="tts-platform-card">
-              <div className="tts-platform-card-heading"><span className={`tts-platform-icon ${platform.toLowerCase()}`}><Icon size={18} /></span><div><h3>{platform}</h3><p>Conector de plataforma</p></div><span className={`tts-platform-dot ${online ? "online" : active ? "pending" : item.status === "error" ? "error" : ""}`} /></div>
-              <label className="tts-platform-field">Canal
-                <input value={connectionChannels[platform]} onChange={(event) => updateConnectionChannel(platform, event.target.value)} disabled={active} placeholder={placeholder} />
-              </label>
-              <div className="tts-platform-status"><span>Status</span><p className={item.status === "error" ? "error" : online ? "online" : active ? "pending" : ""}>{item.detail}</p>{item.viewers !== null && <small>Espectadores: {item.viewers}</small>}{item.meta && <small>{item.meta}</small>}</div>
-              <button type="button" className={active ? "tts-platform-action disconnect" : "tts-platform-action"} disabled={!active && !connectionChannels[platform].trim()} onClick={() => togglePlatformConnection(platform)}>{active ? <><WifiOff size={14} />Desconectar</> : <><Wifi size={14} />Conectar canal</>}</button>
-            </article>;
-          })}
-        </div>
-      </section>}
+      {showConnections && <PlatformBioConnections />}
       {showFilters && <TtsFiltersPanel />}
       
       {!showConnections && !showFilters && !showEffects && <>
