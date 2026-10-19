@@ -993,6 +993,10 @@ app.use(/^\/dashboard\/?$/, (req: Request, res: Response, next: NextFunction) =>
 app.use(/^\/admin\/banco\/?$/, (req: Request, res: Response, next: NextFunction) =>
   requirePageSession(req, res, next, "admin"),
 );
+/* Arquivos JSON internos nunca devem ser servidos diretamente pelo Vite de desenvolvimento. */
+app.use(/^\/dashboard\/admin\/banco\/json(?:\/.*)?$/, (req: Request, res: Response, next: NextFunction) =>
+  requirePageSession(req, res, next, "admin"),
+);
 
 if (!isDevServer && !isApiOnly) {
   app.use(express.static(distDir));
