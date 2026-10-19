@@ -36,27 +36,21 @@ export default function AdminConnectionsPage() {
         const token = sessionStorage.getItem("livenexus_token");
         const headers: Record<string, string> = {};
         if (token) headers["Authorization"] = `Bearer ${token}`;
-        const response = await fetch("/api/platforms", {
+        const response = await fetch("/api/plataformas", {
           headers,
           credentials: "include",
           cache: "no-store",
         });
         const data = await response.json();
         if (!response.ok || !data.ok) {
-          throw new Error(data.message || "Não foi possível carregar os canais salvos.");
+          throw new Error(data.error || data.message || "Não foi possível carregar os canais salvos.");
         }
         if (cancelled) return;
-        const platformNames: Record<string, ChatPlatform> = {
-          twitch: "Twitch",
-          kick: "Kick",
-          youtube: "YouTube",
-        };
-        for (const connection of data.connections ?? []) {
-          const platform = platformNames[String(connection.platform ?? "").toLowerCase()];
-          if (platform && typeof connection.channel_id === "string") {
-            setMultiChatChannel(platform, connection.channel_id);
-          }
-        }
+        const saved = Array.isArray(data.plataformas) ? data.plataformas[0] : null;
+        if (!saved) return;
+        if (typeof saved.twitch === "string" && saved.twitch) setMultiChatChannel("Twitch", saved.twitch);
+        if (typeof saved.kick === "string" && saved.kick) setMultiChatChannel("Kick", saved.kick);
+        if (typeof saved.youtube === "string" && saved.youtube) setMultiChatChannel("YouTube", saved.youtube);
       } catch (error) {
         if (!cancelled) {
           setConnectionError(error instanceof Error ? error.message : "Falha ao carregar conexões salvas.");
@@ -72,15 +66,6 @@ export default function AdminConnectionsPage() {
     setMultiChatChannel(platform, value);
     setConnectionError("");
     setConnectionNotice("");
-  }
-
-  function channelUrl(platform: ChatPlatform, channel: string) {
-    const value = channel.trim();
-    if (platform === "Twitch") return `https://www.twitch.tv/${value.replace(/^@/, "")}`;
-    if (platform === "Kick") return `https://kick.com/${value.replace(/^@/, "")}`;
-    if (/^https?:\/\//i.test(value)) return value;
-    if (/^[a-zA-Z0-9_-]{11}$/.test(value)) return `https://www.youtube.com/watch?v=${value}`;
-    return `https://www.youtube.com/${value.startsWith("@") ? value : `@${value}`}/live`;
   }
 
   async function connectPlatform(platform: ChatPlatform) {
@@ -101,12 +86,11 @@ export default function AdminConnectionsPage() {
           platform: platform.toLowerCase(),
           channel_id: channel,
           channel_name: channel,
-          channel_url: channelUrl(platform, channel),
         }),
       });
       const data = await response.json();
       if (!response.ok || !data.ok) {
-        throw new Error(data.message || "Não foi possível salvar o canal no JSON do usuário.");
+        throw new Error(data.error || data.message || "Não foi possível salvar o canal no JSON do usuário.");
       }
       connectMultiChatPlatform(platform);
       setConnectionNotice(`Canal ${platform} salvo no JSON da conta autenticada.`);
