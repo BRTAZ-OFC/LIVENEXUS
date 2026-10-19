@@ -1,26 +1,4 @@
 {
-  "ativacoes": {
-    "id": "ativacoes",
-    "name": "Ativações",
-    "fields": [
-      {
-        "name": "email",
-        "type": "texto"
-      },
-      {
-        "name": "code",
-        "type": "texto"
-      },
-      {
-        "name": "expires_at",
-        "type": "data"
-      },
-      {
-        "name": "created_at",
-        "type": "data"
-      }
-    ]
-  },
   "biblioteca": {
     "id": "biblioteca",
     "name": "Biblioteca",
@@ -358,6 +336,158 @@
       {
         "name": "updated_date",
         "type": "data"
+      }
+    ]
+  },
+  "auth_activation": {
+    "id": "auth_activation",
+    "name": "Ativações",
+    "fields": [
+      {
+        "name": "email",
+        "type": "texto"
+      },
+      {
+        "name": "code",
+        "type": "texto"
+      },
+      {
+        "name": "expires_at",
+        "type": "data"
+      },
+      {
+        "name": "created_at",
+        "type": "data"
+      }
+    ]
+  },
+  "usuarios": {
+    "id": "usuarios",
+    "name": "Usuários",
+    "fields": [
+      {
+        "name": "user_id",
+        "type": "texto"
+      },
+      {
+        "name": "user",
+        "type": "texto"
+      },
+      {
+        "name": "role",
+        "type": "texto"
+      },
+      {
+        "name": "password",
+        "type": "hash"
+      },
+      {
+        "name": "imagen",
+        "type": "texto opcional"
+      },
+      {
+        "name": "data_criacao",
+        "type": "data"
+      },
+      {
+        "name": "data_atualizacao",
+        "type": "data"
+      }
+    ]
+  },
+  "avaliacoes": {
+    "id": "avaliacoes",
+    "name": "Avaliações",
+    "fields": [
+      {
+        "name": "avaliacao_id",
+        "type": "texto"
+      },
+      {
+        "name": "nome",
+        "type": "texto"
+      },
+      {
+        "name": "nota",
+        "type": "número"
+      },
+      {
+        "name": "mensagem",
+        "type": "texto"
+      },
+      {
+        "name": "resposta_admin",
+        "type": "texto opcional"
+      },
+      {
+        "name": "respondido_por",
+        "type": "texto opcional"
+      },
+      {
+        "name": "data_criacao",
+        "type": "data"
+      },
+      {
+        "name": "data_atualizacao",
+        "type": "data"
+      }
+    ]
+  },
+  "plataformas": {
+    "id": "plataformas",
+    "name": "Plataformas",
+    "fields": [
+      {
+        "name": "id",
+        "type": "texto"
+      },
+      {
+        "name": "user_id",
+        "type": "texto"
+      },
+      {
+        "name": "youtube",
+        "type": "texto opcional"
+      },
+      {
+        "name": "youtube_code",
+        "type": "texto opcional"
+      },
+      {
+        "name": "youtube_status",
+        "type": "texto opcional"
+      },
+      {
+        "name": "twitch",
+        "type": "texto opcional"
+      },
+      {
+        "name": "twitch_code",
+        "type": "texto opcional"
+      },
+      {
+        "name": "twitch_status",
+        "type": "texto opcional"
+      },
+      {
+        "name": "kick",
+        "type": "texto opcional"
+      },
+      {
+        "name": "kick_code",
+        "type": "texto opcional"
+      },
+      {
+        "name": "kick_status",
+        "type": "texto opcional"
+      },
+      {
+        "name": "status",
+        "type": "texto opcional"
+      },
+      {
+        "name": "verifiedAt",
+        "type": "data opcional"
       }
     ]
   }
