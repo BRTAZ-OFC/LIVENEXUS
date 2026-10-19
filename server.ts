@@ -37,7 +37,7 @@ const NO_CACHE = {
 };
 
 const app = express();
-const isDevServer = process.argv.includes("--dev") || process.env["NODE_ENV"] !== "production";
+const isDevServer = process.argv.includes("--dev") || process.env["NODE_ENV"] === "development";
 
 if (isDevServer) {
   const { createServer } = await import("vite");
