@@ -195,7 +195,11 @@ function rowsFromTable(definition, data, users) {
   if (definition.shape === "array") {
     data.forEach((record, index) => {
       if (!isRecord(record)) return;
-      rows.push({ ...record, __rowKey: rowKey("array", recordId(record, index)) });
+      const normalized = { ...record };
+      if (normalized.user_id === undefined && typeof normalized.userId === "string") normalized.user_id = normalized.userId;
+      delete normalized.userId;
+      if (typeof normalized.user_id === "string" && !validIds.has(normalized.user_id)) return;
+      rows.push({ ...normalized, __rowKey: rowKey("array", recordId(normalized, index)) });
     });
     return rows;
   }
@@ -205,6 +209,7 @@ function rowsFromTable(definition, data, users) {
       const record = isRecord(value) ? { ...value } : { value };
       if (record.user_id === undefined && typeof record.userId === "string") record.user_id = record.userId;
       delete record.userId;
+      if (typeof record.user_id === "string" && !users.has(record.user_id)) continue;
       if (record[definition.keyField] === undefined) record[definition.keyField] = key;
       rows.push({ ...record, __rowKey: rowKey("map", key) });
     }
@@ -247,9 +252,7 @@ export function getJsonTableDefinitions() {
 export async function listJsonTableRecords(tableId) {
   const definition = definitionFor(tableId);
   const data = await readTable(definition);
-  const users = definition.ownerScoped || definition.shape === "userObject" || definition.shape === "userList"
-    ? await validUserIds()
-    : new Set();
+  const users = await validUserIds();
   return rowsFromTable(definition, data, users);
 }
 
