@@ -1,6 +1,7 @@
 /* BLOCO 1 — Imports de rota, estados React, ícones e painel de dados. */
 import DatabasePage from "./admin/banco";
 import AdminPanel from "./admin/panel";
+import TTSPage from "./tts";
 import { useEffect, useState } from "react";
 import {
   AudioLines,
@@ -32,30 +33,30 @@ function DashboardPage() {
     }
     return false;
   });
-  const [activeSection, setActiveSection] = useState<"overview" | "database" | "admin-panel">(
+  const [activeSection, setActiveSection] = useState<"overview" | "database" | "admin-panel" | "voice">(
     () => {
       if (typeof window !== "undefined") {
         const admin = sessionStorage.getItem("livenexus_role") === "admin";
         if (!admin) return "overview";
         const params = new URLSearchParams(window.location.search);
         const tabParam = params.get("tab");
-        if (tabParam === "database" || tabParam === "overview" || tabParam === "admin-panel")
-          return tabParam as "overview" | "database" | "admin-panel";
+        if (tabParam === "database" || tabParam === "overview" || tabParam === "admin-panel" || tabParam === "voice")
+          return tabParam as "overview" | "database" | "admin-panel" | "voice";
         const stored = sessionStorage.getItem("livenexus_active_tab");
-        if (stored === "database" || stored === "overview" || stored === "admin-panel")
-          return stored as "overview" | "database" | "admin-panel";
+        if (stored === "database" || stored === "overview" || stored === "admin-panel" || stored === "voice")
+          return stored as "overview" | "database" | "admin-panel" | "voice";
       }
       return "overview";
     },
   );
 
   // BLOCO 5 — Atualiza a seção selecionada e persiste a escolha.
-  function handleSelectSection(section: "overview" | "database" | "admin-panel") {
+  function handleSelectSection(section: "overview" | "database" | "admin-panel" | "voice") {
     setActiveSection(section);
     if (typeof window !== "undefined") {
       sessionStorage.setItem("livenexus_active_tab", section);
       const url = new URL(window.location.href);
-      if (section === "database" || section === "admin-panel") {
+      if (section === "database" || section === "admin-panel" || section === "voice") {
         url.searchParams.set("tab", section);
       } else {
         url.searchParams.delete("tab");
@@ -96,6 +97,16 @@ function DashboardPage() {
           >
             <House className="dash-h-2-5-w-2-5-16znhny" />
             {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Início</span>}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSelectSection("voice")}
+            title="Voz & TTS"
+            aria-label="Voz & TTS"
+            className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "voice" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
+          >
+            <Volume2 className="dash-h-2-5-w-2-5-16znhny" />
+            {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Voz &amp; TTS</span>}
           </button>
           {isAdmin && (
             <>
@@ -264,6 +275,10 @@ function DashboardPage() {
                 </ol>
               </section>
             </div>
+          </section>
+        ) : activeSection === "voice" ? (
+          <section className="dash-w-full-px-6-5ebeye">
+            <TTSPage />
           </section>
         ) : activeSection === "admin-panel" && isAdmin ? (
           <section className="dash-w-full-px-6-5ebeye">
