@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, Copy, LoaderCircle, RadioTower, ShieldCheck, Unplug, Youtube } from "lucide-react";
-import { connectMultiChatPlatform, disconnectMultiChatPlatform, getMultiChatSnapshot, setMultiChatChannel, type ChatPlatform } from "./multichat";
+import { connectMultiChatPlatform, disconnectMultiChatPlatform, getMultiChatSnapshot, setMultiChatChannel, useMultiChatSnapshot, type ChatPlatform } from "./multichat";
 
 type Platform = ChatPlatform;
 type PlatformInfo = { label: string; hint: string; placeholder: string; accent: string; Icon: typeof RadioTower };
@@ -14,15 +14,39 @@ type ConnectionState = { channel: string; code: string; challenge: string; verif
 const emptyState = (): ConnectionState => ({ channel: "", code: "", challenge: "", verified: false, busy: false, message: "" });
 
 export default function TtsConnectionsPanel() {
+  const snapshot = useMultiChatSnapshot();
   const [items, setItems] = useState<Record<Platform, ConnectionState>>(() => {
-    const snapshot = getMultiChatSnapshot();
-    return Object.fromEntries(PLATFORMS.map((platform) => [platform, { ...emptyState(), channel: snapshot.channels[platform] }])) as Record<Platform, ConnectionState>;
+    const current = getMultiChatSnapshot();
+    return Object.fromEntries(PLATFORMS.map((platform) => {
+      let savedChannel = current.channels[platform];
+      try { savedChannel = localStorage.getItem(`livenexus:tts-channel:${platform}`) || savedChannel; } catch {}
+      return [platform, { ...emptyState(), channel: savedChannel }];
+    })) as Record<Platform, ConnectionState>;
   });
   const [copied, setCopied] = useState(false);
 
   function patch(platform: Platform, changes: Partial<ConnectionState>) {
+    if (typeof changes.channel === "string") {
+      try { localStorage.setItem(`livenexus:tts-channel:${platform}`, changes.channel); } catch {}
+    }
     setItems((old) => ({ ...old, [platform]: { ...old[platform], ...changes } }));
   }
+
+  useEffect(() => {
+    for (const platform of PLATFORMS) {
+      const channel = items[platform].channel.trim();
+      if (!channel) continue;
+      void fetch("/api/connections/bio/status", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform, channel }),
+      }).then(async (response) => {
+        const result = await response.json() as { ok?: boolean; verified?: boolean };
+        if (response.ok && result.ok && result.verified) patch(platform, { verified: true, message: "Propriedade verificada anteriormente. Você já pode conectar o chat." });
+      }).catch(() => {});
+    }
+  // Initial restoration only: channel changes are handled by the form.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function requestCode(platform: Platform) {
     const item = items[platform];
@@ -82,7 +106,7 @@ export default function TtsConnectionsPanel() {
         {PLATFORMS.map((platform) => {
           const info = INFO[platform];
           const item = items[platform];
-          const status = getMultiChatSnapshot().statuses[platform];
+          const status = snapshot.statuses[platform];
           const active = ["connected", "open", "connecting", "reconnecting"].includes(status.status.toLowerCase());
           const Icon = info.Icon;
           return (
