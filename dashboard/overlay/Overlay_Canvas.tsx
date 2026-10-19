@@ -266,6 +266,29 @@ export default function OverlayCanvas() {
     setSelectedInstanceId(nextInstance.id || null);
   }
 
+  function addWidgetComponent(definition: WidgetDefinition, elementKey: string, label: string) {
+    const existing = config.instances || [];
+    const index = existing.length;
+    const width = 260;
+    const height = 50;
+    const nextInstance: CanvasInstance = {
+      id: `overlay-component-${Date.now()}-${index}`,
+      widgetId: definition.id,
+      elementKey,
+      isFullWidget: false,
+      name: `${definition.name} — ${label}`,
+      x: Math.max(0, Math.min(size.width - width, 24 + (index % 5) * 28)),
+      y: Math.max(0, Math.min(size.height - height, 24 + (index % 5) * 28)),
+      width,
+      height,
+      zIndex: index + 1,
+      visible: true,
+      config: { ...(definition.defaultConfig || {}) },
+    };
+    setConfig((current) => ({ ...current, instances: [...(current.instances || []), nextInstance] }));
+    setSelectedInstanceId(nextInstance.id || null);
+  }
+
   function updateInstance(instanceId: string, patch: Partial<CanvasInstance>) {
     setConfig((current) => ({
       ...current,
@@ -525,6 +548,7 @@ export default function OverlayCanvas() {
           selectedInstanceId={selectedInstanceId}
           onSelectInstance={setSelectedInstanceId}
           onAddWidget={addWidget}
+          onAddComponent={addWidgetComponent}
           onUpdateInstance={updateInstance}
           onDeleteInstance={deleteInstance}
           gridSettings={gridSettings}
