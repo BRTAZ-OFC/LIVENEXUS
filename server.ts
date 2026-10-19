@@ -325,6 +325,30 @@ app.delete("/api/database/avaliacoes", async (req: Request, res: Response) => {
   }
 });
 
+/* Bootstrap do chat ao vivo do YouTube para usuários autenticados. */
+app.get("/api/admin/lab/youtube-test1/bootstrap", async (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  if (!session) {
+    return res.status(401).set(NO_CACHE).json({ ok: false, error: "Faça login para conectar o YouTube." });
+  }
+
+  const identifier = String(req.query["identifier"] ?? "").trim();
+  if (!identifier) {
+    return res.status(400).set(NO_CACHE).json({ ok: false, error: "Informe o canal ou vídeo do YouTube." });
+  }
+
+  try {
+    const { resolveYouTubeLiveBootstrap } = await import("./dashboard/conexao/Admin_youtubeTest1Bootstrap.js");
+    const result = await resolveYouTubeLiveBootstrap(identifier);
+    return res.set(NO_CACHE).json(result);
+  } catch (error) {
+    return res.status(500).set(NO_CACHE).json({
+      ok: false,
+      error: errorMessage(error, "Falha ao preparar o chat do YouTube."),
+    });
+  }
+});
+
 /* API desconhecida retorna JSON em vez da página HTML. */
 app.all(/^\/api(?:\/.*)?$/, (_req: Request, res: Response) => {
   return res.status(404).json({
