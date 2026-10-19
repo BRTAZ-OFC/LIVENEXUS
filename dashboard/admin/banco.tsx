@@ -97,6 +97,31 @@ function getAuthHeaders(): HeadersInit {
   return headers;
 }
 
+type JsonRow = Record<string, unknown> & { __rowKey: string };
+
+const JSON_TABLES: Array<{ id: string; title: string; file: string; description: string }> = [
+  { id: "auth_activation", title: "Ativações", file: "auth_activation.json", description: "Códigos temporários de ativação." },
+  { id: "biblioteca", title: "Biblioteca", file: "biblioteca.json", description: "Músicas, álbuns, artistas e playlists por usuário." },
+  { id: "cenarios", title: "Cenários", file: "cenarios.json", description: "Cenários salvos por usuário." },
+  { id: "galeria", title: "Galeria", file: "galeria.json", description: "Registros de mídia da galeria." },
+  { id: "image_store", title: "Armazenamento de imagens", file: "image_store.json", description: "Metadados e conteúdo de imagens." },
+  { id: "messages", title: "Mensagens", file: "messages.json", description: "Mensagens recebidas pelo sistema." },
+  { id: "metricas", title: "Métricas", file: "metricas.json", description: "Métricas agrupadas por usuário." },
+  { id: "overlays", title: "Overlays", file: "overlays.json", description: "Overlays e configurações por usuário." },
+  { id: "rtc_registry", title: "Identidades RTC", file: "rtc_registry.json", description: "Identificadores RTC associados ao user_id local." },
+  { id: "schemas", title: "Esquemas", file: "schemas.json", description: "Definições de campos das tabelas JSON." },
+  { id: "templates", title: "Modelos", file: "templates.json", description: "Catálogo de modelos visuais." },
+];
+
+function jsonCellValue(value: unknown) {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value === "object") {
+    const text = JSON.stringify(value);
+    return text.length > 60 ? text.slice(0, 60) + "…" : text;
+  }
+  return displayValue(value);
+}
+
 /* BLOCO 5 — Controla seleção de tabelas, registros, edição, exclusão e carregamento. */
 export default function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
   const [selectedTable, setSelectedTable] = useState(() => {
@@ -106,6 +131,9 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     return "usuarios";
   });
   const [isAdmin, setIsAdmin] = useState(embedded);
+  const selectedJsonId = selectedTable.startsWith("json:") ? selectedTable.slice(5) : "";
+  const selectedJsonTable = JSON_TABLES.find((table) => table.id === selectedJsonId);
+
 
   function handleSelectTable(table: string) {
     setSelectedTable(table);
@@ -115,6 +143,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     if (table === "usuarios") void loadUsers();
     else if (table === "avaliacoes") void loadReviews();
     else if (table === "plataformas") void loadPlatforms();
+    else if (table.startsWith("json:")) void loadJsonTable(table.slice(5));
   }
 
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -131,6 +160,11 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   const [platformDraft, setPlatformDraft] = useState<PlatformDraft | null>(null);
   const [platformEditingId, setPlatformEditingId] = useState<string | null>(null);
   const [platformToDelete, setPlatformToDelete] = useState<PlatformRow | null>(null);
+  const [genericRows, setGenericRows] = useState<JsonRow[]>([]);
+  const [genericDraft, setGenericDraft] = useState("");
+  const [genericEditingKey, setGenericEditingKey] = useState<string | null>(null);
+  const [genericNewJson, setGenericNewJson] = useState("{\\n  \\n}");
+
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -155,6 +189,105 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
       setError(err instanceof Error ? err.message : "Não foi possível carregar as plataformas.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadJsonTable(tableId: string) {
+    setLoading(true);
+    setError("");
+    setMessage("");
+    try {
+      const response = await fetch(`/api/database/json-tables/${encodeURIComponent(tableId)}`, {
+        headers: getAuthHeaders(),
+        credentials: "include",
+        cache: "no-store",
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível carregar a tabela JSON.");
+      setGenericRows(Array.isArray(result.rows) ? result.rows : []);
+      setGenericEditingKey(null);
+      setGenericDraft("");
+    } catch (err) {
+      setGenericRows([]);
+      setError(err instanceof Error ? err.message : "Falha ao carregar a tabela JSON.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function createGenericRow() {
+    if (!selectedJsonId) return;
+    setSaving(true);
+    setError("");
+    setMessage("");
+    try {
+      const record = JSON.parse(genericNewJson);
+      if (!record || typeof record !== "object" || Array.isArray(record)) throw new Error("O JSON precisa ser um objeto.");
+      const response = await fetch(`/api/database/json-tables/${encodeURIComponent(selectedJsonId)}`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        credentials: "include",
+        body: JSON.stringify({ record }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível criar o registro.");
+      setGenericNewJson("{\\n  \\n}");
+      setMessage("Registro criado no JSON.");
+      await loadJsonTable(selectedJsonId);
+    } catch (err) {
+      setError(err instanceof SyntaxError ? "JSON inválido. Corrija a sintaxe antes de salvar." : err instanceof Error ? err.message : "Falha ao criar registro.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function saveGenericRow(rowKey: string) {
+    if (!selectedJsonId) return;
+    setSaving(true);
+    setError("");
+    setMessage("");
+    try {
+      const record = JSON.parse(genericDraft);
+      if (!record || typeof record !== "object" || Array.isArray(record)) throw new Error("O JSON precisa ser um objeto.");
+      const response = await fetch(`/api/database/json-tables/${encodeURIComponent(selectedJsonId)}`, {
+        method: "PATCH",
+        headers: getAuthHeaders(),
+        credentials: "include",
+        body: JSON.stringify({ rowKey, record }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível atualizar o registro.");
+      setGenericEditingKey(null);
+      setGenericDraft("");
+      setMessage("Registro atualizado no JSON.");
+      await loadJsonTable(selectedJsonId);
+    } catch (err) {
+      setError(err instanceof SyntaxError ? "JSON inválido. Corrija a sintaxe antes de salvar." : err instanceof Error ? err.message : "Falha ao atualizar registro.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deleteGenericRow(rowKey: string) {
+    if (!selectedJsonId || (typeof window !== "undefined" && !window.confirm("Excluir este registro do arquivo JSON?"))) return;
+    setDeleting(true);
+    setError("");
+    setMessage("");
+    try {
+      const response = await fetch(`/api/database/json-tables/${encodeURIComponent(selectedJsonId)}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+        credentials: "include",
+        body: JSON.stringify({ rowKey }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível excluir o registro.");
+      setMessage("Registro excluído do JSON.");
+      await loadJsonTable(selectedJsonId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao excluir registro.");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -347,6 +480,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
       if (selectedTable === "usuarios") void loadUsers();
       else if (selectedTable === "avaliacoes") void loadReviews();
       else if (selectedTable === "plataformas") void loadPlatforms();
+      else if (selectedTable.startsWith("json:")) void loadJsonTable(selectedTable.slice(5));
     } else {
       setLoading(false);
     }
@@ -516,6 +650,18 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
             <Table2 className="db-h-3-5-w-3-5-l2ap6m" />
             <span className="db-text-9px-font-medium-18gwz7j">Plataformas</span>
           </button>
+          {JSON_TABLES.map((table) => (
+            <button
+              key={table.id}
+              type="button"
+              onClick={() => handleSelectTable(`json:${table.id}`)}
+              title={table.file}
+              className={`db-flex-w-full-oi8986 ${selectedTable === `json:${table.id}` ? "db-bg-violet-500-15-text-vi-1xm6n2h" : "db-bg-white-5-sdteeg"}`}
+            >
+              <Table2 className="db-h-3-5-w-3-5-l2ap6m" />
+              <span className="db-text-9px-font-medium-18gwz7j">{table.title}</span>
+            </button>
+          ))}
         </nav>
       </aside>
 
@@ -549,14 +695,18 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                   ? "Usuários"
                   : selectedTable === "avaliacoes"
                     ? "Avaliações"
-                    : "Plataformas"}
+                    : selectedTable === "plataformas"
+                      ? "Plataformas"
+                      : selectedJsonTable?.title ?? "Tabela JSON"}
               </h1>
               <p className="db-mt-1-text-11px-fgeh1h">
                 {selectedTable === "usuarios"
                   ? "Registros da tabela Usuários. Edite os campos na linha e salve as alterações."
                   : selectedTable === "avaliacoes"
                     ? "Registros da tabela Avaliações. Edite as avaliações ou adicione respostas administrativas oficiais."
-                    : "Registros da tabela Plataformas (conect-plataform.json). Gerencie os canais conectados e status de verificação por bio."}
+                    : selectedTable === "plataformas"
+                      ? "Registros do arquivo conect-plataform.json."
+                      : selectedJsonTable?.description ?? "Registros do arquivo JSON selecionado."}
               </p>
             </div>
             <button
@@ -564,7 +714,8 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
               onClick={() => {
                 if (selectedTable === "usuarios") void loadUsers();
                 else if (selectedTable === "avaliacoes") void loadReviews();
-                else void loadPlatforms();
+                else if (selectedTable === "plataformas") void loadPlatforms();
+                else if (selectedTable.startsWith("json:")) void loadJsonTable(selectedTable.slice(5));
               }}
               disabled={loading || deleting}
               className="db-inline-flex-items-center-39j1c2"
@@ -947,6 +1098,71 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                               </div>
                             )}
                           </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ) : selectedTable.startsWith("json:") ? (
+            <div className="db-mt-3-overflow-hidden-1sbx6fp space-y-3">
+              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-3">
+                <label className="block text-xs text-slate-300">
+                  Novo registro JSON
+                  <textarea
+                    value={genericNewJson}
+                    onChange={(event) => setGenericNewJson(event.target.value)}
+                    rows={5}
+                    spellCheck={false}
+                    className="mt-2 w-full rounded-lg border border-white/10 bg-black/40 p-3 font-mono text-xs text-white"
+                    aria-label="Novo registro JSON"
+                  />
+                </label>
+                <button type="button" onClick={() => void createGenericRow()} disabled={saving || deleting} className="mt-2 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">
+                  {saving ? "Salvando…" : "Adicionar registro"}
+                </button>
+                {selectedJsonTable?.id && ["biblioteca", "cenarios", "metricas", "overlays", "rtc_registry"].includes(selectedJsonTable.id) && (
+                  <p className="mt-2 text-[10px] text-slate-400">Esta tabela exige um <code>user_id</code> que exista em usuario.json. O servidor valida esse vínculo antes de gravar.</p>
+                )}
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-0 border-collapse text-left text-xs">
+                  <thead className="border-b border-white/10 bg-white/5 text-slate-300">
+                    <tr>
+                      {(Array.from(new Set(genericRows.flatMap((row) => Object.keys(row).filter((key) => key !== "__rowKey"))))).map((field) => (
+                        <th key={field} className="px-3 py-2 font-medium">{field}</th>
+                      ))}
+                      <th className="px-3 py-2 font-medium">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {loading && genericRows.length === 0 && <tr><td className="px-3 py-8 text-center text-slate-500" colSpan={2}>Carregando registros…</td></tr>}
+                    {!loading && genericRows.length === 0 && !error && <tr><td className="px-3 py-8 text-center text-slate-500" colSpan={2}>Esta tabela ainda não possui registros.</td></tr>}
+                    {genericRows.map((row) => {
+                      const fields = Object.keys(row).filter((key) => key !== "__rowKey");
+                      const rowIsEditing = genericEditingKey === row.__rowKey;
+                      return (
+                        <tr key={row.__rowKey}>
+                          {rowIsEditing ? (
+                            <td colSpan={fields.length + 1} className="p-3">
+                              <textarea value={genericDraft} onChange={(event) => setGenericDraft(event.target.value)} rows={8} spellCheck={false} className="w-full rounded-lg border border-violet-400/30 bg-black/50 p-3 font-mono text-xs text-white" aria-label="Editar registro JSON" />
+                              <div className="mt-2 flex gap-2">
+                                <button type="button" onClick={() => void saveGenericRow(row.__rowKey)} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white"><Save size={13} />Salvar</button>
+                                <button type="button" onClick={() => { setGenericEditingKey(null); setGenericDraft(""); }} disabled={saving} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-3 py-2 text-xs text-slate-200"><X size={13} />Cancelar</button>
+                              </div>
+                            </td>
+                          ) : (
+                            <>
+                              {fields.map((field) => <td key={field} className="max-w-64 break-words px-3 py-2 align-top text-slate-300" title={String(row[field] ?? "")}>{jsonCellValue(row[field])}</td>)}
+                              <td className="whitespace-nowrap px-3 py-2 align-top">
+                                <div className="flex gap-2">
+                                  <button type="button" onClick={() => { const copy = { ...row }; delete copy.__rowKey; setGenericEditingKey(row.__rowKey); setGenericDraft(JSON.stringify(copy, null, 2)); }} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-200"><Pencil size={12} />Editar</button>
+                                  <button type="button" onClick={() => void deleteGenericRow(row.__rowKey)} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-red-500/20 px-2 py-1 text-[10px] text-red-300"><Trash2 size={12} />Excluir</button>
+                                </div>
+                              </td>
+                            </>
+                          )}
                         </tr>
                       );
                     })}
