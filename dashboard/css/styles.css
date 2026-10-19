@@ -26,3 +26,6 @@
 
 /* BLOCO 7 — Estrutura raiz e página 404. */
 @import "./shell.css";
+
+/* BLOCO 8 — Identidade visual gamer global do LiveNexus. */
+@import "./gamer-theme.css";
