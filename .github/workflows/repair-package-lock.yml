@@ -23,12 +23,16 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
+
+      - name: Use npm with the peer-tree bug fixed
+        run: npm install --global npm@11.19.1
 
       - name: Repair lockfile using npm
         shell: bash
         run: |
           set -e
+          npm --version
           npm install --package-lock-only --ignore-scripts --no-audit --no-fund --prefer-online
           if ! node -e 'const l=require("./package-lock.json"); const p=Object.entries(l.packages||{}).filter(([k,v])=>k && !v.link); const missing=p.filter(([k,v])=>!v.resolved || !v.integrity); console.log("Pacotes:",p.length,"sem resolved/integrity:",missing.length); if(missing.length > Math.max(10,Math.floor(p.length*0.1))) process.exit(1)'; then
             echo "O lock existente não foi completado pelo npm; regenerando do package.json."
