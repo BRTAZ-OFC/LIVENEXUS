@@ -1,6 +1,7 @@
 type EffectId = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
 
 export type ProcessedTtsSettings = {
+  voice: string;
   rate: number;
   volume: number;
   pitch: number;
@@ -14,28 +15,52 @@ export type PlaybackHandle = {
   resume: () => void;
 };
 
-let enginePromise: Promise<any> | null = null;
+const enginePromises = new Map<string, Promise<any>>();
 let audioContext: AudioContext | null = null;
 
-async function getEngine(onProgress?: (message: string) => void) {
-  if (!enginePromise) {
-    enginePromise = import("@pedrobef/vozz/piper").then(({ Piper }) =>
+const PIPER_VOICES: Record<string, { model?: string; config?: string }> = {
+  "pt_BR-faber-medium": {},
+  "pt_BR-edresson-low": {
+    model: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/edresson/low/pt_BR-edresson-low.onnx?download=true",
+    config: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/edresson/low/pt_BR-edresson-low.onnx.json?download=true",
+  },
+  "pt_BR-cadu-medium": {
+    model: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/cadu/medium/pt_BR-cadu-medium.onnx?download=true",
+    config: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/cadu/medium/pt_BR-cadu-medium.onnx.json?download=true",
+  },
+  "pt_BR-jeff-medium": {
+    model: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/jeff/medium/pt_BR-jeff-medium.onnx?download=true",
+    config: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/jeff/medium/pt_BR-jeff-medium.onnx.json?download=true",
+  },
+  "pt_BR-dii": {
+    model: "https://huggingface.co/OpenVoiceOS/pipertts_pt-BR_dii/resolve/main/dii_pt-BR.onnx?download=true",
+    config: "https://huggingface.co/OpenVoiceOS/pipertts_pt-BR_dii/resolve/main/dii_pt-BR.onnx.json?download=true",
+  },
+};
+
+async function getEngine(voice: string, onProgress?: (message: string) => void) {
+  const selectedVoice = PIPER_VOICES[voice] ? voice : "pt_BR-faber-medium";
+  if (!enginePromises.has(selectedVoice)) {
+    const options = PIPER_VOICES[selectedVoice];
+    const promise = import("@pedrobef/vozz/piper").then(({ Piper }) =>
       Piper.carregar({
+        ...(options?.model && options?.config ? { urlModelo: options.model, urlConfig: options.config } : {}),
         aoProgredir: (event: { status?: string; progresso?: number; arquivo?: string }) => {
           if (event.status === "baixando") {
             const percent = typeof event.progresso === "number" ? Math.round(event.progresso * 100) : 0;
-            onProgress?.(`Baixando motor de voz: ${percent}%`);
+            onProgress?.(`Baixando modelo da voz selecionada: ${percent}%`);
           } else if (event.status === "carregando") {
             onProgress?.("Inicializando o motor neural de voz…");
           }
         },
       }),
     ).catch((error) => {
-      enginePromise = null;
+      enginePromises.delete(selectedVoice);
       throw error;
     });
+    enginePromises.set(selectedVoice, promise);
   }
-  return enginePromise;
+  return enginePromises.get(selectedVoice)!;
 }
 
 function makeImpulse(context: AudioContext, seconds: number, decay: number) {
@@ -69,7 +94,7 @@ export async function playProcessedSpeech(
   settings: ProcessedTtsSettings,
   callbacks: { onProgress?: (message: string) => void; onStart?: () => void; onEnd?: () => void; onError?: (error: unknown) => void } = {},
 ): Promise<PlaybackHandle> {
-  const engine = await getEngine(callbacks.onProgress);
+  const engine = await getEngine(settings.voice, callbacks.onProgress);
   const generated = await engine.falar(text, { velocidade: Math.max(0.5, Math.min(2, settings.rate)) });
   const wav = generated.paraWav() as ArrayBuffer;
   const context = audioContext ?? new AudioContext();
