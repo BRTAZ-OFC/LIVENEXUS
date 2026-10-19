@@ -3,7 +3,7 @@ import { AudioLines, Clock3, Play, Pause, RotateCcw, SkipForward, Square, Star, 
 import "./css/tts.css";
 import { playProcessedSpeech, type PlaybackHandle } from "./ttsAudioEngine";
 import { subscribeTtsMessages, type ChatPlatform } from "./multichat";
-import { getTtsFilterConfig, recordTtsQueueBlock, TtsFiltersPanel } from "./ttsFilters";
+import { getTtsFilterConfig, recordTtsQueueBlock, recordTtsQueueDrop, TtsFiltersPanel } from "./ttsFilters";
 
 type VoiceEffect = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
 type TtsSettings = {
@@ -124,9 +124,12 @@ export default function TTSPage() {
           setNotice("Mensagem descartada: a fila preservou mensagens de maior prioridade.");
           return;
         }
+        const dropped = next[worstIndex]!;
+        recordTtsQueueDrop(dropped, "Removida para preservar prioridade");
         next.splice(worstIndex, 1);
       } else {
-        next.shift();
+        const dropped = next.shift();
+        if (dropped) recordTtsQueueDrop(dropped, "Mensagem mais antiga removida da fila");
       }
     }
     queueRef.current = next;
