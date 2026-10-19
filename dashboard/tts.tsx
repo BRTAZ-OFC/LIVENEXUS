@@ -115,8 +115,8 @@ export default function TTSPage() {
         const rank = (entry: QueueItem) => filterRules.priorityEnabled
           ? (filterRules.priorities[entry.tier] ?? 1)
           : (5 - PRIORITY[entry.tier]);
-        const worstIndex = next.reduce((worst, entry, index, all) => rank(entry) < rank(all[worst]) ? index : worst, 0);
-        if (worstIndex === next.length - 1 && rank(item) <= rank(next[worstIndex])) {
+        const worstIndex = next.reduce((worst, entry, index, all) => rank(entry) < rank(all[worst]!) ? index : worst, 0);
+        if (worstIndex === next.length - 1 && rank(item) <= rank(next[worstIndex]!)) {
           recordTtsQueueBlock(message, "Fila preservou mensagens de maior prioridade");
           setNotice("Mensagem descartada: a fila preservou mensagens de maior prioridade.");
           return;
