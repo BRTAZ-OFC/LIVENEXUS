@@ -859,6 +859,45 @@ app.all(/^\/api\/ytmusic(?:\/.*)?$/, async (req: Request, res: Response) => {
   }
 });
 
+/* APIs de metadados Kick/Twitch portadas para dashboard/api, sem D1. */
+app.all(/^\/api\/(?:kick|twitch)(?:\/.*)?$/, async (req: Request, res: Response) => {
+  try {
+    const incomingPath = new URL(req.originalUrl, "http://localhost").pathname;
+    const isKick = incomingPath.startsWith("/api/kick/");
+    const routePath = incomingPath.replace(/^\/api/, "");
+    const target = new URL(req.originalUrl, "http://localhost");
+    target.pathname = routePath;
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (typeof value === "string") headers.set(key, value);
+      else if (Array.isArray(value)) headers.set(key, value.join(", "));
+    }
+    let body: string | undefined;
+    if (req.method !== "GET" && req.method !== "HEAD" && req.body !== undefined) {
+      body = JSON.stringify(req.body);
+      if (!headers.has("content-type")) headers.set("content-type", "application/json");
+    }
+    const webRequest = new Request(target, { method: req.method, headers, body });
+    const api = isKick
+      ? (await import("./api/channel-meta.js")).default
+      : (await import("./api/twitch-meta.js")).default;
+    const env = {
+      TWITCH_CLIENT_ID: process.env["TWITCH_CLIENT_ID"],
+      TWITCH_CLIENT_SECRET: process.env["TWITCH_CLIENT_SECRET"],
+    };
+    const webResponse = await api.fetch(webRequest, env);
+    res.status(webResponse.status);
+    webResponse.headers.forEach((value, key) => res.setHeader(key, value));
+    res.send(Buffer.from(await webResponse.arrayBuffer()));
+  } catch (error) {
+    console.error("[API metadados]", error);
+    res.status(500).set(NO_CACHE).json({
+      ok: false,
+      error: errorMessage(error, "Falha na API de metadados."),
+    });
+  }
+});
+
 /* API desconhecida retorna JSON em vez da página HTML. */
 app.all(/^\/api(?:\/.*)?$/, (req: Request, res: Response) => {
   console.warn(`[API 404] ${req.method} ${req.originalUrl}`);
