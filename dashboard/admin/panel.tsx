@@ -16,6 +16,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import DatabasePage from "./banco";
+import ReviewsManager from "./reviews-manager";
 
 type UserRow = {
   user_id: string;
@@ -431,10 +432,7 @@ export default function AdminPanel() {
               </p>
             </div>
 
-            {/* Embutindo o componente DatabasePage na aba de avaliações */}
-            <div className="rounded-xl overflow-hidden border border-white/10 bg-slate-950/40">
-              <DatabasePage embedded />
-            </div>
+            <ReviewsManager reviews={reviews} onUpdate={() => void loadData()} />
           </div>
         )}
 
