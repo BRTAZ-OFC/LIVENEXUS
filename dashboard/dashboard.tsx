@@ -252,9 +252,11 @@ function DashboardPage() {
         <div className={activeSection === "connections" ? "dash-w-full-px-6-5ebeye" : "hidden"}>
           <PlatformBioConnections />
         </div>
-        <div className={activeSection === "overlay" ? "dash-w-full-px-6-5ebeye" : "hidden"}>
-          <OverlayCanvas />
-        </div>
+        {activeSection === "overlay" && (
+          <div className="dash-w-full-px-6-5ebeye">
+            <OverlayCanvas />
+          </div>
+        )}
         {activeSection === "overview" ? (
           <section className="dash-overview">
             <div className="dash-overview-heading">
