@@ -99,18 +99,18 @@ function getAuthHeaders(): HeadersInit {
 
 type JsonRow = Record<string, unknown> & { __rowKey: string };
 
-const JSON_TABLES: Array<{ id: string; title: string; file: string; description: string }> = [
-  { id: "auth_activation", title: "Ativações", file: "auth_activation.json", description: "Códigos temporários de ativação." },
-  { id: "biblioteca", title: "Biblioteca", file: "biblioteca.json", description: "Músicas, álbuns, artistas e playlists por usuário." },
-  { id: "cenarios", title: "Cenários", file: "cenarios.json", description: "Cenários salvos por usuário." },
-  { id: "galeria", title: "Galeria", file: "galeria.json", description: "Registros de mídia da galeria." },
-  { id: "image_store", title: "Armazenamento de imagens", file: "image_store.json", description: "Metadados e conteúdo de imagens." },
-  { id: "messages", title: "Mensagens", file: "messages.json", description: "Mensagens recebidas pelo sistema." },
-  { id: "metricas", title: "Métricas", file: "metricas.json", description: "Métricas agrupadas por usuário." },
-  { id: "overlays", title: "Overlays", file: "overlays.json", description: "Overlays e configurações por usuário." },
-  { id: "rtc_registry", title: "Identidades RTC", file: "rtc_registry.json", description: "Identificadores RTC associados ao user_id local." },
-  { id: "schemas", title: "Esquemas", file: "schemas.json", description: "Definições de campos das tabelas JSON." },
-  { id: "templates", title: "Modelos", file: "templates.json", description: "Catálogo de modelos visuais." },
+const JSON_TABLES: Array<{ id: string; title: string; file: string; description: string; fields: string[] }> = [
+  { id: "auth_activation", title: "Ativações", file: "auth_activation.json", description: "Códigos temporários de ativação.", fields: ["email", "code", "expiresAt", "created_at"] },
+  { id: "biblioteca", title: "Biblioteca", file: "biblioteca.json", description: "Músicas, álbuns, artistas e playlists por usuário.", fields: ["user_id", "songs", "albums", "artists", "playlists"] },
+  { id: "cenarios", title: "Cenários", file: "cenarios.json", description: "Cenários salvos por usuário.", fields: ["id", "user_id", "name", "config", "created_at"] },
+  { id: "galeria", title: "Galeria", file: "galeria.json", description: "Registros de mídia da galeria.", fields: ["id", "user_id", "filename", "url", "size", "uploadedAt"] },
+  { id: "image_store", title: "Armazenamento de imagens", file: "image_store.json", description: "Metadados e conteúdo de imagens.", fields: ["filename", "user_id", "data", "updatedAt", "id", "source"] },
+  { id: "messages", title: "Mensagens", file: "messages.json", description: "Mensagens recebidas pelo sistema.", fields: ["id", "user_id", "name", "email", "category", "message", "status", "created_date"] },
+  { id: "metricas", title: "Métricas", file: "metricas.json", description: "Métricas agrupadas por usuário.", fields: ["id", "user_id", "type", "data", "created_date"] },
+  { id: "overlays", title: "Overlays", file: "overlays.json", description: "Overlays e configurações por usuário.", fields: ["id", "user_id", "name", "type", "settings", "created_at"] },
+  { id: "rtc_registry", title: "Identidades RTC", file: "rtc_registry.json", description: "Identificadores RTC associados ao user_id local.", fields: ["user_id", "id", "rtcId", "created_at", "updated_at"] },
+  { id: "schemas", title: "Esquemas", file: "schemas.json", description: "Definições de campos das tabelas JSON.", fields: ["id", "name", "fields"] },
+  { id: "templates", title: "Modelos", file: "templates.json", description: "Catálogo de modelos visuais.", fields: ["id", "name", "originalName", "localPath", "url", "format", "category", "role", "sourceRepository", "size"] },
 ];
 
 function jsonCellValue(value: unknown) {
@@ -164,6 +164,10 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   const [genericDraft, setGenericDraft] = useState("");
   const [genericEditingKey, setGenericEditingKey] = useState<string | null>(null);
   const [genericNewJson, setGenericNewJson] = useState("{\n  \n}");
+  const genericColumns = Array.from(new Set([
+    ...(selectedJsonTable?.fields ?? []),
+    ...genericRows.flatMap((row) => Object.keys(row).filter((key) => key !== "__rowKey")),
+  ]));
 
 
   const [loading, setLoading] = useState(true);
@@ -625,7 +629,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
         <div className="db-border-b-border-white-10-15zrj3l">
           <p className="db-text-9px-font-bold-14dl39j">TABELAS JSON</p>
         </div>
-        <nav className="db-p-2-178lum4 space-y-1">
+        <nav className="db-p-2-178lum4 space-y-1 overflow-y-auto">
           <button
             type="button"
             onClick={() => handleSelectTable("usuarios")}
@@ -1130,7 +1134,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                 <table className="w-full min-w-0 border-collapse text-left text-xs">
                   <thead className="border-b border-white/10 bg-white/5 text-slate-300">
                     <tr>
-                      {(Array.from(new Set(genericRows.flatMap((row) => Object.keys(row).filter((key) => key !== "__rowKey"))))).map((field) => (
+                      {genericColumns.map((field) => (
                         <th key={field} className="px-3 py-2 font-medium">{field}</th>
                       ))}
                       <th className="px-3 py-2 font-medium">Ações</th>
@@ -1145,7 +1149,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                       return (
                         <tr key={row.__rowKey}>
                           {rowIsEditing ? (
-                            <td colSpan={fields.length + 1} className="p-3">
+                            <td colSpan={genericColumns.length + 1} className="p-3">
                               <textarea value={genericDraft} onChange={(event) => setGenericDraft(event.target.value)} rows={8} spellCheck={false} className="w-full rounded-lg border border-violet-400/30 bg-black/50 p-3 font-mono text-xs text-white" aria-label="Editar registro JSON" />
                               <div className="mt-2 flex gap-2">
                                 <button type="button" onClick={() => void saveGenericRow(row.__rowKey)} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white"><Save size={13} />Salvar</button>
