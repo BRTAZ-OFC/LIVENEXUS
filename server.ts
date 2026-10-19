@@ -26,6 +26,13 @@ import {
   deleteAvaliacao,
 } from "./dashboard/admin/banco/-avaliacao-crud.js";
 import {
+  getJsonTableDefinitions,
+  listJsonTableRecords,
+  createJsonTableRecord,
+  updateJsonTableRecord,
+  deleteJsonTableRecord,
+} from "./dashboard/admin/banco/-json-tables-crud.js";
+import {
   createSessionToken,
   createSessionCookie,
   clearSessionCookie,
@@ -637,6 +644,78 @@ app.delete("/api/plataformas", async (req: Request, res: Response) => {
         ok: false,
         error: errorMessage(error, "Não foi possível remover a conexão."),
       });
+  }
+});
+
+/* CRUD administrativo genérico das tabelas JSON que não possuem CRUD específico. */
+app.get("/api/database/json-tables", async (req: Request, res: Response) => {
+  if (!requireAdmin(req, res)) return;
+  try {
+    const definitions = getJsonTableDefinitions();
+    const tables = await Promise.all(definitions.map(async (definition) => ({
+      ...definition,
+      count: (await listJsonTableRecords(definition.id)).length,
+    })));
+    return res.set(NO_CACHE).json({ ok: true, tables });
+  } catch (error) {
+    return res.status(500).set(NO_CACHE).json({
+      ok: false,
+      message: errorMessage(error, "Não foi possível listar as tabelas JSON."),
+    });
+  }
+});
+
+app.get("/api/database/json-tables/:tableId", async (req: Request, res: Response) => {
+  if (!requireAdmin(req, res)) return;
+  try {
+    const tableId = String(req.params["tableId"] ?? "");
+    const rows = await listJsonTableRecords(tableId);
+    return res.set(NO_CACHE).json({ ok: true, tableId, rows });
+  } catch (error) {
+    const message = errorMessage(error, "Não foi possível abrir a tabela JSON.");
+    return res.status(/não permitida/i.test(message) ? 404 : 500).set(NO_CACHE).json({ ok: false, message });
+  }
+});
+
+app.post("/api/database/json-tables/:tableId", async (req: Request, res: Response) => {
+  if (!requireAdmin(req, res)) return;
+  try {
+    const tableId = String(req.params["tableId"] ?? "");
+    const row = await createJsonTableRecord(tableId, req.body?.record);
+    return res.status(201).set(NO_CACHE).json({ ok: true, row });
+  } catch (error) {
+    const message = errorMessage(error, "Não foi possível criar o registro JSON.");
+    const status = /não permitida/i.test(message) ? 404 : /não existe em usuario.json|obrigatório|já existe|inválido|informe o user_id/i.test(message) ? 400 : 500;
+    return res.status(status).set(NO_CACHE).json({ ok: false, message });
+  }
+});
+
+app.patch("/api/database/json-tables/:tableId", async (req: Request, res: Response) => {
+  if (!requireAdmin(req, res)) return;
+  try {
+    const tableId = String(req.params["tableId"] ?? "");
+    const rowKey = String(req.body?.rowKey ?? "");
+    const row = await updateJsonTableRecord(tableId, rowKey, req.body?.record);
+    return res.set(NO_CACHE).json({ ok: true, row });
+  } catch (error) {
+    const message = errorMessage(error, "Não foi possível atualizar o registro JSON.");
+    const status = /não permitida|não encontrado|incompatível/i.test(message) ? 404 : /não existe em usuario.json|obrigatório|inválido|não é permitido/i.test(message) ? 400 : 500;
+    return res.status(status).set(NO_CACHE).json({ ok: false, message });
+  }
+});
+
+app.delete("/api/database/json-tables/:tableId", async (req: Request, res: Response) => {
+  if (!requireAdmin(req, res)) return;
+  try {
+    const tableId = String(req.params["tableId"] ?? "");
+    const rowKey = String(req.body?.rowKey ?? "");
+    const deleted = await deleteJsonTableRecord(tableId, rowKey);
+    if (!deleted) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Registro não encontrado." });
+    return res.set(NO_CACHE).json({ ok: true });
+  } catch (error) {
+    const message = errorMessage(error, "Não foi possível excluir o registro JSON.");
+    const status = /não permitida|não encontrado|incompatível/i.test(message) ? 404 : /não existe em usuario.json|obrigatório|inválido/i.test(message) ? 400 : 500;
+    return res.status(status).set(NO_CACHE).json({ ok: false, message });
   }
 });
 
