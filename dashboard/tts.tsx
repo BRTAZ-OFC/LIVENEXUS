@@ -342,9 +342,6 @@ export default function TTSPage() {
         </div>
         <div className="tts-effect-intensity"><RangeControl label="Intensidade do efeito" value={settings.intensity} min={0} max={1.5} step={0.05} suffix="x" display={`${Math.round(settings.intensity * 100)}%`} onChange={(v) => update("intensity", v)} /></div>
         <p className="tts-effect-note">Os efeitos são aplicados ao áudio gerado pelo motor neural: filtros de frequência, modulação, compressão, saturação, delay e reverberação. Esquilo, Monstro e Gigante também combinam mudança de velocidade com equalização; não é um algoritmo de pitch-shift independente da velocidade.</p>
-      </section>
-
-
       </section>}
 
 
