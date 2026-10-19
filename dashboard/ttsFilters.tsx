@@ -260,10 +260,17 @@ export function toggleFlaggedUser(key: string) {
   if (user) { flaggedUsers.set(key, { ...user, blocked: !user.blocked }); persistFlaggedUsers(); emitDiag(); }
 }
 export function clearFlaggedUser(key: string) { flaggedUsers.delete(key); persistFlaggedUsers(); emitDiag(); }
-export function recordTtsQueueBlock(message: MultiChatMessage, reason: string) {
+export function recordTtsQueueBlock(message: Pick<MultiChatMessage, "id" | "platform" | "author" | "text">, reason: string) {
   diag.blocked++;
   diag.reasons[reason] = (diag.reasons[reason] || 0) + 1;
   diag.events.unshift({ id: message.id + "-queue", time: Date.now(), platform: message.platform, author: message.author, decision: "BLOQUEADA", reason, text: message.text });
+  if (diag.events.length > 100) diag.events.length = 100;
+  emitDiag();
+}
+export function recordTtsQueueDrop(message: Pick<MultiChatMessage, "id" | "platform" | "author" | "text">, reason: string) {
+  diag.blocked++;
+  diag.reasons[reason] = (diag.reasons[reason] || 0) + 1;
+  diag.events.unshift({ id: message.id + "-dropped", time: Date.now(), platform: message.platform, author: message.author, decision: "BLOQUEADA", reason, text: message.text });
   if (diag.events.length > 100) diag.events.length = 100;
   emitDiag();
 }
