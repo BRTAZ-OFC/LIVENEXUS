@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AudioLines, Clock3, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
 import "./css/tts.css";
 import { playProcessedSpeech, type PlaybackHandle } from "./ttsAudioEngine";
+import { subscribeTtsMessages } from "./multichat";
 
 type VoiceEffect = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
 type TtsSettings = {
@@ -44,6 +45,7 @@ export default function TTSPage() {
   const [currentText, setCurrentText] = useState("");
   const [notice, setNotice] = useState("O modelo da voz selecionada será carregado na primeira reprodução.");
   const [preset, setPreset] = useState("padrao");
+  const [autoReadChat, setAutoReadChat] = useState(true);
   const queueRef = useRef<QueueItem[]>([]);
   const activeRef = useRef<PlaybackHandle | null>(null);
   const playTokenRef = useRef(0);
@@ -62,6 +64,29 @@ export default function TTSPage() {
       activeRef.current?.stop();
     };
   }, []);
+
+  useEffect(() => subscribeTtsMessages((message) => {
+    if (!autoReadChatRef.current) return;
+    const text = `${message.platform}: ${message.author}: ${message.text}`.trim().slice(0, settingsRef.current.maxChars > 0 ? settingsRef.current.maxChars : 1000);
+    if (!text) return;
+    const roles = message.roles.map((role) => role.toLowerCase());
+    const tier: QueueItem["tier"] = roles.includes("broadcaster") ? "broadcaster"
+      : roles.includes("moderator") ? "moderator"
+      : roles.includes("vip") ? "vip"
+      : roles.includes("subscriber") ? "subscriber" : "normal";
+    const item: QueueItem = { id: ++idRef.current, text, author: `${message.author} · ${message.platform}`, tier, queuedAt: Date.now() };
+    setQueue((old) => {
+      const next = [...old, item];
+      if (next.length > 200) {
+        const discardIndex = next.findIndex((entry) => entry.tier === "normal");
+        if (discardIndex >= 0) next.splice(discardIndex, 1);
+        else next.shift();
+      }
+      queueRef.current = next;
+      return next;
+    });
+    setNotice(`Mensagem recebida do ${message.platform}; adicionada à fila de leitura.`);
+  }), []);
 
   useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch {} }, [settings]);
 
@@ -276,10 +301,10 @@ export default function TTSPage() {
       </section>
 
       <section className="tts-card">
-        <div className="tts-card-title"><span className="tts-title-icon"><AudioLines /></span><div><h2>Fila geral de leitura</h2><p>Fila local de demonstração; ainda sem mensagens das plataformas conectadas</p></div></div>
+        <div className="tts-card-title"><span className="tts-title-icon"><AudioLines /></span><div><h2>Fila geral de leitura</h2><p>Mensagens recebidas pelo multichat e testes manuais, ordenadas por prioridade</p></div></div>
         <div className="tts-queue-toolbar">
           <span className="tts-notice">{notice}</span>
-          <div><button onClick={toggleQueue}>{paused ? <Play size={14} /> : <Pause size={14} />}{paused ? "Retomar fila" : "Pausar fila"}</button><button onClick={skipCurrent}><SkipForward size={14} /> Pular</button><button onClick={clearQueue}><RotateCcw size={14} /> Limpar</button></div>
+          <div><button className={autoReadChat ? "selected" : ""} onClick={() => { setAutoReadChat((enabled) => !enabled); setNotice(autoReadChat ? "Leitura automática do multichat desativada." : "Leitura automática do multichat ativada."); }}><Volume2 size={14} />{autoReadChat ? "Leitura automática ligada" : "Leitura automática desligada"}</button><button onClick={toggleQueue}>{paused ? <Play size={14} /> : <Pause size={14} />}{paused ? "Retomar fila" : "Pausar fila"}</button><button onClick={skipCurrent}><SkipForward size={14} /> Pular</button><button onClick={clearQueue}><RotateCcw size={14} /> Limpar</button></div>
         </div>
         <div className="tts-now-speaking"><span className={speaking ? "tts-pulse on" : "tts-pulse"} /> <div><small>FALA ATUAL</small><strong>{currentText || "Nenhuma fala em reprodução"}</strong></div></div>
         <div className="tts-queue-add">
@@ -287,7 +312,7 @@ export default function TTSPage() {
           <button onClick={() => addDemoMessage("broadcaster")}>Transmissor</button><button onClick={() => addDemoMessage("moderator")}>Moderador</button><button onClick={() => addDemoMessage("vip")}>VIP</button><button onClick={() => addDemoMessage("normal")}>Normal</button>
         </div>
         <div className="tts-queue-list">
-          {queueByPriority.length ? queueByPriority.map((item) => <article key={item.id}><span className={"tts-tier " + item.tier}>{item.tier}</span><strong>{item.author}</strong><p>{item.text}</p><small>{item.expired ? "Expirada — será removida" : "Aguardando"}</small></article>) : <div className="tts-empty">A fila está vazia. Use “Adicionar teste à fila” para validar as prioridades.</div>}
+          {queueByPriority.length ? queueByPriority.map((item) => <article key={item.id}><span className={"tts-tier " + item.tier}>{item.tier}</span><strong>{item.author}</strong><p>{item.text}</p><small>{item.expired ? "Expirada — será removida" : "Aguardando"}</small></article>) : <div className="tts-empty">A fila está vazia. Conecte uma plataforma no Chat ao vivo ou adicione uma mensagem de teste.</div>}
         </div>
       </section>
     </section>
