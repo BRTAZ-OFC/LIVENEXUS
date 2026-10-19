@@ -78,7 +78,7 @@ export default function AdminConnectionsPage() {
       const token = sessionStorage.getItem("livenexus_token");
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
-      const response = await fetch("/api/platforms", {
+      const response = await fetch("/api/plataformas", {
         method: "POST",
         headers,
         credentials: "include",
