@@ -11,7 +11,7 @@ import {
   deleteUser,
   getUserById,
 } from "./dashboard/admin/banco/-crud.js";
-import { PlataformasJohnson } from "./dashboard/conexao/ramal/cruds/Plataformas_Johnson.js";
+import { PlataformasJohnson } from "./dashboard/admin/banco/Plataformas_Johnson.js";
 import {
   listAvaliacoes,
   createAvaliacao,
