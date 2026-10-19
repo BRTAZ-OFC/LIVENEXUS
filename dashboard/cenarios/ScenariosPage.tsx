@@ -45,15 +45,15 @@ function isObject(value: unknown): value is JsonObject {
 }
 
 function getScenarioConfig(row: ScenarioRecord): ScenarioConfig {
-  const source = isObject(row.settings) && Object.keys(row.settings).length
+  const source: JsonObject = isObject(row.settings) && Object.keys(row.settings).length
     ? row.settings
     : isObject(row.config) && Object.keys(row.config).length
       ? row.config
       : isObject(row.data) && Object.keys(row.data).length
         ? row.data
         : {};
-  const visualizerSize = isObject(source["visualizerSize"]) ? source["visualizerSize"] : {};
-  const background = isObject(source["background"]) ? source["background"] : {};
+  const visualizerSize: JsonObject = isObject(source["visualizerSize"]) ? source["visualizerSize"] : {};
+  const background: JsonObject = isObject(source["background"]) ? source["background"] : {};
 
   return {
     name: String(source["name"] ?? row.name ?? "Cenário"),
