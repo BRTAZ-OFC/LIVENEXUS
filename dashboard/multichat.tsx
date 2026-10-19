@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { connectTwitch } from "./configuracao/Config_twitchChat";
 import { connectKick } from "./configuracao/Config_kickChat";
 import { connectYouTube } from "./configuracao/Config_youtubeLive";
-import { RadioTower, Radio, Youtube, Wifi, WifiOff, MessageSquare } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 
 export type ChatPlatform = "Twitch" | "Kick" | "YouTube";
 export type MultiChatMessage = {
@@ -28,12 +28,6 @@ const initialStatus = (): Record<ChatPlatform, PlatformState> => ({
   Kick: { status: "idle", detail: "Desconectado", viewers: null, meta: "" },
   YouTube: { status: "idle", detail: "Desconectado", viewers: null, meta: "" },
 });
-const platformIcons = { Twitch: RadioTower, Kick: Radio, YouTube: Youtube };
-const placeholders: Record<ChatPlatform, string> = {
-  Twitch: "Canal da Twitch (ex.: gaules)",
-  Kick: "Canal do Kick (ex.: xqc)",
-  YouTube: "@canal, URL ou ID do vídeo",
-};
 let snapshot: MultiChatSnapshot = {
   channels: { Twitch: "", Kick: "", YouTube: "" },
   statuses: initialStatus(),
