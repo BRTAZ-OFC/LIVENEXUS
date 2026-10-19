@@ -3,10 +3,7 @@
     "dashboard/**/*.ts",
     "dashboard/**/*.tsx",
     "dashboard/**/*.js",
-    "router.tsx",
-    "routeTree.gen.ts",
-    "server.ts",
-    "start.ts",
+    "server.js",
     "vite.config.ts",
     "eslint.config.js"
   ],
@@ -14,8 +11,15 @@
     "target": "ES2022",
     "jsx": "react-jsx",
     "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "vite/client",
+      "node"
+    ],
     "moduleResolution": "Bundler",
     "allowJs": true,
     "resolveJsonModule": true,
@@ -34,7 +38,9 @@
     "exactOptionalPropertyTypes": true,
     "noUncheckedSideEffectImports": true,
     "paths": {
-      "@/*": ["./dashboard/*"]
+      "@/*": [
+        "./*"
+      ]
     }
   }
 }

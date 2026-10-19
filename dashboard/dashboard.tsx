@@ -1,5 +1,4 @@
 /* BLOCO 1 — Imports de rota, estados React, ícones e painel de dados. */
-import { createFileRoute } from "@tanstack/react-router";
 import DatabasePage from "./admin/banco";
 import AdminPanel from "./admin/panel";
 import { useEffect, useState } from "react";
@@ -17,9 +16,7 @@ import {
   Layers,
 } from "lucide-react";
 
-/* BLOCO 2 — Registra a rota do dashboard autenticado. */
-export const Route = createFileRoute("/dashboard")({ component: DashboardPage });
-
+/* BLOCO 2 — O dashboard é registrado em dashboard/App.tsx. */
 /* BLOCO 3 — Controla menu lateral, seção ativa e acesso administrativo. */
 function DashboardPage() {
   // BLOCO 4 — Inicializa o menu e recupera o papel antes de restaurar a aba ativa.
@@ -225,3 +222,5 @@ function DashboardPage() {
     </div>
   );
 }
+
+export default DashboardPage;

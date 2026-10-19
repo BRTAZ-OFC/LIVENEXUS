@@ -1,12 +1,10 @@
 /* BLOCO 1 — Imports de rota, navegação, estados, ícones e cadastro do servidor. */
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { AudioLines, ArrowRight, LockKeyhole, UserRound } from "lucide-react";
 import { useState } from "react";
-import { registerUser } from "./-auth";
+import { registerUser } from "./auth-client";
 
-/* BLOCO 2 — Registra a rota de cadastro. */
-export const Route = createFileRoute("/login/registro")({ component: RegisterPage });
-
+/* BLOCO 2 — A página de cadastro é registrada em dashboard/App.tsx. */
 /* BLOCO 3 — Armazena usuário, senha, confirmação e mensagens. */
 function RegisterPage() {
   const navigate = useNavigate();
@@ -36,7 +34,7 @@ function RegisterPage() {
       }
       const result = await registerUser({ data: { user, password } });
       if (result.ok) {
-        await navigate({ to: "/login" });
+        navigate("/login");
         return;
       }
       setMessage(result.message);
@@ -138,3 +136,5 @@ function RegisterPage() {
     </main>
   );
 }
+
+export default RegisterPage;

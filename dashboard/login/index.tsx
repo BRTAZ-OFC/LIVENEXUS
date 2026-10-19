@@ -1,12 +1,10 @@
 /* BLOCO 1 — Imports de rota, navegação, estados, ícones e login do servidor. */
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "react-router-dom";
 import { AudioLines, ArrowRight, LockKeyhole, UserRound } from "lucide-react";
 import { useState } from "react";
-import { loginUser } from "./-auth";
+import { loginUser } from "./auth-client";
 
-/* BLOCO 2 — Registra a rota de entrada na conta. */
-export const Route = createFileRoute("/login/")({ component: LoginPage });
-
+/* BLOCO 2 — A página de login é registrada em dashboard/App.tsx. */
 /* BLOCO 3 — Armazena credenciais e mensagens de retorno. */
 function LoginPage() {
   const navigate = useNavigate();
@@ -31,7 +29,7 @@ function LoginPage() {
           }
         }
         setPassword("");
-        await navigate({ to: "/dashboard" });
+        navigate("/dashboard");
         return;
       }
       setMessage(result.message);
@@ -117,3 +115,5 @@ function LoginPage() {
     </main>
   );
 }
+
+export default LoginPage;
