@@ -828,6 +828,37 @@ app.get("/api/admin/lab/youtube-test1/bootstrap", async (req: Request, res: Resp
   }
 });
 
+/* API de música do YouTube portada do BACKUP01, sem dependência de D1/Cloudflare. */
+app.all(/^\/api\/ytmusic(?:\/.*)?$/, async (req: Request, res: Response) => {
+  try {
+    const { handleRequest } = await import("./api/ytmusic.js");
+    const protocol = String(req.headers["x-forwarded-proto"] ?? "http").split(",")[0];
+    const host = req.get("host") || "localhost";
+    const url = new URL(req.originalUrl, `${protocol}://${host}`);
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (typeof value === "string") headers.set(key, value);
+      else if (Array.isArray(value)) headers.set(key, value.join(", "));
+    }
+    let body: string | undefined;
+    if (req.method !== "GET" && req.method !== "HEAD" && req.body !== undefined) {
+      body = JSON.stringify(req.body);
+      if (!headers.has("content-type")) headers.set("content-type", "application/json");
+    }
+    const webRequest = new Request(url, { method: req.method, headers, body });
+    const webResponse = await handleRequest(webRequest);
+    res.status(webResponse.status);
+    webResponse.headers.forEach((value, key) => res.setHeader(key, value));
+    res.send(Buffer.from(await webResponse.arrayBuffer()));
+  } catch (error) {
+    console.error("[API YouTube Music]", error);
+    res.status(500).set(NO_CACHE).json({
+      ok: false,
+      error: errorMessage(error, "Falha na API de música do YouTube."),
+    });
+  }
+});
+
 /* API desconhecida retorna JSON em vez da página HTML. */
 app.all(/^\/api(?:\/.*)?$/, (req: Request, res: Response) => {
   console.warn(`[API 404] ${req.method} ${req.originalUrl}`);
