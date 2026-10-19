@@ -1,6 +1,7 @@
 /* BLOCO 1 — Imports de rota, estados React, ícones e painel de dados. */
 import { createFileRoute } from "@tanstack/react-router";
 import DatabasePage from "./admin/banco";
+import AdminPanel from "./admin/panel";
 import { useEffect, useState } from "react";
 import {
   AudioLines,
@@ -13,6 +14,7 @@ import {
   Database,
   ChevronRight,
   ChevronLeft,
+  Layers,
 } from "lucide-react";
 
 /* BLOCO 2 — Registra a rota do dashboard autenticado. */
@@ -28,27 +30,31 @@ function DashboardPage() {
     }
     return false;
   });
-  const [activeSection, setActiveSection] = useState<"overview" | "database">(() => {
-    if (typeof window !== "undefined") {
-      const admin = sessionStorage.getItem("livenexus_role") === "admin";
-      if (!admin) return "overview";
-      const params = new URLSearchParams(window.location.search);
-      const tabParam = params.get("tab");
-      if (tabParam === "database" || tabParam === "overview") return tabParam;
-      const stored = sessionStorage.getItem("livenexus_active_tab");
-      if (stored === "database" || stored === "overview") return stored;
-    }
-    return "overview";
-  });
+  const [activeSection, setActiveSection] = useState<"overview" | "database" | "admin-panel">(
+    () => {
+      if (typeof window !== "undefined") {
+        const admin = sessionStorage.getItem("livenexus_role") === "admin";
+        if (!admin) return "overview";
+        const params = new URLSearchParams(window.location.search);
+        const tabParam = params.get("tab");
+        if (tabParam === "database" || tabParam === "overview" || tabParam === "admin-panel")
+          return tabParam as "overview" | "database" | "admin-panel";
+        const stored = sessionStorage.getItem("livenexus_active_tab");
+        if (stored === "database" || stored === "overview" || stored === "admin-panel")
+          return stored as "overview" | "database" | "admin-panel";
+      }
+      return "overview";
+    },
+  );
 
   // BLOCO 5 — Atualiza a seção selecionada e persiste a escolha.
-  function handleSelectSection(section: "overview" | "database") {
+  function handleSelectSection(section: "overview" | "database" | "admin-panel") {
     setActiveSection(section);
     if (typeof window !== "undefined") {
       sessionStorage.setItem("livenexus_active_tab", section);
       const url = new URL(window.location.href);
-      if (section === "database") {
-        url.searchParams.set("tab", "database");
+      if (section === "database" || section === "admin-panel") {
+        url.searchParams.set("tab", section);
       } else {
         url.searchParams.delete("tab");
       }
@@ -90,18 +96,32 @@ function DashboardPage() {
             {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Início</span>}
           </button>
           {isAdmin && (
-            <button
-              type="button"
-              onClick={() => handleSelectSection("database")}
-              title="Banco de dados"
-              aria-label="Banco de dados"
-              className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "database" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
-            >
-              <Database className="dash-h-2-5-w-2-5-16znhny" />
-              {sidebarExpanded && (
-                <span className="dash-text-7px-font-semibold-r7z1tv">Banco de dados</span>
-              )}
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => handleSelectSection("admin-panel")}
+                title="Painel Admin"
+                aria-label="Painel Admin"
+                className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "admin-panel" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
+              >
+                <Layers className="dash-h-2-5-w-2-5-16znhny" />
+                {sidebarExpanded && (
+                  <span className="dash-text-7px-font-semibold-r7z1tv">Painel Admin</span>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSelectSection("database")}
+                title="Banco de dados"
+                aria-label="Banco de dados"
+                className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "database" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
+              >
+                <Database className="dash-h-2-5-w-2-5-16znhny" />
+                {sidebarExpanded && (
+                  <span className="dash-text-7px-font-semibold-r7z1tv">Banco de dados</span>
+                )}
+              </button>
+            </>
           )}
         </nav>
         <button
@@ -192,7 +212,11 @@ function DashboardPage() {
               </article>
             </div>
           </section>
-        ) : isAdmin ? (
+        ) : activeSection === "admin-panel" && isAdmin ? (
+          <section className="dash-w-full-px-6-5ebeye">
+            <AdminPanel />
+          </section>
+        ) : activeSection === "database" && isAdmin ? (
           <section className="dash-w-full-px-6-5ebeye">
             <DatabasePage embedded />
           </section>

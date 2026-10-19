@@ -1,6 +1,7 @@
 /* BLOCO 1 — Imports de roteamento e ícones usados na página pública. */
 import { createFileRoute } from "@tanstack/react-router";
 import {
+  ArrowLeft,
   ArrowRight,
   AudioLines,
   Check,
