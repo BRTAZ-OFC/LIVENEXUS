@@ -51,10 +51,7 @@ function LoginPage() {
 
   return (
     <main className="auth-page">
-      <div
-        aria-hidden="true"
-        className="auth-pointer-events-none-abso-13gjxy4"
-      />
+      <div aria-hidden="true" className="auth-pointer-events-none-abso-13gjxy4" />
       <section className="auth-card">
         <a href="/" className="auth-brand">
           <span className="auth-brand-mark">
@@ -64,9 +61,7 @@ function LoginPage() {
             LIVE<span className="auth-text-cyan-300-bbfjjq">NEXUS</span>
           </span>
         </a>
-        <p className="auth-eyebrow-login">
-          Bem-vindo de volta
-        </p>
+        <p className="auth-eyebrow-login">Bem-vindo de volta</p>
         <h1 className="auth-title">Entrar na conta</h1>
         <p className="auth-description">Acesse seu espaço LiveNexus.</p>
         {/* BLOCO 6 — Campos, botão de entrada e mensagem de diagnóstico. */}
@@ -100,17 +95,11 @@ function LoginPage() {
               />
             </span>
           </label>
-          <button
-            className="auth-submit"
-            type="submit"
-          >
+          <button className="auth-submit" type="submit">
             Entrar <ArrowRight className="auth-h-4-w-4-3ulyf2" />
           </button>
           {message && (
-            <p
-              role="status"
-              className="auth-message"
-            >
+            <p role="status" className="auth-message">
               {message}
             </p>
           )}

@@ -49,10 +49,7 @@ function RegisterPage() {
 
   return (
     <main className="auth-page">
-      <div
-        aria-hidden="true"
-        className="auth-pointer-events-none-abso-kxfgfw"
-      />
+      <div aria-hidden="true" className="auth-pointer-events-none-abso-kxfgfw" />
       <section className="auth-card">
         <a href="/" className="auth-brand">
           <span className="auth-brand-mark">
@@ -62,13 +59,9 @@ function RegisterPage() {
             LIVE<span className="auth-text-cyan-300-bbfjjq">NEXUS</span>
           </span>
         </a>
-        <p className="auth-eyebrow-register">
-          Comece por aqui
-        </p>
+        <p className="auth-eyebrow-register">Comece por aqui</p>
         <h1 className="auth-title">Criar conta</h1>
-        <p className="auth-description">
-          Preencha os dados para criar seu acesso.
-        </p>
+        <p className="auth-description">Preencha os dados para criar seu acesso.</p>
         {/* BLOCO 6 — Campos do cadastro, aviso de senha exclusiva e mensagens. */}
         <form className="auth-form" onSubmit={submit}>
           <label className="auth-field-label">
@@ -123,17 +116,11 @@ function RegisterPage() {
             Não use senhas padrão, repetidas ou utilizadas em outros serviços. Use uma senha
             exclusiva com pelo menos 8 caracteres.
           </p>
-          <button
-            className="auth-submit"
-            type="submit"
-          >
+          <button className="auth-submit" type="submit">
             Cadastrar <ArrowRight className="auth-h-4-w-4-3ulyf2" />
           </button>
           {message && (
-            <p
-              role="status"
-              className="auth-message"
-            >
+            <p role="status" className="auth-message">
               {message}
             </p>
           )}

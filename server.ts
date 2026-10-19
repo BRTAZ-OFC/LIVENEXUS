@@ -1,3 +1,9 @@
+import { randomBytes } from "node:crypto";
+
+if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+  process.env.SESSION_SECRET = randomBytes(32).toString("hex");
+}
+
 /* BLOCO 1 — Gera HTML mínimo para responder a erros inesperados do servidor. */
 function renderErrorPage(): string {
   return `<!doctype html>

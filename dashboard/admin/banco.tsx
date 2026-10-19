@@ -206,13 +206,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   }
 
   return (
-    <div
-      className={
-        embedded
-          ? "db-flex-min-h-0-1yrwjzw"
-          : "db-flex-min-h-screen-axmrk9"
-      }
-    >
+    <div className={embedded ? "db-flex-min-h-0-1yrwjzw" : "db-flex-min-h-screen-axmrk9"}>
       {!embedded && (
         <aside className="db-flex-min-h-screen-18ufx4p">
           <div className="db-flex-h-11-1nokrch">
@@ -221,20 +215,12 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
             </span>
             <span className="db-text-11px-font-extrabold-1tiyd6b">LIVENEXUS</span>
           </div>
-            {/* BLOCO 11 — Links de navegação da tabela independente. */}
-        <nav className="db-flex-flex-col-1vt2mhw">
-            <Link
-              to="/dashboard"
-              title="Início"
-              className="db-flex-h-7-1jvyogy"
-            >
+          {/* BLOCO 11 — Links de navegação da tabela independente. */}
+          <nav className="db-flex-flex-col-1vt2mhw">
+            <Link to="/dashboard" title="Início" className="db-flex-h-7-1jvyogy">
               <House className="db-h-3-w-3-92ylou" /> Início
             </Link>
-            <Link
-              to="/admin/banco"
-              title="Banco de dados"
-              className="db-flex-h-7-1yq75cr"
-            >
+            <Link to="/admin/banco" title="Banco de dados" className="db-flex-h-7-1yq75cr">
               <Database className="db-h-3-w-3-92ylou" /> Banco de dados
             </Link>
           </nav>
@@ -269,10 +255,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                   LIVE<span className="db-text-cyan-300-bbfjjq">NEXUS</span>
                 </span>
               </Link>
-              <Link
-                to="/dashboard"
-                className="db-inline-flex-items-center-1h04382"
-              >
+              <Link to="/dashboard" className="db-inline-flex-items-center-1h04382">
                 <ArrowLeft className="db-h-3-w-3-1s0lck6" /> Voltar ao início
               </Link>
             </div>
@@ -282,9 +265,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
         <section className={embedded ? "db-min-w-0-flex-1-1pl9mdh" : "db-w-full-px-6-5ebeye"}>
           <div className="db-flex-flex-wrap-qlnoif">
             <div>
-              <p className="db-text-9px-font-bold-ukmi15">
-                TABELA SELECIONADA
-              </p>
+              <p className="db-text-9px-font-bold-ukmi15">TABELA SELECIONADA</p>
               <h1 className="db-mt-1-flex-590iju">
                 <Table2 className="db-h-5-w-5-36nguv" /> Usuários
               </h1>
@@ -298,23 +279,20 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
               disabled={loading || deleting}
               className="db-inline-flex-items-center-39j1c2"
             >
-              <RefreshCw className={`db-h-3-w-3-1s0lck6 ${loading ? "db-animate-spin-1steumz" : ""}`} /> Atualizar
+              <RefreshCw
+                className={`db-h-3-w-3-1s0lck6 ${loading ? "db-animate-spin-1steumz" : ""}`}
+              />{" "}
+              Atualizar
             </button>
           </div>
 
           {message && (
-            <p
-              role="status"
-              className="db-mt-5-rounded-xl-3ntd3c"
-            >
+            <p role="status" className="db-mt-5-rounded-xl-3ntd3c">
               {message}
             </p>
           )}
           {error && (
-            <p
-              role="alert"
-              className="db-mt-5-rounded-xl-13l52ky"
-            >
+            <p role="alert" className="db-mt-5-rounded-xl-13l52ky">
               {error}
             </p>
           )}
@@ -351,12 +329,9 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                   {users.map((row) => {
                     const editing = editingId === row.user_id && draft !== null;
                     // BLOCO 10 — Monta os painéis de dados e os controles CRUD.
-  return (
+                    return (
                       <tr key={row.user_id} className="db-bg-white-0-02-lcbolw">
-                        <td
-                          className="db-max-w-44-px-2-5-1uhmtbx"
-                          title={row.user_id}
-                        >
+                        <td className="db-max-w-44-px-2-5-1uhmtbx" title={row.user_id}>
                           {displayValue(row.user_id)}
                         </td>
                         <td className="db-px-2-5-py-2-1not5md">
@@ -436,7 +411,8 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                                 disabled={saving}
                                 className="db-inline-flex-max-w-full-108qdn7"
                               >
-                                <Save className="db-h-3-5-w-3-5-mho9dy" /> {saving ? "Salvando" : "Salvar"}
+                                <Save className="db-h-3-5-w-3-5-mho9dy" />{" "}
+                                {saving ? "Salvando" : "Salvar"}
                               </button>
                               <button
                                 type="button"
@@ -505,14 +481,19 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     <h2 id="delete-dialog-title" className="db-text-base-font-bold-1au4nai">
                       Confirmar exclusão
                     </h2>
-                    <p className="db-text-xs-text-slate-400-1qmab5e">Esta ação não poderá ser desfeita.</p>
+                    <p className="db-text-xs-text-slate-400-1qmab5e">
+                      Esta ação não poderá ser desfeita.
+                    </p>
                   </div>
                 </div>
                 <p className="db-mt-4-text-xs-1p2vnyp">
                   Deseja realmente excluir o usuário{" "}
-                  <strong className="db-font-semibold-text-white-19kgctp">"{userToDelete.user}"</strong> (ID:{" "}
-                  <span className="db-font-mono-text-slate-400-2q6jsq">{userToDelete.user_id}</span>)? O
-                  registro será removido permanentemente do arquivo JSON.
+                  <strong className="db-font-semibold-text-white-19kgctp">
+                    "{userToDelete.user}"
+                  </strong>{" "}
+                  (ID:{" "}
+                  <span className="db-font-mono-text-slate-400-2q6jsq">{userToDelete.user_id}</span>
+                  )? O registro será removido permanentemente do arquivo JSON.
                 </p>
                 <div className="db-mt-6-flex-t4d3go">
                   <button

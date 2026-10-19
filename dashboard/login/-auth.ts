@@ -28,13 +28,18 @@ export const registerUser = createServerFn({ method: "POST" })
 export const loginUser = createServerFn({ method: "POST" })
   .validator((data: Credentials) => data)
   .handler(async ({ data }) => {
-    const { authenticateUser } = await import("../admin/banco/-crud.js");
-    const user = await authenticateUser(data.user, data.password);
-    if (!user) {
-      return { ok: false as const, message: "Usuário ou senha incorretos." };
+    try {
+      const { authenticateUser } = await import("../admin/banco/-crud.js");
+      const user = await authenticateUser(data.user, data.password);
+      if (!user) {
+        return { ok: false as const, message: "Usuário ou senha incorretos." };
+      }
+      const { createSessionCookie, createSessionToken } = await import("./-session");
+      const token = createSessionToken(user);
+      setResponseHeader("Set-Cookie", createSessionCookie(user));
+      return { ok: true as const, user, token, message: "Login validado com sucesso." };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Erro interno ao processar o login.";
+      return { ok: false as const, message };
     }
-    const { createSessionCookie, createSessionToken } = await import("./-session");
-    const token = createSessionToken(user);
-    setResponseHeader("Set-Cookie", createSessionCookie(user));
-    return { ok: true as const, user, token, message: "Login validado com sucesso." };
   });

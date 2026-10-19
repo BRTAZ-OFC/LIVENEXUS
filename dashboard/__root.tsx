@@ -67,23 +67,15 @@ function NotFoundComponent() {
           <AudioLines className="shell-h-7-w-7-13cuvnl" />
         </div>
         <p className="not-found-eyebrow">Erro 404</p>
-        <h1 className="not-found-title">
-          Página não encontrada
-        </h1>
+        <h1 className="not-found-title">Página não encontrada</h1>
         <p className="not-found-description">
           A rota solicitada não existe ou foi movida. Verifique o endereço e tente novamente.
         </p>
         <div className="not-found-actions">
-          <Link
-            to="/dashboard"
-            className="button-primary"
-          >
+          <Link to="/dashboard" className="button-primary">
             <House className="shell-h-4-w-4-3ulyf2" /> Ir para o Início
           </Link>
-          <Link
-            to="/"
-            className="button-secondary"
-          >
+          <Link to="/" className="button-secondary">
             <ArrowLeft className="shell-h-4-w-4-3ulyf2" /> Voltar
           </Link>
         </div>

@@ -13,8 +13,15 @@ type Session = {
 /* BLOCO 2 — Lê e valida o segredo privado usado para assinar sessões. */
 function secret() {
   const value = process.env.SESSION_SECRET;
-  if (!value || value.length < 32) {
-    throw new Error("SESSION_SECRET precisa estar configurada com pelo menos 32 caracteres.");
+  if (!value) {
+    throw new Error(
+      "Erro de configuração: a variável de ambiente SESSION_SECRET não está configurada.",
+    );
+  }
+  if (value.length < 32) {
+    throw new Error(
+      "Erro de configuração: SESSION_SECRET precisa estar configurada com pelo menos 32 caracteres.",
+    );
   }
   return value;
 }

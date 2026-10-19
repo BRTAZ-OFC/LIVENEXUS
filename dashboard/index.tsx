@@ -66,19 +66,13 @@ function HomePage() {
       {/* BLOCO 5 — Navegação superior, marca e links de acesso. */}
       <header className="home-sticky-top-0-hehs4o">
         <nav className="home-mx-auto-flex-1i0mnsl">
-          <a
-            href="#inicio"
-            className="home-flex-shrink-0-1mc3xk4"
-            aria-label="LiveNexus início"
-          >
+          <a href="#inicio" className="home-flex-shrink-0-1mc3xk4" aria-label="LiveNexus início">
             <span className="home-flex-h-10-1qydtod">
               <AudioLines className="home-h-5-w-5-8794lx" />
             </span>
             <span className="home-text-lg-font-extrabold-18415w6">
               LIVE<span className="home-text-cyan-300-bbfjjq">NEXUS</span>
-              <span className="home-ml-2-hidden-u7wz9r">
-                for streamers
-              </span>
+              <span className="home-ml-2-hidden-u7wz9r">for streamers</span>
             </span>
           </a>
 
@@ -95,16 +89,10 @@ function HomePage() {
           </div>
 
           <div className="home-flex-shrink-0-1mm3j93">
-            <a
-              href="/login"
-              className="home-rounded-xl-border-bnh4rt"
-            >
+            <a href="/login" className="home-rounded-xl-border-bnh4rt">
               Entrar
             </a>
-            <a
-              href="/login/registro"
-              className="home-rounded-xl-bg-gradient-t-iu534x"
-            >
+            <a href="/login/registro" className="home-rounded-xl-bg-gradient-t-iu534x">
               Cadastrar
             </a>
           </div>
@@ -125,9 +113,7 @@ function HomePage() {
 
             <h1 className="home-mx-auto-max-w-3xl-1bmda6p">
               Sua live merece
-              <span className="home-mt-2-block-zi3mod">
-                estar conectada.
-              </span>
+              <span className="home-mt-2-block-zi3mod">estar conectada.</span>
             </h1>
 
             <p className="home-mx-auto-mt-6-1o5j63p">
@@ -137,16 +123,10 @@ function HomePage() {
             </p>
 
             <div className="home-mt-8-flex-18lpy6w">
-              <a
-                href="/login/registro"
-                className="home-inline-flex-items-center-1a3j2x0"
-              >
+              <a href="/login/registro" className="home-inline-flex-items-center-1a3j2x0">
                 Começar agora <ArrowRight className="home-h-4-w-4-3ulyf2" />
               </a>
-              <a
-                href="#plataforma"
-                className="home-inline-flex-items-center-1c8e949"
-              >
+              <a href="#plataforma" className="home-inline-flex-items-center-1c8e949">
                 Conhecer a plataforma <ChevronRight className="home-h-4-w-4-3ulyf2" />
               </a>
             </div>
@@ -165,10 +145,7 @@ function HomePage() {
           </div>
 
           <div className="home-relative-mx-auto-mhxt4s">
-            <div
-              aria-hidden="true"
-              className="home-absolute-inset-8-1m8xhuc"
-            />
+            <div aria-hidden="true" className="home-absolute-inset-8-1m8xhuc" />
             <div className="home-relative-overflow-hidden-li6lbx">
               <div className="home-flex-items-center-nxanuk">
                 <div className="home-flex-items-center-8gxtq2">
@@ -213,21 +190,16 @@ function HomePage() {
                 </div>
                 <div className="home-space-y-3-1o1kk97">
                   <div className="home-flex-gap-3-gwr3e">
-                    <span className="home-flex-h-8-1ylm08o">
-                      NX
-                    </span>
+                    <span className="home-flex-h-8-1ylm08o">NX</span>
                     <div className="home-min-w-0-flex-1-1hdapse">
                       <p className="home-text-11px-font-semibold-1bx9li4">
-                        nexus_viewer{" "}
-                        <span className="home-ml-1-font-normal-rkrvrr">· Twitch</span>
+                        nexus_viewer <span className="home-ml-1-font-normal-rkrvrr">· Twitch</span>
                       </p>
                       <p className="home-mt-1-text-xs-1pqlyn8">Salve, live muito boa hoje!</p>
                     </div>
                   </div>
                   <div className="home-flex-gap-3-gwr3e">
-                    <span className="home-flex-h-8-nt9194">
-                      LV
-                    </span>
+                    <span className="home-flex-h-8-nt9194">LV</span>
                     <div className="home-min-w-0-flex-1-1hdapse">
                       <p className="home-text-11px-font-semibold-1gw7i7s">
                         live_fan <span className="home-ml-1-font-normal-rkrvrr">· Kick</span>
@@ -236,13 +208,10 @@ function HomePage() {
                     </div>
                   </div>
                   <div className="home-flex-gap-3-gwr3e">
-                    <span className="home-flex-h-8-srqwnc">
-                      YT
-                    </span>
+                    <span className="home-flex-h-8-srqwnc">YT</span>
                     <div className="home-min-w-0-flex-1-1hdapse">
                       <p className="home-text-11px-font-semibold-yatb1c">
-                        pixel_player{" "}
-                        <span className="home-ml-1-font-normal-rkrvrr">· YouTube</span>
+                        pixel_player <span className="home-ml-1-font-normal-rkrvrr">· YouTube</span>
                       </p>
                       <p className="home-mt-1-text-xs-1pqlyn8">Cheguei agora, bora!</p>
                     </div>
@@ -278,9 +247,7 @@ function HomePage() {
         <section id="comunidade" className="home-border-y-border-white-0--xoeo62">
           <div className="home-mx-auto-flex-acefjp">
             <div className="home-text-left-1kw6lmg">
-              <p className="home-text-10px-font-bold-1vu79y6">
-                Feito para sua comunidade
-              </p>
+              <p className="home-text-10px-font-bold-1vu79y6">Feito para sua comunidade</p>
               <p className="home-mt-1-text-sm-1pppyln">
                 As principais plataformas, reunidas em um só fluxo.
               </p>
@@ -300,10 +267,7 @@ function HomePage() {
         </section>
 
         {/* BLOCO 8 — Cards de recursos e chamada para cadastro. */}
-        <section
-          id="plataforma"
-          className="home-mx-auto-max-w-7xl-1gxcbf9"
-        >
+        <section id="plataforma" className="home-mx-auto-max-w-7xl-1gxcbf9">
           <div className="home-mx-auto-max-w-2xl-105m6zu">
             <span className="home-inline-flex-items-center-h4sp8n">
               <Sparkles className="home-h-3-5-w-3-5-mho9dy" /> Uma plataforma, várias possibilidades
@@ -321,10 +285,7 @@ function HomePage() {
             {features.map((feature) => {
               const Icon = feature.icon;
               return (
-                <article
-                  key={feature.title}
-                  className="group home-rounded-2xl-border-49lope"
-                >
+                <article key={feature.title} className="group home-rounded-2xl-border-49lope">
                   <div className="home-mb-5-flex-1pgn79f">
                     <Icon className="home-h-5-w-5-sv0uoi" />
                   </div>
@@ -339,17 +300,12 @@ function HomePage() {
             <div className="home-mx-auto-flex-14fa954">
               <Zap className="home-h-6-w-6-1wr5v1u" />
             </div>
-            <h3 className="home-mt-5-text-2xl-11qds3j">
-              Dê voz à sua comunidade.
-            </h3>
+            <h3 className="home-mt-5-text-2xl-11qds3j">Dê voz à sua comunidade.</h3>
             <p className="home-mx-auto-mt-3-lxs9o4">
               Prepare seu espaço, conecte suas plataformas e torne a conversa parte central da
               transmissão.
             </p>
-            <a
-              href="/login/registro"
-              className="home-mt-6-inline-flex-1bvzh69"
-            >
+            <a href="/login/registro" className="home-mt-6-inline-flex-1bvzh69">
               Criar minha conta <ArrowRight className="home-h-4-w-4-3ulyf2" />
             </a>
           </div>
@@ -358,12 +314,8 @@ function HomePage() {
         <section className="home-border-t-border-white-0--qlvhak">
           <div className="home-mx-auto-grid-s02tki">
             <div>
-              <p className="home-text-xs-font-bold-12oqxjo">
-                Pensado para quem transmite
-              </p>
-              <h2 className="home-mt-4-text-3xl-5odoxq">
-                Menos abas. Mais interação.
-              </h2>
+              <p className="home-text-xs-font-bold-12oqxjo">Pensado para quem transmite</p>
+              <h2 className="home-mt-4-text-3xl-5odoxq">Menos abas. Mais interação.</h2>
               <p className="home-mt-4-max-w-lg-1ywodtv">
                 O LiveNexus está sendo desenvolvido para reunir recursos úteis em uma interface
                 clara, acessível e preparada para acompanhar sua rotina de live.

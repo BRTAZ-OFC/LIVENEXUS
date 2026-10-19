@@ -98,7 +98,9 @@ function DashboardPage() {
               className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "database" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
             >
               <Database className="dash-h-2-5-w-2-5-16znhny" />
-              {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Banco de dados</span>}
+              {sidebarExpanded && (
+                <span className="dash-text-7px-font-semibold-r7z1tv">Banco de dados</span>
+              )}
             </button>
           )}
         </nav>
@@ -146,12 +148,8 @@ function DashboardPage() {
         </header>
         {activeSection === "overview" ? (
           <section className="dash-w-full-px-6-n4tgk">
-            <p className="dash-text-xs-font-bold-1eh0cdm">
-              Área do usuário
-            </p>
-            <h1 className="dash-mt-3-text-3xl-1fv0i93">
-              Dashboard
-            </h1>
+            <p className="dash-text-xs-font-bold-1eh0cdm">Área do usuário</p>
+            <h1 className="dash-mt-3-text-3xl-1fv0i93">Dashboard</h1>
             <p className="dash-mt-3-max-w-2xl-1oz8868">
               Bem-vindo ao LiveNexus. Este é o painel inicial da sua conta.
             </p>
