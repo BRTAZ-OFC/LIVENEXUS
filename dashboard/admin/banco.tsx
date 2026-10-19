@@ -111,7 +111,6 @@ const JSON_TABLES: Array<{ id: string; title: string; file: string; description:
   { id: "vods", title: "VODs e sessões", file: "vods.json", description: "VODs e sessões de transmissão agrupados por usuário.", fields: ["id", "user_id", "title", "url", "vodStatus", "created_date", "updated_date"] },
   { id: "overlays", title: "Overlays", file: "overlays.json", description: "Overlays e configurações por usuário.", fields: ["id", "user_id", "name", "type", "settings", "created_at"] },
   { id: "rtc_registry", title: "Identidades RTC", file: "rtc_registry.json", description: "Identificadores RTC associados ao user_id local.", fields: ["user_id", "id", "rtcId", "created_at", "updated_at"] },
-  { id: "schemas", title: "Esquemas", file: "schemas.json", description: "Definições de campos das tabelas JSON.", fields: ["id", "name", "fields"] },
   { id: "templates", title: "Modelos", file: "templates.json", description: "Catálogo de modelos visuais.", fields: ["id", "name", "originalName", "localPath", "url", "format", "category", "role", "sourceRepository", "size"] },
 ];
 
@@ -200,6 +199,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
 
   async function loadJsonTable(tableId: string) {
     setLoading(true);
+    setGenericRows([]);
     setError("");
     setMessage("");
     try {
@@ -1112,69 +1112,131 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
               </div>
             </div>
           ) : selectedTable.startsWith("json:") ? (
-            <div className="db-mt-3-overflow-hidden-1sbx6fp space-y-3">
-              <div className="rounded-xl border border-white/10 bg-slate-950/50 p-3">
-                <label className="block text-xs text-slate-300">
-                  Novo registro JSON
-                  <textarea
-                    value={genericNewJson}
-                    onChange={(event) => setGenericNewJson(event.target.value)}
-                    rows={5}
-                    spellCheck={false}
-                    className="mt-2 w-full rounded-lg border border-white/10 bg-black/40 p-3 font-mono text-xs text-white"
-                    aria-label="Novo registro JSON"
-                  />
-                </label>
-                <button type="button" onClick={() => void createGenericRow()} disabled={saving || deleting} className="mt-2 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">
-                  {saving ? "Salvando…" : "Adicionar registro"}
-                </button>
-                {selectedJsonTable?.id && ["biblioteca", "cenarios", "metricas", "overlays", "rtc_registry"].includes(selectedJsonTable.id) && (
-                  <p className="mt-2 text-[10px] text-slate-400">Esta tabela exige um <code>user_id</code> que exista em usuario.json. O servidor valida esse vínculo antes de gravar.</p>
-                )}
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-0 border-collapse text-left text-xs">
-                  <thead className="border-b border-white/10 bg-white/5 text-slate-300">
-                    <tr>
-                      {genericColumns.map((field) => (
-                        <th key={field} className="px-3 py-2 font-medium">{field}</th>
-                      ))}
-                      <th className="px-3 py-2 font-medium">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {loading && genericRows.length === 0 && <tr><td className="px-3 py-8 text-center text-slate-500" colSpan={genericColumns.length + 1}>Carregando registros…</td></tr>}
-                    {!loading && genericRows.length === 0 && !error && <tr><td className="px-3 py-8 text-center text-slate-500" colSpan={genericColumns.length + 1}>Esta tabela ainda não possui registros.</td></tr>}
-                    {genericRows.map((row) => {
-                      const fields = Object.keys(row).filter((key) => key !== "__rowKey");
-                      const rowIsEditing = genericEditingKey === row.__rowKey;
-                      return (
-                        <tr key={row.__rowKey}>
-                          {rowIsEditing ? (
-                            <td colSpan={genericColumns.length + 1} className="p-3">
-                              <textarea value={genericDraft} onChange={(event) => setGenericDraft(event.target.value)} rows={8} spellCheck={false} className="w-full rounded-lg border border-violet-400/30 bg-black/50 p-3 font-mono text-xs text-white" aria-label="Editar registro JSON" />
-                              <div className="mt-2 flex gap-2">
-                                <button type="button" onClick={() => void saveGenericRow(row.__rowKey)} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white"><Save size={13} />Salvar</button>
-                                <button type="button" onClick={() => { setGenericEditingKey(null); setGenericDraft(""); }} disabled={saving} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-3 py-2 text-xs text-slate-200"><X size={13} />Cancelar</button>
-                              </div>
-                            </td>
-                          ) : (
-                            <>
-                              {fields.map((field) => <td key={field} className="max-w-64 break-words px-3 py-2 align-top text-slate-300" title={String(row[field] ?? "")}>{jsonCellValue(row[field])}</td>)}
-                              <td className="whitespace-nowrap px-3 py-2 align-top">
-                                <div className="flex gap-2">
-                                  <button type="button" onClick={() => { const copy = Object.fromEntries(Object.entries(row).filter(([key]) => key !== "__rowKey")); setGenericEditingKey(row.__rowKey); setGenericDraft(JSON.stringify(copy, null, 2)); }} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-200"><Pencil size={12} />Editar</button>
-                                  <button type="button" onClick={() => void deleteGenericRow(row.__rowKey)} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-red-500/20 px-2 py-1 text-[10px] text-red-300"><Trash2 size={12} />Excluir</button>
-                                </div>
-                              </td>
-                            </>
-                          )}
+            <div className="db-mt-3-overflow-hidden-1sbx6fp">
+              {loading && genericRows.length === 0 ? (
+                <p className="rounded-xl border border-white/10 px-4 py-8 text-center text-slate-500">
+                  Carregando registros…
+                </p>
+              ) : !loading && genericRows.length === 0 ? (
+                !error ? (
+                  <p className="rounded-xl border border-white/10 px-4 py-8 text-center text-slate-500">
+                    Esta tabela ainda não possui registros.
+                  </p>
+                ) : null
+              ) : (
+                <>
+                  <div className="space-y-3 rounded-xl border border-white/10 bg-slate-950/50 p-3">
+                    <label className="block text-xs text-slate-300">
+                      Novo registro JSON
+                      <textarea
+                        value={genericNewJson}
+                        onChange={(event) => setGenericNewJson(event.target.value)}
+                        rows={5}
+                        spellCheck={false}
+                        className="mt-2 w-full rounded-lg border border-white/10 bg-black/40 p-3 font-mono text-xs text-white"
+                        aria-label="Novo registro JSON"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => void createGenericRow()}
+                      disabled={saving || deleting}
+                      className="mt-2 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                    >
+                      {saving ? "Salvando…" : "Adicionar registro"}
+                    </button>
+                    {selectedJsonTable?.id && ["biblioteca", "cenarios", "metricas", "overlays", "rtc_registry"].includes(selectedJsonTable.id) && (
+                      <p className="mt-2 text-[10px] text-slate-400">
+                        Esta tabela exige um <code>user_id</code> que exista em usuario.json. O servidor valida esse vínculo antes de gravar.
+                      </p>
+                    )}
+                  </div>
+                  <div className="mt-3 overflow-x-auto">
+                    <table className="w-full min-w-0 border-collapse text-left text-xs">
+                      <thead className="border-b border-white/10 bg-white/5 text-slate-300">
+                        <tr>
+                          {genericColumns.map((field) => (
+                            <th key={field} className="px-3 py-2 font-medium">{field}</th>
+                          ))}
+                          <th className="px-3 py-2 font-medium">Ações</th>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {genericRows.map((row) => {
+                          const fields = Object.keys(row).filter((key) => key !== "__rowKey");
+                          const rowIsEditing = genericEditingKey === row.__rowKey;
+                          return (
+                            <tr key={row.__rowKey}>
+                              {rowIsEditing ? (
+                                <td colSpan={genericColumns.length + 1} className="p-3">
+                                  <textarea
+                                    value={genericDraft}
+                                    onChange={(event) => setGenericDraft(event.target.value)}
+                                    rows={8}
+                                    spellCheck={false}
+                                    className="w-full rounded-lg border border-violet-400/30 bg-black/50 p-3 font-mono text-xs text-white"
+                                    aria-label="Editar registro JSON"
+                                  />
+                                  <div className="mt-2 flex gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => void saveGenericRow(row.__rowKey)}
+                                      disabled={saving || deleting}
+                                      className="inline-flex items-center gap-1 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white"
+                                    >
+                                      <Save size={13} />Salvar
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => { setGenericEditingKey(null); setGenericDraft(""); }}
+                                      disabled={saving}
+                                      className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-3 py-2 text-xs text-slate-200"
+                                    >
+                                      <X size={13} />Cancelar
+                                    </button>
+                                  </div>
+                                </td>
+                              ) : (
+                                <>
+                                  {fields.map((field) => (
+                                    <td key={field} className="max-w-64 break-words px-3 py-2 align-top text-slate-300" title={String(row[field] ?? "")}>
+                                      {jsonCellValue(row[field])}
+                                    </td>
+                                  ))}
+                                  <td className="whitespace-nowrap px-3 py-2 align-top">
+                                    <div className="flex gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const copy = Object.fromEntries(Object.entries(row).filter(([key]) => key !== "__rowKey"));
+                                          setGenericEditingKey(row.__rowKey);
+                                          setGenericDraft(JSON.stringify(copy, null, 2));
+                                        }}
+                                        disabled={saving || deleting}
+                                        className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-200"
+                                      >
+                                        <Pencil size={12} />Editar
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => void deleteGenericRow(row.__rowKey)}
+                                        disabled={saving || deleting}
+                                        className="inline-flex items-center gap-1 rounded-lg border border-red-500/20 px-2 py-1 text-[10px] text-red-300"
+                                      >
+                                        <Trash2 size={12} />Excluir
+                                      </button>
+                                    </div>
+                                  </td>
+                                </>
+                              )}
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             <div className="db-mt-3-overflow-hidden-1sbx6fp">
