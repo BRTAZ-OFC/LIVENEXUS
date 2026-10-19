@@ -1,5 +1,5 @@
 /* BLOCO 1 — Painel Administrativo integrado ao dashboard do LiveNexus. */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   House,
   Image,
@@ -8,8 +8,6 @@ import {
   BookOpen,
   Star,
   HelpCircle,
-  ChevronLeft,
-  ChevronRight,
   RefreshCw,
   Save,
   ShieldCheck,
@@ -25,6 +23,7 @@ import DatabasePage from "./banco";
 import ReviewsManager from "./reviews-manager";
 import AdminConnectionsPage from "./connections";
 import WidgetsSection from "../widget/Widget_Section";
+import HorizontalMenu from "../components/HorizontalMenu";
 import OverlaySection from "../overlay/Overlay_Section";
 
 type UserRow = {
@@ -52,11 +51,6 @@ export default function AdminPanel() {
     "inicial" | "galeria" | "overlay" | "cenarios" | "biblioteca" | "avaliacoes" | "suporte" | "conexoes" | "widgets"
   >("inicial");
 
-  // Submenu scroll & arrows state
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(false);
-
   // Real data state
   const [users, setUsers] = useState<UserRow[]>([]);
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
@@ -72,27 +66,6 @@ export default function AdminPanel() {
   const [expandedScenesUserId, setExpandedScenesUserId] = useState<string | null>(null);
   const [userActiveScenes, setUserActiveScenes] = useState<Record<string, string>>({});
   const [previewingSceneKey, setPreviewingSceneKey] = useState<string | null>(null);
-
-  function checkScrollPosition() {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-    const { scrollLeft, scrollWidth, clientWidth } = el;
-    setShowLeftArrow(scrollLeft > 2);
-    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 2);
-  }
-
-  function scrollSubmenu(direction: "left" | "right") {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-    const amount = 200;
-    el.scrollBy({ left: direction === "left" ? -amount : amount, behavior: "smooth" });
-  }
-
-  useEffect(() => {
-    checkScrollPosition();
-    window.addEventListener("resize", checkScrollPosition);
-    return () => window.removeEventListener("resize", checkScrollPosition);
-  }, []);
 
   async function loadData() {
     setLoading(true);
@@ -195,58 +168,28 @@ export default function AdminPanel() {
         </div>
       )}
 
-      {/* Submenu horizontal com setas de navegação (4px de distância) */}
-      <div className="flex items-center">
-        {showLeftArrow && (
-          <button
-            type="button"
-            onClick={() => scrollSubmenu("left")}
-            style={{ marginRight: "4px" }}
-            className="p-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-white/10 shrink-0 shadow-md transition z-10"
-            aria-label="Rolar para esquerda"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-        )}
-
-        <div
-          ref={scrollContainerRef}
-          onScroll={checkScrollPosition}
-          className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 flex-1"
-        >
-          {subtabsList.map((tab) => {
-            const Icon = tab.icon;
-            const active = subTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setSubTab(tab.id)}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold shrink-0 transition border ${
-                  active
-                    ? "bg-violet-500/15 text-violet-300 border-violet-500/30 shadow-lg shadow-violet-500/10"
-                    : "bg-slate-900/60 text-slate-300 border-white/10 hover:bg-slate-800 hover:text-white"
-                }`}
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {showRightArrow && (
-          <button
-            type="button"
-            onClick={() => scrollSubmenu("right")}
-            style={{ marginLeft: "4px" }}
-            className="p-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-white/10 shrink-0 shadow-md transition z-10"
-            aria-label="Rolar para direita"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        )}
-      </div>
+      {/* Menu horizontal global: setas externas e distância de 4px. */}
+      <HorizontalMenu ariaLabel="Menu do Painel Administrativo" trackClassName="py-1">
+        {subtabsList.map((tab) => {
+          const Icon = tab.icon;
+          const active = subTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setSubTab(tab.id)}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold shrink-0 transition border ${
+                active
+                  ? "bg-violet-500/15 text-violet-300 border-violet-500/30 shadow-lg shadow-violet-500/10"
+                  : "bg-slate-900/60 text-slate-300 border-white/10 hover:bg-slate-800 hover:text-white"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" />
+              {tab.label}
+            </button>
+          );
+        })}
+      </HorizontalMenu>
 
       {/* Conteúdo da sub-área selecionada */}
       <div className="rounded-2xl bg-slate-900/60 border border-white/10 p-6 backdrop-blur-xl">
