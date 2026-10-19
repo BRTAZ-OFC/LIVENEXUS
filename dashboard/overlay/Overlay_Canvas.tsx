@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties } from "react";
-import { Plus } from "lucide-react";
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
 import HorizontalMenu from "../components/HorizontalMenu";
@@ -140,9 +139,6 @@ export default function OverlayCanvas() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [scenarios, setScenarios] = useState<OverlayRow[]>([]);
-  const [activeScenarioId, setActiveScenarioId] = useState("");
-  const [creatingScenario, setCreatingScenario] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -163,21 +159,22 @@ export default function OverlayCanvas() {
           throw new Error(payload.message || "Não foi possível carregar as overlays.");
         }
         const rows = payload.overlays as OverlayRow[];
-        const firstConfigured =
-          rows.find((row) => getCanvasConfig(row).instances.length > 0) || rows[0];
-        if (!cancelled) setScenarios(rows);
+        const requestedScenarioId = sessionStorage.getItem("livenexus_active_scenario_id");
+        const requestedScenario = requestedScenarioId
+          ? rows.find((row) => String(row.id ?? "") === requestedScenarioId)
+          : undefined;
+        const firstConfigured = requestedScenario
+          || rows.find((row) => getCanvasConfig(row).instances.length > 0)
+          || rows[0];
         if (!cancelled && firstConfigured) {
           setConfig(getCanvasConfig(firstConfigured));
-          setActiveScenarioId(String(firstConfigured.id ?? ""));
-        } else if (!cancelled) {
-          setActiveScenarioId("");
-          setConfig({
-            name: "Overlay",
-            visualizerSize: DEFAULT_SIZE,
-            instances: [],
-            background: EMPTY_BACKGROUND,
-          });
-        }
+          if (requestedScenario) sessionStorage.removeItem("livenexus_active_scenario_id");
+        } else if (!cancelled) setConfig({
+          name: "Overlay",
+          visualizerSize: DEFAULT_SIZE,
+          instances: [],
+          background: EMPTY_BACKGROUND,
+        });
       } catch (cause) {
         if (!cancelled) setError(cause instanceof Error ? cause.message : "Erro ao carregar o canvas.");
       } finally {
@@ -189,58 +186,6 @@ export default function OverlayCanvas() {
   }, []);
 
 
-
-  async function createScenario() {
-    const defaultName = `Cenário ${scenarios.length + 1}`;
-    const proposedName = window.prompt("Nome do cenário:", defaultName);
-    if (proposedName === null) return;
-
-    const name = proposedName.trim();
-    if (!name) return;
-
-    setCreatingScenario(true);
-    setError("");
-    try {
-      const id = `scenario-${Date.now()}`;
-      const response = await fetch("/api/overlay/canvas", {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          createNew: true,
-          overlay: {
-            id,
-            name,
-            visualizerSize: DEFAULT_SIZE,
-            instances: [],
-            background: EMPTY_BACKGROUND,
-          },
-        }),
-      });
-      const payload = await response.json();
-      if (!response.ok || !payload.ok || !payload.overlay) {
-        throw new Error(payload.message || "Não foi possível criar o cenário.");
-      }
-
-      const createdScenario = payload.overlay as OverlayRow;
-      setScenarios((current) => [...current, createdScenario]);
-      setActiveScenarioId(String(createdScenario.id ?? id));
-      setConfig(getCanvasConfig(createdScenario));
-      setSelectedInstanceId(null);
-      setGridSettings({
-        showGrid: false,
-        snapToGrid: false,
-        gridSize: 20,
-        showSafeAreas: false,
-        verticalGuides: [],
-        horizontalGuides: [],
-      });
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Não foi possível criar o cenário.");
-    } finally {
-      setCreatingScenario(false);
-    }
-  }
 
   const size = useMemo(() => ({
     width: Math.max(320, Number(config.visualizerSize?.width) || DEFAULT_SIZE.width),
@@ -340,44 +285,7 @@ export default function OverlayCanvas() {
   );
 
   return (
-    <section className="flex w-full min-w-0 flex-col items-stretch gap-3 overflow-hidden">
-      <div className="flex w-full min-w-0 items-center justify-between gap-3 rounded-lg border border-white/10 bg-slate-950/50 p-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <label htmlFor="overlay-scenario-select" className="shrink-0 text-xs font-semibold text-slate-200">
-            Cenário
-          </label>
-          <select
-            id="overlay-scenario-select"
-            value={activeScenarioId}
-            disabled={loading || scenarios.length === 0}
-            onChange={(event) => {
-              const selected = scenarios.find((scenario) => String(scenario.id ?? "") === event.target.value);
-              if (!selected) return;
-              setActiveScenarioId(String(selected.id ?? ""));
-              setConfig(getCanvasConfig(selected));
-              setSelectedInstanceId(null);
-              setError("");
-            }}
-            className="min-w-0 max-w-full rounded-md border border-white/10 bg-slate-900 px-3 py-2 text-xs text-slate-100 outline-none focus:border-violet-400"
-          >
-            {scenarios.length === 0 && <option value="">Nenhum cenário criado</option>}
-            {scenarios.map((scenario, index) => (
-              <option key={String(scenario.id ?? index)} value={String(scenario.id ?? "")}>
-                {String(scenario.name ?? getCanvasConfig(scenario).name ?? `Cenário ${index + 1}`)}
-              </option>
-            ))}
-          </select>
-        </div>
-        <button
-          type="button"
-          onClick={() => void createScenario()}
-          disabled={creatingScenario || loading}
-          className="inline-flex shrink-0 items-center gap-2 rounded-md border border-violet-400/40 bg-violet-500/15 px-3 py-2 text-xs font-semibold text-violet-100 transition hover:bg-violet-500/25 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Plus size={14} aria-hidden="true" />
-          {creatingScenario ? "Criando..." : "Criar cenário"}
-        </button>
-      </div>
+    <section className="flex w-full min-w-0 flex-col items-center gap-2 overflow-hidden">
       <div className="w-full min-w-0">
         <HorizontalMenu ariaLabel="Widgets de Overlay" className="w-full">
           {catalog.filter((widget) => widget.implemented !== false).map((widget) => (
