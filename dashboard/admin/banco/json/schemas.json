@@ -1,0 +1,300 @@
+{
+  "ativacoes": {
+    "id": "ativacoes",
+    "name": "Ativações",
+    "fields": [
+      {
+        "name": "email",
+        "type": "texto"
+      },
+      {
+        "name": "code",
+        "type": "texto"
+      },
+      {
+        "name": "expires_at",
+        "type": "data"
+      },
+      {
+        "name": "created_at",
+        "type": "data"
+      }
+    ]
+  },
+  "biblioteca": {
+    "id": "biblioteca",
+    "name": "Biblioteca",
+    "fields": [
+      {
+        "name": "user_id",
+        "type": "texto"
+      },
+      {
+        "name": "songs",
+        "type": "lista"
+      },
+      {
+        "name": "albums",
+        "type": "lista"
+      },
+      {
+        "name": "artists",
+        "type": "lista"
+      },
+      {
+        "name": "playlists",
+        "type": "lista"
+      }
+    ]
+  },
+  "cenarios": {
+    "id": "cenarios",
+    "name": "Cenários",
+    "fields": [
+      {
+        "name": "id",
+        "type": "texto"
+      },
+      {
+        "name": "user_id",
+        "type": "texto"
+      },
+      {
+        "name": "name",
+        "type": "texto"
+      },
+      {
+        "name": "config",
+        "type": "objeto"
+      },
+      {
+        "name": "created_at",
+        "type": "data"
+      }
+    ]
+  },
+  "galeria": {
+    "id": "galeria",
+    "name": "Galeria",
+    "fields": [
+      {
+        "name": "id",
+        "type": "texto"
+      },
+      {
+        "name": "user_id",
+        "type": "texto opcional"
+      },
+      {
+        "name": "filename",
+        "type": "texto"
+      },
+      {
+        "name": "url",
+        "type": "texto"
+      },
+      {
+        "name": "size",
+        "type": "número"
+      },
+      {
+        "name": "uploaded_at",
+        "type": "data"
+      }
+    ]
+  },
+  "image_store": {
+    "id": "image_store",
+    "name": "Armazenamento de imagens",
+    "fields": [
+      {
+        "name": "filename",
+        "type": "texto"
+      },
+      {
+        "name": "user_id",
+        "type": "texto opcional"
+      },
+      {
+        "name": "data",
+        "type": "texto"
+      },
+      {
+        "name": "source",
+        "type": "texto"
+      },
+      {
+        "name": "updated_at",
+        "type": "data"
+      }
+    ]
+  },
+  "messages": {
+    "id": "messages",
+    "name": "Mensagens",
+    "fields": [
+      {
+        "name": "id",
+        "type": "texto"
+      },
+      {
+        "name": "user_id",
+        "type": "texto opcional"
+      },
+      {
+        "name": "name",
+        "type": "texto"
+      },
+      {
+        "name": "email",
+        "type": "texto"
+      },
+      {
+        "name": "category",
+        "type": "texto"
+      },
+      {
+        "name": "message",
+        "type": "texto"
+      },
+      {
+        "name": "status",
+        "type": "texto"
+      },
+      {
+        "name": "created_at",
+        "type": "data"
+      }
+    ]
+  },
+  "metricas": {
+    "id": "metricas",
+    "name": "Métricas",
+    "fields": [
+      {
+        "name": "id",
+        "type": "texto"
+      },
+      {
+        "name": "user_id",
+        "type": "texto"
+      },
+      {
+        "name": "type",
+        "type": "texto"
+      },
+      {
+        "name": "data",
+        "type": "objeto"
+      },
+      {
+        "name": "created_at",
+        "type": "data"
+      }
+    ]
+  },
+  "overlays": {
+    "id": "overlays",
+    "name": "Overlays",
+    "fields": [
+      {
+        "name": "id",
+        "type": "texto"
+      },
+      {
+        "name": "user_id",
+        "type": "texto"
+      },
+      {
+        "name": "name",
+        "type": "texto"
+      },
+      {
+        "name": "type",
+        "type": "texto"
+      },
+      {
+        "name": "settings",
+        "type": "objeto"
+      },
+      {
+        "name": "created_at",
+        "type": "data"
+      }
+    ]
+  },
+  "rtc_registry": {
+    "id": "rtc_registry",
+    "name": "Identidades RTC",
+    "fields": [
+      {
+        "name": "user_id",
+        "type": "texto"
+      },
+      {
+        "name": "rtcId",
+        "type": "texto"
+      },
+      {
+        "name": "created_at",
+        "type": "data"
+      },
+      {
+        "name": "updated_at",
+        "type": "data"
+      }
+    ]
+  },
+  "templates": {
+    "id": "templates",
+    "name": "Modelos",
+    "fields": [
+      {
+        "name": "id",
+        "type": "texto"
+      },
+      {
+        "name": "name",
+        "type": "texto"
+      },
+      {
+        "name": "original_name",
+        "type": "texto"
+      },
+      {
+        "name": "local_path",
+        "type": "texto"
+      },
+      {
+        "name": "url",
+        "type": "texto"
+      },
+      {
+        "name": "format",
+        "type": "texto"
+      },
+      {
+        "name": "category",
+        "type": "texto"
+      }
+    ]
+  },
+  "schemas": {
+    "id": "schemas",
+    "name": "Esquemas",
+    "fields": [
+      {
+        "name": "id",
+        "type": "texto"
+      },
+      {
+        "name": "name",
+        "type": "texto"
+      },
+      {
+        "name": "fields",
+        "type": "lista"
+      }
+    ]
+  }
+}
