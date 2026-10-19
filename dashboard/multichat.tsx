@@ -53,7 +53,7 @@ export function getMultiChatSnapshot() { return snapshot; }
 export function subscribeMultiChat(listener: (value: MultiChatSnapshot) => void) {
   listeners.add(listener);
   listener(snapshot);
-  return () => listeners.delete(listener);
+  return () => { listeners.delete(listener); };
 }
 export function useMultiChatSnapshot() {
   const [value, setValue] = useState(snapshot);
@@ -67,7 +67,7 @@ export function setMultiChatChannel(platform: ChatPlatform, channel: string) {
 export function subscribeTtsMessages(listener: (message: MultiChatMessage) => void) {
   ttsListeners.add(listener);
   while (pendingTts.length) listener(pendingTts.shift()!);
-  return () => ttsListeners.delete(listener);
+  return () => { ttsListeners.delete(listener); };
 }
 function publishTts(message: MultiChatMessage) {
   if (ttsListeners.size) ttsListeners.forEach((listener) => listener(message));
