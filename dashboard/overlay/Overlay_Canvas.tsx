@@ -238,7 +238,36 @@ export default function OverlayCanvas() {
   );
 
   return (
-    <section className="flex w-full min-w-0 justify-center overflow-hidden">
+    <section className="flex w-full min-w-0 flex-col items-center gap-2 overflow-hidden">
+      <div className="w-full min-w-0">
+        <HorizontalMenu ariaLabel="Categorias de widgets" className="w-full">
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              type="button"
+              onClick={() => setActiveCategory(category.id)}
+              aria-pressed={activeCategory === category.id}
+              className={`shrink-0 rounded-md border px-3 py-1.5 text-xs transition ${activeCategory === category.id ? "border-violet-400/60 bg-violet-500/20 text-violet-200" : "border-white/10 bg-slate-900/70 text-slate-300 hover:bg-slate-800"}`}
+            >
+              {category.label}
+            </button>
+          ))}
+        </HorizontalMenu>
+        <HorizontalMenu ariaLabel={`Widgets de ${activeCategory}`} className="mt-1 w-full">
+          {categoryWidgets.map((widget) => (
+            <button
+              key={widget.id}
+              type="button"
+              onClick={() => addWidget(widget)}
+              title={`Adicionar ${widget.name} ao canvas`}
+              className="shrink-0 rounded-md border border-white/10 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"
+            >
+              {widget.name}
+            </button>
+          ))}
+        </HorizontalMenu>
+      </div>
+      <div className="flex w-full min-w-0 justify-center overflow-hidden">
       <div
         ref={frameRef}
         className="relative mx-auto shrink-0 overflow-hidden bg-transparent"
@@ -339,6 +368,7 @@ export default function OverlayCanvas() {
           onPointerUp={() => { resizeStart.current = null; }}
           onPointerCancel={() => { resizeStart.current = null; }}
         />
+      </div>
       </div>
     </section>
   );
