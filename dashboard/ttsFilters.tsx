@@ -267,7 +267,7 @@ export function recordTtsQueueBlock(message: Pick<MultiChatMessage, "id" | "plat
   if (diag.events.length > 100) diag.events.length = 100;
   emitDiag();
 }
-export function recordTtsQueueDrop(message: Pick<MultiChatMessage, "id" | "platform" | "author" | "text">, reason: string) {
+export function recordTtsQueueDrop(message: { id: string | number; platform: ChatPlatform; author: string; text: string }, reason: string) {
   diag.blocked++;
   diag.reasons[reason] = (diag.reasons[reason] || 0) + 1;
   diag.events.unshift({ id: message.id + "-dropped", time: Date.now(), platform: message.platform, author: message.author, decision: "BLOQUEADA", reason, text: message.text });
