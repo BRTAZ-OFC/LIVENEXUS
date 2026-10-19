@@ -284,7 +284,7 @@
 }
 .dash-chat-panel,
 .dash-speakers-panel {
-  @apply flex min-h-[560px] min-w-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0d1120];
+  @apply flex h-[640px] min-h-[640px] min-w-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0d1120];
 }
 .dash-panel-header {
   @apply flex items-center justify-between gap-3 border-b border-white/10 px-4 py-4;
@@ -342,6 +342,7 @@
 .dash-speakers-empty strong { @apply text-xs font-semibold text-slate-300; }
 .dash-speakers-empty span { @apply text-[11px] leading-4 text-slate-500; }
 .dash-speakers-list { @apply flex-1 divide-y divide-white/5 px-3; }
+.dash-speakers-list li.is-empty { @apply opacity-45; }
 .dash-speakers-list li { @apply flex min-w-0 items-center gap-2 py-3; }
 .dash-speaker-rank { @apply w-4 shrink-0 text-center text-[10px] font-bold text-slate-500; }
 .dash-speaker-avatar { @apply flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px] text-slate-400; }
@@ -354,5 +355,6 @@
   .dash-live-workspace { grid-template-columns: minmax(0, 1fr) 280px; }
 }
 @media (max-width: 899px) {
-  .dash-chat-panel, .dash-speakers-panel { min-height: 420px; }
+  .dash-live-workspace { @apply grid-cols-1; }
+  .dash-chat-panel, .dash-speakers-panel { height: 640px; min-height: 640px; }
 }
