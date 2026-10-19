@@ -675,6 +675,60 @@ app.get("/api/overlay/canvas", async (req: Request, res: Response) => {
   }
 });
 
+/* Grava a composição do canvas de Overlay no JSON do usuário autenticado. */
+app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) {
+    return res.status(401).set(NO_CACHE).json({
+      ok: false,
+      message: "Faça login para salvar o canvas de Overlay.",
+    });
+  }
+
+  const input = req.body?.overlay;
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    return res.status(400).set(NO_CACHE).json({
+      ok: false,
+      message: "Envie a configuração do canvas no campo overlay.",
+    });
+  }
+
+  try {
+    const rows = await listJsonTableRecords("overlays");
+    const ownedRows = rows.filter((row: Record<string, unknown>) => String(row["user_id"] ?? "") === session.user_id);
+    const requestedId = String(input.id ?? "");
+    const existing = ownedRows.find((row: Record<string, unknown>) => requestedId && String(row["id"] ?? "") === requestedId)
+      || ownedRows[0];
+
+    const settings = { ...input } as Record<string, unknown>;
+    delete settings["id"];
+    delete settings["user_id"];
+    delete settings["__rowKey"];
+
+    const record = {
+      ...(existing || {}),
+      id: String(existing?.["id"] ?? input.id ?? ""),
+      user_id: session.user_id,
+      name: String(input.name ?? existing?.["name"] ?? "Overlay"),
+      settings,
+      updated_at: new Date().toISOString(),
+    };
+
+    delete (record as Record<string, unknown>)["__rowKey"];
+
+    const saved = existing
+      ? await updateJsonTableRecord("overlays", String(existing["__rowKey"]), record)
+      : await createJsonTableRecord("overlays", record);
+
+    return res.set(NO_CACHE).json({ ok: true, overlay: saved });
+  } catch (error) {
+    return res.status(500).set(NO_CACHE).json({
+      ok: false,
+      message: errorMessage(error, "Não foi possível salvar o canvas de Overlay."),
+    });
+  }
+});
+
 /* CRUD administrativo genérico das tabelas JSON que não possuem CRUD específico. */
 app.get("/api/database/json-tables", async (req: Request, res: Response) => {
   if (!requireAdmin(req, res)) return;
