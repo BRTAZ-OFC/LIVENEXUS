@@ -19,7 +19,6 @@ export default function HorizontalScrollContainer({
     <HorizontalMenu
       ariaLabel="Opções do editor de Overlay"
       className={className}
-      trackClassName="overflow-hidden"
     >
       <div className={`flex w-max min-w-max items-center ${contentClassName}`}>
         {children}
