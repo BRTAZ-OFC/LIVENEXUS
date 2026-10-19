@@ -317,8 +317,6 @@ export default function OverlayEditorSidebar({
 }) {
   const { connections, streamMeta, liveActivity } = useStreaming();
   const [activeTab, setActiveTab] = useState('widget');
-  const [modalTab, setModalTab] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFontCategory, setSelectedFontCategory] = useState('Sans Moderna');
   const [librarySearchQuery, setLibrarySearchQuery] = useState('');
   const [libraryFavorites, setLibraryFavorites] = useState([]);
@@ -607,10 +605,7 @@ export default function OverlayEditorSidebar({
             return (
               <button
                 key={tab.id}
-                onClick={() => {
-                  setModalTab(tab.id);
-                  setIsModalOpen(true);
-                }}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex-shrink-0 flex flex-col items-center py-1.5 px-2.5 rounded-lg text-[10px] font-medium transition-all ${
                   isActive 
                     ? 'bg-purple-600/30 text-purple-200 border border-purple-500/40' 
@@ -3770,25 +3765,7 @@ export default function OverlayEditorSidebar({
 
         </div>
       </div>
-      {/* Simple Modal Implementation */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-slate-900 border border-white/20 rounded-xl w-[800px] h-[600px] flex flex-col shadow-2xl">
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
-              <h3 className="text-sm font-bold text-white capitalize">{modalTab}</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-4 text-xs text-white">
-              {/* Content mapped from tab id */}
-              {modalTab === 'widget' && <p>Conteúdo de Widget</p>}
-              {modalTab === 'config' && <p>Conteúdo de Config</p>}
-              {/* ... and so on ... */}
-            </div>
-          </div>
-        </div>
-      )}
+
     </aside>
   );
 }
