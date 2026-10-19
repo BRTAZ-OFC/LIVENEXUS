@@ -3,7 +3,7 @@ import DatabasePage from "./admin/banco";
 import AdminPanel from "./admin/panel";
 import TTSPage from "./tts";
 import PlatformBioConnections from "./conexao/PlatformBioConnections";
-import OverlaySection from "./overlay/Overlay_Section";
+import OverlayCanvas from "./overlay/Overlay_Canvas";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import { useEffect, useState } from "react";
 import {
@@ -253,7 +253,7 @@ function DashboardPage() {
           <PlatformBioConnections />
         </div>
         <div className={activeSection === "overlay" ? "dash-w-full-px-6-5ebeye" : "hidden"}>
-          <OverlaySection />
+          <OverlayCanvas />
         </div>
         {activeSection === "overview" ? (
           <section className="dash-overview">
