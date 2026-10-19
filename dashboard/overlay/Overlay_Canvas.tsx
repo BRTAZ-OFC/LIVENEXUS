@@ -119,13 +119,15 @@ function backgroundStyle(background: CanvasBackground): CSSProperties {
 
 /**
  * Somente o canvas de Overlay do BACKUP01, adaptado ao catálogo e ao multichat do LIVENEXUS.
- * Não inclui barra de ferramentas, painel lateral, seleção, alças ou ações de edição.
+ * Mantém apenas o canvas, com seleção, arraste e redimensionamento direto das widgets.
  */
 export default function OverlayCanvas() {
   const frameRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [displaySize, setDisplaySize] = useState(DEFAULT_SIZE);
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
+  const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
+  const widgetPointer = useRef<{ index: number; mode: "move" | "resize"; x: number; y: number; left: number; top: number; width: number; height: number } | null>(null);
   const [config, setConfig] = useState<CanvasConfig>({
     name: "Overlay",
     visualizerSize: DEFAULT_SIZE,
@@ -263,6 +265,8 @@ export default function OverlayCanvas() {
                 widgetConfig["flipH"] ? "scaleX(-1)" : "",
                 widgetConfig["flipV"] ? "scaleY(-1)" : "",
               ].filter(Boolean).join(" ");
+              const instanceId = instance.id || `${instance.widgetId}-${index}`;
+              const isSelected = selectedInstanceId === instanceId;
               const instanceStyle: CSSProperties = {
                 position: "absolute",
                 left: Number(instance.x) || 0,
@@ -270,12 +274,68 @@ export default function OverlayCanvas() {
                 width,
                 height,
                 zIndex: Number(instance.zIndex) || index + 1,
-                overflow: "hidden",
+                overflow: "visible",
                 opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100,
                 transform: transform || undefined,
+                outline: isSelected ? "1px solid #a78bfa" : "none",
+                cursor: "move",
+                touchAction: "none",
               };
               return (
-                <div key={instance.id || `${instance.widgetId}-${index}`} style={instanceStyle}>
+                <div
+                  key={instanceId}
+                  style={instanceStyle}
+                  onPointerDown={(event) => {
+                    setSelectedInstanceId(instanceId);
+                    if ((event.target as HTMLElement).closest("button,input,textarea,select,a,[data-no-widget-drag]")) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    widgetPointer.current = {
+                      index,
+                      mode: "move",
+                      x: event.clientX,
+                      y: event.clientY,
+                      left: Number(instance.x) || 0,
+                      top: Number(instance.y) || 0,
+                      width,
+                      height,
+                    };
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                    setConfig((current) => {
+                      const instances = [...(current.instances || [])];
+                      const maxZ = instances.reduce((max, item) => Math.max(max, Number(item.zIndex) || 0), 0);
+                      if (instances[index]) instances[index] = { ...instances[index], zIndex: maxZ + 1 };
+                      return { ...current, instances };
+                    });
+                  }}
+                  onPointerMove={(event) => {
+                    const drag = widgetPointer.current;
+                    if (!drag || drag.index !== index || !(event.buttons & 1)) return;
+                    const dx = (event.clientX - drag.x) / scale;
+                    const dy = (event.clientY - drag.y) / scale;
+                    setConfig((current) => {
+                      const instances = [...(current.instances || [])];
+                      const item = instances[index];
+                      if (!item) return current;
+                      if (drag.mode === "move") {
+                        instances[index] = {
+                          ...item,
+                          x: Math.max(0, Math.min(size.width - drag.width, drag.left + dx)),
+                          y: Math.max(0, Math.min(size.height - drag.height, drag.top + dy)),
+                        };
+                      } else {
+                        instances[index] = {
+                          ...item,
+                          width: Math.max(40, Math.min(size.width - drag.left, drag.width + dx)),
+                          height: Math.max(20, Math.min(size.height - drag.top, drag.height + dy)),
+                        };
+                      }
+                      return { ...current, instances };
+                    });
+                  }}
+                  onPointerUp={() => { widgetPointer.current = null; }}
+                  onPointerCancel={() => { widgetPointer.current = null; }}
+                >
                   <div className="h-full w-full overflow-hidden">
                     <OverlayWidgetElementRenderer
                       widgetId={instance.widgetId}
@@ -289,6 +349,30 @@ export default function OverlayCanvas() {
                       instanceName={instance.name}
                     />
                   </div>
+                  {isSelected && (
+                    <div
+                      role="separator"
+                      aria-label={`Redimensionar ${instance.name || definition.name}`}
+                      title="Arraste para ajustar o tamanho"
+                      className="absolute bottom-0 right-0 z-50 h-3 w-3 cursor-se-resize border border-white bg-violet-500"
+                      style={{ touchAction: "none" }}
+                      onPointerDown={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        widgetPointer.current = {
+                          index,
+                          mode: "resize",
+                          x: event.clientX,
+                          y: event.clientY,
+                          left: Number(instance.x) || 0,
+                          top: Number(instance.y) || 0,
+                          width,
+                          height,
+                        };
+                        event.currentTarget.parentElement?.setPointerCapture(event.pointerId);
+                      }}
+                    />
+                  )}
                 </div>
               );
             })}
