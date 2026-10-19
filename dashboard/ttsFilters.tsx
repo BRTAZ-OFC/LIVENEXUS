@@ -102,33 +102,7 @@ function defaultConfig(): TtsFilterConfig {
   };
 }
 function loadConfig(): TtsFilterConfig {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultConfig();
-    const parsed = JSON.parse(raw);
-    const merge = (value: Partial<RuleSet> | undefined): RuleSet => ({
-      ...defaultRules(),
-      ...(value || {}),
-      roles: { ...defaultRules().roles, ...(value?.roles || {}) },
-      events: { ...defaultRules().events, ...(value?.events || {}) },
-      content: { ...defaultRules().content, ...(value?.content || {}) },
-      priorities: { ...defaultRules().priorities, ...(value?.priorities || {}) },
-      bannedWords: Array.isArray(value?.bannedWords) ? value.bannedWords.map(String) : [],
-      triggers: Array.isArray(value?.triggers) ? value.triggers : [],
-    });
-    return {
-      mode: parsed.mode === "custom" ? "custom" : "free",
-      scope: parsed.scope === "perPlatform" ? "perPlatform" : "shared",
-      shared: merge(parsed.shared),
-      perPlatform: {
-        Twitch: merge(parsed.perPlatform?.Twitch),
-        Kick: merge(parsed.perPlatform?.Kick),
-        YouTube: merge(parsed.perPlatform?.YouTube),
-      },
-    };
-  } catch {
-    return defaultConfig();
-  }
+  return defaultConfig();
 }
 let config = loadConfig();
 const configListeners = new Set<() => void>();
@@ -181,9 +155,6 @@ export function getTtsFilterConfig() {
 }
 export function setTtsFilterConfig(next: TtsFilterConfig) {
   config = next;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  } catch {}
   emitConfig();
 }
 export function useTtsFilterConfig() {
