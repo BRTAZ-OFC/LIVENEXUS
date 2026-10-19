@@ -108,7 +108,7 @@ export default function AdminConnectionsPage() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-white">Conexões administrativas</h2>
-          <p className="mt-1 text-xs text-slate-400">Conectores globais do multichat. Permanecem ativos ao navegar entre as abas da plataforma.</p>
+          <p className="mt-1 text-xs text-slate-400">Conexões da conta autenticada. Os canais são salvos no JSON vinculados ao user_id.</p>
         </div>
         <button type="button" onClick={clearAll} className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-300 hover:bg-red-500/20">
           <Trash2 size={14} /> Desconectar todas
