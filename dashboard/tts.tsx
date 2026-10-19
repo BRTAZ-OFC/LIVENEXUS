@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AudioLines, Clock3, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
 import "./css/tts.css";
 import { playProcessedSpeech, type PlaybackHandle } from "./ttsAudioEngine";
-import { subscribeTtsMessages } from "./multichat";
-import { getTtsFilterConfig, TtsFiltersPanel } from "./ttsFilters";
+import { subscribeTtsMessages, type ChatPlatform } from "./multichat";
+import { getTtsFilterConfig, recordTtsQueueBlock, TtsFiltersPanel } from "./ttsFilters";
 
 type VoiceEffect = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
 type TtsSettings = {
@@ -47,7 +47,7 @@ function formatEventName(eventType: string) {
   return EVENT_NAMES[eventType.toLowerCase()] ?? eventType.replace(/^(twitch|kick|youtube)_/, "").replace(/_/g, " ");
 }
 
-type QueueItem = { id: number; text: string; author: string; tier: "broadcaster" | "moderator" | "vip" | "subscriber" | "normal"; queuedAt: number };
+type QueueItem = { id: number; text: string; author: string; platform: ChatPlatform; tier: "broadcaster" | "moderator" | "vip" | "subscriber" | "normal"; queuedAt: number };
 const PRIORITY: Record<QueueItem["tier"], number> = { broadcaster: 1, moderator: 2, vip: 3, subscriber: 3, normal: 4 };
 const TTL: Record<QueueItem["tier"], number> = { broadcaster: 120000, moderator: 90000, vip: 45000, subscriber: 45000, normal: 30000 };
 
@@ -99,7 +99,7 @@ export default function TTSPage() {
       : roles.includes("moderator") ? "moderator"
       : roles.includes("vip") ? "vip"
       : roles.includes("subscriber") ? "subscriber" : "normal";
-    const item: QueueItem = { id: ++idRef.current, text, author: message.author, tier, queuedAt: Date.now() };
+    const item: QueueItem = { id: ++idRef.current, text, author: message.author, platform: message.platform, tier, queuedAt: Date.now() };
     const filterConfig = getTtsFilterConfig();
     const filterRules = filterConfig.scope === "perPlatform" ? filterConfig.perPlatform[message.platform] : filterConfig.shared;
     const currentQueue = queueRef.current;
@@ -107,6 +107,7 @@ export default function TTSPage() {
     const queueLimit = filterConfig.mode === "custom" && filterRules.queueLimitEnabled ? filterRules.queueMax : 200;
     if (next.length > queueLimit) {
       if (filterConfig.mode === "custom" && filterRules.queueLimitEnabled && filterRules.queuePolicy === "reject") {
+        recordTtsQueueBlock(message, "Limite da fila TTS");
         setNotice("Mensagem descartada: limite da fila TTS atingido.");
         return;
       }
@@ -116,6 +117,7 @@ export default function TTSPage() {
           : (5 - PRIORITY[entry.tier]);
         const worstIndex = next.reduce((worst, entry, index, all) => rank(entry) < rank(all[worst]) ? index : worst, 0);
         if (worstIndex === next.length - 1 && rank(item) <= rank(next[worstIndex])) {
+          recordTtsQueueBlock(message, "Fila preservou mensagens de maior prioridade");
           setNotice("Mensagem descartada: a fila preservou mensagens de maior prioridade.");
           return;
         }
@@ -211,12 +213,19 @@ export default function TTSPage() {
     const normalItems = valid.filter((item) => item.tier === "normal");
     const fairnessSlot = selectionCountRef.current % 5 === 0 && normalItems.length > 0;
     const agedNormal = normalItems.find((item) => now - item.queuedAt >= 20000);
-    const hasPrivileged = valid.some((item) => PRIORITY[item.tier] < 4);
+    const rank = (item: QueueItem) => {
+      const filterConfig = getTtsFilterConfig();
+      const rules = filterConfig.scope === "perPlatform" ? filterConfig.perPlatform[item.platform] : filterConfig.shared;
+      return filterConfig.mode === "custom" && rules.priorityEnabled
+        ? 11 - (rules.priorities[item.tier] ?? 1)
+        : PRIORITY[item.tier];
+    };
+    const hasPrivileged = valid.some((item) => rank(item) < rank({ ...item, tier: "normal" }));
     const selected = fairnessSlot
       ? normalItems[0]
       : (!hasPrivileged && agedNormal
           ? agedNormal
-          : valid.slice().sort((a, b) => PRIORITY[a.tier] - PRIORITY[b.tier] || a.queuedAt - b.queuedAt)[0]);
+          : valid.slice().sort((a, b) => rank(a) - rank(b) || a.queuedAt - b.queuedAt)[0]);
     if (!selected) return;
     setQueue((old) => old.filter((item) => item.id !== selected.id));
     queueRef.current = queueRef.current.filter((item) => item.id !== selected.id);
@@ -232,7 +241,7 @@ export default function TTSPage() {
   function addDemoMessage(tier: QueueItem["tier"] = "normal") {
     const text = testText.trim().slice(0, settings.maxChars > 0 ? settings.maxChars : undefined);
     if (!text) { setNotice("Digite o texto de teste antes de adicionar à fila."); return; }
-    const item = { id: ++idRef.current, text, author: tier === "normal" ? "Teste" : tier, tier, queuedAt: Date.now() } satisfies QueueItem;
+    const item = { id: ++idRef.current, text, author: tier === "normal" ? "Teste" : tier, platform: "Twitch" as const, tier, queuedAt: Date.now() } satisfies QueueItem;
     setQueue((old) => {
       let next = [...old, item];
       if (next.length > 200) {
