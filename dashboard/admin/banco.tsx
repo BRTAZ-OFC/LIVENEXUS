@@ -49,6 +49,28 @@ type ReviewDraft = {
   resposta_admin: string;
 };
 
+type PlatformRow = {
+  id: string;
+  user_id: string;
+  youtube?: string | null;
+  youtube_status?: string | null;
+  twitch?: string | null;
+  twitch_status?: string | null;
+  kick?: string | null;
+  kick_status?: string | null;
+  status?: string | null;
+  verifiedAt?: string | null;
+};
+
+type PlatformDraft = {
+  youtube: string;
+  youtube_status: string;
+  twitch: string;
+  twitch_status: string;
+  kick: string;
+  kick_status: string;
+};
+
 /* BLOCO 4 — Helpers para formatar valores, datas e cabeçalhos de autenticação. */
 function displayValue(value: unknown) {
   if (value === null || value === undefined || value === "") return "—";
@@ -92,6 +114,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     }
     if (table === "usuarios") void loadUsers();
     else if (table === "avaliacoes") void loadReviews();
+    else if (table === "plataformas") void loadPlatforms();
   }
 
   const [users, setUsers] = useState<UserRow[]>([]);
@@ -104,11 +127,118 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   const [reviewEditingId, setReviewEditingId] = useState<string | null>(null);
   const [reviewToDelete, setReviewToDelete] = useState<ReviewRow | null>(null);
 
+  const [platforms, setPlatforms] = useState<PlatformRow[]>([]);
+  const [platformDraft, setPlatformDraft] = useState<PlatformDraft | null>(null);
+  const [platformEditingId, setPlatformEditingId] = useState<string | null>(null);
+  const [platformToDelete, setPlatformToDelete] = useState<PlatformRow | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  async function loadPlatforms() {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch("/api/database/plataformas", {
+        headers: getAuthHeaders(),
+        credentials: "include",
+        cache: "no-store",
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok)
+        throw new Error(result.message || "Falha ao carregar as plataformas.");
+      setPlatforms(result.plataformas);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível carregar as plataformas.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function confirmDeletePlatform(userId: string) {
+    if (deleting) return;
+    setDeleting(true);
+    setMessage("");
+    setError("");
+    try {
+      const response = await fetch("/api/database/plataformas", {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+        credentials: "include",
+        cache: "no-store",
+        body: JSON.stringify({ user_id: userId }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) {
+        throw new Error(result.message || "Não foi possível excluir a plataforma.");
+      }
+      setPlatforms((current) => current.filter((row) => row.user_id !== userId));
+      setPlatformToDelete(null);
+      setMessage(result.message || "Plataforma excluída com sucesso.");
+      void loadPlatforms();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Falha ao excluir a plataforma.");
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  function startEditingPlatform(row: PlatformRow) {
+    setPlatformEditingId(row.id);
+    setPlatformDraft({
+      youtube: row.youtube ?? "",
+      youtube_status: row.youtube_status ?? "",
+      twitch: row.twitch ?? "",
+      twitch_status: row.twitch_status ?? "",
+      kick: row.kick ?? "",
+      kick_status: row.kick_status ?? "",
+    });
+    setMessage("");
+    setError("");
+  }
+
+  async function savePlatform(row: PlatformRow) {
+    if (!platformDraft) return;
+    setSaving(true);
+    setMessage("");
+    setError("");
+    try {
+      const response = await fetch("/api/database/plataformas", {
+        method: "PATCH",
+        headers: getAuthHeaders(),
+        credentials: "include",
+        cache: "no-store",
+        body: JSON.stringify({
+          user_id: row.user_id,
+          changes: {
+            id: row.id,
+            youtube: platformDraft.youtube.trim() || null,
+            youtube_status: platformDraft.youtube_status.trim() || null,
+            twitch: platformDraft.twitch.trim() || null,
+            twitch_status: platformDraft.twitch_status.trim() || null,
+            kick: platformDraft.kick.trim() || null,
+            kick_status: platformDraft.kick_status.trim() || null,
+          },
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível salvar.");
+      setPlatforms((current) =>
+        current.map((item) => (item.id === row.id ? result.plataforma : item)),
+      );
+      setPlatformEditingId(null);
+      setPlatformDraft(null);
+      setMessage("Plataforma atualizada com sucesso.");
+      void loadPlatforms();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível salvar as alterações.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   // BLOCO 6 — Busca os usuários pela API administrativa sem usar cache.
   async function loadUsers() {
@@ -216,6 +346,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     if (admin) {
       if (selectedTable === "usuarios") void loadUsers();
       else if (selectedTable === "avaliacoes") void loadReviews();
+      else if (selectedTable === "plataformas") void loadPlatforms();
     } else {
       setLoading(false);
     }
@@ -377,6 +508,14 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
             <Table2 className="db-h-3-5-w-3-5-l2ap6m" />
             <span className="db-text-9px-font-medium-18gwz7j">Avaliações</span>
           </button>
+          <button
+            type="button"
+            onClick={() => handleSelectTable("plataformas")}
+            className={`db-flex-w-full-oi8986 ${selectedTable === "plataformas" ? "db-bg-violet-500-15-text-vi-1xm6n2h" : "db-bg-white-5-sdteeg"}`}
+          >
+            <Table2 className="db-h-3-5-w-3-5-l2ap6m" />
+            <span className="db-text-9px-font-medium-18gwz7j">Plataformas</span>
+          </button>
         </nav>
       </aside>
 
@@ -406,19 +545,26 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
               <p className="db-text-9px-font-bold-ukmi15">TABELA SELECIONADA</p>
               <h1 className="db-mt-1-flex-590iju">
                 <Table2 className="db-h-5-w-5-36nguv" />{" "}
-                {selectedTable === "usuarios" ? "Usuários" : "Avaliações"}
+                {selectedTable === "usuarios"
+                  ? "Usuários"
+                  : selectedTable === "avaliacoes"
+                    ? "Avaliações"
+                    : "Plataformas"}
               </h1>
               <p className="db-mt-1-text-11px-fgeh1h">
                 {selectedTable === "usuarios"
                   ? "Registros da tabela Usuários. Edite os campos na linha e salve as alterações."
-                  : "Registros da tabela Avaliações. Edite as avaliações ou adicione respostas administrativas oficiais."}
+                  : selectedTable === "avaliacoes"
+                    ? "Registros da tabela Avaliações. Edite as avaliações ou adicione respostas administrativas oficiais."
+                    : "Registros da tabela Plataformas (conect-plataform.json). Gerencie os canais conectados e status de verificação por bio."}
               </p>
             </div>
             <button
               type="button"
               onClick={() => {
                 if (selectedTable === "usuarios") void loadUsers();
-                else void loadReviews();
+                else if (selectedTable === "avaliacoes") void loadReviews();
+                else void loadPlatforms();
               }}
               disabled={loading || deleting}
               className="db-inline-flex-items-center-39j1c2"
@@ -611,7 +757,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                 </table>
               </div>
             </div>
-          ) : (
+          ) : selectedTable === "avaliacoes" ? (
             <div className="db-mt-3-overflow-hidden-1sbx6fp">
               <div className="db-overflow-x-auto-1ytsssi">
                 <table className="db-w-full-min-w-0-ldzfuq">
@@ -808,6 +954,236 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                 </table>
               </div>
             </div>
+          ) : (
+            <div className="db-mt-3-overflow-hidden-1sbx6fp">
+              <div className="db-overflow-x-auto-1ytsssi">
+                <table className="db-w-full-min-w-0-ldzfuq">
+                  <thead className="db-border-b-border-white-10-1134gff">
+                    <tr>
+                      <th className="db-w-13-break-words-1g87fub">ID</th>
+                      <th className="db-px-2-5-py-2-4bicug">User ID</th>
+                      <th className="db-px-2-5-py-2-4bicug">YouTube</th>
+                      <th className="db-px-2-5-py-2-4bicug">YT Status</th>
+                      <th className="db-px-2-5-py-2-4bicug">Twitch</th>
+                      <th className="db-px-2-5-py-2-4bicug">Twitch Status</th>
+                      <th className="db-px-2-5-py-2-4bicug">Kick</th>
+                      <th className="db-px-2-5-py-2-4bicug">Kick Status</th>
+                      <th className="db-px-2-5-py-2-4bicug">Verificado em</th>
+                      <th className="db-px-2-5-py-2-4bicug">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="db-divide-y-divide-white-0--11j827l">
+                    {loading && platforms.length === 0 && (
+                      <tr>
+                        <td colSpan={10} className="db-px-4-py-10-sxzx56">
+                          Carregando plataformas…
+                        </td>
+                      </tr>
+                    )}
+                    {!loading && platforms.length === 0 && !error && (
+                      <tr>
+                        <td colSpan={10} className="db-px-4-py-10-sxzx56">
+                          A tabela ainda não possui plataformas conectadas.
+                        </td>
+                      </tr>
+                    )}
+                    {platforms.map((row) => {
+                      const editing = platformEditingId === row.id && platformDraft !== null;
+                      return (
+                        <tr key={row.id} className="db-bg-white-0-02-lcbolw">
+                          <td className="db-max-w-44-px-2-5-1uhmtbx" title={row.id}>
+                            {displayValue(row.id)}
+                          </td>
+                          <td className="db-max-w-44-px-2-5-1uhmtbx" title={row.user_id}>
+                            {displayValue(row.user_id)}
+                          </td>
+                          <td className="db-px-2-5-py-2-1not5md">
+                            {editing ? (
+                              <input
+                                value={platformDraft.youtube}
+                                onChange={(e) =>
+                                  setPlatformDraft({ ...platformDraft, youtube: e.target.value })
+                                }
+                                className="db-w-full-min-w-0-1o9jto"
+                                aria-label="YouTube channel"
+                              />
+                            ) : (
+                              <span
+                                className="db-font-semibold-text-white-19kgctp"
+                                title={row.youtube || ""}
+                              >
+                                {displayValue(row.youtube)}
+                              </span>
+                            )}
+                          </td>
+                          <td className="db-px-2-5-py-2-1not5md">
+                            {editing ? (
+                              <input
+                                value={platformDraft.youtube_status}
+                                onChange={(e) =>
+                                  setPlatformDraft({
+                                    ...platformDraft,
+                                    youtube_status: e.target.value,
+                                  })
+                                }
+                                className="db-w-full-min-w-0-1o9jto"
+                                aria-label="YouTube status"
+                              />
+                            ) : (
+                              <span
+                                className="db-rounded-md-bg-white-0-06-sgt1ga"
+                                title={row.youtube_status || ""}
+                              >
+                                {displayValue(row.youtube_status)}
+                              </span>
+                            )}
+                          </td>
+                          <td className="db-px-2-5-py-2-1not5md">
+                            {editing ? (
+                              <input
+                                value={platformDraft.twitch}
+                                onChange={(e) =>
+                                  setPlatformDraft({ ...platformDraft, twitch: e.target.value })
+                                }
+                                className="db-w-full-min-w-0-1o9jto"
+                                aria-label="Twitch channel"
+                              />
+                            ) : (
+                              <span
+                                className="db-font-semibold-text-white-19kgctp"
+                                title={row.twitch || ""}
+                              >
+                                {displayValue(row.twitch)}
+                              </span>
+                            )}
+                          </td>
+                          <td className="db-px-2-5-py-2-1not5md">
+                            {editing ? (
+                              <input
+                                value={platformDraft.twitch_status}
+                                onChange={(e) =>
+                                  setPlatformDraft({
+                                    ...platformDraft,
+                                    twitch_status: e.target.value,
+                                  })
+                                }
+                                className="db-w-full-min-w-0-1o9jto"
+                                aria-label="Twitch status"
+                              />
+                            ) : (
+                              <span
+                                className="db-rounded-md-bg-white-0-06-sgt1ga"
+                                title={row.twitch_status || ""}
+                              >
+                                {displayValue(row.twitch_status)}
+                              </span>
+                            )}
+                          </td>
+                          <td className="db-px-2-5-py-2-1not5md">
+                            {editing ? (
+                              <input
+                                value={platformDraft.kick}
+                                onChange={(e) =>
+                                  setPlatformDraft({ ...platformDraft, kick: e.target.value })
+                                }
+                                className="db-w-full-min-w-0-1o9jto"
+                                aria-label="Kick channel"
+                              />
+                            ) : (
+                              <span
+                                className="db-font-semibold-text-white-19kgctp"
+                                title={row.kick || ""}
+                              >
+                                {displayValue(row.kick)}
+                              </span>
+                            )}
+                          </td>
+                          <td className="db-px-2-5-py-2-1not5md">
+                            {editing ? (
+                              <input
+                                value={platformDraft.kick_status}
+                                onChange={(e) =>
+                                  setPlatformDraft({
+                                    ...platformDraft,
+                                    kick_status: e.target.value,
+                                  })
+                                }
+                                className="db-w-full-min-w-0-1o9jto"
+                                aria-label="Kick status"
+                              />
+                            ) : (
+                              <span
+                                className="db-rounded-md-bg-white-0-06-sgt1ga"
+                                title={row.kick_status || ""}
+                              >
+                                {displayValue(row.kick_status)}
+                              </span>
+                            )}
+                          </td>
+                          <td
+                            className="db-whitespace-nowrap-px-2-5-8kbajn"
+                            title={formatDate(row.verifiedAt || undefined)}
+                          >
+                            {displayValue(formatDate(row.verifiedAt || undefined))}
+                          </td>
+                          <td className="db-px-2-5-py-2-1not5md">
+                            {editing ? (
+                              <div className="db-flex-flex-wrap-1k8awxs">
+                                <button
+                                  type="button"
+                                  onClick={() => void savePlatform(row)}
+                                  disabled={saving}
+                                  className="db-inline-flex-max-w-full-108qdn7"
+                                >
+                                  <Save className="db-h-3-5-w-3-5-mho9dy" />{" "}
+                                  {saving ? "Salvando" : "Salvar"}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setPlatformEditingId(null);
+                                    setPlatformDraft(null);
+                                  }}
+                                  disabled={saving}
+                                  className="db-rounded-lg-border-ffggg6"
+                                  aria-label="Cancelar edição"
+                                >
+                                  <X className="db-h-4-w-4-3ulyf2" />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="db-flex-flex-wrap-agiabx">
+                                <button
+                                  type="button"
+                                  onClick={() => startEditingPlatform(row)}
+                                  disabled={deleting}
+                                  className="db-inline-flex-max-w-full-1710mde"
+                                >
+                                  <Pencil className="db-h-3-5-w-3-5-mho9dy" /> Editar
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setMessage("");
+                                    setError("");
+                                    setPlatformToDelete(row);
+                                  }}
+                                  disabled={deleting}
+                                  className="db-inline-flex-max-w-full-13vi12l"
+                                  title="Excluir plataforma"
+                                >
+                                  <Trash2 className="db-h-3-5-w-3-5-mho9dy" /> Excluir
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
 
           <p className="db-mt-2-text-10px-15p4c0e">
@@ -928,6 +1304,64 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     ) : (
                       <>
                         <Trash2 className="db-h-3-5-w-3-5-mho9dy" /> Excluir avaliação
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {platformToDelete && (
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="delete-platform-title"
+              className="db-fixed-inset-0-cet2d5"
+            >
+              <div className="db-w-full-max-w-md-9gxz7l">
+                <div className="db-flex-items-center-1bpln9w">
+                  <span className="db-flex-h-10-s20i5t">
+                    <Trash2 className="db-h-5-w-5-sv0uoi" />
+                  </span>
+                  <div>
+                    <h2 id="delete-platform-title" className="db-text-base-font-bold-1au4nai">
+                      Confirmar exclusão de plataforma
+                    </h2>
+                    <p className="db-text-xs-text-slate-400-1qmab5e">
+                      Esta ação não poderá ser desfeita.
+                    </p>
+                  </div>
+                </div>
+                <p className="db-mt-4-text-xs-1p2vnyp">
+                  Deseja realmente excluir as conexões de plataforma do usuário (ID:{" "}
+                  <span className="db-font-mono-text-slate-400-2q6jsq">
+                    {platformToDelete.user_id}
+                  </span>
+                  )? O registro será removido permanentemente do arquivo JSON conect-plataform.json.
+                </p>
+                <div className="db-mt-6-flex-t4d3go">
+                  <button
+                    type="button"
+                    onClick={() => setPlatformToDelete(null)}
+                    disabled={deleting}
+                    className="db-rounded-lg-border-8ndnc"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void confirmDeletePlatform(platformToDelete.user_id)}
+                    disabled={deleting}
+                    className="db-inline-flex-items-center-i4nxas"
+                  >
+                    {deleting ? (
+                      <>
+                        <RefreshCw className="db-h-3-5-w-3-5-172mrj8" /> Excluindo...
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="db-h-3-5-w-3-5-mho9dy" /> Excluir plataforma
                       </>
                     )}
                   </button>

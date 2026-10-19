@@ -1,1 +1,19 @@
-{}
+{
+  "ca10f56b-571e-4418-8ecf-65192e7d6695": [
+    {
+      "id": "20fd4229-4baa-48ab-ab18-e63ecf4741e8",
+      "user_id": "ca10f56b-571e-4418-8ecf-65192e7d6695",
+      "youtube": null,
+      "youtube_code": null,
+      "youtube_status": null,
+      "twitch": "brtaz_ofc",
+      "twitch_code": "LNX-65HVQ2",
+      "twitch_status": "verified",
+      "kick": "brtaz-ofc",
+      "kick_code": "LNX-3B28RC",
+      "kick_status": "verified",
+      "status": "verified",
+      "verifiedAt": "2026-10-19T11:53:30.910Z"
+    }
+  ]
+}

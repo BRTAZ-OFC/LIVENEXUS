@@ -20,7 +20,7 @@ export default defineConfig(() => ({
     allowedHosts: ["localhost", ".run.app"],
     // Ambientes hospedados que não encaminham WebSocket devem manter o HMR desligado.
     // Para habilitá-lo explicitamente em um ambiente compatível, defina ENABLE_HMR=true.
-    hmr: process.env["ENABLE_HMR"] === "true" ? undefined : false,
+    hmr: process.env["ENABLE_HMR"] === "true" ? {} : false,
     watch: process.env["ENABLE_HMR"] === "true" ? {} : null,
     proxy: {
       "/api": {

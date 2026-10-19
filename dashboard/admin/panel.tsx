@@ -4,6 +4,7 @@ import {
   House,
   Image,
   Layers,
+  Clapperboard,
   BookOpen,
   Star,
   HelpCircle,
@@ -15,6 +16,10 @@ import {
   User,
   MessageSquare,
   RadioTower,
+  Play,
+  CheckCircle2,
+  Sliders,
+  Tv,
 } from "lucide-react";
 import DatabasePage from "./banco";
 import ReviewsManager from "./reviews-manager";
@@ -42,7 +47,7 @@ type ReviewRow = {
 
 export default function AdminPanel() {
   const [subTab, setSubTab] = useState<
-    "inicial" | "galeria" | "overlay" | "biblioteca" | "avaliacoes" | "suporte" | "conexoes"
+    "inicial" | "galeria" | "overlay" | "cenarios" | "biblioteca" | "avaliacoes" | "suporte" | "conexoes"
   >("inicial");
 
   // Submenu scroll & arrows state
@@ -60,6 +65,11 @@ export default function AdminPanel() {
   // Editing state for users (Galeria / Overlay / Biblioteca)
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [userImagenDraft, setUserImagenDraft] = useState("");
+
+  // Cenários state
+  const [expandedScenesUserId, setExpandedScenesUserId] = useState<string | null>(null);
+  const [userActiveScenes, setUserActiveScenes] = useState<Record<string, string>>({});
+  const [previewingSceneKey, setPreviewingSceneKey] = useState<string | null>(null);
 
   function checkScrollPosition() {
     const el = scrollContainerRef.current;
@@ -144,6 +154,7 @@ export default function AdminPanel() {
     { id: "inicial", label: "Inicial", icon: House },
     { id: "galeria", label: "Galeria", icon: Image },
     { id: "overlay", label: "Overlay", icon: Layers },
+    { id: "cenarios", label: "Cenários", icon: Clapperboard },
     { id: "biblioteca", label: "Biblioteca", icon: BookOpen },
     { id: "avaliacoes", label: "Avaliações", icon: Star },
     { id: "suporte", label: "Suporte", icon: HelpCircle },
@@ -403,6 +414,277 @@ export default function AdminPanel() {
                 ))}
               </div>
             </div>
+          </div>
+        )}
+
+        {subTab === "cenarios" && (
+          <div className="space-y-4">
+            {users.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-400 bg-slate-950/60 rounded-xl border border-white/10">
+                {loading ? "Carregando usuários..." : "Nenhum usuário cadastrado encontrado."}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {users.map((u) => {
+                  const isExpanded = expandedScenesUserId === u.user_id;
+                  const activeScene = userActiveScenes[u.user_id] || "gameplay";
+
+                  return (
+                    <div
+                      key={u.user_id}
+                      className="rounded-xl bg-slate-950/60 border border-white/10 transition overflow-hidden"
+                    >
+                      <div className="p-4 flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="h-10 w-10 rounded-full bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300 shrink-0 overflow-hidden">
+                            {u.imagen ? (
+                              <img
+                                src={u.imagen}
+                                alt={u.user}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              u.user.slice(0, 2).toUpperCase()
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-xs font-semibold text-white truncate">{u.user}</p>
+                              <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-violet-500/10 text-violet-300 border border-violet-500/20">
+                                {u.role || "Streamer"}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-slate-400 truncate">ID: {u.user_id}</p>
+                          </div>
+                        </div>
+
+                        <div className="shrink-0 flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setExpandedScenesUserId(isExpanded ? null : u.user_id)
+                            }
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition border flex items-center gap-1.5 ${
+                              isExpanded
+                                ? "bg-violet-600 text-white border-violet-500 shadow-sm"
+                                : "bg-slate-800 text-slate-200 hover:bg-slate-700 border-white/10"
+                            }`}
+                          >
+                            <Clapperboard className="h-3.5 w-3.5 text-violet-300" />
+                            {isExpanded ? "Ocultar cenários" : "Exibir cenários"}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Exibição dos Cenários do Usuário Selecionado */}
+                      {isExpanded && (
+                        <div className="border-t border-white/10 p-5 bg-slate-900/60 space-y-4">
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-semibold text-violet-300 flex items-center gap-1.5">
+                              <Clapperboard className="h-4 w-4" />
+                              Cenários de Transmissão — {u.user}
+                            </p>
+                            <span className="text-[10px] text-slate-400">
+                              Resolução padrão: 1920 × 1080 (60 FPS)
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {[
+                              {
+                                id: "gameplay",
+                                title: "Cena Principal (Ao Vivo)",
+                                badge: "Transmissão Principal",
+                                badgeColor:
+                                  "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
+                                description:
+                                  "Foco na captura de tela/jogo com multichat flutuante lateral e alertas TTS ativos.",
+                                resolution: "1920 × 1080 (60 FPS)",
+                                transition: "Fade Suave (300ms)",
+                                elements: [
+                                  "Captura de Jogo / Janela 16:9",
+                                  "Overlay Multichat Flutuante",
+                                  "Alertas de Voz TTS Integrados",
+                                  "Status dos Canais Conectados",
+                                ],
+                              },
+                              {
+                                id: "chatting",
+                                title: "Bate-Papo & Reações (Just Chatting)",
+                                badge: "Interativo",
+                                badgeColor: "bg-cyan-500/10 text-cyan-300 border-cyan-500/20",
+                                description:
+                                  "Destaque expandido para a câmera com chat em largura total e top falantes.",
+                                resolution: "1920 × 1080 (60 FPS)",
+                                transition: "Slide Horizontal",
+                                elements: [
+                                  "Webcam Expandida em Alta Resolução",
+                                  "Top 10 Falantes em Tempo Real",
+                                  "Multichat Unificado",
+                                  "Contador de Espectadores",
+                                ],
+                              },
+                              {
+                                id: "brb",
+                                title: "Intervalo / Pausa (BRB)",
+                                badge: "Espera",
+                                badgeColor:
+                                  "bg-amber-500/10 text-amber-300 border-amber-500/20",
+                                description:
+                                  "Cena de pausa com timer regressivo, aviso de retorno em breve e trilha sonora.",
+                                resolution: "1920 × 1080 (60 FPS)",
+                                transition: "Corte Imediato",
+                                elements: [
+                                  "Temporizador Regressivo",
+                                  "Mensagem de Retorno em Breve",
+                                  "Feed de Chat em Modo Silencioso",
+                                  "Player de Música de Fundo",
+                                ],
+                              },
+                              {
+                                id: "ending",
+                                title: "Encerramento da Transmissão",
+                                badge: "Conclusão",
+                                badgeColor:
+                                  "bg-purple-500/10 text-purple-300 border-purple-500/20",
+                                description:
+                                  "Créditos finais, resumo de mensagens recebidas e agradecimentos aos espectadores.",
+                                resolution: "1920 × 1080 (60 FPS)",
+                                transition: "Fade to Black (500ms)",
+                                elements: [
+                                  "Resumo de Espectadores e Chat",
+                                  "Agradecimentos aos Seguidores",
+                                  "Créditos Rolantes da Live",
+                                  "Links Sociais e Próxima Transmissão",
+                                ],
+                              },
+                            ].map((scene) => {
+                              const isActive = activeScene === scene.id;
+                              const previewKey = `${u.user_id}_${scene.id}`;
+                              const isPreviewing = previewingSceneKey === previewKey;
+
+                              return (
+                                <div
+                                  key={scene.id}
+                                  className={`p-4 rounded-xl border transition flex flex-col justify-between ${
+                                    isActive
+                                      ? "bg-slate-950/80 border-violet-500/40 shadow-lg shadow-violet-500/5 ring-1 ring-violet-500/20"
+                                      : "bg-slate-950/60 border-white/10 hover:border-white/20"
+                                  }`}
+                                >
+                                  <div>
+                                    <div className="flex items-start justify-between gap-2 mb-2">
+                                      <div className="flex items-center gap-2">
+                                        <Tv className="h-4 w-4 text-violet-400 shrink-0" />
+                                        <h3 className="text-xs font-bold text-white">
+                                          {scene.title}
+                                        </h3>
+                                      </div>
+                                      <span
+                                        className={`px-2 py-0.5 rounded text-[10px] font-semibold border ${scene.badgeColor}`}
+                                      >
+                                        {scene.badge}
+                                      </span>
+                                    </div>
+
+                                    <p className="text-[11px] text-slate-300 leading-relaxed mb-3">
+                                      {scene.description}
+                                    </p>
+
+                                    <div className="space-y-1 mb-3">
+                                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                                        Elementos da Cena:
+                                      </p>
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-[10px] text-slate-300">
+                                        {scene.elements.map((el, idx) => (
+                                          <div
+                                            key={idx}
+                                            className="flex items-center gap-1.5 truncate"
+                                          >
+                                            <span className="h-1.5 w-1.5 rounded-full bg-violet-400 shrink-0" />
+                                            <span className="truncate">{el}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className="mt-3 pt-3 border-t border-white/10 flex items-center justify-between gap-2">
+                                    <div>
+                                      {isActive ? (
+                                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                                          <CheckCircle2 className="h-3 w-3" /> Ativa no Ar
+                                        </span>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setUserActiveScenes((prev) => ({
+                                              ...prev,
+                                              [u.user_id]: scene.id,
+                                            }));
+                                            setMessage(
+                                              `Cenário "${scene.title}" ativado para ${u.user}.`
+                                            );
+                                          }}
+                                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-violet-600 hover:bg-violet-500 text-white transition shadow-sm"
+                                        >
+                                          <Play className="h-3 w-3 fill-current" /> Ativar Cena
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setPreviewingSceneKey(
+                                          isPreviewing ? null : previewKey
+                                        )
+                                      }
+                                      className="px-2 py-1 rounded-md text-[11px] text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-white/10 transition"
+                                    >
+                                      {isPreviewing ? "Fechar Prévia" : "Prévia do Layout"}
+                                    </button>
+                                  </div>
+
+                                  {isPreviewing && (
+                                    <div className="mt-3 p-2.5 rounded-lg bg-slate-900 border border-violet-500/30 text-xs text-slate-300 space-y-1.5">
+                                      <div className="flex items-center justify-between text-[10px] font-semibold text-violet-300">
+                                        <span>Frame da Stream — @{u.user}</span>
+                                        <span className="text-[9px] text-slate-400">
+                                          1080p Canvas
+                                        </span>
+                                      </div>
+                                      <div className="aspect-video w-full rounded border border-white/10 bg-slate-950 p-2 relative flex flex-col justify-between overflow-hidden">
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-[8px] bg-red-600/80 text-white font-bold px-1.5 py-0.5 rounded">
+                                            AO VIVO
+                                          </span>
+                                          <span className="text-[8px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">
+                                            {scene.title}
+                                          </span>
+                                        </div>
+                                        <div className="flex items-center justify-center text-[10px] text-slate-400 font-medium">
+                                          Layout da cena para {u.user}
+                                        </div>
+                                        <div className="flex items-center justify-between text-[8px] text-slate-500 border-t border-white/5 pt-1">
+                                          <span>Canal: @{u.user}</span>
+                                          <span>60 FPS</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
 

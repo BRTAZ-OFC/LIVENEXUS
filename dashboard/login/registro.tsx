@@ -40,7 +40,11 @@ function RegisterPage() {
       }
       setMessage(result.message);
     } catch (error) {
-      reportRealError({ error, message: error instanceof Error ? error.message : String(error), type: "Erro do Sistema" });
+      reportRealError({
+        error,
+        message: error instanceof Error ? error.message : String(error),
+        type: "Erro do Sistema",
+      });
       setMessage("");
     }
   }

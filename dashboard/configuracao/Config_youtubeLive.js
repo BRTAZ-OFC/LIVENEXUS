@@ -2,25 +2,25 @@
 // 100% alinhado com a fórmula validada no Painel Admin -> Laboratório -> Teste YouTube 1.
 // connectYouTube(channel, onMessage, onStatus, onMeta) -> { disconnect }
 
-const WORKER_LIVE_CHAT_ENDPOINT = 'https://youtube-innertube.radiotweet.workers.dev/live-chat';
+const WORKER_LIVE_CHAT_ENDPOINT = "https://youtube-innertube.radiotweet.workers.dev/live-chat";
 
 export function parseYouTubeViewers(raw) {
-  if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
-  if (!raw || typeof raw !== 'string') return null;
+  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+  if (!raw || typeof raw !== "string") return null;
   const trimmed = raw.trim();
 
   // Verifica sufixos K ou M se existirem (ex: 1.5K, 2.3M)
   if (/\d+([.,]\d+)?\s*[kK]/.test(trimmed)) {
-    const num = parseFloat(trimmed.replace(/[^\d.,]/g, '').replace(',', '.'));
+    const num = parseFloat(trimmed.replace(/[^\d.,]/g, "").replace(",", "."));
     return Number.isFinite(num) ? Math.round(num * 1000) : null;
   }
   if (/\d+([.,]\d+)?\s*[mM]/.test(trimmed)) {
-    const num = parseFloat(trimmed.replace(/[^\d.,]/g, '').replace(',', '.'));
+    const num = parseFloat(trimmed.replace(/[^\d.,]/g, "").replace(",", "."));
     return Number.isFinite(num) ? Math.round(num * 1000000) : null;
   }
 
   // Extrai dígitos numéricos (ex: "1.234 assistindo agora" -> 1234)
-  const digitsOnly = trimmed.replace(/[^\d]/g, '');
+  const digitsOnly = trimmed.replace(/[^\d]/g, "");
   if (digitsOnly) {
     const parsed = parseInt(digitsOnly, 10);
     return Number.isFinite(parsed) ? parsed : null;
@@ -32,17 +32,25 @@ function parseYouTubeRoles(item) {
   const roles = [];
   const badges = item?.authorBadges || [];
   for (const b of badges) {
-    const iconType = b?.liveChatAuthorBadgeRenderer?.icon?.iconType || '';
-    const tooltip = (b?.liveChatAuthorBadgeRenderer?.tooltip || '').toLowerCase();
-    if (iconType === 'OWNER' || tooltip.includes('proprietário') || tooltip.includes('owner')) {
-      roles.push('broadcaster');
-    } else if (iconType === 'MODERATOR' || tooltip.includes('moderador') || tooltip.includes('mod')) {
-      roles.push('moderator');
-    } else if (tooltip.includes('membro') || tooltip.includes('member') || tooltip.includes('subscriber')) {
-      roles.push('subscriber');
+    const iconType = b?.liveChatAuthorBadgeRenderer?.icon?.iconType || "";
+    const tooltip = (b?.liveChatAuthorBadgeRenderer?.tooltip || "").toLowerCase();
+    if (iconType === "OWNER" || tooltip.includes("proprietário") || tooltip.includes("owner")) {
+      roles.push("broadcaster");
+    } else if (
+      iconType === "MODERATOR" ||
+      tooltip.includes("moderador") ||
+      tooltip.includes("mod")
+    ) {
+      roles.push("moderator");
+    } else if (
+      tooltip.includes("membro") ||
+      tooltip.includes("member") ||
+      tooltip.includes("subscriber")
+    ) {
+      roles.push("subscriber");
     }
   }
-  return roles.length > 0 ? [...new Set(roles)] : ['normal'];
+  return roles.length > 0 ? [...new Set(roles)] : ["normal"];
 }
 
 function processYouTubeChatAction(act, onMessage, seenIds = null) {
@@ -60,8 +68,20 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
         seenIds.delete(first);
       }
     }
-    const author = textItem.authorName?.simpleText || textItem.authorName?.runs?.map((r) => r.text).join('') || 'Anônimo';
-    const msgText = textItem.message?.runs?.map((r) => r.text || r.emoji?.shortcuts?.[0] || r.emoji?.image?.accessibility?.accessibilityData?.label || '').join('') || '';
+    const author =
+      textItem.authorName?.simpleText ||
+      textItem.authorName?.runs?.map((r) => r.text).join("") ||
+      "Anônimo";
+    const msgText =
+      textItem.message?.runs
+        ?.map(
+          (r) =>
+            r.text ||
+            r.emoji?.shortcuts?.[0] ||
+            r.emoji?.image?.accessibility?.accessibilityData?.label ||
+            "",
+        )
+        .join("") || "";
     const timestamp = textItem.timestampUsec
       ? Math.floor(parseInt(textItem.timestampUsec, 10) / 1000)
       : Date.now();
@@ -87,9 +107,9 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
   // 2. Super Chat (liveChatPaidMessageRenderer)
   const paidItem = act.addChatItemAction?.item?.liveChatPaidMessageRenderer;
   if (paidItem) {
-    const author = paidItem.authorName?.simpleText || 'Anônimo';
-    const msgText = paidItem.message?.runs?.map((r) => r.text).join('') || '';
-    const amount = paidItem.purchaseAmountText?.simpleText || 'Super Chat';
+    const author = paidItem.authorName?.simpleText || "Anônimo";
+    const msgText = paidItem.message?.runs?.map((r) => r.text).join("") || "";
+    const amount = paidItem.purchaseAmountText?.simpleText || "Super Chat";
     const msgId = paidItem.id || crypto.randomUUID();
     const timestamp = paidItem.timestampUsec
       ? Math.floor(parseInt(paidItem.timestampUsec, 10) / 1000)
@@ -104,7 +124,7 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
       roles,
       timestamp,
       firstMsg: false,
-      eventType: 'youtube_superchat',
+      eventType: "youtube_superchat",
       eventMeta: {
         amount,
         amountText: amount,
@@ -120,8 +140,8 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
   // 3. Super Sticker (liveChatPaidStickerRenderer)
   const stickerItem = act.addChatItemAction?.item?.liveChatPaidStickerRenderer;
   if (stickerItem) {
-    const author = stickerItem.authorName?.simpleText || 'Anônimo';
-    const amount = stickerItem.purchaseAmountText?.simpleText || 'Super Sticker';
+    const author = stickerItem.authorName?.simpleText || "Anônimo";
+    const amount = stickerItem.purchaseAmountText?.simpleText || "Super Sticker";
     const stickerUrl = stickerItem.sticker?.thumbnails?.[0]?.url || null;
     const msgId = stickerItem.id || crypto.randomUUID();
     const timestamp = stickerItem.timestampUsec
@@ -137,7 +157,7 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
       roles,
       timestamp,
       firstMsg: false,
-      eventType: 'youtube_supersticker',
+      eventType: "youtube_supersticker",
       eventMeta: {
         amount,
         amountText: amount,
@@ -151,17 +171,17 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
   // 4. Membership / Novo Membro / Marco de Membro (liveChatMembershipItemRenderer)
   const memberItem = act.addChatItemAction?.item?.liveChatMembershipItemRenderer;
   if (memberItem) {
-    const author = memberItem.authorName?.simpleText || 'Anônimo';
-    const headerSubtext = memberItem.headerSubtext?.runs?.map((r) => r.text).join('') || '';
-    const headerPrimary = memberItem.headerPrimaryText?.runs?.map((r) => r.text).join('') || '';
-    const msgText = memberItem.message?.runs?.map((r) => r.text).join('') || '';
+    const author = memberItem.authorName?.simpleText || "Anônimo";
+    const headerSubtext = memberItem.headerSubtext?.runs?.map((r) => r.text).join("") || "";
+    const headerPrimary = memberItem.headerPrimaryText?.runs?.map((r) => r.text).join("") || "";
+    const msgText = memberItem.message?.runs?.map((r) => r.text).join("") || "";
     const msgId = memberItem.id || crypto.randomUUID();
     const timestamp = memberItem.timestampUsec
       ? Math.floor(parseInt(memberItem.timestampUsec, 10) / 1000)
       : Date.now();
-    const roles = ['subscriber', ...parseYouTubeRoles(memberItem)];
+    const roles = ["subscriber", ...parseYouTubeRoles(memberItem)];
 
-    const eventDetail = headerSubtext || headerPrimary || 'Novo membro!';
+    const eventDetail = headerSubtext || headerPrimary || "Novo membro!";
     onMessage({
       id: msgId,
       author,
@@ -170,7 +190,7 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
       roles: [...new Set(roles)],
       timestamp,
       firstMsg: false,
-      eventType: 'youtube_membership',
+      eventType: "youtube_membership",
       eventMeta: {
         headerSubtext,
         headerPrimaryText: headerPrimary,
@@ -182,11 +202,13 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
   }
 
   // 5. Presente de Membresias (liveChatSponsorshipsGiftPurchaseAnnouncementRenderer)
-  const giftPurchase = act.addChatItemAction?.item?.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer;
+  const giftPurchase =
+    act.addChatItemAction?.item?.liveChatSponsorshipsGiftPurchaseAnnouncementRenderer;
   if (giftPurchase) {
     const header = giftPurchase.header?.liveChatSponsorshipsHeaderRenderer;
-    const author = header?.authorName?.simpleText || 'Anônimo';
-    const primaryText = header?.primaryText?.runs?.map((r) => r.text).join('') || 'Presenteou membros';
+    const author = header?.authorName?.simpleText || "Anônimo";
+    const primaryText =
+      header?.primaryText?.runs?.map((r) => r.text).join("") || "Presenteou membros";
     const msgId = giftPurchase.id || crypto.randomUUID();
     const timestamp = Date.now();
 
@@ -195,10 +217,10 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
       author,
       authorId: null,
       text: `${author}: ${primaryText}`,
-      roles: ['subscriber'],
+      roles: ["subscriber"],
       timestamp,
       firstMsg: false,
-      eventType: 'youtube_membership_gifting',
+      eventType: "youtube_membership_gifting",
       eventMeta: {
         announcement: primaryText,
       },
@@ -208,10 +230,13 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
   }
 
   // 6. Membresia de Presente Recebida (liveChatSponsorshipsGiftRedemptionAnnouncementRenderer)
-  const giftRedemption = act.addChatItemAction?.item?.liveChatSponsorshipsGiftRedemptionAnnouncementRenderer;
+  const giftRedemption =
+    act.addChatItemAction?.item?.liveChatSponsorshipsGiftRedemptionAnnouncementRenderer;
   if (giftRedemption) {
-    const author = giftRedemption.authorName?.simpleText || 'Anônimo';
-    const msgText = giftRedemption.message?.runs?.map((r) => r.text).join('') || 'Ganhou uma membresia de presente!';
+    const author = giftRedemption.authorName?.simpleText || "Anônimo";
+    const msgText =
+      giftRedemption.message?.runs?.map((r) => r.text).join("") ||
+      "Ganhou uma membresia de presente!";
     const msgId = giftRedemption.id || crypto.randomUUID();
     const timestamp = giftRedemption.timestampUsec
       ? Math.floor(parseInt(giftRedemption.timestampUsec, 10) / 1000)
@@ -222,10 +247,10 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
       author,
       authorId: giftRedemption.authorExternalChannelId || null,
       text: `${author} ${msgText}`,
-      roles: ['subscriber'],
+      roles: ["subscriber"],
       timestamp,
       firstMsg: false,
-      eventType: 'youtube_gift_membership_received',
+      eventType: "youtube_gift_membership_received",
       eventMeta: {
         message: msgText,
       },
@@ -236,34 +261,34 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
 
   // 7. Enquete Nativa do YouTube (showLiveChatActionPanelAction ou updateLiveChatPollAction)
   const pollRenderer =
-    act.showLiveChatActionPanelAction?.panelToShow?.liveChatActionPanelRenderer?.contents?.pollRenderer ||
-    act.updateLiveChatPollAction?.pollToUpdate?.pollRenderer;
+    act.showLiveChatActionPanelAction?.panelToShow?.liveChatActionPanelRenderer?.contents
+      ?.pollRenderer || act.updateLiveChatPollAction?.pollToUpdate?.pollRenderer;
   if (pollRenderer) {
     const pollId = pollRenderer.liveChatPollId || crypto.randomUUID();
     const question =
-      pollRenderer.header?.pollHeaderRenderer?.pollQuestion?.runs?.map((r) => r.text).join('') ||
+      pollRenderer.header?.pollHeaderRenderer?.pollQuestion?.runs?.map((r) => r.text).join("") ||
       pollRenderer.header?.pollHeaderRenderer?.pollQuestion?.simpleText ||
-      'Enquete do YouTube';
+      "Enquete do YouTube";
     const status =
-      pollRenderer.header?.pollHeaderRenderer?.metadataText?.runs?.map((r) => r.text).join('') ||
-      'Enquete ativa';
+      pollRenderer.header?.pollHeaderRenderer?.metadataText?.runs?.map((r) => r.text).join("") ||
+      "Enquete ativa";
     const options = (pollRenderer.choices || []).map((c, idx) => ({
       id: c.selected?.toString() || idx,
-      text: c.text?.runs?.map((r) => r.text).join('') || c.text?.simpleText || `Opção ${idx + 1}`,
-      voteRatio: typeof c.voteRatio === 'number' ? c.voteRatio : null,
-      votePercentage: c.votePercentage?.simpleText || '',
+      text: c.text?.runs?.map((r) => r.text).join("") || c.text?.simpleText || `Opção ${idx + 1}`,
+      voteRatio: typeof c.voteRatio === "number" ? c.voteRatio : null,
+      votePercentage: c.votePercentage?.simpleText || "",
       voteCount: c.voteCount?.simpleText || null,
     }));
 
     onMessage({
       id: `poll_${pollId}`,
-      author: 'YouTube',
+      author: "YouTube",
       authorId: null,
       text: `[Enquete] ${question}`,
-      roles: ['broadcaster'],
+      roles: ["broadcaster"],
       timestamp: Date.now(),
       firstMsg: false,
-      eventType: 'youtube_poll',
+      eventType: "youtube_poll",
       eventMeta: {
         pollId,
         question,
@@ -277,19 +302,19 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
 
   // 8. Fechamento de painel de enquete (closeLiveChatActionPanelAction)
   if (act.closeLiveChatActionPanelAction) {
-    const targetId = act.closeLiveChatActionPanelAction.targetPanelId || 'poll_closed';
+    const targetId = act.closeLiveChatActionPanelAction.targetPanelId || "poll_closed";
     onMessage({
       id: `poll_closed_${Date.now()}`,
-      author: 'YouTube',
+      author: "YouTube",
       authorId: null,
-      text: '[Enquete encerrada]',
-      roles: ['broadcaster'],
+      text: "[Enquete encerrada]",
+      roles: ["broadcaster"],
       timestamp: Date.now(),
       firstMsg: false,
-      eventType: 'youtube_poll',
+      eventType: "youtube_poll",
       eventMeta: {
         pollId: targetId,
-        status: 'Enquete encerrada',
+        status: "Enquete encerrada",
         closed: true,
       },
       emotes: null,
@@ -301,14 +326,14 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
   let stopped = false;
   let metaTimer = null;
   let chatAbortController = null;
-  const chan = (channel || '').trim();
+  const chan = (channel || "").trim();
 
   if (!chan) {
-    onStatus('idle', 'Informe o identificador do canal do YouTube (@handle, URL ou Video ID).');
+    onStatus("idle", "Informe o identificador do canal do YouTube (@handle, URL ou Video ID).");
     return { disconnect: () => {} };
   }
 
-  onStatus('connecting');
+  onStatus("connecting");
 
   // Loop contínuo de polling do chat e eventos via Cloudflare Worker
   async function startChatLoop(bootstrapData) {
@@ -316,10 +341,10 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
     const apiKey = bootstrapData.apiKey;
     const clientContext = bootstrapData.clientContext || {
       client: {
-        clientName: 'WEB',
-        clientVersion: bootstrapData.clientVersion || '2.20240501.01.00',
-        hl: 'pt',
-        gl: 'BR',
+        clientName: "WEB",
+        clientVersion: bootstrapData.clientVersion || "2.20240501.01.00",
+        hl: "pt",
+        gl: "BR",
       },
     };
 
@@ -342,9 +367,9 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
 
       try {
         const response = await fetch(WORKER_LIVE_CHAT_ENDPOINT, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(payload),
           signal,
@@ -355,9 +380,14 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
         if (!response.ok) {
           consecutiveErrors++;
           if (consecutiveErrors >= 5) {
-            onStatus('reconnecting', `Worker respondeu HTTP ${response.status}. Tentando reconectar...`);
+            onStatus(
+              "reconnecting",
+              `Worker respondeu HTTP ${response.status}. Tentando reconectar...`,
+            );
           }
-          await new Promise((resolve) => setTimeout(resolve, Math.min(30000, 3000 * consecutiveErrors)));
+          await new Promise((resolve) =>
+            setTimeout(resolve, Math.min(30000, 3000 * consecutiveErrors)),
+          );
           continue;
         }
 
@@ -389,7 +419,7 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
             c0.timedContinuationData?.timeoutMs ||
             c0.reloadContinuationData?.timeoutMs;
 
-          if (typeof tMs === 'number' && tMs > 0) {
+          if (typeof tMs === "number" && tMs > 0) {
             timeoutMs = tMs;
           }
         }
@@ -404,7 +434,9 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
       } catch (err) {
         if (stopped) break;
         consecutiveErrors++;
-        await new Promise((resolve) => setTimeout(resolve, Math.min(30000, 2000 * consecutiveErrors)));
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.min(30000, 2000 * consecutiveErrors)),
+        );
       }
     }
   }
@@ -413,7 +445,9 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
   async function fetchBootstrapAndStart() {
     if (stopped) return;
     try {
-      const resp = await fetch(`/api/admin/lab/youtube-test1/bootstrap?identifier=${encodeURIComponent(chan)}`);
+      const resp = await fetch(
+        `/api/admin/lab/youtube-test1/bootstrap?identifier=${encodeURIComponent(chan)}`,
+      );
       if (!resp.ok) {
         throw new Error(`HTTP ${resp.status}`);
       }
@@ -421,19 +455,19 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
       if (stopped) return;
 
       if (!data.ok) {
-        onStatus('idle', data.error || 'Erro ao resolver live do YouTube.');
+        onStatus("idle", data.error || "Erro ao resolver live do YouTube.");
         onMeta({ viewers: null, offline: true });
         return;
       }
 
       if (data.isLive && data.videoId) {
         const parsedViewers = parseYouTubeViewers(data.concurrentViewers);
-        onStatus('connected');
+        onStatus("connected");
         onMeta({
           viewers: parsedViewers,
           meta: {
             streamId: data.videoId,
-            title: data.title || '',
+            title: data.title || "",
             channelName: data.author || chan,
             startedAt: new Date().toISOString(),
             streamUrl: data.finalUrl || `https://www.youtube.com/watch?v=${data.videoId}`,
@@ -443,12 +477,12 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
         // Inicia o polling contínuo de chat e eventos através do Worker
         startChatLoop(data);
       } else {
-        onStatus('idle', 'Canal offline ou sem live ativa no momento.');
+        onStatus("idle", "Canal offline ou sem live ativa no momento.");
         onMeta({ viewers: null, offline: true });
       }
     } catch (err) {
       if (stopped) return;
-      onStatus('idle', err.message || 'Falha ao consultar live do YouTube.');
+      onStatus("idle", err.message || "Falha ao consultar live do YouTube.");
       onMeta({ viewers: null, offline: true });
     }
   }
@@ -459,7 +493,9 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
   metaTimer = setInterval(async () => {
     if (stopped) return;
     try {
-      const resp = await fetch(`/api/admin/lab/youtube-test1/bootstrap?identifier=${encodeURIComponent(chan)}`);
+      const resp = await fetch(
+        `/api/admin/lab/youtube-test1/bootstrap?identifier=${encodeURIComponent(chan)}`,
+      );
       if (resp.ok && !stopped) {
         const data = await resp.json();
         if (data.ok && data.isLive) {
@@ -468,7 +504,7 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
             viewers: parsedViewers,
             meta: {
               streamId: data.videoId,
-              title: data.title || '',
+              title: data.title || "",
               channelName: data.author || chan,
               startedAt: new Date().toISOString(),
               streamUrl: data.finalUrl || `https://www.youtube.com/watch?v=${data.videoId}`,
@@ -484,9 +520,11 @@ export function connectYouTube(channel, onMessage, onStatus, onMeta) {
       stopped = true;
       if (metaTimer) clearInterval(metaTimer);
       if (chatAbortController) {
-        try { chatAbortController.abort(); } catch {}
+        try {
+          chatAbortController.abort();
+        } catch {}
       }
-      onStatus('idle');
+      onStatus("idle");
       onMeta({ viewers: null, offline: true });
     },
   };

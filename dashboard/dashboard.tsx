@@ -28,14 +28,26 @@ function DashboardPage() {
   // BLOCO 4 — Inicializa o menu e recupera o papel antes de restaurar a aba ativa.
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const chatState = useMultiChatSnapshot();
-  const connectedPlatforms = ["Twitch", "Kick", "YouTube"].filter((platform) => ["connected", "open"].includes(chatState.statuses[platform as keyof typeof chatState.statuses].status.toLowerCase()));
-  const totalViewers = ["Twitch", "Kick", "YouTube"].reduce((total, platform) => total + (chatState.statuses[platform as keyof typeof chatState.statuses].viewers ?? 0), 0);
-  const speakerCounts = Object.values(chatState.messages.reduce<Record<string, { author: string; count: number }>>((acc, message) => {
-    const key = message.author.trim().toLowerCase() || "anônimo";
-    if (!acc[key]) acc[key] = { author: message.author || "Anônimo", count: 0 };
-    acc[key].count += 1;
-    return acc;
-  }, {})).sort((a, b) => b.count - a.count).slice(0, 10);
+  const connectedPlatforms = ["Twitch", "Kick", "YouTube"].filter((platform) =>
+    ["connected", "open"].includes(
+      chatState.statuses[platform as keyof typeof chatState.statuses].status.toLowerCase(),
+    ),
+  );
+  const totalViewers = ["Twitch", "Kick", "YouTube"].reduce(
+    (total, platform) =>
+      total + (chatState.statuses[platform as keyof typeof chatState.statuses].viewers ?? 0),
+    0,
+  );
+  const speakerCounts = Object.values(
+    chatState.messages.reduce<Record<string, { author: string; count: number }>>((acc, message) => {
+      const key = message.author.trim().toLowerCase() || "anônimo";
+      if (!acc[key]) acc[key] = { author: message.author || "Anônimo", count: 0 };
+      acc[key].count += 1;
+      return acc;
+    }, {}),
+  )
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
 
   const [isAdmin, setIsAdmin] = useState(() => {
     if (typeof window !== "undefined") {
@@ -43,32 +55,45 @@ function DashboardPage() {
     }
     return false;
   });
-  const [activeSection, setActiveSection] = useState<"overview" | "database" | "admin-panel" | "voice" | "connections">(
-    () => {
-      if (typeof window !== "undefined") {
-        const admin = sessionStorage.getItem("livenexus_role") === "admin";
-        const params = new URLSearchParams(window.location.search);
-        const tabParam = params.get("tab");
-        const stored = sessionStorage.getItem("livenexus_active_tab");
-        const candidate = tabParam || stored;
+  const [activeSection, setActiveSection] = useState<
+    "overview" | "database" | "admin-panel" | "voice" | "connections"
+  >(() => {
+    if (typeof window !== "undefined") {
+      const admin = sessionStorage.getItem("livenexus_role") === "admin";
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      const stored = sessionStorage.getItem("livenexus_active_tab");
+      const candidate = tabParam || stored;
 
-        // A seção Conexão é de uso geral; as seções administrativas continuam restritas.
-        if (candidate === "connections") return "connections";
-        if (admin && (candidate === "database" || candidate === "overview" || candidate === "admin-panel" || candidate === "voice")) {
-          return candidate as "overview" | "database" | "admin-panel" | "voice";
-        }
+      // A seção Conexão é de uso geral; as seções administrativas continuam restritas.
+      if (candidate === "connections") return "connections";
+      if (
+        admin &&
+        (candidate === "database" ||
+          candidate === "overview" ||
+          candidate === "admin-panel" ||
+          candidate === "voice")
+      ) {
+        return candidate as "overview" | "database" | "admin-panel" | "voice";
       }
-      return "overview";
-    },
-  );
+    }
+    return "overview";
+  });
 
   // BLOCO 5 — Atualiza a seção selecionada e persiste a escolha.
-  function handleSelectSection(section: "overview" | "database" | "admin-panel" | "voice" | "connections") {
+  function handleSelectSection(
+    section: "overview" | "database" | "admin-panel" | "voice" | "connections",
+  ) {
     setActiveSection(section);
     if (typeof window !== "undefined") {
       sessionStorage.setItem("livenexus_active_tab", section);
       const url = new URL(window.location.href);
-      if (section === "database" || section === "admin-panel" || section === "voice" || section === "connections") {
+      if (
+        section === "database" ||
+        section === "admin-panel" ||
+        section === "voice" ||
+        section === "connections"
+      ) {
         url.searchParams.set("tab", section);
       } else {
         url.searchParams.delete("tab");
@@ -82,7 +107,9 @@ function DashboardPage() {
     const admin = sessionStorage.getItem("livenexus_role") === "admin";
     setIsAdmin(admin);
     if (!admin) {
-      setActiveSection((section) => section === "database" || section === "admin-panel" ? "overview" : section);
+      setActiveSection((section) =>
+        section === "database" || section === "admin-panel" ? "overview" : section,
+      );
       const stored = sessionStorage.getItem("livenexus_active_tab");
       if (stored === "database" || stored === "admin-panel") {
         sessionStorage.setItem("livenexus_active_tab", "overview");
@@ -121,7 +148,9 @@ function DashboardPage() {
             className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "voice" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
           >
             <Volume2 className="dash-h-2-5-w-2-5-16znhny" />
-            {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Voz &amp; TTS</span>}
+            {sidebarExpanded && (
+              <span className="dash-text-7px-font-semibold-r7z1tv">Voz &amp; TTS</span>
+            )}
           </button>
           <button
             type="button"
@@ -217,30 +246,57 @@ function DashboardPage() {
                 <p className="dash-text-xs-font-bold-1eh0cdm">CENTRAL DE TRANSMISSÃO</p>
                 <h1 className="dash-mt-3-text-3xl-1fv0i93">Dashboard</h1>
               </div>
-              <span className="dash-preview-tag">{connectedPlatforms.length ? `${connectedPlatforms.length} plataforma(s) conectada(s)` : "Aguardando conexões"}</span>
+              <span className="dash-preview-tag">
+                {connectedPlatforms.length
+                  ? `${connectedPlatforms.length} plataforma(s) conectada(s)`
+                  : "Aguardando conexões"}
+              </span>
             </div>
 
             <div className="dash-live-stats">
               <article className="dash-stat-card">
-                <div className="dash-stat-label"><Radio /> Quantidade de espectadores por plataforma</div>
+                <div className="dash-stat-label">
+                  <Radio /> Quantidade de espectadores por plataforma
+                </div>
                 <div className="dash-platform-counts">
-                  <span><i className="dash-platform-dot twitch" /> Twitch <b>{(chatState.statuses.Twitch.viewers ?? 0).toLocaleString("pt-BR")}</b></span>
-                  <span><i className="dash-platform-dot youtube" /> YouTube <b>{(chatState.statuses.YouTube.viewers ?? 0).toLocaleString("pt-BR")}</b></span>
-                  <span><i className="dash-platform-dot kick" /> KICK <b>{(chatState.statuses.Kick.viewers ?? 0).toLocaleString("pt-BR")}</b></span>
+                  <span>
+                    <i className="dash-platform-dot twitch" /> Twitch{" "}
+                    <b>{(chatState.statuses.Twitch.viewers ?? 0).toLocaleString("pt-BR")}</b>
+                  </span>
+                  <span>
+                    <i className="dash-platform-dot youtube" /> YouTube{" "}
+                    <b>{(chatState.statuses.YouTube.viewers ?? 0).toLocaleString("pt-BR")}</b>
+                  </span>
+                  <span>
+                    <i className="dash-platform-dot kick" /> KICK{" "}
+                    <b>{(chatState.statuses.Kick.viewers ?? 0).toLocaleString("pt-BR")}</b>
+                  </span>
                 </div>
               </article>
               <article className="dash-stat-card">
-                <div className="dash-stat-label"><Eye /> Total de espectadores</div>
+                <div className="dash-stat-label">
+                  <Eye /> Total de espectadores
+                </div>
                 <strong className="dash-stat-number">{totalViewers.toLocaleString("pt-BR")}</strong>
                 <span className="dash-stat-caption">Soma das plataformas conectadas</span>
               </article>
               <article className="dash-stat-card">
-                <div className="dash-stat-label"><Clock3 /> Status da transmissão</div>
-                <strong className="dash-stat-number">{connectedPlatforms.length ? "Ativo" : "Offline"}</strong>
-                <span className="dash-stat-caption">{connectedPlatforms.length ? "Conectores recebendo status" : "Conecte um canal no chat ao vivo"}</span>
+                <div className="dash-stat-label">
+                  <Clock3 /> Status da transmissão
+                </div>
+                <strong className="dash-stat-number">
+                  {connectedPlatforms.length ? "Ativo" : "Offline"}
+                </strong>
+                <span className="dash-stat-caption">
+                  {connectedPlatforms.length
+                    ? "Conectores recebendo status"
+                    : "Conecte um canal no chat ao vivo"}
+                </span>
               </article>
               <article className="dash-stat-card">
-                <div className="dash-stat-label"><MessageSquare /> Mensagens recebidas</div>
+                <div className="dash-stat-label">
+                  <MessageSquare /> Mensagens recebidas
+                </div>
                 <strong className="dash-stat-number">{chatState.messages.length}</strong>
                 <span className="dash-stat-caption">Mensagens recentes no multichat</span>
               </article>
@@ -262,8 +318,12 @@ function DashboardPage() {
                     return (
                       <li key={index} className={speaker ? "" : "is-empty"}>
                         <span className="dash-speaker-rank">{index + 1}</span>
-                        <span className="dash-speaker-avatar">{speaker ? speaker.author.slice(0, 2).toUpperCase() : "—"}</span>
-                        <span className="dash-speaker-placeholder">{speaker?.author ?? "Aguardando usuário"}</span>
+                        <span className="dash-speaker-avatar">
+                          {speaker ? speaker.author.slice(0, 2).toUpperCase() : "—"}
+                        </span>
+                        <span className="dash-speaker-placeholder">
+                          {speaker?.author ?? "Aguardando usuário"}
+                        </span>
                         <b>{speaker?.count ?? 0}</b>
                       </li>
                     );

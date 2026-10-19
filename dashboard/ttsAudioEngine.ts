@@ -1,4 +1,5 @@
-type EffectId = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
+type EffectId =
+  "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
 
 export type ProcessedTtsSettings = {
   voice: string;
@@ -21,20 +22,28 @@ let audioContext: AudioContext | null = null;
 const PIPER_VOICES: Record<string, { model?: string; config?: string }> = {
   "pt_BR-faber-medium": {},
   "pt_BR-edresson-low": {
-    model: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/edresson/low/pt_BR-edresson-low.onnx?download=true",
-    config: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/edresson/low/pt_BR-edresson-low.onnx.json?download=true",
+    model:
+      "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/edresson/low/pt_BR-edresson-low.onnx?download=true",
+    config:
+      "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/edresson/low/pt_BR-edresson-low.onnx.json?download=true",
   },
   "pt_BR-cadu-medium": {
-    model: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/cadu/medium/pt_BR-cadu-medium.onnx?download=true",
-    config: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/cadu/medium/pt_BR-cadu-medium.onnx.json?download=true",
+    model:
+      "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/cadu/medium/pt_BR-cadu-medium.onnx?download=true",
+    config:
+      "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/cadu/medium/pt_BR-cadu-medium.onnx.json?download=true",
   },
   "pt_BR-jeff-medium": {
-    model: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/jeff/medium/pt_BR-jeff-medium.onnx?download=true",
-    config: "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/jeff/medium/pt_BR-jeff-medium.onnx.json?download=true",
+    model:
+      "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/jeff/medium/pt_BR-jeff-medium.onnx?download=true",
+    config:
+      "https://huggingface.co/rhasspy/piper-voices/resolve/main/pt/pt_BR/jeff/medium/pt_BR-jeff-medium.onnx.json?download=true",
   },
   "pt_BR-dii": {
-    model: "https://huggingface.co/OpenVoiceOS/pipertts_pt-BR_dii/resolve/main/dii_pt-BR.onnx?download=true",
-    config: "https://huggingface.co/OpenVoiceOS/pipertts_pt-BR_dii/resolve/main/dii_pt-BR.onnx.json?download=true",
+    model:
+      "https://huggingface.co/OpenVoiceOS/pipertts_pt-BR_dii/resolve/main/dii_pt-BR.onnx?download=true",
+    config:
+      "https://huggingface.co/OpenVoiceOS/pipertts_pt-BR_dii/resolve/main/dii_pt-BR.onnx.json?download=true",
   },
 };
 
@@ -42,22 +51,27 @@ async function getEngine(voice: string, onProgress?: (message: string) => void) 
   const selectedVoice = PIPER_VOICES[voice] ? voice : "pt_BR-faber-medium";
   if (!enginePromises.has(selectedVoice)) {
     const options = PIPER_VOICES[selectedVoice];
-    const promise = import("@pedrobef/vozz/piper").then(({ Piper }) =>
-      Piper.carregar({
-        ...(options?.model && options?.config ? { urlModelo: options.model, urlConfig: options.config } : {}),
-        aoProgredir: (event: { status?: string; progresso?: number; arquivo?: string }) => {
-          if (event.status === "baixando") {
-            const percent = typeof event.progresso === "number" ? Math.round(event.progresso * 100) : 0;
-            onProgress?.(`Baixando modelo da voz selecionada: ${percent}%`);
-          } else if (event.status === "carregando") {
-            onProgress?.("Inicializando o motor neural de voz…");
-          }
-        },
-      }),
-    ).catch((error) => {
-      enginePromises.delete(selectedVoice);
-      throw error;
-    });
+    const promise = import("@pedrobef/vozz/piper")
+      .then(({ Piper }) =>
+        Piper.carregar({
+          ...(options?.model && options?.config
+            ? { urlModelo: options.model, urlConfig: options.config }
+            : {}),
+          aoProgredir: (event: { status?: string; progresso?: number; arquivo?: string }) => {
+            if (event.status === "baixando") {
+              const percent =
+                typeof event.progresso === "number" ? Math.round(event.progresso * 100) : 0;
+              onProgress?.(`Baixando modelo da voz selecionada: ${percent}%`);
+            } else if (event.status === "carregando") {
+              onProgress?.("Inicializando o motor neural de voz…");
+            }
+          },
+        }),
+      )
+      .catch((error) => {
+        enginePromises.delete(selectedVoice);
+        throw error;
+      });
     enginePromises.set(selectedVoice, promise);
   }
   return enginePromises.get(selectedVoice)!;
@@ -92,10 +106,17 @@ function makeDistortion(context: AudioContext, amount: number) {
 export async function playProcessedSpeech(
   text: string,
   settings: ProcessedTtsSettings,
-  callbacks: { onProgress?: (message: string) => void; onStart?: () => void; onEnd?: () => void; onError?: (error: unknown) => void } = {},
+  callbacks: {
+    onProgress?: (message: string) => void;
+    onStart?: () => void;
+    onEnd?: () => void;
+    onError?: (error: unknown) => void;
+  } = {},
 ): Promise<PlaybackHandle> {
   const engine = await getEngine(settings.voice, callbacks.onProgress);
-  const generated = await engine.falar(text, { velocidade: Math.max(0.5, Math.min(2, settings.rate)) });
+  const generated = await engine.falar(text, {
+    velocidade: Math.max(0.5, Math.min(2, settings.rate)),
+  });
   const wav = generated.paraWav() as ArrayBuffer;
   const context = audioContext ?? new AudioContext();
   audioContext = context;
@@ -103,11 +124,16 @@ export async function playProcessedSpeech(
   const buffer = await context.decodeAudioData(wav.slice(0));
   const intensity = Math.max(0, Math.min(1.5, settings.intensity));
   const effect = settings.effect;
-  const sourceRate = effect === "squirrel" ? 1 + 0.25 * intensity
-    : effect === "monster" ? 1 - 0.18 * intensity
-    : effect === "giant" ? 1 - 0.25 * intensity
-    : effect === "alien" ? 1 + 0.08 * intensity
-    : 1;
+  const sourceRate =
+    effect === "squirrel"
+      ? 1 + 0.25 * intensity
+      : effect === "monster"
+        ? 1 - 0.18 * intensity
+        : effect === "giant"
+          ? 1 - 0.25 * intensity
+          : effect === "alien"
+            ? 1 + 0.08 * intensity
+            : 1;
   let source: AudioBufferSourceNode | null = null;
   let startedAt = 0;
   let offset = 0;
@@ -125,44 +151,76 @@ export async function playProcessedSpeech(
 
     const filter = context.createBiquadFilter();
     if (effect === "radio") {
-      filter.type = "bandpass"; filter.frequency.value = 1700; filter.Q.value = 0.8;
-      previous.connect(filter); previous = filter; nodes.push(filter);
+      filter.type = "bandpass";
+      filter.frequency.value = 1700;
+      filter.Q.value = 0.8;
+      previous.connect(filter);
+      previous = filter;
+      nodes.push(filter);
     } else if (effect === "megaphone") {
-      filter.type = "bandpass"; filter.frequency.value = 1300; filter.Q.value = 1.1;
-      previous.connect(filter); previous = filter; nodes.push(filter);
+      filter.type = "bandpass";
+      filter.frequency.value = 1300;
+      filter.Q.value = 1.1;
+      previous.connect(filter);
+      previous = filter;
+      nodes.push(filter);
     } else if (effect === "monster" || effect === "giant") {
-      filter.type = "lowshelf"; filter.frequency.value = 240; filter.gain.value = 8 * intensity;
-      previous.connect(filter); previous = filter; nodes.push(filter);
+      filter.type = "lowshelf";
+      filter.frequency.value = 240;
+      filter.gain.value = 8 * intensity;
+      previous.connect(filter);
+      previous = filter;
+      nodes.push(filter);
     } else if (effect === "ghost") {
-      filter.type = "highpass"; filter.frequency.value = 260;
-      previous.connect(filter); previous = filter; nodes.push(filter);
+      filter.type = "highpass";
+      filter.frequency.value = 260;
+      previous.connect(filter);
+      previous = filter;
+      nodes.push(filter);
     } else if (effect === "squirrel") {
-      filter.type = "highshelf"; filter.frequency.value = 1800; filter.gain.value = 5 * intensity;
-      previous.connect(filter); previous = filter; nodes.push(filter);
+      filter.type = "highshelf";
+      filter.frequency.value = 1800;
+      filter.gain.value = 5 * intensity;
+      previous.connect(filter);
+      previous = filter;
+      nodes.push(filter);
     } else if (effect === "alien" || effect === "robot") {
-      filter.type = "bandpass"; filter.frequency.value = effect === "robot" ? 1100 : 1900; filter.Q.value = 1.2;
-      previous.connect(filter); previous = filter; nodes.push(filter);
+      filter.type = "bandpass";
+      filter.frequency.value = effect === "robot" ? 1100 : 1900;
+      filter.Q.value = 1.2;
+      previous.connect(filter);
+      previous = filter;
+      nodes.push(filter);
     }
 
     if (effect === "robot" || effect === "alien") {
       modGain = context.createGain();
       modGain.gain.value = effect === "robot" ? 0.72 : 0.82;
-      previous.connect(modGain); previous = modGain; nodes.push(modGain);
+      previous.connect(modGain);
+      previous = modGain;
+      nodes.push(modGain);
       modulator = context.createOscillator();
       const depth = context.createGain();
       modulator.type = effect === "robot" ? "square" : "sine";
       modulator.frequency.value = effect === "robot" ? 34 : 7;
       depth.gain.value = effect === "robot" ? 0.28 * intensity : 0.18 * intensity;
-      modulator.connect(depth); depth.connect(modGain.gain); modulator.start();
+      modulator.connect(depth);
+      depth.connect(modGain.gain);
+      modulator.start();
       nodes.push(modulator, depth);
     }
 
     if (effect === "radio" || effect === "megaphone" || effect === "robot") {
       const distortion = makeDistortion(context, (effect === "megaphone" ? 0.7 : 0.4) * intensity);
-      previous.connect(distortion); previous = distortion; nodes.push(distortion);
+      previous.connect(distortion);
+      previous = distortion;
+      nodes.push(distortion);
       const compressor = context.createDynamicsCompressor();
-      compressor.threshold.value = -24; compressor.ratio.value = 5;
-      previous.connect(compressor); previous = compressor; nodes.push(compressor);
+      compressor.threshold.value = -24;
+      compressor.ratio.value = 5;
+      previous.connect(compressor);
+      previous = compressor;
+      nodes.push(compressor);
     }
 
     if (effect === "ghost" || effect === "alien") {
@@ -170,32 +228,50 @@ export async function playProcessedSpeech(
       delay.delayTime.value = effect === "ghost" ? 0.32 : 0.12;
       const feedback = context.createGain();
       feedback.gain.value = (effect === "ghost" ? 0.3 : 0.12) * intensity;
-      previous.connect(delay); delay.connect(feedback); feedback.connect(delay);
-      const mix = context.createGain(); mix.gain.value = effect === "ghost" ? 0.45 * intensity : 0.25 * intensity;
-      delay.connect(mix); previous.connect(mix); previous = mix;
+      previous.connect(delay);
+      delay.connect(feedback);
+      feedback.connect(delay);
+      const mix = context.createGain();
+      mix.gain.value = effect === "ghost" ? 0.45 * intensity : 0.25 * intensity;
+      delay.connect(mix);
+      previous.connect(mix);
+      previous = mix;
       nodes.push(delay, feedback, mix);
     }
 
     if (effect === "ghost") {
       const reverb = context.createConvolver();
       reverb.buffer = makeImpulse(context, 1.8, 2.5);
-      const wet = context.createGain(); wet.gain.value = 0.28 * intensity;
-      previous.connect(reverb); reverb.connect(wet);
-      const mix = context.createGain(); mix.gain.value = 0.78;
-      previous.connect(mix); wet.connect(mix); previous = mix;
+      const wet = context.createGain();
+      wet.gain.value = 0.28 * intensity;
+      previous.connect(reverb);
+      reverb.connect(wet);
+      const mix = context.createGain();
+      mix.gain.value = 0.78;
+      previous.connect(mix);
+      wet.connect(mix);
+      previous = mix;
       nodes.push(reverb, wet, mix);
     }
 
     const master = context.createGain();
     master.gain.value = Math.max(0, Math.min(1, settings.volume));
-    previous.connect(master); master.connect(context.destination);
+    previous.connect(master);
+    master.connect(context.destination);
     nodes.push(master);
     input.onended = () => {
       if (source !== input) return;
       modulator?.stop();
-      nodes.forEach((node) => { try { node.disconnect(); } catch {} });
+      nodes.forEach((node) => {
+        try {
+          node.disconnect();
+        } catch {}
+      });
       source = null;
-      if (!paused && !ended) { ended = true; callbacks.onEnd?.(); }
+      if (!paused && !ended) {
+        ended = true;
+        callbacks.onEnd?.();
+      }
     };
     source = input;
     startedAt = context.currentTime;
@@ -206,9 +282,14 @@ export async function playProcessedSpeech(
   const handle: PlaybackHandle = {
     stop() {
       if (ended) return;
-      ended = true; paused = false;
-      try { source?.stop(); } catch {}
-      try { modulator?.stop(); } catch {}
+      ended = true;
+      paused = false;
+      try {
+        source?.stop();
+      } catch {}
+      try {
+        modulator?.stop();
+      } catch {}
       source = null;
       callbacks.onEnd?.();
     },
@@ -216,9 +297,13 @@ export async function playProcessedSpeech(
       if (!source || paused || ended) return;
       offset += context.currentTime - startedAt;
       paused = true;
-      try { source.stop(); } catch {}
+      try {
+        source.stop();
+      } catch {}
       source = null;
-      try { modulator?.stop(); } catch {}
+      try {
+        modulator?.stop();
+      } catch {}
     },
     resume() {
       if (!paused || ended) return;
