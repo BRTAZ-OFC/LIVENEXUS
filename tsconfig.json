@@ -3,7 +3,7 @@
     "dashboard/**/*.ts",
     "dashboard/**/*.tsx",
     "dashboard/**/*.js",
-    "server.js",
+    "server.ts",
     "vite.config.ts",
     "eslint.config.js"
   ],

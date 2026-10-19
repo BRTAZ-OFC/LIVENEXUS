@@ -4,10 +4,10 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k -n api,web \"node server.js --dev\" \"vite --host 0.0.0.0 --port 3000\"",
+    "dev": "tsx server.ts",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "preview": "concurrently -k -n api,web \"node server.js --dev\" \"vite preview --host 0.0.0.0 --port 3000\"",
+    "preview": "node server.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "start": "node server.js",
@@ -71,10 +71,12 @@
     "@eslint/js": "^9.32.0",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
+    "@types/express": "^5.0.0",
     "@types/node": "^22.16.5",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.2.0",
+    "concurrently": "^9.1.2",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.6",
@@ -83,11 +85,10 @@
     "globals": "^15.15.0",
     "jsdom": "^20.0.3",
     "prettier": "^3.7.3",
+    "tsx": "^4.23.15",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "8.1.5",
-    "vitest": "^4.1.10",
-    "concurrently": "^9.1.2",
-    "@types/express": "^5.0.0"
+    "vitest": "^4.1.10"
   }
 }
