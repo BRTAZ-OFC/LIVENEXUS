@@ -647,6 +647,33 @@ app.delete("/api/plataformas", async (req: Request, res: Response) => {
   }
 });
 
+/* Leitura do canvas de Overlay: cada usuário recebe somente seus próprios registros JSON. */
+app.get("/api/overlay/canvas", async (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) {
+    return res.status(401).set(NO_CACHE).json({
+      ok: false,
+      message: "Faça login para visualizar o canvas de Overlay.",
+    });
+  }
+
+  try {
+    const rows = await listJsonTableRecords("overlays");
+    const overlays = rows
+      .filter((row: Record<string, unknown>) => String(row.user_id ?? "") === session.user_id)
+      .map((row: Record<string, unknown>) => {
+        const { __rowKey: _rowKey, ...record } = row;
+        return record;
+      });
+    return res.set(NO_CACHE).json({ ok: true, overlays });
+  } catch (error) {
+    return res.status(500).set(NO_CACHE).json({
+      ok: false,
+      message: errorMessage(error, "Não foi possível carregar o canvas de Overlay."),
+    });
+  }
+});
+
 /* CRUD administrativo genérico das tabelas JSON que não possuem CRUD específico. */
 app.get("/api/database/json-tables", async (req: Request, res: Response) => {
   if (!requireAdmin(req, res)) return;
