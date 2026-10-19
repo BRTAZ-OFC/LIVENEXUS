@@ -280,10 +280,9 @@ export function TtsFiltersPanel() {
     if (cfg.scope === "perPlatform") setTtsFilterConfig({ ...cfg, perPlatform: { ...cfg.perPlatform, [platform]: { ...rules, ...patch } } });
     else setTtsFilterConfig({ ...cfg, shared: { ...rules, ...patch } });
   };
-  const updateNested = <K extends "roles" | "events" | "content" | "priorities">(key: K, name: string, value: boolean | number) => updateRules({ [key]: { ...rules[key], [name]: value } } as Pick<RuleSet, K>);
+  const updateNested = <K extends "roles" | "events" | "content" | "priorities",>(key: K, name: string, value: boolean | number) => updateRules({ [key]: { ...rules[key], [name]: value } } as Pick<RuleSet, K>);
   const addWord = () => { const value = word.trim(); if (value && !rules.bannedWords.some((v) => v.toLowerCase() === value.toLowerCase())) updateRules({ bannedWords: [...rules.bannedWords, value] }); setWord(""); };
   const addTrigger = () => { const value = trigger.trim(); if (value) updateRules({ triggers: [...rules.triggers, { id: Date.now().toString(36), value, matchType: triggerType }] }); setTrigger(""); };
-  const reset = () => setTtsFilterConfig(defaultConfig());
   return <section className="tts-card tts-filters-card">
     <div className="tts-card-title"><span className="tts-title-icon"><Filter /></span><div><h2>Filtros de leitura</h2><p>Regras aplicadas antes de adicionar mensagens à fila TTS.</p></div></div>
     <div className="tts-filter-top">
