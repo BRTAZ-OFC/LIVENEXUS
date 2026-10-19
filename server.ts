@@ -2,6 +2,7 @@ import express, { type Request, type Response, type NextFunction } from "express
 import { randomBytes } from "node:crypto";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createServer as createHttpServer } from "node:http";
 import {
   createUser,
   authenticateUser,
@@ -838,15 +839,6 @@ app.all(/^\/api(?:\/.*)?$/, (req: Request, res: Response) => {
   });
 });
 
-if (isDevServer) {
-  const { createServer } = await import("vite");
-  const vite = await createServer({
-    server: { middlewareMode: true, hmr: false },
-    appType: "spa",
-  });
-  app.use(vite.middlewares);
-}
-
 if (!isDevServer && !isApiOnly) {
   app.use(express.static(distDir));
   app.get(/.*/, (_req: Request, res: Response) => {
@@ -862,6 +854,20 @@ app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 const port = isApiOnly ? 3001 : Number(process.env["PORT"] || 3000);
-app.listen(port, "0.0.0.0", () => {
+const httpServer = createHttpServer(app);
+
+if (isDevServer) {
+  const { createServer: createViteServer } = await import("vite");
+  const vite = await createViteServer({
+    server: {
+      middlewareMode: true,
+      hmr: { server: httpServer },
+    },
+    appType: "spa",
+  });
+  app.use(vite.middlewares);
+}
+
+httpServer.listen(port, "0.0.0.0", () => {
   console.log("LiveNexus server listening on port " + port);
 });
