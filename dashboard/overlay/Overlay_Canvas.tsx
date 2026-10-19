@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties } from "react";
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
+import HorizontalMenu from "../components/HorizontalMenu";
 
 type JsonObject = Record<string, unknown>;
 type CanvasInstance = {
@@ -320,6 +321,21 @@ export default function OverlayCanvas() {
 
   return (
     <section className="flex w-full min-w-0 flex-col items-center gap-2 overflow-hidden">
+      <div className="w-full min-w-0">
+        <HorizontalMenu ariaLabel="Widgets de Overlay" className="w-full">
+          {catalog.filter((widget) => widget.implemented !== false).map((widget) => (
+            <button
+              key={widget.id}
+              type="button"
+              onClick={() => addWidget(widget)}
+              title={`Adicionar ${widget.name} ao canvas`}
+              className="shrink-0 rounded-md border border-white/10 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"
+            >
+              {widget.name}
+            </button>
+          ))}
+        </HorizontalMenu>
+      </div>
       {saveError && (
         <p role="alert" className="w-full rounded border border-rose-500/30 bg-rose-950/40 px-2 py-1 text-[10px] text-rose-200">
           Falha ao salvar o canvas: {saveError}
