@@ -112,7 +112,7 @@ export default function HorizontalMenu({
         aria-label={ariaLabel}
         onScroll={updateEdges}
         onWheel={(event) => {
-          if (event.deltaX !== 0 || event.shiftKey) event.preventDefault();
+          event.preventDefault();
         }}
         className={`lnx-horizontal-menu-track min-w-0 flex-1 ${trackClassName}`}
       >
