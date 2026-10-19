@@ -403,9 +403,9 @@ app.post("/api/plataformas", async (req: Request, res: Response) => {
   try {
     const user = await getAuthenticatedJsonUser(req, res);
     if (!user) return;
-    const requestedStatus = String(req.body?.status ?? "").toLowerCase();
+    const requestedStatus = String(req.body?.status ?? "").trim().toLowerCase();
     const directVerified = requestedStatus === "verified" ||
-      ["twitch_status", "kick_status", "youtube_status"].some((field) => String(req.body?.[field] ?? "").toLowerCase() === "verified");
+      ["twitch_status", "kick_status", "youtube_status"].some((field) => String(req.body?.[field] ?? "").trim().toLowerCase() === "verified");
     if (directVerified) {
       return res.status(403).set(NO_CACHE).json({
         ok: false,
@@ -433,9 +433,9 @@ app.patch("/api/plataformas", async (req: Request, res: Response) => {
   try {
     const user = await getAuthenticatedJsonUser(req, res);
     if (!user) return;
-    const requestedStatus = String(req.body?.status ?? "").toLowerCase();
+    const requestedStatus = String(req.body?.status ?? "").trim().toLowerCase();
     const directVerified = requestedStatus === "verified" ||
-      ["twitch_status", "kick_status", "youtube_status"].some((field) => String(req.body?.[field] ?? "").toLowerCase() === "verified");
+      ["twitch_status", "kick_status", "youtube_status"].some((field) => String(req.body?.[field] ?? "").trim().toLowerCase() === "verified");
     if (directVerified) {
       return res.status(403).set(NO_CACHE).json({
         ok: false,
