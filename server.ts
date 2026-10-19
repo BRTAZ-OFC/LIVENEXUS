@@ -660,9 +660,10 @@ app.get("/api/overlay/canvas", async (req: Request, res: Response) => {
   try {
     const rows = await listJsonTableRecords("overlays");
     const overlays = rows
-      .filter((row: Record<string, unknown>) => String(row.user_id ?? "") === session.user_id)
+      .filter((row: Record<string, unknown>) => String(row["user_id"] ?? "") === session.user_id)
       .map((row: Record<string, unknown>) => {
-        const { __rowKey: _rowKey, ...record } = row;
+        const record = { ...row };
+        delete record["__rowKey"];
         return record;
       });
     return res.set(NO_CACHE).json({ ok: true, overlays });
