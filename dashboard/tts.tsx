@@ -3,6 +3,7 @@ import { AudioLines, Clock3, Play, Pause, RotateCcw, SkipForward, Square, Star, 
 import "./css/tts.css";
 import { playProcessedSpeech, type PlaybackHandle } from "./ttsAudioEngine";
 import { subscribeTtsMessages } from "./multichat";
+import { getTtsFilterConfig, TtsFiltersPanel } from "./ttsFilters";
 
 type VoiceEffect = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
 type TtsSettings = {
@@ -99,16 +100,32 @@ export default function TTSPage() {
       : roles.includes("vip") ? "vip"
       : roles.includes("subscriber") ? "subscriber" : "normal";
     const item: QueueItem = { id: ++idRef.current, text, author: message.author, tier, queuedAt: Date.now() };
-    setQueue((old) => {
-      const next = [...old, item];
-      if (next.length > 200) {
-        const discardIndex = next.findIndex((entry) => entry.tier === "normal");
-        if (discardIndex >= 0) next.splice(discardIndex, 1);
-        else next.shift();
+    const filterConfig = getTtsFilterConfig();
+    const filterRules = filterConfig.scope === "perPlatform" ? filterConfig.perPlatform[message.platform] : filterConfig.shared;
+    const currentQueue = queueRef.current;
+    const next = [...currentQueue, item];
+    const queueLimit = filterConfig.mode === "custom" && filterRules.queueLimitEnabled ? filterRules.queueMax : 200;
+    if (next.length > queueLimit) {
+      if (filterConfig.mode === "custom" && filterRules.queueLimitEnabled && filterRules.queuePolicy === "reject") {
+        setNotice("Mensagem descartada: limite da fila TTS atingido.");
+        return;
       }
-      queueRef.current = next;
-      return next;
-    });
+      if (filterConfig.mode === "custom" && filterRules.queueLimitEnabled && filterRules.queuePolicy === "preserve_priority") {
+        const rank = (entry: QueueItem) => filterRules.priorityEnabled
+          ? (filterRules.priorities[entry.tier] ?? 1)
+          : (5 - PRIORITY[entry.tier]);
+        const worstIndex = next.reduce((worst, entry, index, all) => rank(entry) < rank(all[worst]) ? index : worst, 0);
+        if (worstIndex === next.length - 1 && rank(item) <= rank(next[worstIndex])) {
+          setNotice("Mensagem descartada: a fila preservou mensagens de maior prioridade.");
+          return;
+        }
+        next.splice(worstIndex, 1);
+      } else {
+        next.shift();
+      }
+    }
+    queueRef.current = next;
+    setQueue(next);
     setNotice(message.eventType ? `Evento recebido: ${message.eventType}; adicionado à fila de leitura.` : `Mensagem de ${message.author} adicionada à fila de leitura.`);
   }), []);
 
@@ -323,6 +340,8 @@ export default function TTSPage() {
           <button className={preset === "grave" ? "selected" : ""} onClick={() => applyPreset("grave", { rate: 0.85, pitch: 0.55, volume: 1 })}>Grave <small>0.85x · tom 0.55 · 100%</small></button>
         </div>
       </section>
+
+      <TtsFiltersPanel />
 
       <section className="tts-card">
         <div className="tts-card-title"><span className="tts-title-icon"><AudioLines /></span><div><h2>Fila geral de leitura</h2><p>Mensagens recebidas pelo multichat e testes manuais, ordenadas por prioridade</p></div></div>
