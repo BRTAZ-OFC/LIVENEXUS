@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties } from "react";
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
-import OverlayEditorSidebar from "./Overlay_EditorSidebar";
 
 type JsonObject = Record<string, unknown>;
 type CanvasInstance = {
@@ -540,20 +539,6 @@ export default function OverlayCanvas() {
           onPointerCancel={() => { resizeStart.current = null; }}
         />
       </div>
-        <OverlayEditorSidebar
-          catalog={catalog}
-          instances={config.instances || []}
-          selectedInstanceId={selectedInstanceId}
-          onSelectInstance={setSelectedInstanceId}
-          onAddWidget={addWidget}
-          onAddComponent={addWidgetComponent}
-          onUpdateInstance={updateInstance}
-          onDeleteInstance={deleteInstance}
-          gridSettings={gridSettings}
-          onUpdateGridSettings={updateGridSettings}
-          background={config.background || EMPTY_BACKGROUND}
-          onUpdateBackground={updateBackground}
-        />
       </div>
 
     </section>
