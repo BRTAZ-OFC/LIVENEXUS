@@ -121,6 +121,8 @@ function backgroundStyle(background: CanvasBackground): CSSProperties {
 export default function OverlayCanvas() {
   const frameRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+  const [displaySize, setDisplaySize] = useState(DEFAULT_SIZE);
+  const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [config, setConfig] = useState<CanvasConfig>({
     name: "Overlay",
     visualizerSize: DEFAULT_SIZE,
@@ -176,12 +178,16 @@ export default function OverlayCanvas() {
   useEffect(() => {
     const frame = frameRef.current;
     if (!frame) return;
-    const updateScale = () => setScale(Math.min(1, frame.clientWidth / size.width));
+    const updateScale = () => {
+      const widthScale = frame.clientWidth / size.width;
+      const heightScale = frame.clientHeight / size.height;
+      setScale(Math.min(1, widthScale, heightScale));
+    };
     updateScale();
     const observer = new ResizeObserver(updateScale);
     observer.observe(frame);
     return () => observer.disconnect();
-  }, [size.width, size.height]);
+  }, [size.width, size.height, displaySize.width, displaySize.height]);
 
   const canvasBackground = useMemo(
     () => backgroundStyle(config.background || EMPTY_BACKGROUND),
@@ -189,11 +195,11 @@ export default function OverlayCanvas() {
   );
 
   return (
-    <section className="w-full min-w-0">
+    <section className="flex w-full min-w-0 justify-center overflow-hidden">
       <div
         ref={frameRef}
-        className="relative mx-auto w-full overflow-hidden rounded-xl border border-white/10 bg-[#080a10]"
-        style={{ maxWidth: size.width, aspectRatio: `${size.width} / ${size.height}` }}
+        className="relative mx-auto shrink-0 overflow-hidden bg-transparent"
+        style={{ width: displaySize.width, maxWidth: "100%", height: displaySize.height, boxSizing: "border-box" }}
         aria-label="Canvas de Overlay"
       >
         <div
@@ -201,12 +207,6 @@ export default function OverlayCanvas() {
           style={{ width: size.width, height: size.height, transform: `scale(${scale})`, transformOrigin: "top left" }}
         >
           <div className="absolute inset-0" style={canvasBackground} />
-          {config.background?.showBorder && (
-            <div
-              className="pointer-events-none absolute inset-0 z-30 border-2 border-violet-500/30"
-              style={{ borderRadius: config.background.borderRadius || "0px" }}
-            />
-          )}
           {config.instances
             ?.filter((instance) => instance.visible !== false)
             .slice()
@@ -267,6 +267,35 @@ export default function OverlayCanvas() {
             </div>
           )}
         </div>
+        <div
+          role="separator"
+          aria-label="Redimensionar canvas"
+          title="Arraste para redimensionar (mínimo 40 × 20 px)"
+          className="absolute bottom-0 right-0 z-[70] h-4 w-4 cursor-se-resize touch-none opacity-60 hover:opacity-100"
+          style={{ background: "linear-gradient(135deg, transparent 50%, #a78bfa 50%, #a78bfa 62%, transparent 62%, transparent 74%, #a78bfa 74%, #a78bfa 86%, transparent 86%)" }}
+          onPointerDown={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            resizeStart.current = {
+              x: event.clientX,
+              y: event.clientY,
+              width: displaySize.width,
+              height: displaySize.height,
+            };
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerMove={(event) => {
+            const start = resizeStart.current;
+            if (!start || !(event.buttons & 1)) return;
+            const parentWidth = frameRef.current?.parentElement?.clientWidth ?? 2400;
+            setDisplaySize({
+              width: Math.round(Math.max(40, Math.min(2400, parentWidth, start.width + event.clientX - start.x))),
+              height: Math.round(Math.max(20, Math.min(1600, start.height + event.clientY - start.y))),
+            });
+          }}
+          onPointerUp={() => { resizeStart.current = null; }}
+          onPointerCancel={() => { resizeStart.current = null; }}
+        />
       </div>
     </section>
   );
