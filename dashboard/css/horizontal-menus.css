@@ -1,0 +1,37 @@
+/* Menus horizontais globais: sem barra nem rolagem manual. Somente os botões externos movem a faixa. */
+.lnx-horizontal-menu {
+  min-width: 0;
+  gap: 0;
+}
+
+.lnx-horizontal-menu-track {
+  min-width: 0;
+  overflow-x: hidden !important;
+  overflow-y: hidden;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+  scroll-behavior: smooth;
+}
+
+.lnx-horizontal-menu-track::-webkit-scrollbar {
+  display: none !important;
+  width: 0;
+  height: 0;
+}
+
+.lnx-horizontal-menu-content {
+  width: max-content;
+  min-width: 100%;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.lnx-horizontal-menu-content > * {
+  flex-shrink: 0;
+}
+
+.lnx-horizontal-menu-arrow {
+  flex-shrink: 0;
+}
