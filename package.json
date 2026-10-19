@@ -7,7 +7,7 @@
     "dev": "concurrently -k -n api,web \"node server.js --dev\" \"vite --host 0.0.0.0 --port 3000\"",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "preview": "vite preview --host 0.0.0.0 --port 3000",
+    "preview": "concurrently -k -n api,web \"node server.js --dev\" \"vite preview --host 0.0.0.0 --port 3000\"",
     "lint": "eslint .",
     "format": "prettier --write .",
     "start": "node server.js",
