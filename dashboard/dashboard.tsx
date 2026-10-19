@@ -187,6 +187,9 @@ function DashboardPage() {
             </button>
           </div>
         </header>
+        <div className={activeSection === "voice" ? "dash-w-full-px-6-5ebeye" : "hidden"}>
+          <TTSPage />
+        </div>
         {activeSection === "overview" ? (
           <section className="dash-overview">
             <div className="dash-overview-heading">
@@ -253,10 +256,6 @@ function DashboardPage() {
                 )}
               </section>
             </div>
-          </section>
-        ) : activeSection === "voice" ? (
-          <section className="dash-w-full-px-6-5ebeye">
-            <TTSPage />
           </section>
         ) : activeSection === "admin-panel" && isAdmin ? (
           <section className="dash-w-full-px-6-5ebeye">
