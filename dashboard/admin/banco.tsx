@@ -1,5 +1,5 @@
 /* BLOCO 1 — Imports de rota, ícones e estados da tabela JSON. */
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "react-router-dom";
 import {
   AudioLines,
   ArrowLeft,
@@ -14,9 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-/* BLOCO 2 — Registra a rota da tabela administrativa. */
-export const Route = createFileRoute("/admin/banco")({ component: DatabasePage });
-
+/* BLOCO 2 — A tabela pode ser usada no dashboard ou na rota própria. */
 /* BLOCO 3 — Tipos dos campos que podem aparecer nas tabelas. */
 type UserRow = {
   user_id: string;
