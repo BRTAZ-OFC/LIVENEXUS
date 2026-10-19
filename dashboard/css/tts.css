@@ -51,3 +51,12 @@
 .tts-filter-footer { margin: 0; color: #71717a; font-size: 10px; line-height: 1.5; }
 @media(max-width: 1000px) { .tts-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .tts-filter-top { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media(max-width: 620px) { .tts-filter-grid, .tts-filter-top { grid-template-columns: 1fr; } .tts-filter-events article { grid-template-columns: auto minmax(0, 1fr); } .tts-filter-events span { grid-column: 1 / -1; } }
+
+.tts-filter-flagged { display: grid; gap: 7px; }
+.tts-filter-flagged h3 { margin: 0; color: #c4b5fd; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.tts-filter-flagged > p { margin: 0; color: #71717a; font-size: 10px; }
+.tts-filter-flagged > div { display: flex; align-items: center; gap: 8px; border: 1px solid #272c3a; border-radius: 8px; background: #06081080; padding: 8px 10px; }
+.tts-filter-flagged label { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; color: #e4e4e7; font-size: 11px; }
+.tts-filter-flagged label input { accent-color: #ef4444; }
+.tts-filter-flagged small { color: #9ca3af; font-size: 10px; }
+.tts-filter-flagged button { display: inline-flex; align-items: center; justify-content: center; border: 0; background: transparent; color: #fca5a5; }
