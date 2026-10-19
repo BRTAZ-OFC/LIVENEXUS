@@ -14,9 +14,11 @@ import {
   ShieldCheck,
   User,
   MessageSquare,
+  RadioTower,
 } from "lucide-react";
 import DatabasePage from "./banco";
 import ReviewsManager from "./reviews-manager";
+import AdminConnectionsPage from "./connections";
 
 type UserRow = {
   user_id: string;
@@ -40,7 +42,7 @@ type ReviewRow = {
 
 export default function AdminPanel() {
   const [subTab, setSubTab] = useState<
-    "inicial" | "galeria" | "overlay" | "biblioteca" | "avaliacoes" | "suporte"
+    "inicial" | "galeria" | "overlay" | "biblioteca" | "avaliacoes" | "suporte" | "conexoes"
   >("inicial");
 
   // Submenu scroll & arrows state
@@ -145,6 +147,7 @@ export default function AdminPanel() {
     { id: "biblioteca", label: "Biblioteca", icon: BookOpen },
     { id: "avaliacoes", label: "Avaliações", icon: Star },
     { id: "suporte", label: "Suporte", icon: HelpCircle },
+    { id: "conexoes", label: "Conexão", icon: RadioTower },
   ] as const;
 
   return (
@@ -233,6 +236,8 @@ export default function AdminPanel() {
 
       {/* Conteúdo da sub-área selecionada */}
       <div className="rounded-2xl bg-slate-900/60 border border-white/10 p-6 backdrop-blur-xl">
+        {subTab === "conexoes" && <AdminConnectionsPage />}
+
         {subTab === "inicial" && (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
