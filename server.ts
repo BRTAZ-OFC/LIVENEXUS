@@ -101,7 +101,7 @@ const PUBLIC_API_ENDPOINTS = new Set([
   "POST /api/avaliacoes",
 ]);
 
-app.use(/^\\/api(?:\\/.*)?$/, async (req: Request, res: Response, next: NextFunction) => {
+app.use(/^\/api(?:\/.*)?$/, async (req: Request, res: Response, next: NextFunction) => {
   if (PUBLIC_API_ENDPOINTS.has(`${req.method} ${req.path}`)) return next();
 
   const session = readSession(req) as SessionData | null;
@@ -986,10 +986,10 @@ async function requirePageSession(
   }
 }
 
-app.use(/^\\/dashboard\\/?$/, (req: Request, res: Response, next: NextFunction) =>
+app.use(/^\/dashboard\/?$/, (req: Request, res: Response, next: NextFunction) =>
   requirePageSession(req, res, next),
 );
-app.use(/^\\/admin\\/banco\\/?$/, (req: Request, res: Response, next: NextFunction) =>
+app.use(/^\/admin\/banco\/?$/, (req: Request, res: Response, next: NextFunction) =>
   requirePageSession(req, res, next, "admin"),
 );
 
