@@ -6,7 +6,7 @@ import {
   disconnectMultiChatPlatform,
   getMultiChatSnapshot,
   setMultiChatChannel,
-  useMultiChatSnapshot,
+  useMultiChatStatusSnapshot,
   type ChatPlatform,
 } from "../multichat";
 
@@ -21,7 +21,7 @@ const EMPTY: Record<ChatPlatform, VerificationState> = {
 type AuthUser = { user_id: string; user: string; role?: string };
 
 export default function PlatformBioConnections() {
-  const state = useMultiChatSnapshot();
+  const state = useMultiChatStatusSnapshot();
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [channels, setChannels] = useState<Record<ChatPlatform, string>>({
     Twitch: "",
