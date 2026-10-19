@@ -89,7 +89,7 @@ export default function AdminConnectionsPage() {
         method: "POST",
         headers,
         credentials: "include",
-        body: JSON.stringify({ platform: platform.toLowerCase(), channel_name: channel, status: "pending" }),
+        body: JSON.stringify({ platform: platform.toLowerCase(), channel_name: channel }),
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.ok) setNotice(`Conexão iniciada; não foi possível salvar o canal no JSON: ${data.error || "erro de gravação"}`);
