@@ -88,7 +88,7 @@ function createKickRawCapture(msg) {
 }
 
 export function connectKick(channel, onMessage, onStatus, onMeta) {
-  let ws = null, pingTimer = null, destroyed = false, chatroomId = null;
+  let ws = null, pingTimer = null, connectTimer = null, destroyed = false, chatroomId = null, subscribed = false;
   const slug = normalizeKickSlug(channel);
   diag.Kick.reconnectSupported = false;
 
@@ -111,7 +111,7 @@ export function connectKick(channel, onMessage, onStatus, onMeta) {
     return _userOnMessage(payload);
   };
 
-  const cleanup = () => { if (pingTimer) { clearInterval(pingTimer); pingTimer = null; diag.Kick.pingTimerActive = 0; } if (metaTimer) { clearInterval(metaTimer); metaTimer = null; } if (ws) { ws.onclose = null; ws.onerror = null; try { ws.close(); } catch {} diag.Kick.socketsClosed++; diag.Kick.socketActive = 0; ws = null; } };
+  const cleanup = () => { if (connectTimer) { clearTimeout(connectTimer); connectTimer = null; } if (pingTimer) { clearInterval(pingTimer); pingTimer = null; diag.Kick.pingTimerActive = 0; } if (metaTimer) { clearInterval(metaTimer); metaTimer = null; } if (ws) { ws.onclose = null; ws.onerror = null; try { ws.close(); } catch {} diag.Kick.socketsClosed++; diag.Kick.socketActive = 0; ws = null; } };
   const disconnect = () => { destroyed = true; cleanup(); diag.Kick.disconnectedAt = new Date().toISOString(); diag.Kick.disconnectReason = 'manual'; diag.Kick.recoveryStatus = 'manual_disconnect'; };
 
   // Viewer count via API v2 do Kick (frontend, sem Worker). Reutiliza o mesmo
@@ -150,7 +150,16 @@ export function connectKick(channel, onMessage, onStatus, onMeta) {
     if (destroyed) return;
 
     ws = new WebSocket(PUSHER_URL); diag.Kick.socketsCreated++; diag.Kick.socketActive = 1;
-    ws.onopen = () => { pingTimer = setInterval(() => ws.readyState === WebSocket.OPEN && ws.send(JSON.stringify({ event: 'pusher:ping', data: {} })), 30000); diag.Kick.pingTimerActive = 1; };
+    connectTimer = setTimeout(() => {
+      if (!destroyed && !subscribed) {
+        const message = 'O WebSocket abriu, mas o Kick não confirmou a assinatura do chat em 15 segundos.';
+        diag.Kick.lastError = message; diag.Kick.lastErrorAt = new Date().toISOString();
+        pushError({ platform: 'Kick', step: 'subscription_timeout', message });
+        onStatus('error', message);
+        destroyed = true; cleanup();
+      }
+    }, 15000);
+    ws.onopen = () => { pingTimer = setInterval(() => ws && ws.readyState === WebSocket.OPEN && ws.send(JSON.stringify({ event: 'pusher:ping', data: {} })), 30000); diag.Kick.pingTimerActive = 1; };
     ws.onmessage = e => {
       let msg; try { msg = JSON.parse(e.data); } catch { return; }
       // TEMPORARY: raw capture setup — BEFORE classification (no behavior change)
@@ -158,7 +167,8 @@ export function connectKick(channel, onMessage, onStatus, onMeta) {
       const _isKnownChat = /ChatMessage/i.test(msg.event || '');
       if (!_isPusherInternal && !_isKnownChat) _rawCapturePending = createKickRawCapture(msg);
       if (msg.event === 'pusher:connection_established') ws.send(JSON.stringify({ event: 'pusher:subscribe', data: { auth: '', channel: `chatrooms.${chatroomId}.v2` } }));
-      else if (msg.event === 'pusher_internal:subscription_succeeded') { diag.Kick.connectedAt = new Date().toISOString(); diag.Kick.disconnectReason = null; diag.Kick.recoveryStatus = 'subscribed'; onStatus('connected'); pollViewers(); metaTimer = setInterval(pollViewers, 60000); }
+      else if (msg.event === 'pusher_internal:subscription_succeeded') { subscribed = true; if (connectTimer) { clearTimeout(connectTimer); connectTimer = null; } diag.Kick.connectedAt = new Date().toISOString(); diag.Kick.disconnectReason = null; diag.Kick.recoveryStatus = 'subscribed'; onStatus('connected', 'Conectado ao chat do Kick.'); pollViewers(); metaTimer = setInterval(pollViewers, 60000); }
+      else if (msg.event === 'pusher:subscription_error') { const detail = `Kick recusou a assinatura do chat: ${String(msg.data || 'erro de assinatura')}`; diag.Kick.lastError = detail; diag.Kick.lastErrorAt = new Date().toISOString(); pushError({ platform: 'Kick', step: 'subscription_error', message: detail }); onStatus('error', detail); destroyed = true; cleanup(); }
       else if (msg.event === 'pusher:ping') ws.send(JSON.stringify({ event: 'pusher:pong', data: {} }));
       else if (msg.event === 'App\\Events\\ChatMessageEvent' || msg.event === 'App\\Events\\ChatMessageSentEvent') {
         let d; try { d = JSON.parse(msg.data); } catch { return; }
@@ -202,9 +212,9 @@ export function connectKick(channel, onMessage, onStatus, onMeta) {
         }
       }
     };
-    ws.onerror = () => { diag.Kick.lastError = 'Pusher onerror'; diag.Kick.lastErrorAt = new Date().toISOString(); pushError({ platform: 'Kick', step: 'pusher.onerror', message: 'Erro na conexão com o Pusher do Kick.' }); onStatus('error', 'Erro na conexão com o Pusher do Kick.'); };
-    // Fechamento natural do Pusher: marca encerrada, limpa timers e impede novos polls (idempotente).
-    ws.onclose = () => { if (!destroyed) { destroyed = true; cleanup(); diag.Kick.disconnectedAt = new Date().toISOString(); diag.Kick.disconnectReason = 'socket_closed'; diag.Kick.recoveryStatus = 'closed'; } };
+    ws.onerror = () => { const detail = 'Erro na conexão com o Pusher do Kick.'; diag.Kick.lastError = 'Pusher onerror'; diag.Kick.lastErrorAt = new Date().toISOString(); pushError({ platform: 'Kick', step: 'pusher.onerror', message: detail }); onStatus('error', detail); };
+    // Nunca deixa a interface presa em CONNECTING se o servidor fechar o socket.
+    ws.onclose = (event) => { if (!destroyed) { const detail = subscribed ? 'WebSocket do Kick foi encerrado.' : `WebSocket do Kick fechou antes de conectar (código ${event.code}${event.reason ? `: ${event.reason}` : ''}).`; destroyed = true; cleanup(); diag.Kick.disconnectedAt = new Date().toISOString(); diag.Kick.disconnectReason = 'socket_closed'; diag.Kick.recoveryStatus = 'closed'; if (!subscribed) onStatus('error', detail); else onStatus('closed', detail); } };
   })();
 
   return { disconnect };
