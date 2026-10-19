@@ -20,15 +20,99 @@ const META: Record<ChatPlatform, { placeholder: string; color: string; Icon: typ
 export default function AdminConnectionsPage() {
   const state = useMultiChatSnapshot();
   const [channels, setChannels] = useState(state.channels);
+  const [connectionError, setConnectionError] = useState("");
+  const [connectionNotice, setConnectionNotice] = useState("");
+
   useEffect(() => {
     const sync = () => setChannels(getMultiChatSnapshot().channels);
     const unsubscribe = subscribeMultiChat(sync);
     return unsubscribe;
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    async function loadSavedConnections() {
+      try {
+        const token = sessionStorage.getItem("livenexus_token");
+        const headers: Record<string, string> = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+        const response = await fetch("/api/platforms", {
+          headers,
+          credentials: "include",
+          cache: "no-store",
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok) {
+          throw new Error(data.message || "Não foi possível carregar os canais salvos.");
+        }
+        if (cancelled) return;
+        const platformNames: Record<string, ChatPlatform> = {
+          twitch: "Twitch",
+          kick: "Kick",
+          youtube: "YouTube",
+        };
+        for (const connection of data.connections ?? []) {
+          const platform = platformNames[String(connection.platform ?? "").toLowerCase()];
+          if (platform && typeof connection.channel_id === "string") {
+            setMultiChatChannel(platform, connection.channel_id);
+          }
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setConnectionError(error instanceof Error ? error.message : "Falha ao carregar conexões salvas.");
+        }
+      }
+    }
+    void loadSavedConnections();
+    return () => { cancelled = true; };
+  }, []);
+
   function updateChannel(platform: ChatPlatform, value: string) {
     setChannels((old) => ({ ...old, [platform]: value }));
     setMultiChatChannel(platform, value);
+    setConnectionError("");
+    setConnectionNotice("");
+  }
+
+  function channelUrl(platform: ChatPlatform, channel: string) {
+    const value = channel.trim();
+    if (platform === "Twitch") return `https://www.twitch.tv/${value.replace(/^@/, "")}`;
+    if (platform === "Kick") return `https://kick.com/${value.replace(/^@/, "")}`;
+    if (/^https?:\/\//i.test(value)) return value;
+    if (/^[a-zA-Z0-9_-]{11}$/.test(value)) return `https://www.youtube.com/watch?v=${value}`;
+    return `https://www.youtube.com/${value.startsWith("@") ? value : `@${value}`}/live`;
+  }
+
+  async function connectPlatform(platform: ChatPlatform) {
+    setConnectionError("");
+    setConnectionNotice("");
+    const channel = channels[platform].trim();
+    if (!channel) return;
+
+    try {
+      const token = sessionStorage.getItem("livenexus_token");
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const response = await fetch("/api/platforms", {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({
+          platform: platform.toLowerCase(),
+          channel_id: channel,
+          channel_name: channel,
+          channel_url: channelUrl(platform, channel),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        throw new Error(data.message || "Não foi possível salvar o canal no JSON do usuário.");
+      }
+      connectMultiChatPlatform(platform);
+      setConnectionNotice(`Canal ${platform} salvo no JSON da conta autenticada.`);
+    } catch (error) {
+      setConnectionError(error instanceof Error ? error.message : "Falha ao salvar a conexão.");
+    }
   }
 
   function clearAll() {
@@ -46,6 +130,9 @@ export default function AdminConnectionsPage() {
           <Trash2 size={14} /> Desconectar todas
         </button>
       </header>
+
+      {connectionError && <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">{connectionError}</p>}
+      {connectionNotice && <p role="status" className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300">{connectionNotice}</p>}
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         {PLATFORMS.map((platform) => {
@@ -77,7 +164,7 @@ export default function AdminConnectionsPage() {
               {active ? (
                 <button type="button" onClick={() => disconnectMultiChatPlatform(platform)} className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 py-2 text-xs font-semibold text-red-300 hover:bg-red-500/20"><WifiOff size={14} /> Desconectar</button>
               ) : (
-                <button type="button" onClick={() => connectMultiChatPlatform(platform)} disabled={!channels[platform].trim()} className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet-600 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40"><Wifi size={14} /> Conectar canal</button>
+                <button type="button" onClick={() => void connectPlatform(platform)} disabled={!channels[platform].trim()} className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet-600 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40"><Wifi size={14} /> Conectar canal</button>
               )}
             </article>
           );
