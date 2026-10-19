@@ -100,7 +100,6 @@ export function connectMultiChatPlatform(platform: ChatPlatform) {
   };
   const onStatus = (next: string, detail?: string) => {
     patchPlatform(platform, { status: String(next || "unknown"), detail: detail || String(next || "Status atualizado") });
-    if (["error", "closed", "disconnected", "idle"].includes(String(next).toLowerCase())) handles[platform] = undefined;
   };
   const onMeta = (raw: unknown) => {
     if (!raw || typeof raw !== "object") return;
