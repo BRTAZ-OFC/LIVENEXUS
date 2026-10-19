@@ -2,6 +2,7 @@
 import DatabasePage from "./admin/banco";
 import AdminPanel from "./admin/panel";
 import TTSPage from "./tts";
+import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import { useEffect, useState } from "react";
 import {
   AudioLines,
@@ -26,7 +27,15 @@ import {
 function DashboardPage() {
   // BLOCO 4 — Inicializa o menu e recupera o papel antes de restaurar a aba ativa.
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
-  const [chatSoundEnabled, setChatSoundEnabled] = useState(false);
+  const chatState = useMultiChatSnapshot();
+  const connectedPlatforms = ["Twitch", "Kick", "YouTube"].filter((platform) => ["connected", "open"].includes(chatState.statuses[platform as keyof typeof chatState.statuses].status.toLowerCase()));
+  const totalViewers = ["Twitch", "Kick", "YouTube"].reduce((total, platform) => total + (chatState.statuses[platform as keyof typeof chatState.statuses].viewers ?? 0), 0);
+  const speakerCounts = Object.values(chatState.messages.reduce<Record<string, { author: string; count: number }>>((acc, message) => {
+    const key = message.author.trim().toLowerCase() || "anônimo";
+    if (!acc[key]) acc[key] = { author: message.author || "Anônimo", count: 0 };
+    acc[key].count += 1;
+    return acc;
+  }, {})).sort((a, b) => b.count - a.count).slice(0, 10);
   const [isAdmin, setIsAdmin] = useState(() => {
     if (typeof window !== "undefined") {
       return sessionStorage.getItem("livenexus_role") === "admin";
@@ -186,16 +195,16 @@ function DashboardPage() {
                 <p className="dash-text-xs-font-bold-1eh0cdm">CENTRAL DE TRANSMISSÃO</p>
                 <h1 className="dash-mt-3-text-3xl-1fv0i93">Dashboard</h1>
               </div>
-              <span className="dash-preview-tag">Prévia estrutural · sem conexões</span>
+              <span className="dash-preview-tag">{connectedPlatforms.length ? `${connectedPlatforms.length} plataforma(s) conectada(s)` : "Aguardando conexões"}</span>
             </div>
 
             <div className="dash-live-stats">
               <article className="dash-stat-card">
                 <div className="dash-stat-label"><Radio /> Plataformas ao vivo</div>
                 <div className="dash-platform-counts">
-                  <span><i className="dash-platform-dot twitch" /> Twitch <b>0</b></span>
-                  <span><i className="dash-platform-dot youtube" /> YouTube <b>0</b></span>
-                  <span><i className="dash-platform-dot kick" /> KICK <b>0</b></span>
+                  <span><i className="dash-platform-dot twitch" /> Twitch <b>{["connected", "open"].includes(chatState.statuses.Twitch.status.toLowerCase()) ? 1 : 0}</b></span>
+                  <span><i className="dash-platform-dot youtube" /> YouTube <b>{["connected", "open"].includes(chatState.statuses.YouTube.status.toLowerCase()) ? 1 : 0}</b></span>
+                  <span><i className="dash-platform-dot kick" /> KICK <b>{["connected", "open"].includes(chatState.statuses.Kick.status.toLowerCase()) ? 1 : 0}</b></span>
                 </div>
               </article>
               <article className="dash-stat-card">
@@ -216,41 +225,7 @@ function DashboardPage() {
             </div>
 
             <div className="dash-live-workspace">
-              <section className="dash-chat-panel">
-                <header className="dash-panel-header">
-                  <div>
-                    <h2>Chat ao vivo</h2>
-                    <p>Mensagens unificadas</p>
-                  </div>
-                  <button
-                    type="button"
-                    className="dash-icon-button"
-                    aria-label={chatSoundEnabled ? "Desativar som do chat (visual)" : "Ativar som do chat (visual)"}
-                    title="Som do chat (visual)"
-                    onClick={() => setChatSoundEnabled((enabled) => !enabled)}
-                    aria-pressed={chatSoundEnabled}
-                  >
-                    {chatSoundEnabled ? <Volume2 /> : <VolumeX />}
-                  </button>
-                </header>
-                <div className="dash-chat-toolbar">
-                  <span className="dash-chat-status-dot" /> Chat desconectado
-                  <span className="dash-chat-demo-label">Prévia</span>
-                </div>
-                <div className="dash-chat-messages" role="log" aria-label="Mensagens do chat de demonstração">
-                  <div className="dash-chat-empty">
-                    <MessageSquare />
-                    <strong>Nenhuma mensagem</strong>
-                    <span>As mensagens das plataformas aparecerão aqui quando as conexões forem configuradas.</span>
-                  </div>
-                </div>
-                <form className="dash-chat-composer" onSubmit={(event) => event.preventDefault()}>
-                  <input aria-label="Mensagem de chat" placeholder="Conectores ainda não configurados" disabled />
-                  <button type="submit" aria-label="Enviar mensagem" disabled title="Disponível após conectar"><Send /></button>
-                </form>
-              </section>
-
-              <section className="dash-speakers-panel">
+              <MultiChatPanel />\n\n              <section className="dash-speakers-panel">
                 <header className="dash-panel-header">
                   <div>
                     <h2>Top 10 falantes</h2>
@@ -258,21 +233,24 @@ function DashboardPage() {
                   </div>
                   <UserRound className="dash-panel-heading-icon" />
                 </header>
-                <div className="dash-speakers-empty">
-                  <div className="dash-speakers-empty-icon"><UserRound /></div>
-                  <strong>Ranking indisponível</strong>
-                  <span>O ranking será preenchido quando houver mensagens recebidas.</span>
-                </div>
-                <ol className="dash-speakers-list" aria-label="Top 10 falantes">
-                  {Array.from({ length: 10 }, (_, index) => (
-                    <li key={index}>
-                      <span className="dash-speaker-rank">{index + 1}</span>
-                      <span className="dash-speaker-avatar">{index + 1}</span>
-                      <span className="dash-speaker-placeholder">Aguardando usuário</span>
-                      <b>0</b>
-                    </li>
-                  ))}
-                </ol>
+                {speakerCounts.length === 0 ? (
+                  <div className="dash-speakers-empty">
+                    <div className="dash-speakers-empty-icon"><UserRound /></div>
+                    <strong>Ranking aguardando mensagens</strong>
+                    <span>Os 10 usuários mais ativos aparecerão aqui conforme o multichat receber mensagens.</span>
+                  </div>
+                ) : (
+                  <ol className="dash-speakers-list" aria-label="Top 10 falantes">
+                    {speakerCounts.map((speaker, index) => (
+                      <li key={speaker.author.toLowerCase()}>
+                        <span className="dash-speaker-rank">{index + 1}</span>
+                        <span className="dash-speaker-avatar">{speaker.author.slice(0, 2).toUpperCase()}</span>
+                        <span className="dash-speaker-placeholder">{speaker.author}</span>
+                        <b>{speaker.count}</b>
+                      </li>
+                    ))}
+                  </ol>
+                )}           </ol>
               </section>
             </div>
           </section>
