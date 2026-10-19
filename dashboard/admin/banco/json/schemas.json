@@ -296,5 +296,69 @@
         "type": "lista"
       }
     ]
+  },
+  "galeria_usuarios": {
+    "id": "galeria_usuarios",
+    "name": "Galeria de usuários",
+    "fields": [
+      {
+        "name": "user_id",
+        "type": "texto"
+      },
+      {
+        "name": "id",
+        "type": "texto"
+      },
+      {
+        "name": "filename",
+        "type": "texto"
+      },
+      {
+        "name": "url",
+        "type": "texto"
+      },
+      {
+        "name": "size",
+        "type": "número"
+      },
+      {
+        "name": "uploadedAt",
+        "type": "data"
+      }
+    ]
+  },
+  "vods": {
+    "id": "vods",
+    "name": "VODs e sessões",
+    "fields": [
+      {
+        "name": "user_id",
+        "type": "texto"
+      },
+      {
+        "name": "id",
+        "type": "texto"
+      },
+      {
+        "name": "title",
+        "type": "texto"
+      },
+      {
+        "name": "url",
+        "type": "texto"
+      },
+      {
+        "name": "vodStatus",
+        "type": "texto"
+      },
+      {
+        "name": "created_date",
+        "type": "data"
+      },
+      {
+        "name": "updated_date",
+        "type": "data"
+      }
+    ]
   }
 }
