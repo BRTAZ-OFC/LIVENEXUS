@@ -16,8 +16,8 @@ createRoot(rootElement).render(
     <RealErrorBoundary>
       <BrowserRouter>
         <App />
-        <RealErrorViewer />
       </BrowserRouter>
     </RealErrorBoundary>
+    <RealErrorViewer />
   </StrictMode>,
 );
