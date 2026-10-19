@@ -15,23 +15,23 @@
   @apply w-16;
 }
 
-/* BLOCO 004 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
+/* BLOCO 004 — botões do menu: reduzir a altura sem alterar a largura da sidebar. */
 .dash-flex-h-11-141hbqq {
-  @apply flex h-11 items-center rounded-lg transition;
+  @apply mx-auto flex h-9 items-center rounded-lg transition;
 
   @variant hover {
     @apply bg-white/5;
   }
 }
 
-/* BLOCO 005 — estilo de elemento; origem dashboard/dashboard.tsx. */
+/* BLOCO 005 — botões com texto: ocupar menos espaço dentro da sidebar expandida. */
 .dash-gap-3-px-3-x5a6yh {
-  @apply gap-3 px-3;
+  @apply w-[92%] gap-3 px-3;
 }
 
-/* BLOCO 006 — estilo de elemento; origem dashboard/dashboard.tsx. */
+/* BLOCO 006 — botões recolhidos: manter apenas um botão compacto para o ícone. */
 .dash-justify-center-160tcmj {
-  @apply justify-center;
+  @apply w-9 justify-center px-0;
 }
 
 /* BLOCO 008 — tipografia e aparência; origem dashboard/dashboard.tsx. */
@@ -80,7 +80,7 @@
 
 /* BLOCO 017 — tipografia e aparência; origem dashboard/dashboard.tsx. */
 .dash-text-7px-font-semibold-r7z1tv {
-  @apply text-[7px] font-semibold;
+  @apply text-[14px] font-semibold;
 }
 
 /* BLOCO 018 — tipografia e aparência; origem dashboard/dashboard.tsx. */
@@ -150,7 +150,7 @@
   @apply h-4 w-4;
 }
 
-/* BLOCO 029 — estilo de elemento; origem dashboard/dashboard.tsx. */
+/* BLOCO 029 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
 .dash-w-full-px-6-n4tgk {
   @apply w-full px-6 py-8;
 
