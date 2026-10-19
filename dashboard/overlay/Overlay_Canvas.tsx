@@ -76,7 +76,7 @@ function getCanvasConfig(row: OverlayRow): CanvasConfig {
         : row as unknown as JsonObject;
   return {
     ...source,
-    id: typeof row.id === "string" ? row.id : undefined,
+    ...(typeof row.id === "string" ? { id: row.id } : {}),
     name: String(source["name"] ?? row.name ?? "Overlay"),
     visualizerSize: isObject(source["visualizerSize"])
       ? source["visualizerSize"] as CanvasConfig["visualizerSize"]
