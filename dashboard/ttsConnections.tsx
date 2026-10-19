@@ -37,7 +37,8 @@ function loadConnectionItems(): Record<Platform, ConnectionState> {
       code: challengeValid ? item.code! : "",
       challenge: challengeValid ? item.challenge! : "",
       challengeExpiresAt: challengeValid ? expiresAt : 0,
-      verified: item.verified === true,
+      // A verificação é confirmada novamente pela API; sessionStorage não é autoridade de acesso.
+      verified: false,
       busy: false,
       message: !challengeValid && !!item.code && item.verified !== true
         ? "O código expirou. Gere outro código para continuar."
