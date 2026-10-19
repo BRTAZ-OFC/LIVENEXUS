@@ -22,21 +22,9 @@ export default defineConfig(() => ({
     // Para habilitá-lo explicitamente em um ambiente compatível, defina ENABLE_HMR=true.
     hmr: process.env["ENABLE_HMR"] === "true" ? {} : false,
     watch: process.env["ENABLE_HMR"] === "true" ? {} : null,
-    proxy: {
-      "/api": {
-        target: "http://127.0.0.1:3001",
-        changeOrigin: true,
-      },
-    },
   },
   preview: {
     host: "0.0.0.0",
     port: 3000,
-    proxy: {
-      "/api": {
-        target: "http://127.0.0.1:3001",
-        changeOrigin: true,
-      },
-    },
   },
 }));

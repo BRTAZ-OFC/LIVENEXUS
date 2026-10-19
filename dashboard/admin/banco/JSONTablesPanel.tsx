@@ -78,10 +78,10 @@ export default function JSONTablesPanel({ tableId, title, refreshKey = 0 }: Prop
         cache: "no-store",
       });
       const data = await response.json();
-      if (!response.ok || !data.ok || !Array.isArray(data.records)) {
+      if (!response.ok || !data.ok) {
         throw new Error(data.message || "Não foi possível carregar esta tabela JSON.");
       }
-      setRows(data.records as JsonRow[]);
+      setRows(Array.isArray(data.rows) ? (data.rows as JsonRow[]) : []);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Falha ao carregar os registros.");
       setRows([]);

@@ -317,6 +317,8 @@ export default function OverlayEditorSidebar({
 }) {
   const { connections, streamMeta, liveActivity } = useStreaming();
   const [activeTab, setActiveTab] = useState('widget');
+  const [modalTab, setModalTab] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFontCategory, setSelectedFontCategory] = useState('Sans Moderna');
   const [librarySearchQuery, setLibrarySearchQuery] = useState('');
   const [libraryFavorites, setLibraryFavorites] = useState([]);
@@ -556,7 +558,7 @@ export default function OverlayEditorSidebar({
   const WidgetPreviewComponent = selectedWidget?.component;
 
   return (
-    <aside className="fixed inset-x-0 bottom-0 z-50 flex flex-col items-stretch pointer-events-none">
+    <aside className="fixed top-0 right-0 bottom-0 z-50 flex flex-row items-stretch pointer-events-none">
       <style>{`
         .no-scrollbar::-webkit-scrollbar {
           display: none !important;
@@ -569,7 +571,7 @@ export default function OverlayEditorSidebar({
       {/* Toggle Handle Button on left border of sidebar */}
       <button
         onClick={onToggleOpen}
-        className="pointer-events-auto self-end h-6 px-3 bg-purple-600 hover:bg-purple-500 text-white rounded-t-xl flex items-center justify-center shadow-2xl transition-all"
+        className="pointer-events-auto self-start mt-20 h-10 px-2 bg-purple-600 hover:bg-purple-500 text-white rounded-l-xl flex items-center justify-center shadow-2xl transition-all"
         title={isOpen ? 'Recolher Editor' : 'Expandir Editor'}
       >
         {isOpen ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -577,8 +579,8 @@ export default function OverlayEditorSidebar({
 
       {/* Floating Panel (does NOT push visualizer) */}
       <div
-        className={`pointer-events-auto w-full bg-slate-900/95 border-t border-white/10 backdrop-blur-2xl shadow-2xl flex flex-col transition-all duration-300 overflow-hidden ${
-          isOpen ? 'h-[36vh] min-h-[250px] max-h-[45vh]' : 'h-0 opacity-0 pointer-events-none'
+        className={`pointer-events-auto h-full bg-slate-900/95 border-l border-white/10 backdrop-blur-2xl shadow-2xl flex flex-col transition-all duration-300 overflow-hidden ${
+          isOpen ? 'w-[440px] min-w-[300px] max-w-[90vw]' : 'w-0 opacity-0 pointer-events-none'
         }`}
       >
         {/* Header */}
@@ -605,7 +607,10 @@ export default function OverlayEditorSidebar({
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setModalTab(tab.id);
+                  setIsModalOpen(true);
+                }}
                 className={`flex-shrink-0 flex flex-col items-center py-1.5 px-2.5 rounded-lg text-[10px] font-medium transition-all ${
                   isActive 
                     ? 'bg-purple-600/30 text-purple-200 border border-purple-500/40' 
@@ -664,18 +669,16 @@ export default function OverlayEditorSidebar({
                       <button
                         onClick={() => {
                           if (selectedInst) {
-                            onUpdateInstance(selectedInst.id, {
-                              width: visualizerSize.width,
-                              height: visualizerSize.height,
-                              x: 0,
-                              y: 0
+                            onUpdateVisualizerSize({
+                              width: selectedInst.width || 400,
+                              height: selectedInst.height || 300
                             });
                           }
                         }}
                         className="flex flex-col items-center justify-center gap-1 py-1.5 px-1 rounded-lg bg-indigo-900/40 hover:bg-indigo-800/60 border border-indigo-500/30 text-indigo-200 transition-all cursor-pointer"
                       >
                         <Maximize2 className="h-3 w-3" />
-                        <span className="text-[9px] font-bold uppercase leading-none">Widget = Cenário</span>
+                        <span className="text-[9px] font-bold uppercase leading-none">Cenário = Widget</span>
                       </button>
                       <button
                         onClick={() => {
@@ -3767,6 +3770,25 @@ export default function OverlayEditorSidebar({
 
         </div>
       </div>
+      {/* Simple Modal Implementation */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 border border-white/20 rounded-xl w-[800px] h-[600px] flex flex-col shadow-2xl">
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <h3 className="text-sm font-bold text-white capitalize">{modalTab}</h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 text-xs text-white">
+              {/* Content mapped from tab id */}
+              {modalTab === 'widget' && <p>Conteúdo de Widget</p>}
+              {modalTab === 'config' && <p>Conteúdo de Config</p>}
+              {/* ... and so on ... */}
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }

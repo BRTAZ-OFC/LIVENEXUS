@@ -58,15 +58,7 @@ const isApiOnly = process.argv.includes("--api-only");
 const isDevServer =
   !isApiOnly && (process.argv.includes("--dev") || process.env["NODE_ENV"] === "development");
 
-if (isDevServer) {
-  const { createServer } = await import("vite");
-  const vite = await createServer({
-    server: { middlewareMode: true },
-    appType: "spa",
-  });
-  app.use(vite.middlewares);
-}
-
+/* Define routes first */
 app.disable("x-powered-by");
 app.use(express.json({ limit: "1mb" }));
 
@@ -845,6 +837,15 @@ app.all(/^\/api(?:\/.*)?$/, (req: Request, res: Response) => {
     endpoint: req.originalUrl,
   });
 });
+
+if (isDevServer) {
+  const { createServer } = await import("vite");
+  const vite = await createServer({
+    server: { middlewareMode: true },
+    appType: "spa",
+  });
+  app.use(vite.middlewares);
+}
 
 if (!isDevServer && !isApiOnly) {
   app.use(express.static(distDir));

@@ -127,7 +127,6 @@ function backgroundStyle(background: CanvasBackground): CSSProperties {
 export default function OverlayCanvas() {
   const frameRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
-  const [displaySize, setDisplaySize] = useState(DEFAULT_SIZE);
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
   const [editorOpen, setEditorOpen] = useState(true);
@@ -183,6 +182,7 @@ export default function OverlayCanvas() {
   }, []);
 
   // Persiste a composição no JSON com debounce para não gravar a cada movimento do mouse.
+  /*
   useEffect(() => {
     if (loading || error) return;
     // A carga inicial é apenas leitura; só salvar depois de uma alteração do usuário.
@@ -223,6 +223,7 @@ export default function OverlayCanvas() {
       window.clearTimeout(timeout);
     };
   }, [config, loading, error]);
+  */
 
   const size = useMemo(() => ({
     width: Math.max(320, Number(config.visualizerSize?.width) || DEFAULT_SIZE.width),
@@ -241,7 +242,7 @@ export default function OverlayCanvas() {
     const observer = new ResizeObserver(updateScale);
     observer.observe(frame);
     return () => observer.disconnect();
-  }, [size.width, size.height, displaySize.width, displaySize.height]);
+  }, [size.width, size.height]);
 
   function addWidget(definition: WidgetDefinition) {
     const existing = config.instances || [];
@@ -347,7 +348,7 @@ export default function OverlayCanvas() {
       <div
         ref={frameRef}
         className="relative mx-auto shrink-0 overflow-hidden bg-transparent"
-        style={{ width: displaySize.width, maxWidth: "100%", height: displaySize.height, boxSizing: "border-box" }}
+        style={{ width: size.width, maxWidth: "100%", height: size.height, boxSizing: "border-box" }}
         aria-label="Canvas de Overlay"
       >
         <div
@@ -536,8 +537,8 @@ export default function OverlayCanvas() {
             resizeStart.current = {
               x: event.clientX,
               y: event.clientY,
-              width: displaySize.width,
-              height: displaySize.height,
+              width: size.width,
+              height: size.height,
             };
             event.currentTarget.setPointerCapture(event.pointerId);
           }}
@@ -545,10 +546,13 @@ export default function OverlayCanvas() {
             const start = resizeStart.current;
             if (!start || !(event.buttons & 1)) return;
             const parentWidth = frameRef.current?.parentElement?.clientWidth ?? 2400;
-            setDisplaySize({
-              width: Math.round(Math.max(40, Math.min(2400, parentWidth, start.width + event.clientX - start.x))),
-              height: Math.round(Math.max(20, Math.min(1600, start.height + event.clientY - start.y))),
-            });
+            setConfig((current) => ({
+              ...current,
+              visualizerSize: {
+                width: Math.round(Math.max(40, Math.min(2400, parentWidth, start.width + event.clientX - start.x))),
+                height: Math.round(Math.max(20, Math.min(1600, start.height + event.clientY - start.y))),
+              }
+            }));
           }}
           onPointerUp={() => { resizeStart.current = null; }}
           onPointerCancel={() => { resizeStart.current = null; }}

@@ -250,7 +250,7 @@ export function RealErrorViewer() {
 
   const currentError = errors[selectedIndex] || errors[errors.length - 1];
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     if (!currentError) return;
     const textToCopy = [
       `[LIVENEXUS ERROR DEVTOOLS DUMP]`,
@@ -269,9 +269,14 @@ export function RealErrorViewer() {
       .filter(Boolean)
       .join("\n");
 
-    navigator.clipboard.writeText(textToCopy);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+      // Optional: Handle user feedback if copy fails
+    }
   };
 
   const handleClear = () => {
