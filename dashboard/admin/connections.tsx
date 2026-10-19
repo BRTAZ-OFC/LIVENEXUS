@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { RadioTower, Radio, Youtube, Wifi, WifiOff, Trash2, Activity, ShieldCheck, Copy } from "lucide-react";
-import { channelVerify } from "../configuracao/Config_channelVerify";
+import { RadioTower, Radio, Youtube, Wifi, WifiOff, Trash2, Activity } from "lucide-react";
 import {
   connectMultiChatPlatform,
   disconnectMultiChatPlatform,
@@ -12,137 +11,98 @@ import {
 } from "../multichat";
 
 const PLATFORMS: ChatPlatform[] = ["Twitch", "Kick", "YouTube"];
-const META: Record<ChatPlatform, { placeholder: string; color: string; Icon: typeof RadioTower }> = {
-  Twitch: { placeholder: "Nome do canal (ex.: gaules)", color: "violet", Icon: RadioTower },
-  Kick: { placeholder: "Slug do canal (ex.: xqc)", color: "emerald", Icon: Radio },
-  YouTube: { placeholder: "@canal ou URL do canal", color: "red", Icon: Youtube },
+const META: Record<ChatPlatform, { placeholder: string; Icon: typeof RadioTower }> = {
+  Twitch: { placeholder: "Nome do canal (ex.: gaules)", Icon: RadioTower },
+  Kick: { placeholder: "Slug do canal (ex.: xqc)", Icon: Radio },
+  YouTube: { placeholder: "@canal ou URL do canal", Icon: Youtube },
 };
-type VerificationState = { challengeId: string; code: string; verified: boolean };
-const EMPTY_VERIFICATION = (): Record<ChatPlatform, VerificationState> => ({
-  Twitch: { challengeId: "", code: "", verified: false },
-  Kick: { challengeId: "", code: "", verified: false },
-  YouTube: { challengeId: "", code: "", verified: false },
-});
 
 export default function AdminConnectionsPage() {
   const state = useMultiChatSnapshot();
-  const [channels, setChannels] = useState(state.channels);
-  const [verification, setVerification] = useState(EMPTY_VERIFICATION);
-  const [busyPlatform, setBusyPlatform] = useState<ChatPlatform | "">("");
-  const [connectionError, setConnectionError] = useState("");
-  const [connectionNotice, setConnectionNotice] = useState("");
+  const [channels, setChannels] = useState(getMultiChatSnapshot().channels);
+  const [busy, setBusy] = useState<ChatPlatform | "">("");
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
 
   useEffect(() => {
-    const sync = () => setChannels(getMultiChatSnapshot().channels);
+    const sync = () => setChannels((old) => ({ ...old, ...getMultiChatSnapshot().channels }));
     return subscribeMultiChat(sync);
   }, []);
 
   useEffect(() => {
     let cancelled = false;
-    async function loadSavedConnections() {
+    async function loadSaved() {
       try {
         const token = sessionStorage.getItem("livenexus_token");
         const headers: Record<string, string> = {};
         if (token) headers.Authorization = `Bearer ${token}`;
-        const response = await fetch("/api/plataformas", {
-          headers,
-          credentials: "include",
-          cache: "no-store",
-        });
+        const response = await fetch("/api/plataformas", { headers, credentials: "include", cache: "no-store" });
         const data = await response.json();
-        if (!response.ok || !data.ok) {
-          throw new Error(data.error || data.message || "Não foi possível carregar os canais salvos.");
-        }
-        if (cancelled) return;
+        if (!response.ok || !data.ok) return;
         const saved = Array.isArray(data.plataformas) ? data.plataformas[0] : null;
-        if (!saved) return;
-        const nextChannels = {
+        if (!saved || cancelled) return;
+        const next = {
           Twitch: typeof saved.twitch === "string" ? saved.twitch : "",
           Kick: typeof saved.kick === "string" ? saved.kick : "",
           YouTube: typeof saved.youtube === "string" ? saved.youtube : "",
         };
-        setChannels((old) => ({ ...old, ...nextChannels }));
-        for (const platform of PLATFORMS) {
-          if (nextChannels[platform]) setMultiChatChannel(platform, nextChannels[platform]);
-        }
-        setVerification({
-          Twitch: { challengeId: "", code: "", verified: String(saved.twitch_status || "").toLowerCase() === "verified" },
-          Kick: { challengeId: "", code: "", verified: String(saved.kick_status || "").toLowerCase() === "verified" },
-          YouTube: { challengeId: "", code: "", verified: String(saved.youtube_status || "").toLowerCase() === "verified" },
-        });
-      } catch (error) {
-        if (!cancelled) setConnectionError(error instanceof Error ? error.message : "Falha ao carregar conexões salvas.");
+        setChannels(next);
+        PLATFORMS.forEach((platform) => { if (next[platform]) setMultiChatChannel(platform, next[platform]); });
+      } catch {
+        // A conexão administrativa não depende da API de vinculação por bio.
       }
     }
-    void loadSavedConnections();
+    void loadSaved();
     return () => { cancelled = true; };
   }, []);
 
   function updateChannel(platform: ChatPlatform, value: string) {
     setChannels((old) => ({ ...old, [platform]: value }));
     setMultiChatChannel(platform, value);
-    setVerification((old) => ({ ...old, [platform]: { challengeId: "", code: "", verified: false } }));
-    setConnectionError("");
-    setConnectionNotice("");
+    setError("");
+    setNotice("");
   }
 
-  async function generateCode(platform: ChatPlatform) {
-    setConnectionError("");
-    setConnectionNotice("");
+  async function toggleConnection(platform: ChatPlatform) {
+    const status = state.statuses[platform].status.toLowerCase();
+    if (["connected", "open", "connecting", "reconnecting"].includes(status)) {
+      disconnectMultiChatPlatform(platform);
+      setNotice(`${platform} desconectado.`);
+      return;
+    }
     const channel = channels[platform].trim();
-    if (!channel) return;
-    setBusyPlatform(platform);
-    try {
-      const result = await channelVerify.challenge(platform, channel);
-      setVerification((old) => ({
-        ...old,
-        [platform]: { challengeId: result.challengeId, code: result.verificationCode, verified: false },
-      }));
-      setConnectionNotice(`Código gerado para ${platform}. Coloque-o na descrição pública/bio do canal e depois clique em “Verificar bio”.`);
-    } catch (error) {
-      setConnectionError(error instanceof Error ? error.message : "Não foi possível gerar o código.");
-    } finally {
-      setBusyPlatform("");
-    }
-  }
-
-  async function verifyAndConnect(platform: ChatPlatform) {
-    setConnectionError("");
-    setConnectionNotice("");
-    const challengeId = verification[platform].challengeId;
-    if (!challengeId) {
-      setConnectionError("Gere um código de verificação primeiro.");
+    if (!channel) {
+      setError("Informe o canal antes de conectar.");
       return;
     }
-    setBusyPlatform(platform);
-    try {
-      const result = await channelVerify.verify(challengeId);
-      const verifiedChannel = String(result.channelIdentifier || channels[platform]).trim();
-      setChannels((old) => ({ ...old, [platform]: verifiedChannel }));
-      setMultiChatChannel(platform, verifiedChannel);
-      setVerification((old) => ({ ...old, [platform]: { challengeId: "", code: "", verified: true } }));
-      connectMultiChatPlatform(platform);
-      setConnectionNotice(`Bio de ${platform} verificada. Canal salvo no JSON e conexão iniciada.`);
-    } catch (error) {
-      setConnectionError(error instanceof Error ? error.message : "Não foi possível verificar a bio.");
-    } finally {
-      setBusyPlatform("");
-    }
-  }
-
-  function connectVerified(platform: ChatPlatform) {
-    if (!verification[platform].verified) {
-      setConnectionError("Verifique a bio do canal antes de conectar.");
-      return;
-    }
-    setMultiChatChannel(platform, channels[platform]);
+    setBusy(platform);
+    setError("");
+    setNotice("");
+    setMultiChatChannel(platform, channel);
     connectMultiChatPlatform(platform);
-    setConnectionNotice(`Conectando ao canal ${platform} já verificado.`);
+    setNotice(`Conexão administrativa de ${platform} iniciada sem exigir vinculação por bio.`);
+    try {
+      const token = sessionStorage.getItem("livenexus_token");
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const response = await fetch("/api/plataformas", {
+        method: "POST",
+        headers,
+        credentials: "include",
+        body: JSON.stringify({ platform: platform.toLowerCase(), channel_name: channel, status: "pending" }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) setNotice(`Conexão iniciada; não foi possível salvar o canal no JSON: ${data.error || "erro de gravação"}`);
+    } catch {
+      setNotice("Conexão iniciada. A gravação opcional do canal no JSON não ficou disponível.");
+    } finally {
+      setBusy("");
+    }
   }
 
-  function clearAll() {
+  function disconnectAll() {
     PLATFORMS.forEach(disconnectMultiChatPlatform);
-    setConnectionNotice("Todas as conexões ativas foram desconectadas.");
+    setNotice("Todas as conexões administrativas foram desconectadas.");
   }
 
   return (
@@ -150,82 +110,47 @@ export default function AdminConnectionsPage() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-white">Conexões administrativas</h2>
-          <p className="mt-1 text-xs text-slate-400">A conexão só é liberada depois que o servidor encontra o código na bio pública do canal.</p>
+          <p className="mt-1 text-xs text-slate-400">Conexão direta para testes administrativos. Não exige vinculação por bio.</p>
         </div>
-        <button type="button" onClick={clearAll} className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-300 hover:bg-red-500/20">
+        <button type="button" onClick={disconnectAll} className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-300 hover:bg-red-500/20">
           <Trash2 size={14} /> Desconectar todas
         </button>
       </header>
-
-      {connectionError && <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">{connectionError}</p>}
-      {connectionNotice && <p role="status" className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300">{connectionNotice}</p>}
-
+      {error && <p role="alert" className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">{error}</p>}
+      {notice && <p role="status" className="rounded-lg border border-violet-500/30 bg-violet-500/10 px-3 py-2 text-xs text-violet-200">{notice}</p>}
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         {PLATFORMS.map((platform) => {
-          const { Icon, color, placeholder } = META[platform];
+          const { Icon, placeholder } = META[platform];
           const item = state.statuses[platform];
-          const verified = verification[platform].verified;
           const active = ["connected", "open", "connecting", "reconnecting"].includes(item.status.toLowerCase());
-          const dot = ["connected", "open"].includes(item.status.toLowerCase());
-          return (
-            <article key={platform} className="space-y-4 rounded-2xl border border-white/10 bg-slate-950/60 p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className={`grid h-10 w-10 place-items-center rounded-xl border ${color === "violet" ? "border-violet-400/30 bg-violet-400/10 text-violet-300" : color === "emerald" ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : "border-red-400/30 bg-red-400/10 text-red-300"}`}>
-                    <Icon size={19} />
-                  </span>
-                  <div><h3 className="text-sm font-semibold text-white">{platform}</h3><p className="text-[10px] text-slate-500">{verified ? "Bio verificada" : "Verificação por bio obrigatória"}</p></div>
-                </div>
-                <span className={`h-2.5 w-2.5 rounded-full ${dot ? "bg-emerald-400" : item.status.toLowerCase().includes("connect") ? "animate-pulse bg-amber-400" : item.status === "error" ? "bg-red-400" : "bg-slate-600"}`} />
+          const online = ["connected", "open"].includes(item.status.toLowerCase());
+          return <article key={platform} className="space-y-4 rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-violet-300"><Icon size={19} /></span>
+                <div><h3 className="text-sm font-semibold text-white">{platform}</h3><p className="text-[10px] text-slate-500">Conexão livre</p></div>
               </div>
-              <label className="block space-y-1.5">
-                <span className="text-[11px] text-slate-400">Canal</span>
-                <input value={channels[platform]} onChange={(e) => updateChannel(platform, e.target.value)} disabled={active || busyPlatform === platform} placeholder={placeholder} className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-violet-400/50 disabled:opacity-50" />
-              </label>
-              {verification[platform].code && !verified && (
-                <div className="space-y-2 rounded-xl border border-amber-400/20 bg-amber-400/5 p-3">
-                  <p className="text-[11px] text-amber-200">Adicione este código à descrição pública/bio do canal:</p>
-                  <div className="flex items-center justify-between gap-2">
-                    <code className="text-sm font-bold tracking-wider text-white">{verification[platform].code}</code>
-                    <button type="button" onClick={() => { void navigator.clipboard?.writeText(verification[platform].code); }} className="inline-flex items-center gap-1 rounded border border-white/10 px-2 py-1 text-[10px] text-slate-200"><Copy size={12} /> Copiar</button>
-                  </div>
-                  <p className="text-[10px] text-slate-400">O código expira em 30 minutos.</p>
-                </div>
-              )}
-              <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Status</p>
-                <p className={`mt-1 flex items-center gap-1 text-xs font-medium ${item.status === "error" ? "text-red-300" : dot ? "text-emerald-300" : active ? "text-amber-300" : "text-slate-200"}`}>{verified && <ShieldCheck size={13} />}{verified ? "Bio verificada" : "Aguardando verificação"} · {item.detail}</p>
-                {item.viewers !== null && <p className="mt-1 text-[11px] text-slate-400">Espectadores: {item.viewers}</p>}
-                {item.meta && <p className="mt-1 truncate text-[11px] text-slate-400">{item.meta}</p>}
-              </div>
-              {active ? (
-                <button type="button" onClick={() => disconnectMultiChatPlatform(platform)} className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 py-2 text-xs font-semibold text-red-300 hover:bg-red-500/20"><WifiOff size={14} /> Desconectar</button>
-              ) : verified ? (
-                <button type="button" onClick={() => connectVerified(platform)} disabled={!channels[platform].trim() || busyPlatform === platform} className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet-600 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40"><Wifi size={14} /> Conectar canal verificado</button>
-              ) : verification[platform].challengeId ? (
-                <button type="button" onClick={() => void verifyAndConnect(platform)} disabled={busyPlatform === platform} className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-600 py-2 text-xs font-semibold text-white hover:bg-amber-500 disabled:cursor-wait disabled:opacity-50">{busyPlatform === platform ? "Verificando…" : "Verificar bio e conectar"}</button>
-              ) : (
-                <button type="button" onClick={() => void generateCode(platform)} disabled={!channels[platform].trim() || busyPlatform === platform} className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet-600 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40">{busyPlatform === platform ? "Gerando código…" : "Gerar código de bio"}</button>
-              )}
-            </article>
-          );
+              <span className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400" : active ? "animate-pulse bg-amber-400" : item.status === "error" ? "bg-red-400" : "bg-slate-600"}`} />
+            </div>
+            <label className="block space-y-1.5"><span className="text-[11px] text-slate-400">Canal</span>
+              <input value={channels[platform]} onChange={(e) => updateChannel(platform, e.target.value)} disabled={active || busy === platform} placeholder={placeholder} className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-violet-400/50 disabled:opacity-50" />
+            </label>
+            <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Status</p>
+              <p className="mt-1 text-xs text-slate-200">{item.detail}</p>
+              {item.viewers !== null && <p className="mt-1 text-[11px] text-slate-400">Espectadores: {item.viewers}</p>}
+              {item.meta && <p className="mt-1 truncate text-[11px] text-slate-400">{item.meta}</p>}
+            </div>
+            <button type="button" onClick={() => void toggleConnection(platform)} disabled={!active && !channels[platform].trim() || busy === platform} className={`flex w-full items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold ${active ? "border border-red-500/30 bg-red-500/10 text-red-300" : "bg-violet-600 text-white hover:bg-violet-500"} disabled:cursor-not-allowed disabled:opacity-40`}>
+              {active ? <><WifiOff size={14} />Desconectar</> : <><Wifi size={14} />{busy === platform ? "Conectando…" : "Conectar canal"}</>}
+            </button>
+          </article>;
         })}
       </div>
-
       <section className="overflow-hidden rounded-2xl border border-white/10 bg-slate-950/50">
-        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-          <div className="flex items-center gap-2 text-sm font-semibold text-white"><Activity size={15} /> Eventos recebidos</div>
-          <span className="text-[10px] text-slate-500">{state.messages.length} mensagens</span>
-        </div>
+        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3"><div className="flex items-center gap-2 text-sm font-semibold text-white"><Activity size={15} />Eventos recebidos</div><span className="text-[10px] text-slate-500">{state.messages.length} mensagens</span></div>
         <div className="max-h-80 overflow-y-auto divide-y divide-white/5">
-          {state.messages.length === 0 ? <p className="p-5 text-xs text-slate-500">Nenhuma mensagem recebida.</p> : state.messages.slice(0, 60).map((message) => (
-            <div key={message.id} className="flex gap-3 px-4 py-3 text-xs">
-              <span className="shrink-0 text-slate-500">{new Date(message.timestamp).toLocaleTimeString("pt-BR")}</span>
-              <span className="shrink-0 font-semibold text-violet-300">{message.author}</span>
-              <span className="shrink-0 text-slate-500">{message.platform}</span>
-              <span className="min-w-0 break-words text-slate-300">{message.text}</span>
-            </div>
-          ))}
+          {state.messages.length === 0 ? <p className="p-5 text-xs text-slate-500">Nenhuma mensagem recebida.</p> : state.messages.slice(0, 60).map((message) => <div key={message.id} className="flex gap-3 px-4 py-3 text-xs"><span className="shrink-0 text-slate-500">{new Date(message.timestamp).toLocaleTimeString("pt-BR")}</span><span className="shrink-0 font-semibold text-violet-300">{message.author}</span><span className="shrink-0 text-slate-500">{message.platform}</span><span className="min-w-0 break-words text-slate-300">{message.text}</span></div>)}
         </div>
       </section>
     </div>
