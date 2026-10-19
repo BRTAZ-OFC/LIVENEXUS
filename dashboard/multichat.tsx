@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { connectTwitch } from "./configuracao/Config_twitchChat";
 import { connectKick } from "./configuracao/Config_kickChat";
 import { connectYouTube } from "./configuracao/Config_youtubeLive";
-import { MessageSquare } from "lucide-react";
-import { applyTtsFilters } from "./ttsFilters";
+import { MessageSquare, Volume2, VolumeX } from "lucide-react";
+import { evaluateTtsFilters } from "./ttsFilters";
 
 export type ChatPlatform = "Twitch" | "Kick" | "YouTube";
 export type MultiChatMessage = {
@@ -15,6 +15,8 @@ export type MultiChatMessage = {
   timestamp: number;
   eventType?: string | null;
   emotes?: unknown;
+  ttsAllowed?: boolean;
+  ttsFilterReason?: string;
 };
 export type PlatformState = { status: string; detail: string; viewers: number | null; meta: string };
 export type MultiChatSnapshot = {
@@ -91,10 +93,11 @@ export function connectMultiChatPlatform(platform: ChatPlatform) {
       eventType: typeof raw.eventType === "string" ? raw.eventType : null,
       emotes: raw.emotes,
     };
-    snapshot = { ...snapshot, messages: [message, ...snapshot.messages].slice(0, 300) };
+    const decision = evaluateTtsFilters(message);
+    const displayMessage: MultiChatMessage = { ...message, ttsAllowed: decision.allowed, ttsFilterReason: decision.reason };
+    snapshot = { ...snapshot, messages: [displayMessage, ...snapshot.messages].slice(0, 300) };
     notify();
-    const ttsMessage = applyTtsFilters(message);
-    if (ttsMessage) publishTts(ttsMessage);
+    if (decision.message) publishTts(decision.message);
   };
   const onStatus = (next: string, detail?: string) => {
     patchPlatform(platform, { status: String(next || "unknown"), detail: detail || String(next || "Status atualizado") });
@@ -148,7 +151,7 @@ export default function MultiChatPanel() {
             <time className="shrink-0 text-[10px] text-slate-500">{new Date(message.timestamp).toLocaleTimeString("pt-BR")}</time>
             <div className="min-w-0 flex-1">
               <p className="mb-0.5 text-[10px] font-semibold text-violet-300">{message.author}<span className="ml-1 font-normal text-slate-500">· {message.platform}</span></p>
-              <p className="break-words text-slate-200">{message.text}</p>
+              <div className="flex items-start gap-2"><p className="min-w-0 flex-1 break-words text-slate-200">{message.text}</p><span className={message.ttsAllowed === false ? "multichat-tts-status muted" : "multichat-tts-status allowed"} title={message.ttsAllowed === false ? `Silenciada: ${message.ttsFilterReason || "bloqueada pelos filtros"}` : "Liberada para leitura TTS"} aria-label={message.ttsAllowed === false ? "Mensagem silenciada" : "Mensagem liberada para leitura"}>{message.ttsAllowed === false ? <VolumeX size={15} /> : <Volume2 size={15} />}</span></div>
             </div>
           </article>
         ))}
