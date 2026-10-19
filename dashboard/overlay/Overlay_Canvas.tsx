@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ComponentType, type CSSPrope
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
 import HorizontalMenu from "../components/HorizontalMenu";
+import OverlayEditorSidebar from "./Overlay_EditorSidebar";
 
 type JsonObject = Record<string, unknown>;
 type CanvasInstance = {
@@ -127,6 +128,8 @@ export default function OverlayCanvas() {
   const [displaySize, setDisplaySize] = useState(DEFAULT_SIZE);
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
+  const [editorOpen, setEditorOpen] = useState(true);
+  const [gridSettings, setGridSettings] = useState<Record<string, any>>({ showGrid: false, snapToGrid: false, gridSize: 20, showSafeAreas: false, verticalGuides: [], horizontalGuides: [] });
   const widgetPointer = useRef<{ instanceId: string; mode: "move" | "resize"; x: number; y: number; left: number; top: number; width: number; height: number } | null>(null);
   const [config, setConfig] = useState<CanvasConfig>({
     name: "Overlay",
@@ -216,6 +219,57 @@ export default function OverlayCanvas() {
     setConfig((current) => ({ ...current, instances: [...(current.instances || []), nextInstance] }));
   }
 
+  function addEditorInstance(input: Record<string, unknown>) {
+    const definition = catalog.find((item) => item.id === String(input.widgetId || ""));
+    const index = config.instances?.length || 0;
+    const width = Number(input.width) || definition?.defaultWidth || 280;
+    const height = Number(input.height) || definition?.defaultHeight || 120;
+    const id = `overlay-widget-${Date.now()}-${index}`;
+    const nextInstance: CanvasInstance = {
+      id,
+      widgetId: String(input.widgetId || ""),
+      elementKey: "full_widget",
+      isFullWidget: input.isFullWidget !== false,
+      name: String(input.name || definition?.name || input.widgetId || "Widget"),
+      x: Math.max(0, Math.min(size.width - width, 24 + (index % 5) * 28)),
+      y: Math.max(0, Math.min(size.height - height, 24 + (index % 5) * 28)),
+      width,
+      height,
+      zIndex: index + 1,
+      visible: true,
+      config: {
+        ...(definition?.defaultConfig || {}),
+        ...(isObject(input.defaultConfig) ? input.defaultConfig : {}),
+        ...(isObject(input.config) ? input.config : {}),
+      },
+    };
+    setConfig((current) => ({ ...current, instances: [...(current.instances || []), nextInstance] }));
+    setSelectedInstanceId(id);
+  }
+
+  function updateEditorInstance(id: string, patch: Record<string, unknown>) {
+    setConfig((current) => ({
+      ...current,
+      instances: (current.instances || []).map((instance) => {
+        if (instance.id !== id) return instance;
+        const patchConfig = isObject(patch.config) ? patch.config : {};
+        return {
+          ...instance,
+          ...patch,
+          config: { ...(instance.config || {}), ...patchConfig },
+        } as CanvasInstance;
+      }),
+    }));
+  }
+
+  function deleteEditorInstance(id: string) {
+    setConfig((current) => ({
+      ...current,
+      instances: (current.instances || []).filter((instance) => instance.id !== id),
+    }));
+    setSelectedInstanceId((current) => current === id ? null : current);
+  }
+
   const canvasBackground = useMemo(
     () => backgroundStyle(config.background || EMPTY_BACKGROUND),
     [config.background],
@@ -250,6 +304,25 @@ export default function OverlayCanvas() {
           style={{ width: size.width, height: size.height, transform: `scale(${scale})`, transformOrigin: "top left" }}
         >
           <div className="absolute inset-0" style={canvasBackground} />
+          {gridSettings.showGrid && (
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: "linear-gradient(to right, rgba(167,139,250,.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(167,139,250,.2) 1px, transparent 1px)",
+                backgroundSize: `${Math.max(5, Number(gridSettings.gridSize) || 20)}px ${Math.max(5, Number(gridSettings.gridSize) || 20)}px`,
+              }}
+            />
+          )}
+          {gridSettings.showSafeAreas && (
+            <div aria-hidden="true" className="absolute inset-[5%] pointer-events-none border border-dashed border-emerald-400/60" />
+          )}
+          {(gridSettings.verticalGuides || []).map((guide: { id: string; x: number }) => (
+            <div key={guide.id} aria-hidden="true" className="absolute top-0 bottom-0 z-30 pointer-events-none border-l border-cyan-400/80" style={{ left: guide.x }} />
+          ))}
+          {(gridSettings.horizontalGuides || []).map((guide: { id: string; y: number }) => (
+            <div key={guide.id} aria-hidden="true" className="absolute left-0 right-0 z-30 pointer-events-none border-t border-cyan-400/80" style={{ top: guide.y }} />
+          ))}
           {config.instances
             ?.filter((instance) => instance.visible !== false)
             .slice()
@@ -321,10 +394,15 @@ export default function OverlayCanvas() {
                       if (targetIndex < 0) return current;
                       const item = instances[targetIndex];
                       if (drag.mode === "move") {
+                        const gridSize = Math.max(1, Number(gridSettings.gridSize) || 20);
+                        const rawX = Math.max(0, Math.min(size.width - drag.width, drag.left + dx));
+                        const rawY = Math.max(0, Math.min(size.height - drag.height, drag.top + dy));
+                        const nextX = gridSettings.snapToGrid ? Math.round(rawX / gridSize) * gridSize : rawX;
+                        const nextY = gridSettings.snapToGrid ? Math.round(rawY / gridSize) * gridSize : rawY;
                         instances[targetIndex] = {
                           ...item,
-                          x: Math.max(0, Math.min(size.width - drag.width, drag.left + dx)),
-                          y: Math.max(0, Math.min(size.height - drag.height, drag.top + dy)),
+                          x: Math.max(0, Math.min(size.width - drag.width, nextX)),
+                          y: Math.max(0, Math.min(size.height - drag.height, nextY)),
                         };
                       } else {
                         instances[targetIndex] = {
@@ -426,6 +504,30 @@ export default function OverlayCanvas() {
         />
       </div>
       </div>
+      <OverlayEditorSidebar
+        isOpen={editorOpen}
+        onToggleOpen={() => setEditorOpen((current) => !current)}
+        selectedWidgetId={config.instances?.find((instance) => instance.id === selectedInstanceId)?.widgetId}
+        instances={config.instances || []}
+        selectedInstanceId={selectedInstanceId || undefined}
+        onSelectInstance={(id: string) => setSelectedInstanceId(id)}
+        onAddInstance={addEditorInstance}
+        onUpdateInstance={updateEditorInstance}
+        onDeleteInstance={deleteEditorInstance}
+        overlayName={config.name || "Overlay"}
+        visualizerSize={size}
+        onUpdateVisualizerSize={(patch: { width?: number; height?: number }) => setConfig((current) => ({
+          ...current,
+          visualizerSize: { ...(current.visualizerSize || DEFAULT_SIZE), ...patch },
+        }))}
+        gridSettings={gridSettings}
+        onUpdateGridSettings={(patch: Record<string, unknown>) => setGridSettings((current) => ({ ...current, ...patch }))}
+        background={config.background || EMPTY_BACKGROUND}
+        onUpdateBackground={(patch: Partial<CanvasBackground>) => setConfig((current) => ({
+          ...current,
+          background: { ...(current.background || EMPTY_BACKGROUND), ...patch },
+        }))}
+      />
     </section>
   );
 }
