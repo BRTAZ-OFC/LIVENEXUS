@@ -295,10 +295,11 @@ export default function TTSPage() {
     <section className="tts-page">
       <header className="tts-page-heading">
         <div><p className="tts-eyebrow">CENTRAL DE TRANSMISSÃO</p><h1>Voz &amp; TTS</h1><p>Motor de voz local do navegador · sem créditos de API</p></div>
-        <div className="tts-heading-actions"><button type="button" className={showEffects ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => setShowEffects((open) => !open)} aria-expanded={showEffects}><Star size={14} />Efeitos</button><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => setShowFilters((open) => !open)} aria-expanded={showFilters}><Filter size={14} />Filtros</button><span className={speaking ? "tts-status active" : "tts-status"}>{speaking ? "Falando" : paused ? "Fila pausada" : "Pronto"}</span></div>
+        <div className="tts-heading-actions"><button type="button" className={showEffects ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => { setShowEffects((open) => !open); setShowFilters(false); }} aria-expanded={showEffects}><Star size={14} />Efeitos</button><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => { setShowFilters((open) => !open); setShowEffects(false); }} aria-expanded={showFilters}><Filter size={14} />Filtros</button><span className={speaking ? "tts-status active" : "tts-status"}>{speaking ? "Falando" : paused ? "Fila pausada" : "Pronto"}</span></div>
       </header>
 
       {showFilters && <TtsFiltersPanel />}
+      {!showFilters && !showEffects && <>
 
       <section className="tts-card">
         <div className="tts-card-title"><span className="tts-title-icon"><Volume2 /></span><div><h2>Configurações do motor de voz</h2><p>Escolha a voz e ajuste os parâmetros de leitura</p></div></div>
@@ -321,7 +322,7 @@ export default function TTSPage() {
             <div className="tts-actions">
               <button className="primary" onClick={speakTest} disabled={speaking}> <Play size={15} /> Reproduzir teste</button>
               <button onClick={stopSpeech}><Square size={14} /> Parar</button>
-              <button onClick={() => { setSettings(DEFAULTS); setPreset("padrao"); stopSpeech(); }}><RotateCcw size={14} /> Padrão</button>
+              <button onClick={() => { setSettings(DEFAULTS); stopSpeech(); }}><RotateCcw size={14} /> Padrão</button>
             </div>
           </div>
           <div className="tts-faders">
@@ -334,6 +335,8 @@ export default function TTSPage() {
           </div>
         </div>
       </section>
+
+      </>}
 
       {showEffects && <section className="tts-card">
         <div className="tts-card-title"><span className="tts-title-icon amber"><Star /></span><div><h2>Efeitos de voz do TTS</h2><p>Selecione um personagem e ajuste a intensidade</p></div></div>
