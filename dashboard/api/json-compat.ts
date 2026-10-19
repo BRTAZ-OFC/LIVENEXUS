@@ -17,7 +17,9 @@ const RESOURCE_TABLES: Record<string, string> = {
   "/api/library": "biblioteca",
   "/api/live-sessions": "vods",
   "/api/gallery/general": "galeria",
+  "/api/admin/general-gallery": "galeria",
   "/api/admin/lab/user-gallery": "galeria_usuarios",
+  "/api/rtc-identity": "rtc_registry",
 };
 
 function sessionOf(req: Request): Session {
@@ -57,16 +59,16 @@ export function registerJsonCompatRoutes(app: Express) {
     app.all(route, async (req: Request, res: Response) => {
       const session = requireUser(req, res);
       if (!session) return;
-      if (route.startsWith("/api/admin/") && !requireAdmin(req, res)) return;
+      if (route.startsWith("/api/admin/database-") && !requireAdmin(req, res)) return;
       try {
         if (req.method === "GET") {
           const rows = await listJsonTableRecords(tableId);
-          const visible = tableId === "galeria" ? rows : rows.filter((row) => row.user_id === session.user_id);
+          const visible = ["galeria", "templates"].includes(tableId) ? rows : rows.filter((row) => row.user_id === session.user_id);
           return res.set("Cache-Control", "no-store").json({ ok: true, items: visible });
         }
         if (req.method === "POST") {
           const record = { ...(req.body?.record ?? req.body ?? {}) };
-          if (tableId !== "galeria") record.user_id = session.user_id;
+          if (!["galeria", "templates"].includes(tableId)) record.user_id = session.user_id;
           const row = await createJsonTableRecord(tableId, record);
           return res.status(201).json({ ok: true, item: row });
         }
@@ -75,10 +77,10 @@ export function registerJsonCompatRoutes(app: Express) {
           const record = req.body?.record ?? req.body?.item;
           if (!rowKey || !record) return res.status(400).json({ ok: false, error: "Informe rowKey e record." });
           const existing = (await listJsonTableRecords(tableId)).find((row) => row.__rowKey === rowKey);
-          if (!existing || (tableId !== "galeria" && existing.user_id !== session.user_id)) {
+          if (!existing || (!["galeria", "templates"].includes(tableId) && existing.user_id !== session.user_id)) {
             return res.status(404).json({ ok: false, error: "Registro não encontrado." });
           }
-          const updated = await updateJsonTableRecord(tableId, rowKey, { ...record, ...(tableId !== "galeria" ? { user_id: session.user_id } : {}) });
+          const updated = await updateJsonTableRecord(tableId, rowKey, { ...record, ...(!["galeria", "templates"].includes(tableId) ? { user_id: session.user_id } : {}) });
           return res.json({ ok: true, item: updated });
         }
         if (req.method === "DELETE") {
