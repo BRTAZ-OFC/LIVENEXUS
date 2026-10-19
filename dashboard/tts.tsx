@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Filter, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2, RadioTower } from "lucide-react";
+import { Filter, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
 import "./css/tts.css";
 import { playProcessedSpeech, type PlaybackHandle } from "./ttsAudioEngine";
 import { subscribeTtsMessages } from "./multichat";
-import PlatformBioConnections from "./conexao/PlatformBioConnections";
 import { getTtsFilterConfig, recordTtsQueueBlock, recordTtsQueueDrop, TtsFiltersPanel } from "./ttsFilters";
 
 type VoiceEffect = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
@@ -23,7 +22,7 @@ const VOICE_EFFECTS: { id: VoiceEffect; label: string; description: string; rate
   { id: "ghost", label: "Fantasma", description: "Voz lenta e etérea", rate: 0.82, pitch: 1.3 },
 ];
 const STORAGE_KEY = "livenexus:tts-settings-v1";
-type TtsPanel = "main" | "connections" | "effects" | "filters";
+type TtsPanel = "main" | "effects" | "filters";
 const DEFAULTS: TtsSettings = { voice: "pt_BR-faber-medium", rate: 1, volume: 1, pitch: 1, delay: 0, maxChars: 200, speakInterval: 0, effect: "normal", intensity: 1 };
 const SAMPLES = ["Olá, seja bem-vindo à live!", "Obrigado pela mensagem e por acompanhar a transmissão.", "Atenção, mensagem importante no chat."];
 
@@ -72,7 +71,6 @@ export default function TTSPage() {
   const [autoReadChat, setAutoReadChat] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
   const [showEffects, setShowEffects] = useState(false);
-  const [showConnections, setShowConnections] = useState(false);
   const queueRef = useRef<QueueItem[]>([]);
   const activeRef = useRef<PlaybackHandle | null>(null);
   const playTokenRef = useRef(0);
@@ -295,7 +293,6 @@ export default function TTSPage() {
   }
 
   function selectTtsPanel(panel: TtsPanel) {
-    setShowConnections(panel === "connections");
     setShowEffects(panel === "effects");
     setShowFilters(panel === "filters");
   }
@@ -304,13 +301,12 @@ export default function TTSPage() {
     <section className="tts-page">
       <header className="tts-page-heading">
         <div><p className="tts-eyebrow">CENTRAL DE TRANSMISSÃO</p><h1>Voz &amp; TTS</h1><p>Motor de voz local do navegador · sem créditos de API</p></div>
-        <div className="tts-heading-actions"><button type="button" className={showConnections ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel("connections")} aria-expanded={showConnections}><RadioTower size={14} />Conexão</button><button type="button" className={showEffects ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel("effects")} aria-expanded={showEffects}><Star size={14} />Efeitos</button><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel("filters")} aria-expanded={showFilters}><Filter size={14} />Filtros</button><button type="button" className={!showConnections && !showEffects && !showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel("main")}><Volume2 size={14} />Voz &amp; TTS</button></div>
+        <div className="tts-heading-actions"><button type="button" className={showEffects ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel("effects")} aria-expanded={showEffects}><Star size={14} />Efeitos</button><button type="button" className={showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel("filters")} aria-expanded={showFilters}><Filter size={14} />Filtros</button><button type="button" className={!showEffects && !showFilters ? "tts-filter-open-button selected" : "tts-filter-open-button"} onClick={() => selectTtsPanel("main")}><Volume2 size={14} />Voz &amp; TTS</button></div>
       </header>
 
-      {showConnections && <PlatformBioConnections />}
       {showFilters && <TtsFiltersPanel />}
       
-      {!showConnections && !showFilters && !showEffects && <>
+      {!showFilters && !showEffects && <>
 
       <section className="tts-card">
         <div className="tts-card-title"><span className="tts-title-icon"><Volume2 /></span><div><h2>Configurações do motor de voz</h2><p>Escolha a voz e ajuste os parâmetros de leitura</p></div></div>
