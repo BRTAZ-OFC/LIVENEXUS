@@ -75,7 +75,7 @@ type PlatformDraft = {
 function displayValue(value: unknown) {
   if (value === null || value === undefined || value === "") return "—";
   const text = String(value);
-  return text.length > 25 ? `${text.slice(0, 25)}…` : text;
+  return text.length > 8 ? `${text.slice(0, 7)}…` : text;
 }
 
 function formatDate(value?: string) {
@@ -177,7 +177,7 @@ function readableJsonValue(value: unknown): string {
 
 function jsonCellValue(value: unknown) {
   const text = readableJsonValue(value);
-  return text.length > 10 ? `${text.slice(0, 10)}…` : text;
+  return text.length > 8 ? `${text.slice(0, 7)}…` : text;
 }
 
 function createEmptyJsonRecord(tableId: string, fields: string[]): Record<string, unknown> {
