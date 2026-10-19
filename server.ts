@@ -9,7 +9,13 @@ import {
   listUsers,
   updateUser,
   deleteUser,
+  getUserById,
 } from "./dashboard/admin/banco/-crud.js";
+import {
+  listUserPlatforms,
+  saveUserPlatform,
+  deleteUserPlatform,
+} from "./dashboard/conexao/ramal/cruds/Plataformas_Johnson.js";
 import {
   listAvaliacoes,
   createAvaliacao,
@@ -323,6 +329,78 @@ app.delete("/api/database/avaliacoes", async (req: Request, res: Response) => {
       .status(400)
       .set(NO_CACHE)
       .json({ ok: false, message: errorMessage(error, "Não foi possível excluir a avaliação.") });
+  }
+});
+
+/* Conexões de plataformas persistidas em JSON e isoladas pelo user_id autenticado. */
+async function getAuthenticatedJsonUser(req: Request, res: Response) {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) {
+    res.status(401).set(NO_CACHE).json({ ok: false, message: "Faça login para acessar as conexões." });
+    return null;
+  }
+
+  const user = await getUserById(session.user_id);
+  if (!user) {
+    res.status(401).set(NO_CACHE).json({ ok: false, message: "A conta desta sessão não existe mais." });
+    return null;
+  }
+  return user;
+}
+
+app.get("/api/platforms", async (req: Request, res: Response) => {
+  try {
+    const user = await getAuthenticatedJsonUser(req, res);
+    if (!user) return;
+    const connections = await listUserPlatforms(user.user_id);
+    return res.set(NO_CACHE).json({ ok: true, connections });
+  } catch (error) {
+    return res.status(500).set(NO_CACHE).json({
+      ok: false,
+      message: errorMessage(error, "Não foi possível carregar as conexões."),
+    });
+  }
+});
+
+app.post("/api/platforms", async (req: Request, res: Response) => {
+  try {
+    const user = await getAuthenticatedJsonUser(req, res);
+    if (!user) return;
+    const connection = await saveUserPlatform(user.user_id, {
+      platform: req.body?.["platform"],
+      channel_id: req.body?.["channel_id"],
+      channel_name: req.body?.["channel_name"],
+      channel_url: req.body?.["channel_url"],
+    });
+    return res.status(200).set(NO_CACHE).json({ ok: true, connection });
+  } catch (error) {
+    return res.status(400).set(NO_CACHE).json({
+      ok: false,
+      message: errorMessage(error, "Não foi possível salvar a conexão."),
+    });
+  }
+});
+
+app.delete("/api/platforms", async (req: Request, res: Response) => {
+  try {
+    const user = await getAuthenticatedJsonUser(req, res);
+    if (!user) return;
+    const connectionId = typeof req.body?.["connection_id"] === "string"
+      ? req.body["connection_id"]
+      : "";
+    if (!connectionId) {
+      return res.status(400).set(NO_CACHE).json({ ok: false, message: "ID da conexão não fornecido." });
+    }
+    const deleted = await deleteUserPlatform(user.user_id, connectionId);
+    if (!deleted) {
+      return res.status(404).set(NO_CACHE).json({ ok: false, message: "Conexão não encontrada para este usuário." });
+    }
+    return res.set(NO_CACHE).json({ ok: true, message: "Conexão removida." });
+  } catch (error) {
+    return res.status(500).set(NO_CACHE).json({
+      ok: false,
+      message: errorMessage(error, "Não foi possível remover a conexão."),
+    });
   }
 });
 
