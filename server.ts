@@ -733,8 +733,11 @@ app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
     const rows = await listJsonTableRecords("overlays");
     const ownedRows = rows.filter((row: Record<string, unknown>) => String(row["user_id"] ?? "") === session.user_id);
     const requestedId = String(input.id ?? "");
-    const existing = ownedRows.find((row: Record<string, unknown>) => requestedId && String(row["id"] ?? "") === requestedId)
-      || ownedRows[0];
+    const createNew = req.body?.createNew === true;
+    const existing = createNew
+      ? undefined
+      : ownedRows.find((row: Record<string, unknown>) => requestedId && String(row["id"] ?? "") === requestedId)
+        || ownedRows[0];
 
     const settings = { ...input } as Record<string, unknown>;
     delete settings["id"];
