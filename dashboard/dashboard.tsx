@@ -2,11 +2,13 @@
 import DatabasePage from "./admin/banco";
 import AdminPanel from "./admin/panel";
 import TTSPage from "./tts";
+import PlatformBioConnections from "./conexao/PlatformBioConnections";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import { useEffect, useState } from "react";
 import {
   AudioLines,
   Radio,
+  RadioTower,
   UserRound,
   LogOut,
   House,
@@ -41,30 +43,32 @@ function DashboardPage() {
     }
     return false;
   });
-  const [activeSection, setActiveSection] = useState<"overview" | "database" | "admin-panel" | "voice">(
+  const [activeSection, setActiveSection] = useState<"overview" | "database" | "admin-panel" | "voice" | "connections">(
     () => {
       if (typeof window !== "undefined") {
         const admin = sessionStorage.getItem("livenexus_role") === "admin";
-        if (!admin) return "overview";
         const params = new URLSearchParams(window.location.search);
         const tabParam = params.get("tab");
-        if (tabParam === "database" || tabParam === "overview" || tabParam === "admin-panel" || tabParam === "voice")
-          return tabParam as "overview" | "database" | "admin-panel" | "voice";
         const stored = sessionStorage.getItem("livenexus_active_tab");
-        if (stored === "database" || stored === "overview" || stored === "admin-panel" || stored === "voice")
-          return stored as "overview" | "database" | "admin-panel" | "voice";
+        const candidate = tabParam || stored;
+
+        // A seção Conexão é de uso geral; as seções administrativas continuam restritas.
+        if (candidate === "connections") return "connections";
+        if (admin && (candidate === "database" || candidate === "overview" || candidate === "admin-panel" || candidate === "voice")) {
+          return candidate as "overview" | "database" | "admin-panel" | "voice";
+        }
       }
       return "overview";
     },
   );
 
   // BLOCO 5 — Atualiza a seção selecionada e persiste a escolha.
-  function handleSelectSection(section: "overview" | "database" | "admin-panel" | "voice") {
+  function handleSelectSection(section: "overview" | "database" | "admin-panel" | "voice" | "connections") {
     setActiveSection(section);
     if (typeof window !== "undefined") {
       sessionStorage.setItem("livenexus_active_tab", section);
       const url = new URL(window.location.href);
-      if (section === "database" || section === "admin-panel" || section === "voice") {
+      if (section === "database" || section === "admin-panel" || section === "voice" || section === "connections") {
         url.searchParams.set("tab", section);
       } else {
         url.searchParams.delete("tab");
@@ -78,8 +82,11 @@ function DashboardPage() {
     const admin = sessionStorage.getItem("livenexus_role") === "admin";
     setIsAdmin(admin);
     if (!admin) {
-      setActiveSection("overview");
-      sessionStorage.setItem("livenexus_active_tab", "overview");
+      setActiveSection((section) => section === "database" || section === "admin-panel" ? "overview" : section);
+      const stored = sessionStorage.getItem("livenexus_active_tab");
+      if (stored === "database" || stored === "admin-panel") {
+        sessionStorage.setItem("livenexus_active_tab", "overview");
+      }
     }
   }, []);
   // BLOCO 7 — Renderiza o layout do menu lateral e da área de conteúdo.
@@ -115,6 +122,16 @@ function DashboardPage() {
           >
             <Volume2 className="dash-h-2-5-w-2-5-16znhny" />
             {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Voz &amp; TTS</span>}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSelectSection("connections")}
+            title="Conexão"
+            aria-label="Conexão"
+            className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "connections" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
+          >
+            <RadioTower className="dash-h-2-5-w-2-5-16znhny" />
+            {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Conexão</span>}
           </button>
           {isAdmin && (
             <>
@@ -189,6 +206,9 @@ function DashboardPage() {
         </header>
         <div className={activeSection === "voice" ? "dash-w-full-px-6-5ebeye" : "hidden"}>
           <TTSPage />
+        </div>
+        <div className={activeSection === "connections" ? "dash-w-full-px-6-5ebeye" : "hidden"}>
+          <PlatformBioConnections />
         </div>
         {activeSection === "overview" ? (
           <section className="dash-overview">
