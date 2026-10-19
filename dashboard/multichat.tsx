@@ -14,6 +14,7 @@ export type MultiChatMessage = {
   roles: string[];
   timestamp: number;
   eventType?: string | null;
+  emotes?: unknown;
 };
 export type PlatformState = { status: string; detail: string; viewers: number | null; meta: string };
 export type MultiChatSnapshot = {
@@ -88,6 +89,7 @@ export function connectMultiChatPlatform(platform: ChatPlatform) {
       roles: Array.isArray(raw.roles) ? raw.roles.map(String) : [],
       timestamp: typeof raw.timestamp === "number" ? raw.timestamp : Date.now(),
       eventType: typeof raw.eventType === "string" ? raw.eventType : null,
+      emotes: raw.emotes,
     };
     snapshot = { ...snapshot, messages: [message, ...snapshot.messages].slice(0, 300) };
     notify();
