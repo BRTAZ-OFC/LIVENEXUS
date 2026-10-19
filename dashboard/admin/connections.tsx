@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { RadioTower, Radio, Youtube, Wifi, WifiOff, Trash2, Activity } from "lucide-react";
+import { RadioTower, Radio, Youtube, Wifi, WifiOff, Trash2, Activity, ShieldCheck, Copy } from "lucide-react";
+import { channelVerify } from "../configuracao/Config_channelVerify";
 import {
   connectMultiChatPlatform,
   disconnectMultiChatPlatform,
@@ -14,19 +15,26 @@ const PLATFORMS: ChatPlatform[] = ["Twitch", "Kick", "YouTube"];
 const META: Record<ChatPlatform, { placeholder: string; color: string; Icon: typeof RadioTower }> = {
   Twitch: { placeholder: "Nome do canal (ex.: gaules)", color: "violet", Icon: RadioTower },
   Kick: { placeholder: "Slug do canal (ex.: xqc)", color: "emerald", Icon: Radio },
-  YouTube: { placeholder: "@canal, URL ou ID do vídeo", color: "red", Icon: Youtube },
+  YouTube: { placeholder: "@canal ou URL do canal", color: "red", Icon: Youtube },
 };
+type VerificationState = { challengeId: string; code: string; verified: boolean };
+const EMPTY_VERIFICATION = (): Record<ChatPlatform, VerificationState> => ({
+  Twitch: { challengeId: "", code: "", verified: false },
+  Kick: { challengeId: "", code: "", verified: false },
+  YouTube: { challengeId: "", code: "", verified: false },
+});
 
 export default function AdminConnectionsPage() {
   const state = useMultiChatSnapshot();
   const [channels, setChannels] = useState(state.channels);
+  const [verification, setVerification] = useState(EMPTY_VERIFICATION);
+  const [busyPlatform, setBusyPlatform] = useState<ChatPlatform | "">("");
   const [connectionError, setConnectionError] = useState("");
   const [connectionNotice, setConnectionNotice] = useState("");
 
   useEffect(() => {
     const sync = () => setChannels(getMultiChatSnapshot().channels);
-    const unsubscribe = subscribeMultiChat(sync);
-    return unsubscribe;
+    return subscribeMultiChat(sync);
   }, []);
 
   useEffect(() => {
@@ -35,7 +43,7 @@ export default function AdminConnectionsPage() {
       try {
         const token = sessionStorage.getItem("livenexus_token");
         const headers: Record<string, string> = {};
-        if (token) headers["Authorization"] = `Bearer ${token}`;
+        if (token) headers.Authorization = `Bearer ${token}`;
         const response = await fetch("/api/plataformas", {
           headers,
           credentials: "include",
@@ -48,13 +56,22 @@ export default function AdminConnectionsPage() {
         if (cancelled) return;
         const saved = Array.isArray(data.plataformas) ? data.plataformas[0] : null;
         if (!saved) return;
-        if (typeof saved.twitch === "string" && saved.twitch) setMultiChatChannel("Twitch", saved.twitch);
-        if (typeof saved.kick === "string" && saved.kick) setMultiChatChannel("Kick", saved.kick);
-        if (typeof saved.youtube === "string" && saved.youtube) setMultiChatChannel("YouTube", saved.youtube);
-      } catch (error) {
-        if (!cancelled) {
-          setConnectionError(error instanceof Error ? error.message : "Falha ao carregar conexões salvas.");
+        const nextChannels = {
+          Twitch: typeof saved.twitch === "string" ? saved.twitch : "",
+          Kick: typeof saved.kick === "string" ? saved.kick : "",
+          YouTube: typeof saved.youtube === "string" ? saved.youtube : "",
+        };
+        setChannels((old) => ({ ...old, ...nextChannels }));
+        for (const platform of PLATFORMS) {
+          if (nextChannels[platform]) setMultiChatChannel(platform, nextChannels[platform]);
         }
+        setVerification({
+          Twitch: { challengeId: "", code: "", verified: String(saved.twitch_status || "").toLowerCase() === "verified" },
+          Kick: { challengeId: "", code: "", verified: String(saved.kick_status || "").toLowerCase() === "verified" },
+          YouTube: { challengeId: "", code: "", verified: String(saved.youtube_status || "").toLowerCase() === "verified" },
+        });
+      } catch (error) {
+        if (!cancelled) setConnectionError(error instanceof Error ? error.message : "Falha ao carregar conexões salvas.");
       }
     }
     void loadSavedConnections();
@@ -64,43 +81,68 @@ export default function AdminConnectionsPage() {
   function updateChannel(platform: ChatPlatform, value: string) {
     setChannels((old) => ({ ...old, [platform]: value }));
     setMultiChatChannel(platform, value);
+    setVerification((old) => ({ ...old, [platform]: { challengeId: "", code: "", verified: false } }));
     setConnectionError("");
     setConnectionNotice("");
   }
 
-  async function connectPlatform(platform: ChatPlatform) {
+  async function generateCode(platform: ChatPlatform) {
     setConnectionError("");
     setConnectionNotice("");
     const channel = channels[platform].trim();
     if (!channel) return;
-
+    setBusyPlatform(platform);
     try {
-      const token = sessionStorage.getItem("livenexus_token");
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (token) headers["Authorization"] = `Bearer ${token}`;
-      const response = await fetch("/api/plataformas", {
-        method: "POST",
-        headers,
-        credentials: "include",
-        body: JSON.stringify({
-          platform: platform.toLowerCase(),
-          channel_id: channel,
-          channel_name: channel,
-        }),
-      });
-      const data = await response.json();
-      if (!response.ok || !data.ok) {
-        throw new Error(data.error || data.message || "Não foi possível salvar o canal no JSON do usuário.");
-      }
-      connectMultiChatPlatform(platform);
-      setConnectionNotice(`Canal ${platform} salvo no JSON da conta autenticada.`);
+      const result = await channelVerify.challenge(platform, channel);
+      setVerification((old) => ({
+        ...old,
+        [platform]: { challengeId: result.challengeId, code: result.verificationCode, verified: false },
+      }));
+      setConnectionNotice(`Código gerado para ${platform}. Coloque-o na descrição pública/bio do canal e depois clique em “Verificar bio”.`);
     } catch (error) {
-      setConnectionError(error instanceof Error ? error.message : "Falha ao salvar a conexão.");
+      setConnectionError(error instanceof Error ? error.message : "Não foi possível gerar o código.");
+    } finally {
+      setBusyPlatform("");
     }
+  }
+
+  async function verifyAndConnect(platform: ChatPlatform) {
+    setConnectionError("");
+    setConnectionNotice("");
+    const challengeId = verification[platform].challengeId;
+    if (!challengeId) {
+      setConnectionError("Gere um código de verificação primeiro.");
+      return;
+    }
+    setBusyPlatform(platform);
+    try {
+      const result = await channelVerify.verify(challengeId);
+      const verifiedChannel = String(result.channelIdentifier || channels[platform]).trim();
+      setChannels((old) => ({ ...old, [platform]: verifiedChannel }));
+      setMultiChatChannel(platform, verifiedChannel);
+      setVerification((old) => ({ ...old, [platform]: { challengeId: "", code: "", verified: true } }));
+      connectMultiChatPlatform(platform);
+      setConnectionNotice(`Bio de ${platform} verificada. Canal salvo no JSON e conexão iniciada.`);
+    } catch (error) {
+      setConnectionError(error instanceof Error ? error.message : "Não foi possível verificar a bio.");
+    } finally {
+      setBusyPlatform("");
+    }
+  }
+
+  function connectVerified(platform: ChatPlatform) {
+    if (!verification[platform].verified) {
+      setConnectionError("Verifique a bio do canal antes de conectar.");
+      return;
+    }
+    setMultiChatChannel(platform, channels[platform]);
+    connectMultiChatPlatform(platform);
+    setConnectionNotice(`Conectando ao canal ${platform} já verificado.`);
   }
 
   function clearAll() {
     PLATFORMS.forEach(disconnectMultiChatPlatform);
+    setConnectionNotice("Todas as conexões ativas foram desconectadas.");
   }
 
   return (
@@ -108,7 +150,7 @@ export default function AdminConnectionsPage() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-white">Conexões administrativas</h2>
-          <p className="mt-1 text-xs text-slate-400">Conexões da conta autenticada. Os canais são salvos no JSON vinculados ao user_id.</p>
+          <p className="mt-1 text-xs text-slate-400">A conexão só é liberada depois que o servidor encontra o código na bio pública do canal.</p>
         </div>
         <button type="button" onClick={clearAll} className="inline-flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-300 hover:bg-red-500/20">
           <Trash2 size={14} /> Desconectar todas
@@ -122,6 +164,7 @@ export default function AdminConnectionsPage() {
         {PLATFORMS.map((platform) => {
           const { Icon, color, placeholder } = META[platform];
           const item = state.statuses[platform];
+          const verified = verification[platform].verified;
           const active = ["connected", "open", "connecting", "reconnecting"].includes(item.status.toLowerCase());
           const dot = ["connected", "open"].includes(item.status.toLowerCase());
           return (
@@ -131,24 +174,38 @@ export default function AdminConnectionsPage() {
                   <span className={`grid h-10 w-10 place-items-center rounded-xl border ${color === "violet" ? "border-violet-400/30 bg-violet-400/10 text-violet-300" : color === "emerald" ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-300" : "border-red-400/30 bg-red-400/10 text-red-300"}`}>
                     <Icon size={19} />
                   </span>
-                  <div><h3 className="text-sm font-semibold text-white">{platform}</h3><p className="text-[10px] text-slate-500">Conector global</p></div>
+                  <div><h3 className="text-sm font-semibold text-white">{platform}</h3><p className="text-[10px] text-slate-500">{verified ? "Bio verificada" : "Verificação por bio obrigatória"}</p></div>
                 </div>
                 <span className={`h-2.5 w-2.5 rounded-full ${dot ? "bg-emerald-400" : item.status.toLowerCase().includes("connect") ? "animate-pulse bg-amber-400" : item.status === "error" ? "bg-red-400" : "bg-slate-600"}`} />
               </div>
               <label className="block space-y-1.5">
                 <span className="text-[11px] text-slate-400">Canal</span>
-                <input value={channels[platform]} onChange={(e) => updateChannel(platform, e.target.value)} disabled={active} placeholder={placeholder} className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-violet-400/50 disabled:opacity-50" />
+                <input value={channels[platform]} onChange={(e) => updateChannel(platform, e.target.value)} disabled={active || busyPlatform === platform} placeholder={placeholder} className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs text-white outline-none focus:border-violet-400/50 disabled:opacity-50" />
               </label>
+              {verification[platform].code && !verified && (
+                <div className="space-y-2 rounded-xl border border-amber-400/20 bg-amber-400/5 p-3">
+                  <p className="text-[11px] text-amber-200">Adicione este código à descrição pública/bio do canal:</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <code className="text-sm font-bold tracking-wider text-white">{verification[platform].code}</code>
+                    <button type="button" onClick={() => { void navigator.clipboard?.writeText(verification[platform].code); }} className="inline-flex items-center gap-1 rounded border border-white/10 px-2 py-1 text-[10px] text-slate-200"><Copy size={12} /> Copiar</button>
+                  </div>
+                  <p className="text-[10px] text-slate-400">O código expira em 30 minutos.</p>
+                </div>
+              )}
               <div className="rounded-xl border border-white/5 bg-white/[0.03] p-3">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">Status</p>
-                <p className={`mt-1 text-xs font-medium ${item.status === "error" ? "text-red-300" : dot ? "text-emerald-300" : active ? "text-amber-300" : "text-slate-200"}`}>{item.detail}</p>
+                <p className={`mt-1 flex items-center gap-1 text-xs font-medium ${item.status === "error" ? "text-red-300" : dot ? "text-emerald-300" : active ? "text-amber-300" : "text-slate-200"}`}>{verified && <ShieldCheck size={13} />}{verified ? "Bio verificada" : "Aguardando verificação"} · {item.detail}</p>
                 {item.viewers !== null && <p className="mt-1 text-[11px] text-slate-400">Espectadores: {item.viewers}</p>}
                 {item.meta && <p className="mt-1 truncate text-[11px] text-slate-400">{item.meta}</p>}
               </div>
               {active ? (
                 <button type="button" onClick={() => disconnectMultiChatPlatform(platform)} className="flex w-full items-center justify-center gap-2 rounded-lg border border-red-500/30 bg-red-500/10 py-2 text-xs font-semibold text-red-300 hover:bg-red-500/20"><WifiOff size={14} /> Desconectar</button>
+              ) : verified ? (
+                <button type="button" onClick={() => connectVerified(platform)} disabled={!channels[platform].trim() || busyPlatform === platform} className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet-600 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40"><Wifi size={14} /> Conectar canal verificado</button>
+              ) : verification[platform].challengeId ? (
+                <button type="button" onClick={() => void verifyAndConnect(platform)} disabled={busyPlatform === platform} className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-600 py-2 text-xs font-semibold text-white hover:bg-amber-500 disabled:cursor-wait disabled:opacity-50">{busyPlatform === platform ? "Verificando…" : "Verificar bio e conectar"}</button>
               ) : (
-                <button type="button" onClick={() => void connectPlatform(platform)} disabled={!channels[platform].trim()} className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet-600 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40"><Wifi size={14} /> Conectar canal</button>
+                <button type="button" onClick={() => void generateCode(platform)} disabled={!channels[platform].trim() || busyPlatform === platform} className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet-600 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-40">{busyPlatform === platform ? "Gerando código…" : "Gerar código de bio"}</button>
               )}
             </article>
           );
