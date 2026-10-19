@@ -163,7 +163,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   const [genericRows, setGenericRows] = useState<JsonRow[]>([]);
   const [genericDraft, setGenericDraft] = useState("");
   const [genericEditingKey, setGenericEditingKey] = useState<string | null>(null);
-  const [genericNewJson, setGenericNewJson] = useState("{\\n  \\n}");
+  const [genericNewJson, setGenericNewJson] = useState("{\n  \n}");
 
 
   const [loading, setLoading] = useState(true);
@@ -231,7 +231,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
       });
       const result = await response.json();
       if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível criar o registro.");
-      setGenericNewJson("{\\n  \\n}");
+      setGenericNewJson("{\n  \n}");
       setMessage("Registro criado no JSON.");
       await loadJsonTable(selectedJsonId);
     } catch (err) {
@@ -1157,7 +1157,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                               {fields.map((field) => <td key={field} className="max-w-64 break-words px-3 py-2 align-top text-slate-300" title={String(row[field] ?? "")}>{jsonCellValue(row[field])}</td>)}
                               <td className="whitespace-nowrap px-3 py-2 align-top">
                                 <div className="flex gap-2">
-                                  <button type="button" onClick={() => { const copy = { ...row }; delete copy.__rowKey; setGenericEditingKey(row.__rowKey); setGenericDraft(JSON.stringify(copy, null, 2)); }} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-200"><Pencil size={12} />Editar</button>
+                                  <button type="button" onClick={() => { const { __rowKey: _rowKey, ...copy } = row; setGenericEditingKey(row.__rowKey); setGenericDraft(JSON.stringify(copy, null, 2)); }} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-200"><Pencil size={12} />Editar</button>
                                   <button type="button" onClick={() => void deleteGenericRow(row.__rowKey)} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-red-500/20 px-2 py-1 text-[10px] text-red-300"><Trash2 size={12} />Excluir</button>
                                 </div>
                               </td>
