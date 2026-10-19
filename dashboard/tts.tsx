@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AudioLines, Clock3, Play, Pause, RotateCcw, SkipForward, Square, Star, Volume2 } from "lucide-react";
 import "./css/tts.css";
+import { playProcessedSpeech, type PlaybackHandle } from "./ttsAudioEngine";
 
 type VoiceEffect = "normal" | "squirrel" | "monster" | "robot" | "radio" | "megaphone" | "alien" | "giant" | "ghost";
 type TtsSettings = {
@@ -35,16 +36,17 @@ function loadSettings(): TtsSettings {
 
 export default function TTSPage() {
   const [settings, setSettings] = useState<TtsSettings>(loadSettings);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [engineReady, setEngineReady] = useState(false);
   const [testText, setTestText] = useState(SAMPLES[0]);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [speaking, setSpeaking] = useState(false);
   const [paused, setPaused] = useState(false);
   const [currentText, setCurrentText] = useState("");
-  const [notice, setNotice] = useState("Motor local do navegador pronto.");
+  const [notice, setNotice] = useState("Motor neural pt-BR será carregado na primeira reprodução.");
   const [preset, setPreset] = useState("padrao");
   const queueRef = useRef<QueueItem[]>([]);
-  const activeRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const activeRef = useRef<PlaybackHandle | null>(null);
+  const playTokenRef = useRef(0);
   const idRef = useRef(0);
   const selectionCountRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -54,12 +56,11 @@ export default function TTSPage() {
   queueRef.current = queue;
 
   useEffect(() => {
-    if (!("speechSynthesis" in window)) { setNotice("Este navegador não oferece suporte a síntese de voz."); return; }
-    const synth = window.speechSynthesis;
-    const refresh = () => setVoices(synth.getVoices());
-    refresh();
-    synth.addEventListener?.("voiceschanged", refresh);
-    return () => { synth.removeEventListener?.("voiceschanged", refresh); if (timerRef.current) clearTimeout(timerRef.current); synth.cancel(); };
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      playTokenRef.current += 1;
+      activeRef.current?.stop();
+    };
   }, []);
 
   useEffect(() => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch {} }, [settings]);
@@ -73,42 +74,69 @@ export default function TTSPage() {
     setSettings((old) => ({ ...old, [key]: value }));
   }
 
-  function makeUtterance(text: string) {
-    const u = new SpeechSynthesisUtterance(text);
-    const s = settingsRef.current;
-    const voice = voices.find((v) => v.name === s.voice);
-    if (voice) u.voice = voice;
-    const effect = VOICE_EFFECTS.find((item) => item.id === s.effect) ?? VOICE_EFFECTS[0];
-    // Web Speech exposes pitch/rate, but not the rendered audio stream for EQ, distortion or echo.
-    // These presets therefore shape the synthesis parameters without claiming full DSP effects.
-    const blend = Math.max(0, Math.min(1.5, s.intensity));
-    u.rate = Math.max(0.2, Math.min(3, s.rate * (1 + (effect.rate - 1) * blend)));
-    u.volume = s.volume;
-    u.pitch = Math.max(0.1, Math.min(2, s.pitch * (1 + (effect.pitch - 1) * blend)));
-    return u;
+  async function startPlayback(text: string, onFinished: () => void) {
+    const token = ++playTokenRef.current;
+    let cancelled = false;
+    const placeholder: PlaybackHandle = {
+      stop: () => { cancelled = true; },
+      pause: () => {},
+      resume: () => {},
+    };
+    activeRef.current = placeholder;
+    try {
+      const handle = await playProcessedSpeech(text, settingsRef.current, {
+        onProgress: (message) => setNotice(message),
+        onStart: () => {
+          if (token !== playTokenRef.current || cancelled) return;
+          setSpeaking(true);
+          setCurrentText(text);
+          setEngineReady(true);
+          setNotice("Reproduzindo áudio com efeitos DSP.");
+        },
+        onEnd: () => {
+          if (token !== playTokenRef.current) return;
+          activeRef.current = null;
+          setSpeaking(false);
+          setCurrentText("");
+          onFinished();
+        },
+        onError: (error) => {
+          if (token !== playTokenRef.current) return;
+          setNotice(`Falha no motor TTS: ${error instanceof Error ? error.message : "erro desconhecido"}`);
+        },
+      });
+      if (cancelled || token !== playTokenRef.current) {
+        handle.stop();
+        return;
+      }
+      activeRef.current = handle;
+    } catch (error) {
+      if (token === playTokenRef.current) {
+        activeRef.current = null;
+        setSpeaking(false);
+        setCurrentText("");
+        setNotice(`Não foi possível iniciar o TTS: ${error instanceof Error ? error.message : "verifique a conexão e tente novamente"}`);
+      }
+    }
   }
 
   function speakTest() {
-    if (!("speechSynthesis" in window)) { setNotice("Síntese de voz indisponível neste navegador."); return; }
     const text = testText.trim().slice(0, settings.maxChars > 0 ? settings.maxChars : undefined);
     if (!text) { setNotice("Digite um texto para testar."); return; }
-    window.speechSynthesis.cancel();
-    const u = makeUtterance(text);
-    u.onstart = () => { setSpeaking(true); setCurrentText(text); setNotice("Reproduzindo teste de voz."); };
-    u.onend = u.onerror = () => { setSpeaking(false); setCurrentText(""); setNotice("Teste finalizado."); };
-    activeRef.current = u;
-    window.speechSynthesis.speak(u);
+    stopSpeech();
+    void startPlayback(text, () => setNotice("Teste finalizado."));
   }
 
   function stopSpeech() {
     if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
-    window.speechSynthesis?.cancel();
+    playTokenRef.current += 1;
+    activeRef.current?.stop();
     activeRef.current = null;
     setSpeaking(false); setPaused(false); pausedRef.current = false; setCurrentText("");
   }
 
   function dispatch() {
-    if (pausedRef.current || activeRef.current || timerRef.current || !("speechSynthesis" in window)) return;
+    if (pausedRef.current || activeRef.current || timerRef.current) return;
     const now = Date.now();
     const valid = queueRef.current.filter((item) => now - item.queuedAt <= TTL[item.tier]);
     if (valid.length !== queueRef.current.length) { setQueue(valid); queueRef.current = valid; }
@@ -123,20 +151,14 @@ export default function TTSPage() {
       : (!hasPrivileged && agedNormal
           ? agedNormal
           : valid.slice().sort((a, b) => PRIORITY[a.tier] - PRIORITY[b.tier] || a.queuedAt - b.queuedAt)[0]);
+    if (!selected) return;
     setQueue((old) => old.filter((item) => item.id !== selected.id));
     queueRef.current = queueRef.current.filter((item) => item.id !== selected.id);
-    const u = makeUtterance(selected.text);
-    activeRef.current = u;
-    u.onstart = () => { setSpeaking(true); setCurrentText(selected.text); };
-    const finish = () => {
-      if (activeRef.current !== u) return;
-      activeRef.current = null; setSpeaking(false); setCurrentText("");
+    void startPlayback(selected.text, () => {
       const delay = Math.max(settingsRef.current.delay, settingsRef.current.speakInterval);
       if (delay > 0) timerRef.current = setTimeout(() => { timerRef.current = null; dispatch(); }, delay * 1000);
       else setTimeout(dispatch, 0);
-    };
-    u.onend = finish; u.onerror = finish;
-    window.speechSynthesis.speak(u);
+    });
   }
 
   useEffect(() => { if (!paused && !activeRef.current && queue.length) dispatch(); }, [queue, paused]);
@@ -162,11 +184,11 @@ export default function TTSPage() {
   function toggleQueue() {
     if (paused) {
       pausedRef.current = false; setPaused(false);
-      if (window.speechSynthesis?.paused) window.speechSynthesis.resume();
+      activeRef.current?.resume();
       setNotice("Fila retomada.");
     } else {
       pausedRef.current = true; setPaused(true);
-      if (window.speechSynthesis?.speaking) window.speechSynthesis.pause();
+      activeRef.current?.pause();
       setNotice("Fila pausada.");
     }
   }
@@ -174,8 +196,9 @@ export default function TTSPage() {
   function skipCurrent() {
     const active = activeRef.current;
     if (!active) { setNotice("Não há fala ativa para pular."); return; }
+    playTokenRef.current += 1;
+    active.stop();
     activeRef.current = null;
-    window.speechSynthesis.cancel();
     setSpeaking(false); setCurrentText("");
     setNotice("Fala atual pulada.");
     setTimeout(() => { if (!pausedRef.current) dispatch(); }, 0);
@@ -201,11 +224,11 @@ export default function TTSPage() {
         <div className="tts-card-title"><span className="tts-title-icon"><Volume2 /></span><div><h2>Configurações do motor de voz</h2><p>Escolha a voz e ajuste os parâmetros de leitura</p></div></div>
         <div className="tts-main-grid">
           <div className="tts-input-column">
-            <label>Voz do navegador
+            <label>Voz neural
               <select value={settings.voice} onChange={(e) => update("voice", e.target.value)}>
-                <option value="">Padrão do navegador</option>
-                {voices.map((v) => <option key={v.name} value={v.name}>{v.lang.toLowerCase().includes("pt") ? "PT · " : ""}{v.name} · {v.lang}</option>)}
+                <option value="pt_BR-faber-medium">Português brasileiro · Faber (Piper)</option>
               </select>
+              <small className="tts-engine-caption">{engineReady ? "Motor neural carregado nesta sessão" : "O modelo será baixado na primeira reprodução e ficará em cache"}</small>
             </label>
             <label>Texto de teste <span className="tts-char-count">{testText.length} / {settings.maxChars || "sem limite"}</span>
               <textarea rows={4} value={testText} onChange={(e) => setTestText(e.target.value)} maxLength={settings.maxChars > 0 ? settings.maxChars : undefined} placeholder="Digite um texto para testar a voz..." />
@@ -234,7 +257,7 @@ export default function TTSPage() {
           {VOICE_EFFECTS.map((effect) => <button key={effect.id} className={settings.effect === effect.id ? "selected" : ""} onClick={() => update("effect", effect.id)}><strong>{effect.label}</strong><small>{effect.description}</small></button>)}
         </div>
         <div className="tts-effect-intensity"><RangeControl label="Intensidade do efeito" value={settings.intensity} min={0} max={1.5} step={0.05} suffix="x" display={`${Math.round(settings.intensity * 100)}%`} onChange={(v) => update("intensity", v)} /></div>
-        <p className="tts-effect-note">Limitação técnica: o sintetizador nativo do navegador permite ajustar tom e velocidade, mas não entrega o áudio gerado para aplicar filtros reais de rádio, megafone, distorção robótica ou eco. Esses efeitos precisam de um motor TTS que gere áudio processável ou de uma fonte de áudio dedicada.</p>
+        <p className="tts-effect-note">Os efeitos são aplicados ao áudio gerado pelo motor neural: filtros de frequência, modulação, compressão, saturação, delay e reverberação. Esquilo, Monstro e Gigante também combinam mudança de velocidade com equalização; não é um algoritmo de pitch-shift independente da velocidade.</p>
       </section>
 
       <section className="tts-card">
