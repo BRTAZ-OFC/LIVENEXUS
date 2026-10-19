@@ -146,7 +146,9 @@ export class RealErrorBoundary extends Component<ErrorBoundaryProps, ErrorBounda
   }
 
   override render() {
-    return this.props.children;
+    // Ao falhar a árvore da aplicação, desmonta-a para que o visualizador
+    // global (montado fora deste boundary) continue visível.
+    return this.state.hasError ? null : this.props.children;
   }
 }
 
@@ -191,7 +193,9 @@ export function RealErrorViewer() {
     };
 
     const handleWindowError = (event: ErrorEvent) => {
-      const item = reportRealError({
+      // reportRealError emite o evento global; handleCustomError adiciona o registro
+      // uma única vez, evitando duplicação no painel.
+      reportRealError({
         error: event.error,
         message: event.message,
         filename: event.filename,
@@ -199,19 +203,17 @@ export function RealErrorViewer() {
         colno: event.colno,
         type: "Erro de Execução (Runtime)",
       });
-      setErrors((prev) => [...prev, item]);
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
       const reason = event.reason;
       const isErr = reason instanceof Error;
-      const item = reportRealError({
+      reportRealError({
         error: reason,
         message: isErr ? reason.message : String(reason || "Rejeição de Promise não tratada"),
         stack: isErr ? reason.stack : undefined,
         type: "Promise Rejeitada (Unhandled)",
       });
-      setErrors((prev) => [...prev, item]);
     };
 
     const handleCustomError = (e: Event) => {
