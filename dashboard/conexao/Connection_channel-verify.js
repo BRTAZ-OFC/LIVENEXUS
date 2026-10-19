@@ -82,8 +82,10 @@ async function fetchBio(platform, channel) {
     if (!data?.id) return null;
     return data?.user?.bio ?? data?.bio ?? "";
   }
-  const handle = channel.startsWith("@") ? channel : `@${channel}`;
-  response = await fetch(`https://www.youtube.com/${encodeURIComponent(handle)}/about`, {
+  const youtubeAboutUrl = channel.startsWith("UC")
+    ? `https://www.youtube.com/channel/${encodeURIComponent(channel)}/about`
+    : `https://www.youtube.com/${encodeURIComponent(channel.startsWith("@") ? channel : `@${channel}`)}/about`;
+  response = await fetch(youtubeAboutUrl, {
     headers: {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36",
       "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
