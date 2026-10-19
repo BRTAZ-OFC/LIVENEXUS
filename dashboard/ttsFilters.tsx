@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { Filter, Plus, Trash2, RotateCcw } from "lucide-react";
 import type { MultiChatMessage, ChatPlatform } from "./multichat";
 
@@ -88,14 +88,15 @@ function loadConfig(): TtsFilterConfig {
 }
 let config = loadConfig();
 const configListeners = new Set<() => void>();
-const diag: DiagnosticState = { received: 0, accepted: 0, blocked: 0, reasons: {}, events: [] };
+let diag: DiagnosticState = { received: 0, accepted: 0, blocked: 0, reasons: {}, events: [] };
 const diagListeners = new Set<() => void>();
 const repeats = new Map<string, { text: string; count: number; firstAt: number }>();
 const cooldowns = new Map<string, number>();
 const flaggedUsers = new Map<string, { author: string; platform: ChatPlatform; reason: string; blocked: boolean }>();
 
 function emitConfig() { configListeners.forEach((fn) => fn()); }
-function emitDiag() { diagListeners.forEach((fn) => fn()); }
+let diagRevision = 0;
+function emitDiag() { diagRevision++; diagListeners.forEach((fn) => fn()); }
 export function getTtsFilterConfig() { return config; }
 export function setTtsFilterConfig(next: TtsFilterConfig) {
   config = next;
@@ -104,9 +105,9 @@ export function setTtsFilterConfig(next: TtsFilterConfig) {
 }
 export function useTtsFilterConfig() { return useSyncExternalStore((fn) => { configListeners.add(fn); return () => configListeners.delete(fn); }, () => config); }
 export function getTtsFilterDiagnostics() { return diag; }
-export function useTtsFilterDiagnostics() { return useSyncExternalStore((fn) => { diagListeners.add(fn); return () => diagListeners.delete(fn); }, () => diag); }
+export function useTtsFilterDiagnostics() { return useSyncExternalStore((fn) => { diagListeners.add(fn); return () => diagListeners.delete(fn); }, () => diagRevision); }
 export function resetTtsFilterDiagnostics() {
-  diag.received = 0; diag.accepted = 0; diag.blocked = 0; diag.reasons = {}; diag.events = [];
+  diag = { received: 0, accepted: 0, blocked: 0, reasons: {}, events: [] };
   emitDiag();
 }
 function record(message: MultiChatMessage, allowed: boolean, reason: string, text: string) {
@@ -215,12 +216,13 @@ const eventLabels: Record<string, string> = {
 function Toggle({ checked, onChange, label, description }: { checked: boolean; onChange: (v: boolean) => void; label: string; description?: string }) {
   return <label className="tts-filter-toggle"><input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} /><span><b>{label}</b>{description && <small>{description}</small>}</span></label>;
 }
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
   return <label className="tts-filter-field"><span>{label}</span>{children}</label>;
 }
 export function TtsFiltersPanel() {
   const cfg = useTtsFilterConfig();
-  const diagState = useTtsFilterDiagnostics();
+  useTtsFilterDiagnostics();
+  const diagState = getTtsFilterDiagnostics();
   const [word, setWord] = useState("");
   const [trigger, setTrigger] = useState("");
   const [triggerType, setTriggerType] = useState<MatchType>("contains");
