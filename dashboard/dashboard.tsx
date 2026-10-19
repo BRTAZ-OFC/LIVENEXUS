@@ -4,6 +4,7 @@ import AdminPanel from "./admin/panel";
 import TTSPage from "./tts";
 import PlatformBioConnections from "./conexao/PlatformBioConnections";
 import OverlayCanvas from "./overlay/Overlay_Canvas";
+import ScenariosPage from "./cenarios/ScenariosPage";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import { memo, useEffect, useState } from "react";
 import {
@@ -20,6 +21,7 @@ import {
   Clock3,
   MessageSquare,
   Eye,
+  LayoutGrid,
   Volume2,
 } from "lucide-react";
 
@@ -153,7 +155,7 @@ function DashboardPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<
-    "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay"
+    "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios"
   >(() => {
     if (typeof window !== "undefined") {
       const admin = sessionStorage.getItem("livenexus_role") === "admin";
@@ -165,6 +167,7 @@ function DashboardPage() {
       // Conexão e Overlay são áreas de uso geral; banco e painel admin exigem o papel admin.
       if (candidate === "connections") return "connections";
       if (candidate === "overlay") return "overlay";
+      if (candidate === "scenarios") return "scenarios";
       if (
         admin &&
         (candidate === "database" ||
@@ -180,7 +183,7 @@ function DashboardPage() {
 
   // BLOCO 5 — Atualiza a seção selecionada e persiste a escolha.
   function handleSelectSection(
-    section: "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay",
+    section: "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios",
   ) {
     setActiveSection(section);
     if (typeof window !== "undefined") {
@@ -191,7 +194,8 @@ function DashboardPage() {
         section === "admin-panel" ||
         section === "voice" ||
         section === "connections" ||
-        section === "overlay"
+        section === "overlay" ||
+        section === "scenarios"
       ) {
         url.searchParams.set("tab", section);
       } else {
@@ -317,6 +321,16 @@ function DashboardPage() {
             <Eye className="dash-h-2-5-w-2-5-16znhny" />
             {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Overlay</span>}
           </button>
+          <button
+            type="button"
+            onClick={() => handleSelectSection("scenarios")}
+            title="Cenário"
+            aria-label="Cenário"
+            className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "scenarios" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
+          >
+            <LayoutGrid className="dash-h-2-5-w-2-5-16znhny" />
+            {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Cenário</span>}
+          </button>
           {isAdmin && (
             <>
               <button
@@ -411,6 +425,13 @@ function DashboardPage() {
           <section className="dash-w-full-px-6-5ebeye">
             <DatabasePage embedded />
           </section>
+        ) : activeSection === "scenarios" ? (
+          <ScenariosPage
+            onOpenScenario={(scenarioId) => {
+              sessionStorage.setItem("livenexus_active_scenario_id", scenarioId);
+              handleSelectSection("overlay");
+            }}
+          />
         ) : null}
       </main>
     </div>
