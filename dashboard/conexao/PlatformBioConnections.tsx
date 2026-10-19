@@ -105,20 +105,6 @@ export default function PlatformBioConnections() {
     setNotice(`Conectando ao canal ${platform} verificado.`);
   }
 
-  const saveChannel = async (platform: ChatPlatform) => {
-    const channel = channels[platform].trim();
-    if (!channel) return;
-    const token = sessionStorage.getItem("livenexus_token");
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
-    if (token) headers.Authorization = `Bearer ${token}`;
-    const response = await fetch("/api/plataformas", {
-      method: "POST", headers, credentials: "include",
-      body: JSON.stringify({ platform: platform.toLowerCase(), channel_name: channel, status: verification[platform].verified ? "verified" : "pending" }),
-    });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || !data.ok) throw new Error(data.error || "Não foi possível salvar o canal.");
-  };
-
   return (
     <section className="tts-card tts-platform-connections">
       <div className="tts-card-title"><span className="tts-title-icon"><RadioTower /></span><div><h2>Conexões de plataforma</h2><p>Gere um código, publique-o na bio/descrição pública e confirme a propriedade antes de conectar.</p></div></div>
@@ -145,12 +131,9 @@ export default function PlatformBioConnections() {
             <div className="tts-platform-status"><span>Status</span><p className={item.status === "error" ? "error" : online ? "online" : active ? "pending" : ""}>{verified && <ShieldCheck size={13} className="inline mr-1" />}{verified ? "Bio verificada" : "Aguardando verificação"} · {item.detail}</p>{item.viewers !== null && <small>Espectadores: {item.viewers}</small>}{item.meta && <small>{item.meta}</small>}</div>
             {!verified && !verification[platform].challengeId && <button type="button" className="tts-platform-action" disabled={!channels[platform].trim() || busy === platform} onClick={() => void generateCode(platform)}>{busy === platform ? "Gerando código…" : "Gerar código de bio"}</button>}
             {!verified && verification[platform].challengeId && <button type="button" className="tts-platform-action" disabled={busy === platform} onClick={() => void verifyAndConnect(platform)}>{busy === platform ? "Verificando…" : "Verificar bio e conectar"}</button>}
-            {verified && <button type="button" className={active ? "tts-platform-action disconnect" : "tts-platform-action"} disabled={!channels[platform].trim() || busy === platform} onClick={async () => {
-              try {
-                if (active) { disconnectMultiChatPlatform(platform); return; }
-                await saveChannel(platform);
-                connectVerified(platform);
-              } catch (e) { setError(e instanceof Error ? e.message : "Não foi possível salvar o canal."); }
+            {verified && <button type="button" className={active ? "tts-platform-action disconnect" : "tts-platform-action"} disabled={!channels[platform].trim() || busy === platform} onClick={() => {
+              if (active) { disconnectMultiChatPlatform(platform); return; }
+              connectVerified(platform);
             }}>{active ? <><WifiOff size={14} />Desconectar</> : <><Wifi size={14} />Conectar canal verificado</>}</button>}
           </article>;
         })}
