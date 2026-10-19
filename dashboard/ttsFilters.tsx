@@ -90,7 +90,17 @@ let diag: DiagnosticState = { received: 0, accepted: 0, blocked: 0, reasons: {},
 const diagListeners = new Set<() => void>();
 const repeats = new Map<string, { text: string; count: number; firstAt: number }>();
 const cooldowns = new Map<string, number>();
-const flaggedUsers = new Map<string, { author: string; platform: ChatPlatform; reason: string; blocked: boolean }>();
+function loadFlaggedUsers() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY + ":flagged-users");
+    const entries = raw ? JSON.parse(raw) : [];
+    return new Map<string, { author: string; platform: ChatPlatform; reason: string; blocked: boolean }>(Array.isArray(entries) ? entries : []);
+  } catch { return new Map<string, { author: string; platform: ChatPlatform; reason: string; blocked: boolean }>(); }
+}
+const flaggedUsers = loadFlaggedUsers();
+function persistFlaggedUsers() {
+  try { localStorage.setItem(STORAGE_KEY + ":flagged-users", JSON.stringify(Array.from(flaggedUsers.entries()))); } catch {}
+}
 
 function emitConfig() { configListeners.forEach((fn) => fn()); }
 let diagRevision = 0;
@@ -222,7 +232,8 @@ export function applyTtsFilters(message: MultiChatMessage): MultiChatMessage | n
     if (previous && now - previous.firstAt <= rules.repeatWindowSec * 1000) {
       previous.count++;
       if (previous.count > rules.repeatMax) {
-        flaggedUsers.set(userKey, { author, platform, reason: "Repetição/flood", blocked: false });
+        flaggedUsers.set(userKey, { author, platform, reason: "Repetição/flood", blocked: flaggedUsers.get(userKey)?.blocked ?? false });
+        persistFlaggedUsers();
         return fail("Anti-flood: repetição acima do limite");
       }
     } else repeats.set(key, { text: normalized, count: 1, firstAt: now });
@@ -232,7 +243,10 @@ export function applyTtsFilters(message: MultiChatMessage): MultiChatMessage | n
     if (last && now - last < rules.cooldownSec * 1000) return fail("Cooldown do usuário");
     cooldowns.set(userKey, now);
   }
-  if (URL_TEST.test(message.text) && rules.content.links && rules.links === "allow") flaggedUsers.set(userKey, { author, platform, reason: "Link detectado", blocked: false });
+  if (URL_TEST.test(message.text) && rules.content.links && rules.links === "allow") {
+    flaggedUsers.set(userKey, { author, platform, reason: "Link detectado", blocked: flaggedUsers.get(userKey)?.blocked ?? false });
+    persistFlaggedUsers();
+  }
   if (rules.maxChars > 0 && text.length > rules.maxChars) {
     if (rules.longMessage === "block") return fail("Limite de caracteres excedido");
     if (rules.longMessage === "cut") text = text.slice(0, rules.maxChars);
@@ -243,9 +257,9 @@ export function applyTtsFilters(message: MultiChatMessage): MultiChatMessage | n
 export function getFlaggedUsers() { return Array.from(flaggedUsers.entries()).map(([key, value]) => ({ key, ...value })); }
 export function toggleFlaggedUser(key: string) {
   const user = flaggedUsers.get(key);
-  if (user) { flaggedUsers.set(key, { ...user, blocked: !user.blocked }); emitDiag(); }
+  if (user) { flaggedUsers.set(key, { ...user, blocked: !user.blocked }); persistFlaggedUsers(); emitDiag(); }
 }
-export function clearFlaggedUser(key: string) { flaggedUsers.delete(key); emitDiag(); }
+export function clearFlaggedUser(key: string) { flaggedUsers.delete(key); persistFlaggedUsers(); emitDiag(); }
 export function recordTtsQueueBlock(message: MultiChatMessage, reason: string) {
   diag.blocked++;
   diag.reasons[reason] = (diag.reasons[reason] || 0) + 1;
