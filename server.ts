@@ -37,7 +37,8 @@ const NO_CACHE = {
 };
 
 const app = express();
-const isDevServer = process.argv.includes("--dev") || process.env["NODE_ENV"] === "development";
+const isApiOnly = process.argv.includes("--api-only");
+const isDevServer = !isApiOnly && (process.argv.includes("--dev") || process.env["NODE_ENV"] === "development");
 
 if (isDevServer) {
   const { createServer } = await import("vite");
@@ -332,7 +333,7 @@ app.all(/^\/api(?:\/.*)?$/, (_req: Request, res: Response) => {
   });
 });
 
-if (!isDevServer) {
+if (!isDevServer && !isApiOnly) {
   app.use(express.static(distDir));
   app.get(/.*/, (_req: Request, res: Response) => {
     res.sendFile(resolve(distDir, "index.html"));
@@ -346,7 +347,7 @@ app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
   }
 });
 
-const port = Number(process.env["PORT"] || 3000);
+const port = isApiOnly ? 3001 : Number(process.env["PORT"] || 3000);
 app.listen(port, "0.0.0.0", () => {
   console.log("LiveNexus server listening on port " + port);
 });
