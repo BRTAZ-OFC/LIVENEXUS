@@ -2,7 +2,6 @@
 import DatabasePage from "./admin/banco";
 import AdminPanel from "./admin/panel";
 import TTSPage from "./tts";
-import PlatformConnection from "./configuracao/Config_PlatformConnection";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import { useEffect, useState } from "react";
 import {
@@ -226,20 +225,6 @@ function DashboardPage() {
                 <span className="dash-stat-caption">Mensagens recentes no multichat</span>
               </article>
             </div>
-
-            <section className="my-6 space-y-3">
-              <header>
-                <h2 className="text-base font-semibold text-white">Vinculação de canais</h2>
-                <p className="mt-1 text-xs text-slate-400">
-                  Verifique a propriedade do seu canal publicando um código temporário na bio. Os vínculos ficam salvos no JSON da plataforma.
-                </p>
-              </header>
-              <div className="grid grid-cols-1 gap-3 xl:grid-cols-3">
-                {(["Twitch", "Kick", "YouTube"] as const).map((platform) => (
-                  <PlatformConnection key={platform} platform={platform} />
-                ))}
-              </div>
-            </section>
 
             <div className="dash-live-workspace">
               <MultiChatPanel />
