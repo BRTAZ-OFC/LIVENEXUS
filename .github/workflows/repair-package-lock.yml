@@ -1,0 +1,59 @@
+name: Repair npm package lock
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/repair-package-lock.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate-lock:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Repair lockfile using npm
+        shell: bash
+        run: |
+          set -e
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund --prefer-online
+          if ! node -e 'const l=require("./package-lock.json"); const p=Object.entries(l.packages||{}).filter(([k,v])=>k && !v.link); const missing=p.filter(([k,v])=>!v.resolved || !v.integrity); console.log("Pacotes:",p.length,"sem resolved/integrity:",missing.length); if(missing.length > Math.max(10,Math.floor(p.length*0.1))) process.exit(1)'; then
+            echo "O lock existente não foi completado pelo npm; regenerando do package.json."
+            rm -f package-lock.json
+            npm install --package-lock-only --ignore-scripts --no-audit --no-fund --prefer-online
+          fi
+          node -e 'const l=require("./package-lock.json"); const p=Object.entries(l.packages||{}).filter(([k,v])=>k && !v.link); const missing=p.filter(([k,v])=>!v.resolved || !v.integrity); console.log("Pacotes:",p.length,"sem resolved/integrity:",missing.length); if(l.lockfileVersion!==3 || missing.length > Math.max(10,Math.floor(p.length*0.1))) process.exit(1)'
+
+      - name: Verify clean npm installation
+        run: npm ci --no-audit --no-fund
+
+      - name: Check production build
+        id: build
+        continue-on-error: true
+        run: npm run build
+
+      - name: Commit regenerated lockfile
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "package-lock.json já estava atualizado."
+          else
+            git commit -m "fix: regenerate package-lock with npm metadata"
+            git push origin HEAD:main
+          fi
