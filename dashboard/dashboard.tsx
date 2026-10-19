@@ -14,6 +14,12 @@ import {
   ChevronRight,
   ChevronLeft,
   Layers,
+  Volume2,
+  VolumeX,
+  Send,
+  Clock3,
+  MessageSquare,
+  Eye,
 } from "lucide-react";
 
 /* BLOCO 2 — O dashboard é registrado em dashboard/App.tsx. */
@@ -164,52 +170,121 @@ function DashboardPage() {
           </div>
         </header>
         {activeSection === "overview" ? (
-          <section className="dash-w-full-px-6-n4tgk">
-            <p className="dash-text-xs-font-bold-1eh0cdm">Área do usuário</p>
-            <h1 className="dash-mt-3-text-3xl-1fv0i93">Dashboard</h1>
-            <p className="dash-mt-3-max-w-2xl-1oz8868">
-              Bem-vindo ao LiveNexus. Este é o painel inicial da sua conta.
-            </p>
-            <div className="dash-mt-9-grid-dk8xjy">
-              <article className="dash-rounded-2xl-border-la2jyp">
-                <span className="dash-flex-h-11-w12n1q">
-                  <Radio className="dash-h-5-w-5-sv0uoi" />
-                </span>
-                <h2 className="dash-mt-5-text-lg-1wxow0h">Conexões</h2>
-                <p className="dash-mt-2-text-sm-n1yf0y">
-                  Acesse os recursos de conexão das suas plataformas de transmissão.
-                </p>
-                <span className="dash-mt-5-inline-flex-1wra89i">
-                  Em preparação <ArrowRight className="dash-h-4-w-4-3ulyf2" />
-                </span>
+          <section className="dash-overview">
+            <div className="dash-overview-heading">
+              <div>
+                <p className="dash-text-xs-font-bold-1eh0cdm">CENTRAL DE TRANSMISSÃO</p>
+                <h1 className="dash-mt-3-text-3xl-1fv0i93">Dashboard</h1>
+              </div>
+              <span className="dash-preview-tag">Prévia estrutural · sem conexões</span>
+            </div>
+
+            <div className="dash-live-stats">
+              <article className="dash-stat-card">
+                <div className="dash-stat-label"><Radio /> Plataformas ao vivo</div>
+                <div className="dash-platform-counts">
+                  <span><i className="dash-platform-dot twitch" /> Twitch <b>0</b></span>
+                  <span><i className="dash-platform-dot youtube" /> YouTube <b>0</b></span>
+                  <span><i className="dash-platform-dot kick" /> KICK <b>0</b></span>
+                </div>
               </article>
-              <article className="dash-rounded-2xl-border-la2jyp">
-                <span className="dash-flex-h-11-a0p84e">
-                  <UserRound className="dash-h-5-w-5-sv0uoi" />
-                </span>
-                <h2 className="dash-mt-5-text-lg-1wxow0h">Minha conta</h2>
-                <p className="dash-mt-2-text-sm-n1yf0y">
-                  Área reservada para informações e dados da conta.
-                </p>
-                <span className="dash-mt-5-inline-flex-1wra89i">
-                  Em preparação <ArrowRight className="dash-h-4-w-4-3ulyf2" />
-                </span>
+              <article className="dash-stat-card">
+                <div className="dash-stat-label"><Eye /> Total de espectadores</div>
+                <strong className="dash-stat-number">0</strong>
+                <span className="dash-stat-caption">Soma de todas as plataformas</span>
               </article>
-              <article className="dash-rounded-2xl-border-la2jyp">
-                <span className="dash-flex-h-11-r1ook6">
-                  <Settings2 className="dash-h-5-w-5-sv0uoi" />
-                </span>
-                <h2 className="dash-mt-5-text-lg-1wxow0h">Configurações</h2>
-                <p className="dash-mt-2-text-sm-n1yf0y">
-                  Espaço para as configurações do LiveNexus.
-                </p>
-                <span className="dash-mt-5-inline-flex-1wra89i">
-                  Em preparação <ArrowRight className="dash-h-4-w-4-3ulyf2" />
-                </span>
+              <article className="dash-stat-card">
+                <div className="dash-stat-label"><Clock3 /> Tempo em live</div>
+                <strong className="dash-stat-number">00:00:00</strong>
+                <span className="dash-stat-caption">Aguardando transmissão</span>
+              </article>
+              <article className="dash-stat-card">
+                <div className="dash-stat-label"><MessageSquare /> Fila de mensagens</div>
+                <strong className="dash-stat-number">0</strong>
+                <span className="dash-stat-caption">Mensagens aguardando</span>
               </article>
             </div>
+
+            <div className="dash-live-workspace">
+              <section className="dash-chat-panel">
+                <header className="dash-panel-header">
+                  <div>
+                    <h2>Chat ao vivo</h2>
+                    <p>Mensagens unificadas</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="dash-icon-button"
+                    aria-label="Ativar ou desativar som do chat (visual)"
+                    title="Som do chat (visual)"
+                    onClick={(event) => {
+                      const button = event.currentTarget;
+                      const enabled = button.dataset.sound !== "on";
+                      button.dataset.sound = enabled ? "on" : "off";
+                      button.setAttribute("aria-pressed", String(enabled));
+                      button.innerHTML = "";
+                      const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                      icon.setAttribute("width", "18");
+                      icon.setAttribute("height", "18");
+                      icon.setAttribute("viewBox", "0 0 24 24");
+                      icon.setAttribute("fill", "none");
+                      icon.setAttribute("stroke", "currentColor");
+                      icon.setAttribute("stroke-width", "2");
+                      icon.innerHTML = enabled
+                        ? '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>'
+                        : '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+                      button.appendChild(icon);
+                    }}
+                    data-sound="off"
+                    aria-pressed="false"
+                  >
+                    <VolumeX />
+                  </button>
+                </header>
+                <div className="dash-chat-toolbar">
+                  <span className="dash-chat-status-dot" /> Chat desconectado
+                  <span className="dash-chat-demo-label">Prévia</span>
+                </div>
+                <div className="dash-chat-messages" role="log" aria-label="Mensagens do chat de demonstração">
+                  <div className="dash-chat-empty">
+                    <MessageSquare />
+                    <strong>Nenhuma mensagem</strong>
+                    <span>As mensagens das plataformas aparecerão aqui quando as conexões forem configuradas.</span>
+                  </div>
+                </div>
+                <form className="dash-chat-composer" onSubmit={(event) => event.preventDefault()}>
+                  <input aria-label="Mensagem de chat" placeholder="Conectores ainda não configurados" disabled />
+                  <button type="submit" aria-label="Enviar mensagem" disabled title="Disponível após conectar"><Send /></button>
+                </form>
+              </section>
+
+              <section className="dash-speakers-panel">
+                <header className="dash-panel-header">
+                  <div>
+                    <h2>Top 10 falantes</h2>
+                    <p>Mais ativos no chat</p>
+                  </div>
+                  <UserRound className="dash-panel-heading-icon" />
+                </header>
+                <div className="dash-speakers-empty">
+                  <div className="dash-speakers-empty-icon"><UserRound /></div>
+                  <strong>Ranking indisponível</strong>
+                  <span>O ranking será preenchido quando houver mensagens recebidas.</span>
+                </div>
+                <ol className="dash-speakers-list" aria-label="Top 10 falantes">
+                  {Array.from({ length: 10 }, (_, index) => (
+                    <li key={index}>
+                      <span className="dash-speaker-rank">{index + 1}</span>
+                      <span className="dash-speaker-avatar">{index + 1}</span>
+                      <span className="dash-speaker-placeholder">Aguardando usuário</span>
+                      <b>0</b>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            </div>
           </section>
-        ) : activeSection === "admin-panel" && isAdmin ? (
+        )
           <section className="dash-w-full-px-6-5ebeye">
             <AdminPanel />
           </section>
