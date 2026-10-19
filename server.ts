@@ -12,6 +12,7 @@ import {
   getUserById,
 } from "./dashboard/admin/banco/-crud.js";
 import { PlataformasJohnson } from "./dashboard/admin/banco/Plataformas_Johnson.js";
+import { createChannelChallenge, verifyChannelChallenge } from "./dashboard/conexao/Connection_channel-verify.js";
 import {
   listAvaliacoes,
   createAvaliacao,
@@ -344,6 +345,37 @@ async function getAuthenticatedJsonUser(req: Request, res: Response) {
   return user;
 }
 
+app.post("/api/channel-verify/challenge", async (req: Request, res: Response) => {
+  try {
+    const user = await getAuthenticatedJsonUser(req, res);
+    if (!user) return;
+    const challenge = await createChannelChallenge(
+      user.user_id,
+      req.body?.platform,
+      req.body?.channelIdentifier,
+    );
+    return res.status(201).set(NO_CACHE).json({ ok: true, ...challenge });
+  } catch (error) {
+    return res.status(400).set(NO_CACHE).json({
+      ok: false,
+      error: errorMessage(error, "Não foi possível gerar o código de verificação."),
+    });
+  }
+});
+
+app.post("/api/channel-verify/verify", async (req: Request, res: Response) => {
+  try {
+    const user = await getAuthenticatedJsonUser(req, res);
+    if (!user) return;
+    const result = await verifyChannelChallenge(user.user_id, req.body?.challengeId);
+    return res.set(NO_CACHE).json({ ok: true, ...result });
+  } catch (error) {
+    const message = errorMessage(error, "Não foi possível verificar a bio.");
+    const status = /não encontrado|expirou|não pertence|gere um código|não encontrado na bio|indisponível/i.test(message) ? 400 : 502;
+    return res.status(status).set(NO_CACHE).json({ ok: false, error: message });
+  }
+});
+
 app.get("/api/plataformas", async (req: Request, res: Response) => {
   try {
     const user = await getAuthenticatedJsonUser(req, res);
@@ -371,6 +403,15 @@ app.post("/api/plataformas", async (req: Request, res: Response) => {
   try {
     const user = await getAuthenticatedJsonUser(req, res);
     if (!user) return;
+    const requestedStatus = String(req.body?.status ?? "").toLowerCase();
+    const directVerified = requestedStatus === "verified" ||
+      ["twitch_status", "kick_status", "youtube_status"].some((field) => String(req.body?.[field] ?? "").toLowerCase() === "verified");
+    if (directVerified) {
+      return res.status(403).set(NO_CACHE).json({
+        ok: false,
+        error: "A conexão só pode ser marcada como verificada após validar o código na bio.",
+      });
+    }
     const existing = await PlataformasJohnson.list(user.user_id);
     const plataforma = existing.length
       ? await PlataformasJohnson.update(user.user_id, existing[0].id, req.body ?? {})
@@ -392,6 +433,15 @@ app.patch("/api/plataformas", async (req: Request, res: Response) => {
   try {
     const user = await getAuthenticatedJsonUser(req, res);
     if (!user) return;
+    const requestedStatus = String(req.body?.status ?? "").toLowerCase();
+    const directVerified = requestedStatus === "verified" ||
+      ["twitch_status", "kick_status", "youtube_status"].some((field) => String(req.body?.[field] ?? "").toLowerCase() === "verified");
+    if (directVerified) {
+      return res.status(403).set(NO_CACHE).json({
+        ok: false,
+        error: "A conexão só pode ser marcada como verificada após validar o código na bio.",
+      });
+    }
     const existing = await PlataformasJohnson.list(user.user_id);
     const id = typeof req.query["id"] === "string" ? req.query["id"] : existing[0]?.id;
     if (!id) {
