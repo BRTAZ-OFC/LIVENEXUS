@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStreaming } from '../runtime';
+import { useStreaming } from './runtime';
 
 // A enquete nativa é um evento do fluxo global, independente de comandos de chat.
 export default function YouTubeNativePoll({ config = {}, elementKey = 'full_widget' }) {
