@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef } from "react";
 import { Check, ChevronLeft, ChevronRight, Music2, Plus } from "lucide-react";
 import type { CatalogItem } from "./catalogSources";
 
@@ -12,13 +12,13 @@ type Props = {
 const keyOf = (item: CatalogItem) => item.videoId || item.playlistId || item.browseId || item.id || item.title || "";
 
 export default function MusicCarousel({ title, items, isSaved, onAdd, onOpen }: Props) {
-  const [index, setIndex] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
   const count = items.length;
   const width = 144;
   const gap = 12;
   const step = width + gap;
   if (!count) return null;
-  const shift = (direction: number) => setIndex((current) => (current + direction + count) % count);
+  const shift = (direction: number) => trackRef.current?.scrollBy({ left: direction * step, behavior: "smooth" });
 
   return <section className="min-w-0 space-y-3">
     <header className="flex items-center justify-between gap-3">
@@ -28,7 +28,7 @@ export default function MusicCarousel({ title, items, isSaved, onAdd, onOpen }: 
         <button type="button" onClick={() => shift(1)} aria-label={`Próximo: ${title}`} title="Próximo" className="flex h-7 w-7 items-center justify-center rounded-full border border-white/10 text-slate-300 hover:bg-white/10"><ChevronRight className="h-4 w-4" /></button>
       </div>
     </header>
-    <div className="overflow-hidden"><div className="flex" style={{ transform: `translate3d(-${index * step}px,0,0)`, transition: "transform 0.35s ease" }}>
+    <div ref={trackRef} className="overflow-x-auto" style={{ scrollbarWidth: "none" }}><div className="flex w-max">
       {items.map((item, offset) => {
         const saved = isSaved(item);
         return <article key={`${keyOf(item)}-${offset}`} className="group min-w-0 shrink-0" style={{ width, marginRight: gap }}>
