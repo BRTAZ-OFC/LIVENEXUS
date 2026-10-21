@@ -364,9 +364,13 @@ export default function WidgetElementRenderer({
       contentCSS += `opacity: ${config.effOpacity / 100} !important; `;
     }
 
-    // Todas as widgets do overlay são renderizadas sem fundos sólidos, gradientes ou imagens.
-    // Mantém visíveis textos, ícones, linhas, bordas e o conteúdo real dos elementos.
-    const isTransparent = true;
+    // A transparência afeta somente o contêiner; os fundos internos fazem parte da interface funcional da widget.
+    const isTransparent =
+      config.effBgActiveType === "bg-transparent" ||
+      config.backgroundColor === "transparent" ||
+      config.isTransparent === true ||
+      config.bgMode === "transparent" ||
+      config.effBgType === "transparent";
 
     // 1. FUNDOS BÁSICOS - container effect
     if (isTransparent) {
@@ -728,51 +732,7 @@ export default function WidgetElementRenderer({
           ${containerAnimationsCSS}
         }
 
-        /* Transparency overrides when Transparente is selected or no explicit background is configured */
-        ${
-          isTransparent
-            ? `
-        .${uniqueClass},
-        .${uniqueClass} header,
-        .${uniqueClass} .header,
-        .${uniqueClass} nav,
-        .${uniqueClass} section,
-        .${uniqueClass} article,
-        .${uniqueClass} main,
-        .${uniqueClass} aside,
-        .${uniqueClass} div,
-        .${uniqueClass} ul,
-        .${uniqueClass} ol,
-        .${uniqueClass} li,
-        .${uniqueClass} table,
-        .${uniqueClass} tr,
-        .${uniqueClass} td,
-        .${uniqueClass} th,
-        .${uniqueClass} form,
-        .${uniqueClass} .widget-inner-content,
-        .${uniqueClass} [class*="bg-"],
-        .${uniqueClass} [style*="background"] {
-          background: transparent !important;
-          background-color: transparent !important;
-          background-image: none !important;
-          backdrop-filter: none !important;
-          box-shadow: none !important;
-        }
-        `
-            : !hasExplicitBg
-              ? `
-        .${uniqueClass},
-        .${uniqueClass} .widget-inner-content, 
-        .${uniqueClass} .widget-inner-content > div,
-        .${uniqueClass} [style*="background"],
-        .${uniqueClass} [style*="background-color"] {
-          background: transparent !important;
-          background-color: transparent !important;
-          backdrop-filter: none !important;
-        }
-        `
-              : ""
-        }
+        /* Fundos internos preservados para manter o funcionamento de cada widget. */
 
         ${
           isNoBorder
