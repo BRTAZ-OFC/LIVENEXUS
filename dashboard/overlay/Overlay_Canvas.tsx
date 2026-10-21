@@ -857,7 +857,7 @@ export default function OverlayCanvas() {
                         >{editingTextId === instanceId || !["cascata", "casanique", "rolar", "encarrilha"].includes(String(widgetConfig["animationType"] || ""))
                           ? String(widgetConfig["text"] || "Texto")
                           : <AnimacoesTexto
-                              key={String(widgetConfig["animationType"]) + "-" + String(widgetConfig["text"] || "") + "-" + String(widgetConfig["animationDelayMs"] ?? 1000) + "-" + String(widgetConfig["animationDurationMs"] ?? 650) + "-" + String(Boolean(widgetConfig["animationInfinite"])) + "-" + String(Boolean(widgetConfig["animationAlternate"))}
+                              key={String(widgetConfig["animationType"]) + "-" + String(widgetConfig["text"] || "") + "-" + String(widgetConfig["animationDelayMs"] ?? 1000) + "-" + String(widgetConfig["animationDurationMs"] ?? 650) + "-" + String(Boolean(widgetConfig["animationInfinite"])) + "-" + String(Boolean(widgetConfig["animationAlternate"]))}
                               texto={String(widgetConfig["text"] || "Texto")}
                               tipo={String(widgetConfig["animationType"])}
                               atraso={Math.max(0, Number(widgetConfig["animationDelayMs"] ?? 1000))}
