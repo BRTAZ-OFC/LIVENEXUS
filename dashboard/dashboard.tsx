@@ -9,6 +9,7 @@ import ScenariosPage from "./cenarios/ScenariosPage";
 import ScenarioCanvas from "./cenarios/Scenario_Canvas";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import BibliotecaSearch from "./biblioteca/BibliotecaSearch";
+import GlobalMusicPlayer from "./biblioteca/GlobalMusicPlayer";
 import { memo, useEffect, useState } from "react";
 import {
   AudioLines,
@@ -422,6 +423,7 @@ function DashboardPage() {
                 LIVE<span className="dash-text-cyan-300-bbfjjq">NEXUS</span>
               </span>
             </a>
+            <GlobalMusicPlayer />
             <button
               type="button"
               onClick={async () => {
