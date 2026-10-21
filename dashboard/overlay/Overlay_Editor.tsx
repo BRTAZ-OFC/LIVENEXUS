@@ -11,6 +11,7 @@ type WidgetDefinition = {
   component: ComponentType<{ config?: Record<string, unknown> }>;
   defaultConfig?: Record<string, unknown>;
   implemented?: boolean;
+  category?: string;
 };
 
 type OverlayEditorProps = {
@@ -345,7 +346,7 @@ export default function Overlay_Editor({
 
                 <section aria-label="Campos editáveis da widget" className="flex min-h-0 min-w-0 flex-col">
                   <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Conteúdo editável</p>
-                  {selectedWidget ? (
+                  {selectedWidget ? (selectedWidget.category === "manual" ? (
                     <div className="flex min-h-0 flex-col gap-1.5 overflow-y-auto pr-1">
                       {selectedWidget.id !== "react-hub-widget" && !hasSelectedInstance && <p className="rounded border border-amber-400/30 bg-amber-400/5 p-1.5 text-[10px] text-amber-200">Configuração padrão da widget. Selecione uma instância dela no canvas para aplicar e salvar as alterações.</p>}
                       {selectedWidget.id === "react-hub-widget" && (
@@ -465,7 +466,7 @@ export default function Overlay_Editor({
                         );
                       }) : editableEntries.length === 0 && !["react-hub-widget", "manual-death-counter", "twitch-commands-list", "manual-pix-widget", "manual-timer", "manual-clock", "twitch-rules", "twitch-schedule", "twitch-schedule-ticker", "twitch-sub-goal", "twitch-bits-goal", "twitch-raid-goal", "twitch-poll", "twitch-raffle"].includes(selectedWidget.id) ? <p className="text-[11px] text-slate-500">Esta widget não declara campos manuais adicionais. Os dados exibidos são recebidos do runtime da plataforma.</p> : null}
                     </div>
-                  ) : (
+                  ) : <p className="text-[11px] text-slate-500">Esta widget não está categorizada como manual; os valores dinâmicos não são editáveis aqui.</p>) : (
                     <p className="text-[11px] text-slate-500">Selecione uma widget ou um elemento no canvas para carregar seus campos de configuração.</p>
                   )}
                 </section>
