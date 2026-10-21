@@ -481,8 +481,8 @@ export default function Overlay_Editor({
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Formas pré-montadas</p>
                   </div>
                   {selectedWidget && ["manual-death-counter", "manual-clock", "manual-timer", "manual-now-playing"].includes(selectedWidget.id) ? (
-                    <div className="grid min-h-0 grid-cols-3 content-start gap-2 overflow-y-auto pr-1">
-                      {(selectedWidget.id === "manual-now-playing"
+                    <div className="grid min-h-0 grid-cols-3 content-start gap-1 overflow-y-auto pr-1">
+                      {((selectedWidget.id === "manual-now-playing"
                         ? [
                             { id: "01", label: "Padrão", layout: "default" },
                             { id: "02", label: "Quadrado", layout: "square" },
@@ -513,7 +513,7 @@ export default function Overlay_Editor({
                                 { id: "04", label: "Neon" },
                                 { id: "05", label: "Minimal" },
                               ]
-                      ).map((preset) => {
+                      ) as Array<{ id: string; label: string; layout?: string }>).map((preset) => {
                         const activePreset = String(editableConfig.structuralPreset ?? (selectedWidget.id === "manual-now-playing" ? "01" : "01")) === preset.id;
                         return (
                           <button
@@ -525,7 +525,7 @@ export default function Overlay_Editor({
                               structuralPreset: preset.id,
                               ...("layout" in preset && preset.layout ? { layout: preset.layout } : {}),
                             })}
-                            className={"flex aspect-square min-w-0 flex-col items-center justify-center gap-2 rounded-lg border p-2 text-center transition disabled:cursor-not-allowed disabled:opacity-40 " + (activePreset ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-900/80 text-slate-300 hover:border-violet-400/60 hover:bg-violet-500/10")}
+                            className={"flex aspect-square min-w-0 flex-col items-center justify-center gap-1 rounded-lg border p-1 text-center transition disabled:cursor-not-allowed disabled:opacity-40 " + (activePreset ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-900/80 text-slate-300 hover:border-violet-400/60 hover:bg-violet-500/10")}
                           >
                             <span className="flex h-8 w-8 items-center justify-center rounded border border-current/30 bg-slate-950/70 text-[10px] font-bold">{preset.id}</span>
                             <span className="text-[10px] leading-tight">{preset.label}</span>
@@ -548,11 +548,11 @@ export default function Overlay_Editor({
                     <Timer size={15} className="text-violet-300" />
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Tempo de visualização</p>
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 gap-1">
                     {[
-                      { id: "always", label: "Sem tempo", description: "Sempre visível", icon: <Timer size={21} /> },
-                      { id: "interval", label: "De tempo em tempo", description: "Exibição periódica", icon: <span className="text-lg font-bold">↻</span> },
-                      { id: "event", label: "Interação real", description: "Ao chegar evento ou mensagem", icon: <Zap size={21} /> },
+                      { id: "always", label: "Sem tempo", description: "Sempre visível", icon: <Timer size={16} /> },
+                      { id: "interval", label: "De tempo em tempo", description: "Exibição periódica", icon: <span className="text-base font-bold">↻</span> },
+                      { id: "event", label: "Interação real", description: "Ao chegar evento ou mensagem", icon: <Zap size={16} /> },
                     ].map((mode) => (
                       <button
                         key={mode.id}
@@ -560,7 +560,7 @@ export default function Overlay_Editor({
                         disabled={!hasSelectedInstance}
                         aria-pressed={String(editableConfig.widgetDisplayMode ?? "always") === mode.id}
                         onClick={() => onUpdateSelectedConfig({ widgetDisplayMode: mode.id })}
-                        className={"flex min-h-[92px] min-w-0 flex-col items-center justify-center gap-1 rounded-lg border px-1.5 py-2 text-center transition disabled:cursor-not-allowed disabled:opacity-40 " + (String(editableConfig.widgetDisplayMode ?? "always") === mode.id ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-900/80 text-slate-300 hover:border-violet-400/60 hover:bg-violet-500/10")}
+                        className={"flex min-h-[70px] min-w-0 flex-col items-center justify-center gap-1 rounded-lg border px-1 py-1 text-center transition disabled:cursor-not-allowed disabled:opacity-40 " + (String(editableConfig.widgetDisplayMode ?? "always") === mode.id ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-900/80 text-slate-300 hover:border-violet-400/60 hover:bg-violet-500/10")}
                       >
                         <span className="flex h-7 items-center justify-center">{mode.icon}</span>
                         <span className="text-[10px] font-semibold leading-tight">{mode.label}</span>
@@ -569,7 +569,7 @@ export default function Overlay_Editor({
                     ))}
                   </div>
                   {["interval", "event"].includes(String(editableConfig.widgetDisplayMode ?? "always")) && (
-                    <div className="flex flex-col gap-2 rounded-lg border border-violet-400/30 bg-slate-900/80 p-3">
+                    <div className="flex flex-col gap-2 rounded-lg border border-violet-400/30 bg-slate-900/80 p-2">
                       <p className="text-[11px] font-semibold text-slate-200">
                         {String(editableConfig.widgetDisplayMode) === "event" ? "Tempo de exibição após evento" : "Intervalo entre exibições"}
                       </p>
