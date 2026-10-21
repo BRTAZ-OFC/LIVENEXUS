@@ -31,8 +31,10 @@ type OverlayEditorProps = {
   onAddGuide: (orientation: "vertical" | "horizontal") => void;
   globalStyleConfig: { borderEnabled: boolean; borderWidth: number; borderColor?: string; borderRadius?: number; texture: string; colorEffectEnabled: boolean; colorEffect: string };
   backgroundColor: string;
+  backgroundMode: "transparent" | "solid";
   onUpdateBackgroundColor: (color: string) => void;
-  onUpdateGlobalStyleConfig: (patch: Partial<{ borderEnabled: boolean; borderWidth: number; texture: string; colorEffectEnabled: boolean; colorEffect: string }>) => void;
+  onUpdateBackgroundMode: (mode: "transparent" | "solid") => void;
+  onUpdateGlobalStyleConfig: (patch: Partial<{ borderEnabled: boolean; borderWidth: number; borderColor: string; borderRadius: number; texture: string; colorEffectEnabled: boolean; colorEffect: string }>) => void;
   layers: Array<{ id: string; name: string; widgetId: string; visible: boolean; locked: boolean; selected: boolean; zIndex: number }>;
   onSelectLayer: (id: string) => void;
   onMoveLayer: (id: string, delta: number) => void;
@@ -41,7 +43,7 @@ type OverlayEditorProps = {
   onDeleteLayer: (id: string) => void;
 };
 
-const MENUS = ["INICIO", "TEXTO", "ANIMACAO", "IMAGEMS", "ALINHAMENTO", "FORMAS", "EMOJES", "CAMADAS"] as const;
+const MENUS = ["INICIO", "FUNDO", "TEXTO", "ANIMACAO", "IMAGEMS", "ALINHAMENTO", "FORMAS", "EMOJES", "CAMADAS"] as const;
 type MenuName = (typeof MENUS)[number];
 
 
@@ -176,7 +178,9 @@ export default function Overlay_Editor({
   onAddGuide,
   globalStyleConfig,
   backgroundColor,
+  backgroundMode,
   onUpdateBackgroundColor,
+  onUpdateBackgroundMode,
   onUpdateGlobalStyleConfig,
   layers,
   onSelectLayer,
@@ -703,21 +707,28 @@ export default function Overlay_Editor({
                     <label className="flex min-w-0 items-center gap-1 whitespace-nowrap text-[9px] leading-tight text-slate-300">Espessura <input aria-label="Espessura do contorno" type="number" min={0} max={24} value={Number(selectedInstanceConfig?.strokeWidth ?? 2)} disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} onChange={(event) => onUpdateSelectedConfig({ strokeWidth: Math.max(0, Math.min(24, Number(event.target.value) || 0)) })} className="h-6 w-14 min-w-0 rounded border border-white/10 bg-slate-900 px-1 text-[10px] text-white disabled:opacity-40"/></label>
                     <label className="flex min-w-0 items-center gap-1 whitespace-nowrap text-[9px] leading-tight text-slate-300">Opacidade <span className="flex min-w-0 flex-1 items-center gap-1"><input aria-label="Opacidade da forma" type="range" min={0} max={100} value={Number(selectedInstanceConfig?.opacity ?? 100)} disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} onChange={(event) => onUpdateSelectedConfig({ opacity: Number(event.target.value) })} className="h-6 min-w-0 flex-1 accent-violet-500 disabled:opacity-40"/><span className="w-7 shrink-0 text-right text-[9px]">{Number(selectedInstanceConfig?.opacity ?? 100)}%</span></span></label>
                   </div>
-                  <div className="grid min-w-0 grid-cols-[auto_auto_4.5rem_minmax(0,1fr)_auto_auto_auto] items-center gap-2 border-t border-white/10 pt-2">
-                    <label className="flex items-center gap-1 whitespace-nowrap text-[9px] text-slate-300"><input type="checkbox" checked={globalStyleConfig.borderEnabled} onChange={(event) => onUpdateGlobalStyleConfig({ borderEnabled: event.target.checked })} className="accent-violet-500"/>Ativar borda</label>
-                    <label className="flex items-center gap-1 whitespace-nowrap text-[9px] text-slate-300">Cor da borda <input aria-label="Cor da borda global" type="color" value={String(globalStyleConfig.borderColor || "#dce6ff")} onChange={(event) => onUpdateGlobalStyleConfig({ borderColor: event.target.value })} className="h-6 w-8 rounded border border-white/10 bg-slate-900 p-0.5"/></label>
-                    <label className="flex min-w-0 flex-col gap-0.5 text-[9px] text-slate-300"><span>Arredondamento</span><input aria-label="Arredondamento global da borda" type="number" min={1} max={100} value={Number(globalStyleConfig.borderRadius ?? 16)} onChange={(event) => onUpdateGlobalStyleConfig({ borderRadius: Math.max(1, Math.min(100, Number(event.target.value) || 1)) })} className="h-6 w-full min-w-0 rounded border border-white/10 bg-slate-900 px-1 text-[10px] text-white"/></label>
-                    <label className="flex min-w-0 flex-col gap-0.5 text-[9px] text-slate-300"><span>Texturas</span><select aria-label="Textura global" value={globalStyleConfig.texture} onChange={(event) => onUpdateGlobalStyleConfig({ texture: event.target.value })} className="h-6 w-full min-w-0 rounded border border-white/10 bg-slate-900 px-1 text-[10px] text-white"><option value="none">Nenhuma</option><option value="glass">Vidro</option><option value="brushed-metal">Metal escovado</option><option value="carbon">Fibra de carbono</option><option value="noise">Granulado</option><option value="stripes">Listras</option><option value="dots">Pontos</option><option value="holographic">Holográfica</option><option value="marble">Mármore</option></select></label>
-                    <div className="flex items-center gap-1">
-                      <button type="button" disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} aria-pressed={Number(selectedInstanceConfig?.fillOpacity ?? 100) === 0} onClick={() => onUpdateSelectedConfig({ fillOpacity: 0 })} className={Number(selectedInstanceConfig?.fillOpacity ?? 100) === 0 ? activeButtonClass : buttonClass}>Transparente</button>
-                      <button type="button" disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} aria-pressed={Number(selectedInstanceConfig?.fillOpacity ?? 100) !== 0} onClick={() => onUpdateSelectedConfig({ fillOpacity: 100 })} className={Number(selectedInstanceConfig?.fillOpacity ?? 100) !== 0 ? activeButtonClass : buttonClass}>Sólido</button>
-                    </div>
-                    <label className="flex items-center gap-1 whitespace-nowrap text-[9px] text-slate-300"><input type="checkbox" checked={globalStyleConfig.colorEffectEnabled} onChange={(event) => onUpdateGlobalStyleConfig({ colorEffectEnabled: event.target.checked })} className="accent-violet-500"/>Efeitos de coloração</label>
+                </section>
+              </div>
+            )}
+            {activeMenu === "FUNDO" && (
+              <div className="grid h-full min-h-0 min-w-0 grid-cols-2 gap-3 overflow-hidden">
+                <section className="flex min-h-0 min-w-0 flex-col gap-3 border-r border-white/10 pr-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Configurações do fundo</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="flex min-w-0 items-center gap-1.5 rounded border border-white/10 bg-slate-900/70 p-2 text-[10px] text-slate-200"><input type="checkbox" checked={globalStyleConfig.borderEnabled} onChange={(event) => onUpdateGlobalStyleConfig({ borderEnabled: event.target.checked })} className="accent-violet-500"/>Ativar borda</label>
+                    <label className="flex min-w-0 items-center justify-between gap-1.5 rounded border border-white/10 bg-slate-900/70 p-2 text-[10px] text-slate-200">Cor da borda <input aria-label="Cor da borda global" type="color" value={String(globalStyleConfig.borderColor || "#dce6ff")} onChange={(event) => onUpdateGlobalStyleConfig({ borderColor: event.target.value })} className="h-6 w-8 shrink-0 rounded border border-white/10 bg-slate-900 p-0.5"/></label>
+                    <label className="flex min-w-0 items-center justify-between gap-1.5 rounded border border-white/10 bg-slate-900/70 p-2 text-[10px] text-slate-200">Arredondamento <input aria-label="Arredondamento global da borda" type="number" min={1} max={100} value={Number(globalStyleConfig.borderRadius ?? 16)} onChange={(event) => onUpdateGlobalStyleConfig({ borderRadius: Math.max(1, Math.min(100, Number(event.target.value) || 1)) })} className="h-6 w-14 min-w-0 rounded border border-white/10 bg-slate-950 px-1 text-[10px] text-white"/></label>
+                    <label className="flex min-w-0 items-center justify-between gap-1.5 rounded border border-white/10 bg-slate-900/70 p-2 text-[10px] text-slate-200">Texturas <select aria-label="Textura global" value={globalStyleConfig.texture} onChange={(event) => onUpdateGlobalStyleConfig({ texture: event.target.value })} className="h-6 min-w-0 max-w-[8rem] rounded border border-white/10 bg-slate-950 px-1 text-[10px] text-white"><option value="none">Nenhuma</option><option value="glass">Vidro</option><option value="brushed-metal">Metal escovado</option><option value="carbon">Fibra de carbono</option><option value="noise">Granulado</option><option value="stripes">Listras</option><option value="dots">Pontos</option><option value="holographic">Holográfica</option><option value="marble">Mármore</option></select></label>
+                    <button type="button" aria-pressed={backgroundMode === "transparent"} onClick={() => onUpdateBackgroundMode("transparent")} className={backgroundMode === "transparent" ? activeButtonClass : buttonClass}>Transparente</button>
+                    <button type="button" aria-pressed={backgroundMode === "solid"} onClick={() => onUpdateBackgroundMode("solid")} className={backgroundMode === "solid" ? activeButtonClass : buttonClass}>Sólido</button>
+                    <label className="col-span-2 flex items-center gap-2 rounded border border-white/10 bg-slate-900/70 p-2 text-[10px] text-slate-200"><input type="checkbox" checked={globalStyleConfig.colorEffectEnabled} onChange={(event) => onUpdateGlobalStyleConfig({ colorEffectEnabled: event.target.checked })} className="accent-violet-500"/>Efeitos de coloração</label>
                   </div>
-                  {globalStyleConfig.colorEffectEnabled && <div className="grid min-h-0 grid-cols-9 grid-rows-3 gap-1 overflow-hidden">
-                    {COLOR_EFFECTS.map((effect) => <button key={effect.id} type="button" title={effect.label} aria-pressed={globalStyleConfig.colorEffect === effect.id} onClick={() => onUpdateGlobalStyleConfig({ colorEffect: effect.id })} className={"flex min-h-0 min-w-0 items-center justify-center rounded border px-0.5 text-center text-[8px] leading-tight text-white " + (globalStyleConfig.colorEffect === effect.id ? "border-violet-300 ring-1 ring-violet-400" : "border-white/10 hover:border-violet-400")} style={{ backgroundImage: "linear-gradient(135deg, rgba(255,255,255,.5), rgba(80,80,100,.35), rgba(255,255,255,.08))", backgroundColor: ["gold","copper","ruby"].includes(effect.id) ? "#8a4c32" : ["sapphire","chrome","mirror"].includes(effect.id) ? "#315b85" : ["emerald","glass","crystal"].includes(effect.id) ? "#247b70" : "#624d8f" }}>{effect.label}</button>)}
-                  </div>}
-                  <p className="text-[9px] leading-tight text-slate-500">Os efeitos, a textura e a borda são aplicados globalmente a textos, widgets, formas e demais elementos.</p>
+                </section>
+                <section className="flex min-h-0 min-w-0 flex-col gap-2 overflow-hidden">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Efeitos de coloração</p>
+                  <div className="grid min-h-0 flex-1 grid-cols-7 grid-rows-3 gap-1 overflow-hidden">
+                    {COLOR_EFFECTS.map((effect) => <button key={effect.id} type="button" title={effect.label} aria-pressed={globalStyleConfig.colorEffect === effect.id} onClick={() => onUpdateGlobalStyleConfig({ colorEffect: effect.id, colorEffectEnabled: true })} className={"flex min-h-0 min-w-0 items-center justify-center rounded border px-0.5 text-center text-[9px] leading-tight text-white " + (globalStyleConfig.colorEffect === effect.id ? "border-violet-300 ring-1 ring-violet-400" : "border-white/10 hover:border-violet-400")} style={{ backgroundImage: "linear-gradient(135deg, rgba(255,255,255,.5), rgba(80,80,100,.35), rgba(255,255,255,.08))", backgroundColor: ["gold","copper","ruby"].includes(effect.id) ? "#8a4c32" : ["sapphire","chrome","mirror"].includes(effect.id) ? "#315b85" : ["emerald","glass","crystal"].includes(effect.id) ? "#247b70" : "#624d8f" }}>{effect.label}</button>)}
+                  </div>
                 </section>
               </div>
             )}
@@ -751,7 +762,7 @@ export default function Overlay_Editor({
                 <p className="text-[9px] leading-tight text-slate-500">Cada camada representa um elemento. As setas alteram a ordem e a coluna; o cadeado impede movimentação no canvas.</p>
               </div>
             )}
-            {!["INICIO", "TEXTO", "ANIMACAO", "ALINHAMENTO", "FORMAS", "CAMADAS"].includes(activeMenu) && (
+            {!["INICIO", "FUNDO", "TEXTO", "ANIMACAO", "ALINHAMENTO", "FORMAS", "CAMADAS"].includes(activeMenu) && (
               <div className="flex h-full items-center justify-center text-xs text-slate-500">
                 Este menu ficará vazio nesta etapa.
               </div>
