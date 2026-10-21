@@ -173,9 +173,10 @@ export default function Overlay_Editor({
   const editableConfig = selectedWidget
     ? { ...(selectedWidget.defaultConfig || {}), ...(hasSelectedInstance ? selectedInstanceConfig || {} : {}) }
     : {};
-  const editableEntries = Object.entries(editableConfig).filter(([, value]) =>
+  const editableEntries = selectedWidget?.id === "react-hub-widget" ? [] : Object.entries(editableConfig).filter(([, value]) =>
     value === null || ["string", "number", "boolean"].includes(typeof value) || Array.isArray(value) || (typeof value === "object" && value !== null)
   );
+  const reactHubRecentQueue = reactHubQueue.slice(-4).reverse();
 
   useEffect(() => {
     if (selectedInstanceWidgetId) setSelectedWidgetId(selectedInstanceWidgetId);
@@ -276,19 +277,20 @@ export default function Overlay_Editor({
                   <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Conteúdo editável</p>
                   {selectedWidget ? (
                     <div className="flex min-h-0 flex-col gap-1.5 overflow-y-auto pr-1">
-                      {!hasSelectedInstance && <p className="rounded border border-amber-400/30 bg-amber-400/5 p-1.5 text-[10px] text-amber-200">Configuração padrão da widget. Selecione uma instância dela no canvas para aplicar e salvar as alterações.</p>}
+                      {selectedWidget.id !== "react-hub-widget" && !hasSelectedInstance && <p className="rounded border border-amber-400/30 bg-amber-400/5 p-1.5 text-[10px] text-amber-200">Configuração padrão da widget. Selecione uma instância dela no canvas para aplicar e salvar as alterações.</p>}
                       {selectedWidget.id === "react-hub-widget" && (
-                        <div className="flex min-h-0 flex-col gap-2 rounded border border-white/10 bg-slate-900 p-2">
+                        <div className="flex min-h-0 flex-col gap-2">
                           <div className="flex items-center justify-between gap-2">
-                            <p className="text-[11px] font-semibold text-slate-200">Fila de vídeos ({reactHubQueue.length})</p>
-                            <button type="button" onClick={() => { setReactHubSelected(reactHubQueue[0] || null); setReactHubPopupOpen(true); }} className={buttonClass}>Abrir popup</button>
+                            <p className="text-[11px] font-semibold text-slate-200">Últimos vídeos</p>
+                            <button type="button" onClick={() => { setReactHubSelected(reactHubRecentQueue[0] || null); setReactHubPopupOpen(true); }} className={buttonClass}>Abrir popup</button>
                           </div>
-                          <div className="max-h-48 min-h-8 space-y-1 overflow-y-auto">
-                            {reactHubQueue.length ? reactHubQueue.map((item, index) => (
-                              <button key={item.id || index} type="button" onClick={() => { setReactHubSelected(item); setReactHubPopupOpen(true); }} className="block w-full rounded border border-white/5 bg-slate-950 px-2 py-1.5 text-left text-[10px] text-slate-200 hover:border-violet-400/50">
-                                <span className="font-semibold">{index + 1} - {item.author || "Usuário"} enviou = </span><span className="break-all text-cyan-300 underline">{item.url || item.title || "Link indisponível"}</span>
+                          <div className="grid h-[104px] shrink-0 grid-rows-4 gap-1 overflow-hidden">
+                            {reactHubRecentQueue.map((item, index) => (
+                              <button key={item.id || item.url || index} type="button" onClick={() => { setReactHubSelected(item); setReactHubPopupOpen(true); }} title={item.url || ""} className="block min-h-0 w-full overflow-hidden rounded border border-white/5 bg-slate-950 px-2 text-left text-[10px] leading-5 text-cyan-300 underline">
+                                <span className="block overflow-hidden text-ellipsis whitespace-nowrap">{item.url || ""}</span>
                               </button>
-                            )) : <p className="text-[10px] text-slate-500">Nenhum vídeo na fila. A fila é sincronizada com o React Hub.</p>}
+                            ))}
+                            {Array.from({ length: Math.max(0, 4 - reactHubRecentQueue.length) }, (_, index) => <div key={"empty-" + index} className="rounded border border-white/5 bg-slate-950/50" />)}
                           </div>
                         </div>
                       )}
@@ -391,7 +393,7 @@ export default function Overlay_Editor({
                             )}
                           </label>
                         );
-                      }) : editableEntries.length === 0 && !["manual-death-counter", "twitch-commands-list", "manual-pix-widget", "manual-timer", "manual-clock", "twitch-rules", "twitch-schedule", "twitch-schedule-ticker", "twitch-sub-goal", "twitch-bits-goal", "twitch-raid-goal", "twitch-poll", "twitch-raffle"].includes(selectedWidget.id) ? <p className="text-[11px] text-slate-500">Esta widget não declara campos manuais adicionais. Os dados exibidos são recebidos do runtime da plataforma.</p> : null}
+                      }) : editableEntries.length === 0 && !["react-hub-widget", "manual-death-counter", "twitch-commands-list", "manual-pix-widget", "manual-timer", "manual-clock", "twitch-rules", "twitch-schedule", "twitch-schedule-ticker", "twitch-sub-goal", "twitch-bits-goal", "twitch-raid-goal", "twitch-poll", "twitch-raffle"].includes(selectedWidget.id) ? <p className="text-[11px] text-slate-500">Esta widget não declara campos manuais adicionais. Os dados exibidos são recebidos do runtime da plataforma.</p> : null}
                     </div>
                   ) : (
                     <p className="text-[11px] text-slate-500">Selecione uma widget ou um elemento no canvas para carregar seus campos de configuração.</p>
@@ -505,7 +507,7 @@ export default function Overlay_Editor({
             </div>
             <div className="min-h-0 overflow-y-auto rounded border border-white/10">
               <p className="sticky top-0 border-b border-white/10 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-200">Fila de vídeos</p>
-              {reactHubQueue.map((item, index) => <button key={item.id || index} type="button" onClick={() => setReactHubSelected(item)} className={"block w-full border-b border-white/5 px-3 py-2 text-left text-xs hover:bg-white/10 " + (reactHubSelected?.url === item.url ? "bg-blue-950/70" : "")}><span className="font-semibold text-slate-200">{index + 1} - {item.author || "Usuário"} enviou = </span><span className="break-all text-cyan-300 underline">{item.url || item.title || "Link indisponível"}</span></button>)}
+              {reactHubQueue.map((item, index) => <button key={item.id || item.url || index} type="button" onClick={() => setReactHubSelected(item)} title={item.url || ""} className={"block w-full border-b border-white/5 px-3 py-2 text-left text-xs hover:bg-white/10 " + (reactHubSelected?.url === item.url ? "bg-blue-950/70" : "")}><span className="break-all text-cyan-300 underline">{item.url || ""}</span></button>)}
               {!reactHubQueue.length && <p className="p-3 text-xs text-slate-500">A fila está vazia.</p>}
             </div>
           </div>
