@@ -26,6 +26,7 @@ const listeners = new Set<(next: PlayerState) => void>();
 let frame: HTMLIFrameElement | null = null;
 let messageHandlerReady = false;
 let progressTimer: ReturnType<typeof setInterval> | null = null;
+let observedPlaying = false;
 
 function snapshot(): PlayerState {
   return { ...state, queue: [...state.queue] };
@@ -55,6 +56,7 @@ function playQueueIndex(index: number) {
   const track = state.queue[index];
   if (!track?.videoId) return;
   state.index = index;
+  observedPlaying = false;
   state.track = track;
   state.currentTime = 0;
   state.duration = 0;
@@ -86,17 +88,21 @@ export function connectMusicPlayerFrame(nextFrame: HTMLIFrameElement | null) {
     if (info && typeof info === "object") {
       if (typeof info.currentTime === "number") state.currentTime = info.currentTime;
       if (typeof info.duration === "number" && info.duration > 0) state.duration = info.duration;
-      if (typeof info.playerState === "number") state.isPlaying = info.playerState === 1;
+      if (typeof info.playerState === "number") {
+        state.isPlaying = info.playerState === 1;
+        if (info.playerState === 1) observedPlaying = true;
+        if (info.playerState === 0 && observedPlaying) {
+          observedPlaying = false;
+          if (state.index >= 0 && state.index + 1 < state.queue.length) { playQueueIndex(state.index + 1); return; }
+        }
+      }
       emit();
     }
-    const eventData = message?.info?.playerState ?? message?.data;
-    if (message?.event === "onStateChange" && Number(eventData) === 0) {
+    if (message?.event === "onStateChange" && Number(message?.info) === 0 && observedPlaying) {
+      observedPlaying = false;
       state.isPlaying = false;
+      if (state.index >= 0 && state.index + 1 < state.queue.length) { playQueueIndex(state.index + 1); return; }
       emit();
-      if (state.index >= 0 && state.index + 1 < state.queue.length) playQueueIndex(state.index + 1);
-    }
-    if (message?.event === "infoDelivery" && typeof message?.info?.playerState === "number") {
-      if (message.info.playerState === 0 && state.index >= 0 && state.index + 1 < state.queue.length) playQueueIndex(state.index + 1);
     }
   });
   try { frame.contentWindow?.postMessage(JSON.stringify({ event: "listening", channel: "widget" }), "https://www.youtube-nocookie.com"); } catch {}
