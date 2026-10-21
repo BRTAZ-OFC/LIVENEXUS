@@ -1,11 +1,6 @@
-import React, { useMemo, useLayoutEffect, useRef } from "react";
-import { useStreaming } from "../runtime";
-import {
-  platformIsOnline,
-  platformMessages,
-  visibleChatText,
-  selectedPlatforms,
-} from "../Overlay_platformData";
+import React, { useMemo, useLayoutEffect, useRef } from 'react';
+import { useStreaming } from '../runtime';
+import { platformIsOnline, platformMessages, selectedPlatforms, visibleChatText } from '../Overlay_platformData';
 
 export default function TwitchChatBox({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
@@ -16,11 +11,11 @@ export default function TwitchChatBox({ config = {} }) {
   const chatMessages = useMemo(() => {
     return platformMessages(liveActivity, config)
       .slice(0, 40) // buffer de mensagens
-      .reverse(); // cronológico: mais antiga no índice 0 (topo), mais recente no final (base)
+      .reverse();  // cronológico: mais antiga no índice 0 (topo), mais recente no final (base)
   }, [liveActivity, config.platform, config.platforms]);
 
   const messagesKey = useMemo(() => {
-    return chatMessages.map((m) => m.id).join(",");
+    return chatMessages.map(m => m.id).join(',');
   }, [chatMessages]);
 
   // Mede e oculta mensagens que transbordam no topo para evitar qualquer rolagem
@@ -39,14 +34,12 @@ export default function TwitchChatBox({ config = {} }) {
       const containerHeight = container.clientHeight;
       if (containerHeight <= 0) return;
 
-      const children = Array.from(container.children).filter(
-        (el) => el.getAttribute("data-chat-msg") === "true",
-      );
+      const children = Array.from(container.children).filter(el => el.getAttribute('data-chat-msg') === 'true');
       if (children.length === 0) return;
 
       // Restaura temporariamente para medir as alturas reais
-      children.forEach((child) => {
-        child.style.display = "flex";
+      children.forEach(child => {
+        child.style.display = 'flex';
       });
 
       let totalHeight = 0;
@@ -60,10 +53,10 @@ export default function TwitchChatBox({ config = {} }) {
 
         if (totalHeight + neededSpace <= containerHeight) {
           totalHeight += neededSpace;
-          child.style.display = "flex";
+          child.style.display = 'flex';
         } else {
           // As mensagens anteriores do topo que não cabem somem
-          child.style.display = "none";
+          child.style.display = 'none';
         }
       }
     }
@@ -76,47 +69,47 @@ export default function TwitchChatBox({ config = {} }) {
   }, [chatMessages, messagesKey]);
 
   const style = {
-    fontSize: config.fontSize || "14px",
-    color: config.textColor || "#ffffff",
-    fontFamily: config.fontFamily || "Inter, sans-serif",
+    fontSize: config.fontSize || '14px',
+    color: config.textColor || '#ffffff',
+    fontFamily: config.fontFamily || 'Inter, sans-serif',
   };
 
   const getRoleStyle = (roles) => {
-    if (roles.includes("broadcaster")) return "text-rose-400 font-extrabold";
-    if (roles.includes("moderator")) return "text-emerald-400 font-bold";
-    if (roles.includes("vip")) return "text-indigo-400 font-bold";
-    if (roles.includes("subscriber")) return "text-pink-400";
-    return "text-slate-300";
+    if (roles.includes('broadcaster')) return 'text-rose-400 font-extrabold';
+    if (roles.includes('moderator')) return 'text-emerald-400 font-bold';
+    if (roles.includes('vip')) return 'text-indigo-400 font-bold';
+    if (roles.includes('subscriber')) return 'text-pink-400';
+    return 'text-slate-300';
   };
 
   const getRoleLabel = (roles) => {
-    if (roles.includes("broadcaster")) return "[Broadcaster]";
-    if (roles.includes("moderator")) return "[Mod]";
-    if (roles.includes("vip")) return "[VIP]";
-    if (roles.includes("subscriber")) return "[Sub]";
-    return "";
+    if (roles.includes('broadcaster')) return '[Broadcaster]';
+    if (roles.includes('moderator')) return '[Mod]';
+    if (roles.includes('vip')) return '[VIP]';
+    if (roles.includes('subscriber')) return '[Sub]';
+    return '';
   };
 
   return (
-    <div
+    <div 
       className="w-full h-full p-4 flex flex-col justify-end overflow-hidden transition-all text-left select-none"
       style={{
-        background: config.backgroundColor || "rgba(0, 0, 0, 0.45)",
-        borderRadius: config.borderRadius || "0px",
+        background: config.backgroundColor || 'rgba(0, 0, 0, 0.45)',
+        borderRadius: config.borderRadius || '0px',
       }}
     >
-      <div
+      <div 
         ref={listContainerRef}
         className="space-y-2 overflow-hidden max-h-full flex flex-col justify-end w-full"
       >
         {chatMessages.length === 0 ? (
           <div className="text-xs text-slate-500 font-mono italic text-center py-4">
-            {!isOnline ? "Live não conectada" : "Aguardando mensagens do chat..."}
+            {!isOnline ? 'Live não conectada' : 'Aguardando mensagens do chat...'}
           </div>
         ) : (
-          chatMessages.map((msg) => (
-            <div
-              key={msg.id}
+          chatMessages.map(msg => (
+            <div 
+              key={msg.id} 
               data-chat-msg="true"
               className="flex flex-col md:flex-row md:items-baseline gap-1 md:gap-2 leading-relaxed break-words py-0.5 animate-fade-in-up shrink-0"
               style={style}
@@ -127,11 +120,11 @@ export default function TwitchChatBox({ config = {} }) {
                     {getRoleLabel(msg.roles)}
                   </span>
                 )}
-                <span className={`text-xs ${getRoleStyle(msg.roles || [])}`}>{msg.author}</span>
+                <span className={`text-xs ${getRoleStyle(msg.roles || [])}`}>
+                  {msg.author}
+                </span>
               </span>
-              <span
-                className={`text-xs break-all text-slate-200 min-w-0 ${isMultichat ? "line-clamp-3" : ""}`}
-              >
+              <span className={`text-xs break-all text-slate-200 min-w-0 ${isMultichat ? 'line-clamp-3' : ''}`}>
                 <span className="mr-1 text-slate-400">[{msg.platform}]</span>
                 {visibleChatText(msg)}
               </span>
