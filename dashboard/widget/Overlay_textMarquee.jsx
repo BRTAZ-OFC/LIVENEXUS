@@ -15,18 +15,14 @@ export function TextMarquee({ text = '', isMainChat = false, forceMarquee = fals
   }
 
   return (
-    <div className={`overflow-hidden whitespace-nowrap relative min-w-0 ${className}`} style={{ ...style, overflow: 'hidden', whiteSpace: 'nowrap' }}>
-      <div
-        className="flex w-max"
-        style={{ animation: 'livenexus-text-marquee 15s linear infinite' }}
-      >
-        <span className="shrink-0 pr-8">{str}</span>
-        <span className="shrink-0 pr-8" aria-hidden="true">{str}</span>
+    <div className={`overflow-hidden whitespace-nowrap relative ${className}`} style={style}>
+      <div className="inline-block animate-marquee" style={{ display: 'inline-block', paddingLeft: '100%', animation: 'marquee 12s linear infinite' }}>
+        {str}
       </div>
       <style>{`
-        @keyframes livenexus-text-marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+        @keyframes marquee {
+          0% { transform: translate(0, 0); }
+          100% { transform: translate(-100%, 0); }
         }
       `}</style>
     </div>
