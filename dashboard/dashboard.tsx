@@ -5,6 +5,7 @@ import TTSPage from "./tts";
 import PlatformBioConnections from "./conexao/PlatformBioConnections";
 import OverlayCanvas from "./overlay/Overlay_Canvas";
 import ScenariosPage from "./cenarios/ScenariosPage";
+import ScenarioCanvas from "./cenarios/Scenario_Canvas";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import { memo, useEffect, useState } from "react";
 import {
@@ -154,6 +155,9 @@ function DashboardPage() {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
+  const [activeScenarioId, setActiveScenarioId] = useState<string | null>(() =>
+    typeof window !== "undefined" ? sessionStorage.getItem("livenexus_editor_scenario_id") : null,
+  );
   const [activeSection, setActiveSection] = useState<
     "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios"
   >(() => {
@@ -186,7 +190,10 @@ function DashboardPage() {
     section: "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios",
   ) {
     setActiveSection(section);
+    setActiveScenarioId(null);
     if (typeof window !== "undefined") {
+      sessionStorage.removeItem("livenexus_editor_scenario_id");
+      if (section === "overlay") sessionStorage.removeItem("livenexus_active_scenario_id");
       sessionStorage.setItem("livenexus_active_tab", section);
       const url = new URL(window.location.href);
       if (
@@ -426,12 +433,22 @@ function DashboardPage() {
             <DatabasePage embedded />
           </section>
         ) : activeSection === "scenarios" ? (
-          <ScenariosPage
-            onOpenScenario={(scenarioId) => {
-              sessionStorage.setItem("livenexus_active_scenario_id", scenarioId);
-              handleSelectSection("overlay");
-            }}
-          />
+          activeScenarioId ? (
+            <ScenarioCanvas
+              scenarioId={activeScenarioId}
+              onBack={() => {
+                sessionStorage.removeItem("livenexus_editor_scenario_id");
+                setActiveScenarioId(null);
+              }}
+            />
+          ) : (
+            <ScenariosPage
+              onOpenScenario={(scenarioId) => {
+                sessionStorage.setItem("livenexus_editor_scenario_id", scenarioId);
+                setActiveScenarioId(scenarioId);
+              }}
+            />
+          )
         ) : null}
       </main>
     </div>
