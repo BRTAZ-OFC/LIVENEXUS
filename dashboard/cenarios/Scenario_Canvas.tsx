@@ -237,10 +237,28 @@ export default function ScenarioCanvas({
       else return;
 
       event.preventDefault();
-      updateInstance(selectedId, {
-        x: Math.max(0, Math.min(CANVAS_WIDTH - Math.max(1, Number(selected.width) || 320), (Number(selected.x) || 0) + dx)),
-        y: Math.max(0, Math.min(CANVAS_HEIGHT - Math.max(1, Number(selected.height) || 120), (Number(selected.y) || 0) + dy)),
-      });
+      setScenario((current) =>
+        current
+          ? {
+              ...current,
+              instances: current.instances.map((item, index) => {
+                if (
+                  String(item.id ?? String(item.widgetId) + "-" + index) !== selectedId
+                ) {
+                  return item;
+                }
+                const width = Math.max(1, Number(item.width) || 320);
+                const height = Math.max(1, Number(item.height) || 120);
+                return {
+                  ...item,
+                  x: Math.max(0, Math.min(CANVAS_WIDTH - width, (Number(item.x) || 0) + dx)),
+                  y: Math.max(0, Math.min(CANVAS_HEIGHT - height, (Number(item.y) || 0) + dy)),
+                };
+              }),
+            }
+          : current,
+      );
+      setNotice("");
     }
 
     window.addEventListener("keydown", handleCanvasKeyDown);
