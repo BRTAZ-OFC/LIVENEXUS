@@ -19,7 +19,6 @@ export default function GlobalMusicPlayer() {
     return subscribeMusicPlayer(setPlayer);
   }, []);
   const track = player.track as MusicTrack | null;
-  const progress = player.duration > 0 ? Math.min(100, (player.currentTime / player.duration) * 100) : 0;
 
   return <>
     <div className="mx-3 flex min-w-0 flex-1 items-center justify-center gap-2 rounded-xl border border-cyan-300/15 bg-slate-950/60 px-2 py-1.5 md:mx-6 md:max-w-3xl">
@@ -41,6 +40,6 @@ export default function GlobalMusicPlayer() {
       <Volume2 className="hidden h-4 w-4 shrink-0 text-slate-400 sm:block" />
       <input aria-label="Volume da música" type="range" min={0} max={100} value={player.volume} onChange={(event) => setMusicVolume(Number(event.target.value))} className="hidden w-16 accent-cyan-300 sm:block" />
     </div>
-    <iframe ref={frameRef} title="Player global do YouTube" allow="autoplay; encrypted-media; picture-in-picture" referrerPolicy="origin" style={{ position: "fixed", width: 320, height: 180, right: -340, bottom: -200, opacity: 0.01, pointerEvents: "none", zIndex: -1, border: 0 }} />
+    <iframe ref={frameRef} onLoad={() => connectMusicPlayerFrame(frameRef.current)} title="Player global do YouTube" allow="autoplay; encrypted-media; picture-in-picture" referrerPolicy="origin" style={{ position: "fixed", width: 320, height: 180, right: -340, bottom: -200, opacity: 0.01, pointerEvents: "none", zIndex: -1, border: 0 }} />
   </>;
 }
