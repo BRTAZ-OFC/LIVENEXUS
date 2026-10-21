@@ -80,7 +80,28 @@ type OverlayRow = {
 const catalog = TWITCH_WIDGETS_CATALOG as unknown as WidgetDefinition[];
 const DEFAULT_SIZE = { width: 800, height: 480 };
 const TEXT_WIDGET_ID = "__livenexus_text__";
+const SHAPE_WIDGET_ID = "__livenexus_shape__";
 const EMPTY_BACKGROUND: CanvasBackground = { type: "transparent", opacity: 100 };
+
+
+function OverlayShape({ shape, color, strokeColor, strokeWidth, fillEnabled }: { shape: string; color: string; strokeColor: string; strokeWidth: number; fillEnabled: boolean }) {
+ const fill = fillEnabled ? color : "none";
+ const common = { fill, stroke: strokeColor, strokeWidth, strokeLinejoin: "round" as const, vectorEffect: "non-scaling-stroke" as const };
+ const points: Record<string,string> = {triangle:"50,4 96,94 4,94","right-triangle":"5,5 5,95 95,95",diamond:"50,3 97,50 50,97 3,50",parallelogram:"25,5 97,5 75,95 3,95",trapezoid:"25,5 75,5 97,95 3,95",pentagon:"50,3 97,38 79,96 21,96 3,38",hexagon:"25,4 75,4 97,50 75,96 25,96 3,50",heptagon:"50,3 88,20 98,55 76,90 38,98 5,70 12,30",octagon:"30,3 70,3 97,30 97,70 70,97 30,97 3,70 3,30",decagon:"50,2 79,12 96,35 96,65 79,88 50,98 21,88 4,65 4,35 21,12","star-6":"50,3 61,35 95,35 68,55 78,91 50,70 22,91 32,55 5,35 39,35","arrow-right":"3,30 60,30 60,7 97,50 60,93 60,70 3,70","arrow-left":"97,30 40,30 40,7 3,50 40,93 40,70 97,70","arrow-up":"30,97 30,40 7,40 50,3 93,40 70,40 70,97","arrow-down":"30,3 70,3 70,60 93,60 50,97 7,60 30,60",chevron:"5,5 50,35 95,5 95,35 50,65 5,35",cross:"35,3 65,3 65,35 97,35 97,65 65,65 65,97 35,97 35,65 3,65 3,35 35,35",plus:"38,3 62,3 62,38 97,38 97,62 62,62 62,97 38,97 38,62 3,62 3,38 38,38",minus:"5,38 95,38 95,62 5,62"};
+ if(["circle","ellipse","ring"].includes(shape)) return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><ellipse cx="50" cy="50" rx={shape==="ellipse"?48:43} ry={shape==="ellipse"?30:43} fill={shape==="ring"?"none":fill} stroke={strokeColor} strokeWidth={strokeWidth} vectorEffect="non-scaling-stroke"/></svg>;
+ if(["rectangle","square","rounded-rectangle"].includes(shape)) return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><rect x={shape==="square"?5:2} y={shape==="square"?5:20} width={shape==="square"?90:96} height={shape==="square"?90:60} rx={shape==="rounded-rectangle"?12:0} {...common}/></svg>;
+ if(shape==="star") return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><polygon points="50,3 61,36 96,36 68,57 79,93 50,71 21,93 32,57 4,36 39,36" {...common}/></svg>;
+ if(shape==="heart") return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><path d="M50 91 C40 78 7 56 7 30 C7 5 38 1 50 24 C63 1 94 5 94 30 C94 56 60 79 50 91Z" {...common}/></svg>;
+ if(shape==="lightning") return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><polygon points="57,2 18,56 44,56 35,98 83,37 56,37" {...common}/></svg>;
+ if(shape==="speech-bubble") return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><path d="M8 12 H92 V72 H42 L20 92 V72 H8Z" {...common}/></svg>;
+ if(shape==="cylinder") return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><path d="M8 20 C8 3 92 3 92 20 V80 C92 98 8 98 8 80Z" {...common}/><ellipse cx="50" cy="20" rx="42" ry="14" fill={fill} stroke={strokeColor} strokeWidth={strokeWidth}/></svg>;
+ if(shape==="cloud") return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><path d="M22 76 C1 76 1 48 21 43 C18 17 48 9 60 31 C82 21 100 40 91 58 C109 77 87 88 72 85 H23Z" {...common}/></svg>;
+ if(shape==="arch") return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><path d="M10 95 V48 A40 40 0 0 1 90 48 V95 H68 V48 A18 18 0 0 0 32 48 V95Z" {...common}/></svg>;
+ if(shape==="wave") return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><path d="M4 35 C25 5 35 65 50 35 S75 5 96 35 V65 C75 35 65 95 50 65 S25 35 4 65Z" {...common}/></svg>;
+ if(shape==="pie") return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><path d="M50 50 L50 5 A45 45 0 0 1 95 50Z" {...common}/><circle cx="50" cy="50" r="45" fill="none" stroke={strokeColor} strokeWidth={strokeWidth}/></svg>;
+ if(shape==="line") return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><path d="M8 90 L92 10" fill="none" stroke={strokeColor || color} strokeWidth={Math.max(1,strokeWidth)} strokeLinecap="round"/></svg>;
+ return <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full"><polygon points={points[shape]||points.hexagon} {...common}/></svg>;
+}
 
 function isObject(value: unknown): value is JsonObject {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -530,6 +551,24 @@ export default function OverlayCanvas() {
     setError(""); setNotice("");
   }
 
+
+  function addShapeInstance(shape: string) {
+    const existing = config.instances || [];
+    const width = Math.min(size.width, 140);
+    const height = Math.min(size.height, 100);
+    const label = [["rectangle","Retângulo"],["rounded-rectangle","Retângulo arredondado"],["square","Quadrado"],["circle","Círculo"],["ellipse","Elipse"],["triangle","Triângulo"],["right-triangle","Triângulo retângulo"],["diamond","Losango"],["parallelogram","Paralelogramo"],["trapezoid","Trapézio"],["pentagon","Pentágono"],["hexagon","Hexágono"],["heptagon","Heptágono"],["octagon","Octógono"],["decagon","Decágono"],["star","Estrela"],["star-6","Estrela 6 pontas"],["arrow-right","Seta direita"],["arrow-left","Seta esquerda"],["arrow-up","Seta para cima"],["arrow-down","Seta para baixo"],["chevron","Chevron"],["cross","Cruz"],["plus","Mais"],["minus","Menos"],["heart","Coração"],["lightning","Raio"],["speech-bubble","Balão de fala"],["cylinder","Cilindro"],["cloud","Nuvem"],["arch","Arco"],["wave","Onda"],["pie","Setor circular"],["ring","Anel"],["line","Linha"]].find(([id]) => id === shape)?.[1] || "Forma";
+    const id = makeUniqueWidgetId(String(label), existing);
+    const instance: CanvasInstance = {
+      id, widgetId: SHAPE_WIDGET_ID, elementKey: shape, isFullWidget: false, name: String(label),
+      x: Math.max(0, Math.min(size.width - width, 24)), y: Math.max(0, Math.min(size.height - height, 24)),
+      width, height, zIndex: existing.reduce((max, item) => Math.max(max, Number(item.zIndex) || 0), 0) + 1,
+      visible: true, config: { shape, color: "#8b5cf6", fillColor: "#8b5cf6", strokeColor: "#ddd6fe", strokeWidth: 2, fillEnabled: true, opacity: 100 },
+    };
+    setActiveOverlayId(null);
+    setConfig((current) => ({ ...current, id: undefined, name: String(label), instances: [...(current.instances || []), instance] }));
+    setSelectedInstanceId(id); setEditingTextId(null); setError(""); setNotice("");
+  }
+
   function updateInstance(instanceId: string, patch: Partial<CanvasInstance>) {
     setConfig((current) => ({
       ...current,
@@ -676,7 +715,9 @@ export default function OverlayCanvas() {
                 const definition = catalog.find((item) => item.id === instance.widgetId) ||
                   (instance.widgetId === TEXT_WIDGET_ID
                     ? ({ id: TEXT_WIDGET_ID, name: instance.name || "Texto", defaultWidth: 320, defaultHeight: 60 } as WidgetDefinition)
-                    : undefined);
+                    : instance.widgetId === SHAPE_WIDGET_ID
+                      ? ({ id: SHAPE_WIDGET_ID, name: instance.name || "Forma", defaultWidth: 140, defaultHeight: 100 } as WidgetDefinition)
+                      : undefined);
                 if (!definition) return null;
                 const width = Math.max(1, Number(instance.width) || definition.defaultWidth || 280);
                 const height = Math.max(
@@ -809,7 +850,9 @@ export default function OverlayCanvas() {
                   >
                     <div className="h-full w-full overflow-hidden">
                       <style>{'[data-overlay-instance="' + instanceId + '"] :is(p,span,h1,h2,h3,h4,h5,h6,label,li,a,strong,em,small) { font-family: "' + String(widgetConfig["fontFamily"] || "Inter").replace(/"/g, "") + '", sans-serif !important; font-size: ' + Math.max(1, Number(widgetConfig["fontSize"]) || 16) + 'px !important; color: ' + String(widgetConfig["color"] || widgetConfig["textColor"] || "#ffffff") + ' !important; }'}</style>
-                      {instance.widgetId === TEXT_WIDGET_ID ? (
+                      {instance.widgetId === SHAPE_WIDGET_ID ? (
+                        <div className="h-full w-full" style={{ opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100 }}><OverlayShape shape={String(widgetConfig["shape"] || instance.elementKey || "rectangle")} color={String(widgetConfig["fillColor"] || widgetConfig["color"] || "#8b5cf6")} strokeColor={String(widgetConfig["strokeColor"] || "#ddd6fe")} strokeWidth={Math.max(0, Number(widgetConfig["strokeWidth"] ?? 2))} fillEnabled={widgetConfig["fillEnabled"] !== false}/></div>
+                      ) : instance.widgetId === TEXT_WIDGET_ID ? (
                         <div
                           data-overlay-text
                           data-overlay-text-id={instanceId}
@@ -976,6 +1019,7 @@ export default function OverlayCanvas() {
         catalog={catalog}
         onAddFragment={addWidgetComponent}
         onAddText={addTextInstance}
+        onAddShape={addShapeInstance}
         onFontChange={(fontFamily) => applyTextStyleToSelectedText({ fontFamily })}
         onTextStyleChange={applyTextStyleToSelectedText}
         selectedInstanceWidgetId={config.instances?.find((item, index) => (item.id || `${item.widgetId}-${index}`) === selectedInstanceId)?.widgetId ?? null}
