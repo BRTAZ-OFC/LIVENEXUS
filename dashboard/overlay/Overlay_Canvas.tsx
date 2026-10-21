@@ -827,10 +827,11 @@ export default function OverlayCanvas() {
         >
           <div
             className="absolute left-0 top-0 overflow-hidden"
-            onPointerDown={(event) => {
+            onPointerDownCapture={(event) => {
               const target = event.target as HTMLElement;
               if (!target.closest("[data-overlay-instance]")) {
                 setSelectedInstanceId(null);
+                setEditingTextId(null);
                 setEditorOpen(false);
               }
             }}
@@ -938,6 +939,7 @@ export default function OverlayCanvas() {
                     style={instanceStyle}
                     onPointerDown={(event) => {
                       setSelectedInstanceId(instanceId);
+                      setEditorOpen(true);
                       if (instance.locked) { event.stopPropagation(); return; }
                       const target = event.target as HTMLElement;
                       // Preserve native focus and pointer events on the editable text itself.
@@ -1027,7 +1029,7 @@ export default function OverlayCanvas() {
                     }}
                   >
                     <div className="h-full w-full overflow-hidden" style={{ backgroundColor: "transparent", backgroundImage: "none", boxShadow: "none" }}>
-                      <style>{'[data-overlay-instance="' + instanceId + '"] :is(p,span,h1,h2,h3,h4,h5,h6,label,li,a,strong,em,small) { font-family: "' + String(widgetConfig["fontFamily"] || "Inter").replace(/"/g, "") + '", sans-serif !important; font-size: ' + Math.max(1, Number(widgetConfig["fontSize"]) || 16) + 'px !important; color: ' + String(widgetConfig["color"] || widgetConfig["textColor"] || "#ffffff") + ' !important; }' + '[data-overlay-instance="' + instanceId + '"], [data-overlay-instance="' + instanceId + '"] *, [data-overlay-instance="' + instanceId + '"] *::before, [data-overlay-instance="' + instanceId + '"] *::after { background-color: transparent !important; background-image: none !important; box-shadow: none !important; }'}</style>
+                      <style>{'[data-overlay-instance="' + instanceId + '"] :is(p,span,h1,h2,h3,h4,h5,h6,label,li,a,strong,em,small) { font-family: "' + String(widgetConfig["fontFamily"] || "Inter").replace(/"/g, "") + '", sans-serif !important; font-size: ' + Math.max(1, Number(widgetConfig["fontSize"]) || 16) + 'px !important; color: ' + String(widgetConfig["color"] || widgetConfig["textColor"] || "#ffffff") + ' !important; }' + '[data-overlay-instance="' + instanceId + '"] { background-color: transparent !important; background-image: none !important; box-shadow: none !important; }'}</style>
                       {instance.widgetId === SHAPE_WIDGET_ID ? (
                         <div className="h-full w-full" style={{ opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100 }}><OverlayShape shape={String(widgetConfig["shape"] || instance.elementKey || "rectangle")} color={String(widgetConfig["fillColor"] || widgetConfig["color"] || "#8b5cf6")} strokeColor={String(widgetConfig["strokeColor"] || "#ddd6fe")} strokeWidth={Math.max(0, Number(widgetConfig["strokeWidth"] ?? 2))} fillEnabled={widgetConfig["fillEnabled"] !== false} fillOpacity={Number(widgetConfig["fillOpacity"] ?? 100)}/></div>
                       ) : instance.widgetId === TEXT_WIDGET_ID ? (
@@ -1230,7 +1232,10 @@ export default function OverlayCanvas() {
           selected: (instance.id || `${instance.widgetId}-${index}`) === selectedInstanceId,
           zIndex: Number(instance.zIndex) || index + 1,
         })).sort((a, b) => b.zIndex - a.zIndex)}
-        onSelectLayer={(id) => setSelectedInstanceId(id)}
+        onSelectLayer={(id) => {
+          setSelectedInstanceId(id);
+          setEditorOpen(Boolean(id));
+        }}
         onMoveLayer={(id, delta) => setConfig((current) => {
           const normalized = (current.instances || []).map((item, index) => ({ ...item, id: item.id || `${item.widgetId}-${index}` })).sort((a, b) => (Number(b.zIndex) || 0) - (Number(a.zIndex) || 0));
           const from = normalized.findIndex((item) => item.id === id);
