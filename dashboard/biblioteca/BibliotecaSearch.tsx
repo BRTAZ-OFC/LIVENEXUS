@@ -472,10 +472,9 @@ export default function BibliotecaSearch() {
               <p className="truncate text-sm font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p>
               <p className="truncate text-xs text-slate-400">{item.artist || item.author || item.source || ""}</p>
             </button>
-            <button type="button" disabled={libraryBusy || isSaved(item)} onClick={() => addItem(item)} aria-label={isSaved(item) ? "Já está na biblioteca" : "Adicionar à biblioteca"} title={isSaved(item) ? "Na biblioteca" : "Adicionar à biblioteca"} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 text-cyan-200 hover:bg-cyan-300/10 disabled:opacity-50"><Plus className="h-4 w-4" /></button>
           </article>;
         })}</div>
-        {canLoadMore && <div className="flex justify-center pt-3"><button type="button" disabled={loadingMore || loading} onClick={() => void loadMore()} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10 disabled:opacity-50">{loadingMore ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}{loadingMore ? "Carregando..." : "Carregar mais resultados"}</button></div>}
+        {canLoadMore && !loading && <button type="button" disabled={loadingMore} onClick={() => void loadMore()} className="flex w-full items-center justify-center gap-1.5 rounded-md border border-cyan-500/20 bg-cyan-500/10 py-1.5 text-[11px] text-cyan-300 transition-colors hover:bg-cyan-500/20 disabled:opacity-50">{loadingMore ? <LoaderCircle className="h-3.5 w-3.5 animate-spin" /> : <span aria-hidden="true">⌄</span>}{loadingMore ? "Carregando..." : "Carregar mais"}</button>}
       </section> : <>
         {loadingHome && <div className="flex items-center gap-2 text-sm text-slate-500"><LoaderCircle className="h-4 w-4 animate-spin" />Carregando carrosséis...</div>}
         {CATEGORIES.map((entry) => <MusicCarousel key={entry.key} title={entry.label} items={home[entry.key]} onOpen={openItem} />)}
