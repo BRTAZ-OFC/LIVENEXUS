@@ -224,6 +224,19 @@ export default function ReactHubWidget({ config = {} }) {
           {renderVideoQueueList()}
         </div>
       </div>
+      {previewVideo && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 p-3" role="dialog" aria-modal="true" aria-label={"Reproduzir vídeo enviado por " + (previewVideo.author || "usuário")} onClick={() => setPreviewVideo(null)}>
+          <div className="relative w-full max-w-4xl rounded-lg border border-white/20 bg-slate-950 p-3 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <div className="min-w-0"><p className="text-xs font-semibold text-white">Vídeo do YouTube</p><p className="truncate text-[11px] text-slate-400">Enviado por: {previewVideo.author || "Não identificado"}</p></div>
+              <button type="button" data-no-widget-drag onClick={() => setPreviewVideo(null)} aria-label="Fechar vídeo" className="rounded border border-white/20 p-1.5 text-white hover:bg-white/10"><X size={16} /></button>
+            </div>
+            <div className="aspect-video w-full overflow-hidden rounded bg-black">
+              <iframe className="h-full w-full" src={getYouTubeEmbedUrl(previewVideo.url)} title={"Vídeo enviado por " + (previewVideo.author || "usuário")} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -293,12 +306,17 @@ export default function ReactHubWidget({ config = {} }) {
                 </div>
 
                 {/* Middle line: URL / Title - GUARANTEED SINGLE LINE WITH ELLIPSIS (...) */}
-                <div
-                  className="text-[11px] text-slate-300 font-mono truncate block whitespace-nowrap overflow-hidden text-ellipsis w-full min-w-0"
-                  title={item.title || item.url}
-                >
-                  {item.title || item.url}
+                <div className="flex min-w-0 items-center gap-2">
+                  <a href={item.url} target="_blank" rel="noreferrer" title={item.url} className="min-w-0 flex-1 truncate text-[11px] text-cyan-300 underline decoration-cyan-700 underline-offset-2" onClick={(event) => event.stopPropagation()}>
+                    {item.url || item.title || "Link do YouTube"}
+                  </a>
+                  {getYouTubeEmbedUrl(item.url) && (
+                    <button type="button" data-no-widget-drag onClick={() => setPreviewVideo(item)} className="inline-flex shrink-0 items-center gap-1 rounded border border-cyan-400/40 bg-cyan-500/10 px-2 py-1 text-[10px] font-semibold text-cyan-200 hover:bg-cyan-500/20" title="Abrir vídeo em popup">
+                      <Play size={11} /> Reagir
+                    </button>
+                  )}
                 </div>
+                <p className="truncate text-[10px] text-slate-400">Enviado por: {item.author || "Não identificado"}</p>
               </div>
             );
           })
