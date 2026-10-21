@@ -357,15 +357,15 @@ export default function OverlayCanvas() {
       if (!response.ok || !payload.ok || !payload.overlay) throw new Error(payload.message || "Não foi possível salvar a overlay.");
       const saved = payload.overlay as OverlayRow;
       const savedId = String(saved.id ?? activeOverlayId ?? generatedId);
-      setActiveOverlayId(savedId);
       setOverlays((current) => {
-        const withoutPreviousId = current.filter((row) => String(row.id ?? "") !== activeOverlayId);
-        return withoutPreviousId.some((row) => String(row.id ?? "") === savedId)
-          ? withoutPreviousId.map((row) => String(row.id ?? "") === savedId ? saved : row)
-          : [...withoutPreviousId, saved];
+        const withoutPreviousId = current.filter((row) => String(row.id ?? "") !== savedId);
+        return [...withoutPreviousId, saved];
       });
-      setConfig(getCanvasConfig(saved));
-      setNotice("Overlay salva no JSON.");
+      // Após salvar, mantém a overlay na lista e libera um canvas vazio para criar outra.
+      setActiveOverlayId(null);
+      setSelectedInstanceId(null);
+      setConfig({ name: "Nova Overlay", visualizerSize: size, instances: [], background: EMPTY_BACKGROUND });
+      setNotice(`Overlay "${name}" salva. Canvas limpo para criar outra overlay.`);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Erro ao salvar a overlay.");
     } finally { setSaving(false); }
@@ -485,6 +485,29 @@ export default function OverlayCanvas() {
       <button type="button" onClick={() => void saveOverlay()} disabled={saving || loading} title="Salvar overlay" aria-label="Salvar overlay" className="fixed right-4 top-20 z-[100] inline-flex h-9 w-9 items-center justify-center rounded-lg bg-violet-600 text-white shadow-lg hover:bg-violet-500 disabled:opacity-50"><Save size={16} /></button>
       <button type="button" onClick={() => void deleteOverlay()} disabled={saving || !activeOverlayId} title="Excluir overlay" aria-label="Excluir overlay" className="fixed right-16 top-20 z-[100] inline-flex h-9 w-9 items-center justify-center rounded-lg border border-rose-400/30 bg-slate-950 text-rose-200 shadow-lg hover:bg-rose-500/10 disabled:opacity-40"><Trash2 size={16} /></button>
       {error && <p role="alert" className="w-full text-xs text-rose-200">{error}</p>}
+      {overlays.length > 0 && (
+        <div className="w-full min-w-0">
+          <p className="mb-1 text-[10px] text-violet-200/80">Overlays salvas</p>
+          <HorizontalMenu ariaLabel="Overlays salvas" className="w-full">
+            {overlays.map((overlay) => {
+              const overlayId = String(overlay.id ?? "");
+              const overlayName = String(overlay.name ?? getCanvasConfig(overlay).name ?? overlayId);
+              return (
+                <button
+                  key={overlayId}
+                  type="button"
+                  onClick={() => selectOverlay(overlayId)}
+                  title={`Abrir overlay ${overlayName}`}
+                  aria-pressed={activeOverlayId === overlayId}
+                  className={`shrink-0 rounded-md border px-3 py-1.5 text-xs transition ${activeOverlayId === overlayId ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-800/80 text-slate-200 hover:border-violet-400/60"}`}
+                >
+                  {overlayName}
+                </button>
+              );
+            })}
+          </HorizontalMenu>
+        </div>
+      )}
       <div className="mt-4 w-full min-w-0">
         <HorizontalMenu ariaLabel="Widgets de Overlay" className="w-full">
           {catalog
@@ -735,7 +758,7 @@ export default function OverlayCanvas() {
                 config.instances.filter((item) => item.visible !== false).length === 0) && (
                 <div className="absolute inset-0 z-40 flex items-center justify-center bg-slate-950/20 p-6 text-center">
                   <p className="max-w-sm text-xs text-slate-400">
-                    Nenhuma overlay salva para esta conta.
+                    Canvas vazio. Adicione widgets para criar uma nova overlay ou abra uma overlay salva acima.
                   </p>
                 </div>
               )}
