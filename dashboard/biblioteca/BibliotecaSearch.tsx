@@ -206,7 +206,16 @@ export default function BibliotecaSearch() {
     setDetailLoading(true);
     setError("");
     const kind = itemCategory(item);
-    const browseId = item.browseId || (item.playlistId ? (String(item.playlistId).startsWith("VL") ? item.playlistId : `VL${item.playlistId}`) : "");
+    let browseId = item.browseId || (item.playlistId ? (String(item.playlistId).startsWith("VL") ? item.playlistId : `VL${item.playlistId}`) : "");
+    if (!browseId && kind === "artists") {
+      try {
+        const lookup = await fetch(`/api/ytmusic/bundle?q=${encodeURIComponent(item.title || item.name || "")}`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
+        const bundle = await lookup.json();
+        const match = (bundle.artists || []).find((entry: any) => String(entry.name || entry.title || "").toLowerCase() === String(item.title || item.name || "").toLowerCase()) || bundle.artists?.[0];
+        browseId = match?.browseId || "";
+        if (browseId) setDetailItem((current) => current ? { ...current, browseId } : current);
+      } catch { /* keep basic artist details if lookup fails */ }
+    }
     if (kind === "songs" || !browseId) {
       setDetailData({ ok: true, title: item.title || item.name, tracks: item.videoId ? [item] : [], sections: [] });
       setDetailLoading(false);
