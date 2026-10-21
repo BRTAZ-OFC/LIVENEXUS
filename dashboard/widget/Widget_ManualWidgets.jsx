@@ -196,7 +196,6 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
 
   // 3. LATERAL
   if (layout === 'horizontal') {
-    const textRepeated = `${title} • `.repeat(10);
     return (
       <div 
         className="w-full h-full flex items-center p-3 gap-4 select-none relative overflow-hidden"
@@ -246,6 +245,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
 
   // 4. VINIL
   if (layout === 'vinil') {
+    const textRepeated = `${title} • ${artist} • `.repeat(4);
     return (
       <div 
         className="w-full h-full flex flex-col items-center justify-center p-3 select-none relative overflow-hidden"
@@ -316,7 +316,6 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
 
   // 5. FAIXA (SÓ MARQUEE)
   if (layout === 'marquee') {
-    const textRepeated = `${title} • `.repeat(15);
     return (
       <div 
         className="w-full h-full flex items-center p-3 select-none relative overflow-hidden"
