@@ -11,6 +11,7 @@ import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
 import HorizontalMenu from "../components/HorizontalMenu";
 import Overlay_Editor from "./Overlay_Editor";
+import { loadGoogleFont } from "../fontes/Font_Loader";
 
 type JsonObject = Record<string, unknown>;
 type CanvasInstance = {
@@ -77,6 +78,7 @@ type OverlayRow = {
 
 const catalog = TWITCH_WIDGETS_CATALOG as unknown as WidgetDefinition[];
 const DEFAULT_SIZE = { width: 800, height: 480 };
+const TEXT_WIDGET_ID = "__livenexus_text__";
 const EMPTY_BACKGROUND: CanvasBackground = { type: "transparent", opacity: 100 };
 
 function isObject(value: unknown): value is JsonObject {
@@ -154,6 +156,7 @@ export default function OverlayCanvas() {
   const [scale, setScale] = useState(1);
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
+  const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const [gridSettings, setGridSettings] = useState<CanvasGridSettings>({
     showGrid: false,
     snapToGrid: false,
@@ -233,6 +236,21 @@ export default function OverlayCanvas() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    (config.instances || []).forEach((instance) => {
+      if (instance.widgetId === TEXT_WIDGET_ID && typeof instance.config?.["fontFamily"] === "string") {
+        loadGoogleFont(String(instance.config["fontFamily"]));
+      }
+    });
+  }, [config.instances]);
+
+  useEffect(() => {
+    if (!editingTextId) return;
+    const element = Array.from(document.querySelectorAll<HTMLElement>("[data-overlay-text]"))
+      .find((node) => node.dataset.overlayTextId === editingTextId);
+    element?.focus();
+  }, [editingTextId]);
 
   const size = useMemo(
     () => ({
@@ -463,6 +481,27 @@ export default function OverlayCanvas() {
     setNotice("");
   }
 
+  function addTextInstance(text: string, fontSize: number, color: string, fontFamily: string) {
+    const existing = config.instances || [];
+    const width = Math.min(size.width, Math.max(180, Math.ceil(text.length * fontSize * 0.62) + 24));
+    const height = Math.min(size.height, Math.max(44, Math.ceil(fontSize * 1.6) + 12));
+    const id = makeUniqueWidgetId("texto", existing);
+    loadGoogleFont(fontFamily);
+    const instance: CanvasInstance = {
+      id, widgetId: TEXT_WIDGET_ID, elementKey: "text", isFullWidget: false,
+      name: text.slice(0, 80) || "Texto",
+      x: Math.max(0, Math.min(size.width - width, 24)),
+      y: Math.max(0, Math.min(size.height - height, 24)), width, height,
+      zIndex: existing.reduce((max, item) => Math.max(max, Number(item.zIndex) || 0), 0) + 1,
+      visible: true, config: { text, fontSize, color, fontFamily },
+    };
+    setActiveOverlayId(null);
+    setConfig((current) => ({ ...current, id: undefined, name: text.slice(0, 80) || "Texto", instances: [...(current.instances || []), instance] }));
+    setSelectedInstanceId(id);
+    setEditingTextId(null);
+    setError(""); setNotice("");
+  }
+
   function updateInstance(instanceId: string, patch: Partial<CanvasInstance>) {
     setConfig((current) => ({
       ...current,
@@ -606,7 +645,10 @@ export default function OverlayCanvas() {
               .slice()
               .sort((a, b) => (Number(a.zIndex) || 0) - (Number(b.zIndex) || 0))
               .map((instance, index) => {
-                const definition = catalog.find((item) => item.id === instance.widgetId);
+                const definition = catalog.find((item) => item.id === instance.widgetId) ||
+                  (instance.widgetId === TEXT_WIDGET_ID
+                    ? ({ id: TEXT_WIDGET_ID, name: instance.name || "Texto", defaultWidth: 320, defaultHeight: 60 } as WidgetDefinition)
+                    : undefined);
                 if (!definition) return null;
                 const width = Math.max(1, Number(instance.width) || definition.defaultWidth || 280);
                 const height = Math.max(
@@ -728,17 +770,51 @@ export default function OverlayCanvas() {
                     }}
                   >
                     <div className="h-full w-full overflow-hidden">
-                      <OverlayWidgetElementRenderer
-                        widgetId={instance.widgetId}
-                        elementKey={instance.elementKey || "full_widget"}
-                        isFullWidget={instance.isFullWidget !== false}
-                        config={widgetConfig}
-                        isEditing={false}
-                        onUpdateConfig={() => undefined}
-                        onFinishEditing={() => undefined}
-                        instanceId={instance.id}
-                        instanceName={instance.name}
-                      />
+                      {instance.widgetId === TEXT_WIDGET_ID ? (
+                        <div
+                          data-overlay-text
+                          data-overlay-text-id={instanceId}
+                          contentEditable={editingTextId === instanceId}
+                          suppressContentEditableWarning
+                          spellCheck={false}
+                          onDoubleClick={(event) => {
+                            event.preventDefault(); event.stopPropagation();
+                            setEditingTextId(instanceId); setSelectedInstanceId(instanceId);
+                          }}
+                          onBlur={(event) => {
+                            if (editingTextId !== instanceId) return;
+                            const text = event.currentTarget.textContent || "";
+                            updateInstance(instanceId, { name: text.slice(0, 80) || "Texto", config: { ...widgetConfig, text } });
+                            setEditingTextId(null);
+                          }}
+                          onKeyDown={(event) => {
+                            if (event.key === "Escape" || (event.key === "Enter" && !event.shiftKey)) {
+                              event.preventDefault(); event.currentTarget.blur();
+                            }
+                          }}
+                          onPointerDown={(event) => {
+                            if (editingTextId === instanceId || event.detail >= 2) event.stopPropagation();
+                          }}
+                          style={{
+                            width: "100%", height: "100%", outline: editingTextId === instanceId ? "1px dashed #c4b5fd" : "none",
+                            cursor: editingTextId === instanceId ? "text" : "move", whiteSpace: "pre-wrap", overflowWrap: "anywhere",
+                            color: String(widgetConfig["color"] || "#ffffff"), fontSize: Math.max(1, Number(widgetConfig["fontSize"]) || 32),
+                            fontFamily: `"${String(widgetConfig["fontFamily"] || "Inter")}", sans-serif`, lineHeight: 1.2,
+                          }}
+                        >{String(widgetConfig["text"] || "Texto")}</div>
+                      ) : (
+                        <OverlayWidgetElementRenderer
+                          widgetId={instance.widgetId}
+                          elementKey={instance.elementKey || "full_widget"}
+                          isFullWidget={instance.isFullWidget !== false}
+                          config={widgetConfig}
+                          isEditing={false}
+                          onUpdateConfig={() => undefined}
+                          onFinishEditing={() => undefined}
+                          instanceId={instance.id}
+                          instanceName={instance.name}
+                        />
+                      )}
                     </div>
                     {isSelected && (
                       <div
@@ -830,7 +906,7 @@ export default function OverlayCanvas() {
           />
         </div>
       </div>
-      <Overlay_Editor />
+      <Overlay_Editor catalog={catalog} onAddFragment={addWidgetComponent} onAddText={addTextInstance} />
     </section>
   );
 }
