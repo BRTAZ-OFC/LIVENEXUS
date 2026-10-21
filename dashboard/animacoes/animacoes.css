@@ -9,57 +9,68 @@
   will-change: transform, opacity;
 }
 
-/* 1. Cascata: cada letra cai individualmente. */
-.animacao-texto--cascata .animacao-texto__letra {
-  animation: animacao-cascata var(--animacao-duracao, 650ms) cubic-bezier(0.22, 0.75, 0.35, 1) both;
-  animation-iteration-count: var(--animacao-iteracoes, 1);
-  animation-direction: var(--animacao-direcao, normal);
-  animation-delay: var(--animacao-atraso, 0ms);
-}
+/*
+ * As propriedades animation-* são controladas pelo componente React em cada
+ * letra. Manter apenas os keyframes aqui evita duas fontes de configuração
+ * concorrentes para o mesmo efeito.
+ */
 
+/* Cascata: a letra cai de cima, ultrapassa levemente a posição e estabiliza. */
 @keyframes animacao-cascata {
-  from { opacity: 0; transform: translateY(-1em); }
-  to { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -1.5em, 0) scale(0.92);
+  }
+  72% {
+    opacity: 1;
+    transform: translate3d(0, 0.12em, 0) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
 }
 
-/* 2. Caça-níquel: caracteres embaralham e estabilizam em sequência. */
-.animacao-texto--casanique .animacao-texto__letra {
-  animation: animacao-casanique var(--animacao-duracao, 650ms) ease-out both;
-  animation-iteration-count: var(--animacao-iteracoes, 1);
-  animation-direction: var(--animacao-direcao, normal);
-  animation-delay: var(--animacao-atraso, 0ms);
-}
-
+/* Casanique: a animação visual é complementada pelo embaralhamento em React. */
 @keyframes animacao-casanique {
-  0% { opacity: 0.35; transform: translateY(0.8em) rotateX(-90deg); }
-  60% { opacity: 1; transform: translateY(-0.15em) rotateX(18deg); }
-  100% { opacity: 1; transform: translateY(0) rotateX(0); }
+  0% {
+    opacity: 0.35;
+    transform: translateY(0.8em) rotateX(-90deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-0.15em) rotateX(18deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
 }
 
-/* 3. Rolar: flip vertical individual por letra. */
-.animacao-texto--rolar .animacao-texto__letra {
-  animation: animacao-rolar var(--animacao-duracao, 650ms) ease-in-out both;
-  animation-iteration-count: var(--animacao-iteracoes, 1);
-  animation-direction: var(--animacao-direcao, normal);
-  animation-delay: var(--animacao-atraso, 0ms);
-  backface-visibility: hidden;
-}
-
+/* Rolar: cada letra executa um flip vertical completo em perspectiva. */
 @keyframes animacao-rolar {
-  0% { opacity: 0; transform: perspective(400px) rotateX(-90deg); }
-  50% { opacity: 1; transform: perspective(400px) rotateX(25deg); }
-  100% { opacity: 1; transform: perspective(400px) rotateX(0); }
+  0% {
+    opacity: 0;
+    transform: perspective(500px) rotateX(-180deg);
+  }
+  55% {
+    opacity: 1;
+    transform: perspective(500px) rotateX(18deg);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(500px) rotateX(0);
+  }
 }
 
-/* 4. Encarrilha: revela cada letra da esquerda para a direita. */
-.animacao-texto--encarrilha .animacao-texto__letra {
-  animation: animacao-encarrilha var(--animacao-duracao, 650ms) steps(1, end) both;
-  animation-iteration-count: var(--animacao-iteracoes, 1);
-  animation-direction: var(--animacao-direcao, normal);
-  animation-delay: var(--animacao-atraso, 0ms);
-}
-
+/* Encarrilha: revela cada letra da esquerda para a direita. */
 @keyframes animacao-encarrilha {
-  from { opacity: 0; transform: translateX(-0.35em); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-0.35em);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
