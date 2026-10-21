@@ -535,7 +535,7 @@ export default function Overlay_Editor({
 
                 <section aria-label="Tempo e repetição da animação" className="flex min-h-0 min-w-0 flex-col gap-1 overflow-hidden pl-1">
                   <p className="mb-0 shrink-0 text-[9px] font-semibold uppercase tracking-wide text-slate-400">Tempo da animação</p>
-                  <label className="flex flex-col gap-1 text-[10px] text-slate-300">
+                  <label className="flex min-w-0 flex-col gap-0.5 text-[9px] leading-3 text-slate-300">
                     Intervalo entre letras (ms)
                     <input
                       type="number" min="0" step="100"
@@ -545,7 +545,7 @@ export default function Overlay_Editor({
                       className="h-5 w-full min-w-0 rounded border border-white/10 bg-slate-950 px-1 text-[10px] text-white disabled:opacity-40"
                     />
                   </label>
-                  <label className="flex flex-col gap-1 text-[10px] text-slate-300">
+                  <label className="flex min-w-0 flex-col gap-0.5 text-[9px] leading-3 text-slate-300">
                     Duração de cada letra (ms)
                     <input
                       type="number" min="50" step="50"
@@ -559,7 +559,7 @@ export default function Overlay_Editor({
                     <input className="mt-px h-3 w-3 shrink-0" type="checkbox" disabled={!selectedInstanceWidgetId || !selectedInstanceConfig} checked={Boolean(selectedInstanceConfig?.animationInfinite)} onChange={(event) => onUpdateSelectedConfig({ animationInfinite: event.target.checked })} />
                     Repetir infinitamente
                   </label>
-                  <label className="flex items-center gap-2 text-[10px] text-slate-300">
+                  <label className="flex min-w-0 items-start gap-1 text-[9px] leading-3 text-slate-300">
                     <input className="mt-px h-3 w-3 shrink-0" type="checkbox" disabled={!selectedInstanceWidgetId || !selectedInstanceConfig} checked={Boolean(selectedInstanceConfig?.animationAlternate)} onChange={(event) => onUpdateSelectedConfig({ animationAlternate: event.target.checked })} />
                     Vai e volta (ex.: sobe e desce)
                   </label>
@@ -569,7 +569,7 @@ export default function Overlay_Editor({
                     </p>
                   )}
                   {selectedInstanceWidgetId && selectedInstanceWidgetId !== "__livenexus_text__" && <p className="text-[9px] leading-3 text-slate-500">As animações atuais são para elementos de texto. Efeitos para outros elementos serão adicionados depois.</p>}
-                  {!selectedInstanceWidgetId && <p className="text-[10px] text-slate-500">Selecione um elemento de texto no canvas.</p>}
+                  {!selectedInstanceWidgetId && <p className="text-[9px] leading-3 text-slate-500">Selecione um elemento de texto no canvas.</p>}
                 </section>
               </div>
             )}
