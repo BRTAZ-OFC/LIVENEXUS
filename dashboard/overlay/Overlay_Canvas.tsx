@@ -11,6 +11,7 @@ import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
 import HorizontalMenu from "../components/HorizontalMenu";
 import Overlay_Editor from "./Overlay_Editor";
+import AnimacoesTexto from "../animacoes/AnimacoesTexto";
 import { loadGoogleFont } from "../fontes/Font_Loader";
 
 type JsonObject = Record<string, unknown>;
@@ -848,7 +849,17 @@ export default function OverlayCanvas() {
                             color: String(widgetConfig["color"] || "#ffffff"), fontSize: Math.max(1, Number(widgetConfig["fontSize"]) || 32),
                             fontFamily: `"${String(widgetConfig["fontFamily"] || "Inter")}", sans-serif`, lineHeight: 1.2,
                           }}
-                        >{String(widgetConfig["text"] || "Texto")}</div>
+                        >{editingTextId === instanceId || !["cascata", "casanique", "rolar", "encarrilha"].includes(String(widgetConfig["animationType"] || ""))
+                          ? String(widgetConfig["text"] || "Texto")
+                          : <AnimacoesTexto
+                              texto={String(widgetConfig["text"] || "Texto")}
+                              tipo={String(widgetConfig["animationType"])}
+                              atraso={Math.max(0, Number(widgetConfig["animationDelayMs"] ?? 1000))}
+                              duracao={Math.max(50, Number(widgetConfig["animationDurationMs"] ?? 650))}
+                              infinita={Boolean(widgetConfig["animationInfinite"])}
+                              vaiEVem={Boolean(widgetConfig["animationAlternate"])}
+                              repetir={Boolean(widgetConfig["animationInfinite"])}
+                            />}</div>
                       ) : (
                         <OverlayWidgetElementRenderer
                           widgetId={instance.widgetId}
