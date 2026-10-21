@@ -47,6 +47,12 @@ function getReactHubEmbedUrl(value: string) {
 
 type ReactHubQueueItem = { id?: string; author?: string; url?: string; title?: string; status?: string };
 
+function getReactHubQueueUrl(item: ReactHubQueueItem) {
+  const raw = String(item.url || item.title || "").trim();
+  const match = raw.match(/https?:\/\/[^\s<>"']+/i);
+  return (match?.[0] || "").replace(/[),.;!?\]}]+$/, "");
+}
+
 const buttonClass = "shrink-0 rounded-md border border-white/10 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white";
 const activeButtonClass = "shrink-0 rounded-md border border-violet-400 bg-violet-500/20 px-3 py-1.5 text-xs text-white";
 
@@ -286,8 +292,8 @@ export default function Overlay_Editor({
                           </div>
                           <div className="grid h-[104px] shrink-0 grid-rows-4 gap-1 overflow-hidden">
                             {reactHubRecentQueue.map((item, index) => (
-                              <button key={item.id || item.url || index} type="button" onClick={() => { setReactHubSelected(item); setReactHubPopupOpen(true); }} title={item.url || ""} className="block min-h-0 w-full overflow-hidden rounded border border-white/5 bg-slate-950 px-2 text-left text-[10px] leading-5 text-cyan-300 underline">
-                                <span className="block overflow-hidden text-ellipsis whitespace-nowrap">{item.url || ""}</span>
+                              <button key={item.id || getReactHubQueueUrl(item) || index} type="button" onClick={() => { setReactHubSelected(item); setReactHubPopupOpen(true); }} title={getReactHubQueueUrl(item)} className="block min-h-0 w-full overflow-hidden rounded border border-white/5 bg-slate-950 px-2 text-left text-[10px] leading-5 text-cyan-300 underline">
+                                <span className="block overflow-hidden text-ellipsis whitespace-nowrap">{getReactHubQueueUrl(item)}</span>
                               </button>
                             ))}
                             {Array.from({ length: Math.max(0, 4 - reactHubRecentQueue.length) }, (_, index) => <div key={"empty-" + index} className="rounded border border-white/5 bg-slate-950/50" />)}
@@ -503,11 +509,11 @@ export default function Overlay_Editor({
           </div>
           <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-hidden md:grid-cols-2">
             <div className="flex min-h-[220px] items-center justify-center overflow-hidden rounded bg-black">
-              {reactHubSelected && getReactHubEmbedUrl(reactHubSelected.url || "") ? <iframe className="h-full min-h-[220px] w-full" src={getReactHubEmbedUrl(reactHubSelected.url || "")} title={"Vídeo de " + (reactHubSelected.author || "usuário")} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /> : <p className="p-4 text-xs text-slate-400">Selecione um link válido do YouTube na coluna ao lado.</p>}
+              {reactHubSelected && getReactHubEmbedUrl(getReactHubQueueUrl(reactHubSelected)) ? <iframe className="h-full min-h-[220px] w-full" src={getReactHubEmbedUrl(reactHubSelected.url || "")} title={"Vídeo de " + (reactHubSelected.author || "usuário")} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /> : <p className="p-4 text-xs text-slate-400">Selecione um link válido do YouTube na coluna ao lado.</p>}
             </div>
             <div className="min-h-0 overflow-y-auto rounded border border-white/10">
               <p className="sticky top-0 border-b border-white/10 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-200">Fila de vídeos</p>
-              {reactHubQueue.map((item, index) => <button key={item.id || item.url || index} type="button" onClick={() => setReactHubSelected(item)} title={item.url || ""} className={"block w-full border-b border-white/5 px-3 py-2 text-left text-xs hover:bg-white/10 " + (reactHubSelected?.url === item.url ? "bg-blue-950/70" : "")}><span className="break-all text-cyan-300 underline">{item.url || ""}</span></button>)}
+              {reactHubQueue.map((item, index) => <button key={item.id || item.url || index} type="button" onClick={() => setReactHubSelected(item)} title={item.url || ""} className={"block w-full border-b border-white/5 px-3 py-2 text-left text-xs hover:bg-white/10 " + (getReactHubQueueUrl(reactHubSelected || {}) === getReactHubQueueUrl(item) ? "bg-blue-950/70" : "")}><span className="break-all text-cyan-300 underline">{item.url || ""}</span></button>)}
               {!reactHubQueue.length && <p className="p-3 text-xs text-slate-500">A fila está vazia.</p>}
             </div>
           </div>
