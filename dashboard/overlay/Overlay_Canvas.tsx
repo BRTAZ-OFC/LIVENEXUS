@@ -27,6 +27,7 @@ type CanvasInstance = {
   height?: number;
   zIndex?: number;
   visible?: boolean;
+  locked?: boolean;
   config?: JsonObject;
 };
 type WidgetDefinition = {
@@ -205,6 +206,7 @@ export default function OverlayCanvas() {
     verticalGuides: [],
     horizontalGuides: [],
   });
+  const guidePointer = useRef<{ id: string; orientation: "vertical" | "horizontal" } | null>(null);
   const widgetPointer = useRef<{
     instanceId: string;
     mode: "move" | "resize";
@@ -710,19 +712,21 @@ export default function OverlayCanvas() {
               />
             )}
             {(gridSettings.verticalGuides || []).map((guide: { id: string; x: number }) => (
-              <div
-                key={guide.id}
-                aria-hidden="true"
-                className="absolute top-0 bottom-0 z-30 pointer-events-none border-l border-cyan-400/80"
-                style={{ left: guide.x }}
+              <div key={guide.id} role="separator" aria-label="Arrastar linha-guia vertical" title="Segure o botão esquerdo do mouse e arraste"
+                className="absolute top-0 bottom-0 z-40 w-[7px] -translate-x-1/2 cursor-col-resize border-l border-cyan-400/90"
+                style={{ left: guide.x, touchAction: "none" }}
+                onPointerDown={(event) => { if (event.button !== 0) return; event.preventDefault(); event.stopPropagation(); guidePointer.current = { id: guide.id, orientation: "vertical" }; event.currentTarget.setPointerCapture(event.pointerId); }}
+                onPointerMove={(event) => { if (!guidePointer.current || guidePointer.current.id !== guide.id || !(event.buttons & 1)) return; const rect = frameRef.current?.getBoundingClientRect(); if (!rect) return; const x = Math.max(0, Math.min(size.width, (event.clientX - rect.left) / scale)); updateGridSettings({ verticalGuides: gridSettings.verticalGuides.map((item) => item.id === guide.id ? { ...item, x } : item) }); }}
+                onPointerUp={() => { guidePointer.current = null; }} onPointerCancel={() => { guidePointer.current = null; }}
               />
             ))}
             {(gridSettings.horizontalGuides || []).map((guide: { id: string; y: number }) => (
-              <div
-                key={guide.id}
-                aria-hidden="true"
-                className="absolute left-0 right-0 z-30 pointer-events-none border-t border-cyan-400/80"
-                style={{ top: guide.y }}
+              <div key={guide.id} role="separator" aria-label="Arrastar linha-guia horizontal" title="Segure o botão esquerdo do mouse e arraste"
+                className="absolute left-0 right-0 z-40 h-[7px] -translate-y-1/2 cursor-row-resize border-t border-cyan-400/90"
+                style={{ top: guide.y, touchAction: "none" }}
+                onPointerDown={(event) => { if (event.button !== 0) return; event.preventDefault(); event.stopPropagation(); guidePointer.current = { id: guide.id, orientation: "horizontal" }; event.currentTarget.setPointerCapture(event.pointerId); }}
+                onPointerMove={(event) => { if (!guidePointer.current || guidePointer.current.id !== guide.id || !(event.buttons & 1)) return; const rect = frameRef.current?.getBoundingClientRect(); if (!rect) return; const y = Math.max(0, Math.min(size.height, (event.clientY - rect.top) / scale)); updateGridSettings({ horizontalGuides: gridSettings.horizontalGuides.map((item) => item.id === guide.id ? { ...item, y } : item) }); }}
+                onPointerUp={() => { guidePointer.current = null; }} onPointerCancel={() => { guidePointer.current = null; }}
               />
             ))}
             {config.instances
@@ -782,6 +786,7 @@ export default function OverlayCanvas() {
                     style={instanceStyle}
                     onPointerDown={(event) => {
                       setSelectedInstanceId(instanceId);
+                      if (instance.locked) { event.stopPropagation(); return; }
                       const target = event.target as HTMLElement;
                       // Preserve native focus and pointer events on the editable text itself.
                       if (target.closest("[data-overlay-text]")) {
@@ -1048,6 +1053,28 @@ export default function OverlayCanvas() {
         onUpdateGridSettings={updateGridSettings}
         globalStyleConfig={{ borderEnabled: Boolean(config.globalStyleConfig?.borderEnabled), borderWidth: Math.max(1, Math.min(100, Number(config.globalStyleConfig?.borderWidth) || 1)), texture: String(config.globalStyleConfig?.texture || "none"), colorEffectEnabled: Boolean(config.globalStyleConfig?.colorEffectEnabled), colorEffect: String(config.globalStyleConfig?.colorEffect || "glass") }}
         onUpdateGlobalStyleConfig={(patch) => setConfig((current) => ({ ...current, globalStyleConfig: { borderEnabled: false, borderWidth: 1, texture: "none", colorEffectEnabled: false, colorEffect: "glass", ...(current.globalStyleConfig || {}), ...patch } }))}
+        layers={(config.instances || []).map((instance, index) => ({
+          id: instance.id || `${instance.widgetId}-${index}`,
+          name: String(instance.name || (instance.widgetId === TEXT_WIDGET_ID ? instance.config?.text : "") || catalog.find((item) => item.id === instance.widgetId)?.name || instance.widgetId || `Elemento ${index + 1}`),
+          widgetId: String(instance.widgetId || ""),
+          visible: instance.visible !== false,
+          locked: Boolean(instance.locked),
+          selected: (instance.id || `${instance.widgetId}-${index}`) === selectedInstanceId,
+          zIndex: Number(instance.zIndex) || index + 1,
+        })).sort((a, b) => b.zIndex - a.zIndex)}
+        onSelectLayer={(id) => setSelectedInstanceId(id)}
+        onMoveLayer={(id, delta) => setConfig((current) => {
+          const normalized = (current.instances || []).map((item, index) => ({ ...item, id: item.id || `${item.widgetId}-${index}` }));
+          const from = normalized.findIndex((item) => item.id === id);
+          const to = from + delta;
+          if (from < 0 || to < 0 || to >= normalized.length) return current;
+          const [moved] = normalized.splice(from, 1);
+          normalized.splice(to, 0, moved);
+          return { ...current, instances: normalized.map((item, index) => ({ ...item, zIndex: normalized.length - index })) };
+        })}
+        onToggleLayerVisibility={(id) => setConfig((current) => ({ ...current, instances: (current.instances || []).map((item, index) => (item.id || `${item.widgetId}-${index}`) === id ? { ...item, visible: item.visible === false } : item) }))}
+        onToggleLayerLock={(id) => setConfig((current) => ({ ...current, instances: (current.instances || []).map((item, index) => (item.id || `${item.widgetId}-${index}`) === id ? { ...item, locked: !item.locked } : item) }))}
+        onDeleteLayer={(id) => deleteInstance(id)}
         onAddGuide={(orientation) => {
           const id = `guide-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
           if (orientation === "vertical") updateGridSettings({ verticalGuides: [...gridSettings.verticalGuides, { id, x: Math.round(size.width / 2) }] });
