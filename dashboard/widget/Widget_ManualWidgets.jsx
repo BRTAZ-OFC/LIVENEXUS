@@ -113,7 +113,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
 
   // Lógica de Fragmentação (para templates customizados)
   if (elementKey === 'cover') return <img src={image} alt="Capa" className="h-full w-full object-cover rounded" />;
-  if (elementKey === 'title') return <div className="w-full overflow-hidden">{marqueeAnimation}<span className="inline-block font-bold text-lg text-white whitespace-nowrap" style={marqueeStyle}>{title}</span></div>;
+  if (elementKey === 'title') return <div className="w-full overflow-hidden">{marqueeAnimation}<span className="ln-marquee-motion inline-block font-bold text-lg text-white whitespace-nowrap" style={marqueeStyle}>{title}</span></div>;
   if (elementKey === 'artist') return <span className="text-sm font-medium text-slate-400 truncate">{artist}</span>;
 
   // 1. PADRÃO (FAIXA SUPERIOR)
@@ -137,7 +137,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
         </span>
         <div className="flex-1 overflow-hidden whitespace-nowrap relative">
           {marqueeAnimation}
-          <span className="inline-block font-bold text-white text-sm tracking-wide" style={marqueeStyle}>
+          <span className="ln-marquee-motion inline-block font-bold text-white text-sm tracking-wide" style={marqueeStyle}>
             {textRepeated}
           </span>
         </div>
@@ -186,7 +186,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
           </svg>
           <div className="flex-1 overflow-hidden whitespace-nowrap">
             {marqueeAnimation}
-            <span className="inline-block font-semibold text-slate-100 text-xs tracking-wide" style={marqueeStyle}>
+            <span className="ln-marquee-motion inline-block font-semibold text-slate-100 text-xs tracking-wide" style={marqueeStyle}>
               {textRepeated}
             </span>
           </div>
@@ -223,7 +223,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
             </svg>
             <div className="flex-1 overflow-hidden whitespace-nowrap">
               {marqueeAnimation}
-              <span className="inline-block font-bold text-white text-sm" style={marqueeStyle}>
+              <span className="ln-marquee-motion inline-block font-bold text-white text-sm" style={marqueeStyle}>
                 {textRepeated}
               </span>
             </div>
@@ -340,7 +340,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
         </span>
         <div className="flex-1 overflow-hidden whitespace-nowrap relative">
           {marqueeAnimation}
-          <span className="inline-block font-bold text-white text-sm tracking-wide" style={marqueeStyle}>
+          <span className="ln-marquee-motion inline-block font-bold text-white text-sm tracking-wide" style={marqueeStyle}>
             {textRepeated}
           </span>
         </div>
