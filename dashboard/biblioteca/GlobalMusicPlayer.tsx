@@ -43,6 +43,6 @@ export default function GlobalMusicPlayer() {
       <Volume2 className="hidden h-4 w-4 shrink-0 text-slate-400 sm:block" />
       <input aria-label="Volume da música" type="range" min={0} max={100} value={player.volume} onChange={(event) => setMusicVolume(Number(event.target.value))} className="hidden w-16 accent-cyan-300 sm:block" />
     </div>
-    <iframe ref={frameRef} onLoad={() => connectMusicPlayerFrame(frameRef.current)} title="Player global do YouTube" allow="autoplay; encrypted-media; picture-in-picture" referrerPolicy="origin" style={{ position: "fixed", width: 320, height: 180, right: -340, bottom: -200, opacity: 0.01, pointerEvents: "none", zIndex: -1, border: 0 }} />
+    <iframe ref={frameRef} onLoad={() => connectMusicPlayerFrame(frameRef.current)} title="Player global do YouTube" allow="autoplay; encrypted-media; picture-in-picture" referrerPolicy="origin" style={{ position: "fixed", width: 1, height: 1, right: 0, bottom: 0, opacity: 0, pointerEvents: "none", zIndex: -1, border: 0 }} />
   </>;
 }
