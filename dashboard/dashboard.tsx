@@ -6,7 +6,6 @@ import TTSPage from "./tts";
 import PlatformBioConnections from "./conexao/PlatformBioConnections";
 import OverlayCanvas from "./overlay/Overlay_Canvas";
 import ScenariosPage from "./cenarios/ScenariosPage";
-import BibliotecaPage from "./biblioteca";
 import ScenarioCanvas from "./cenarios/Scenario_Canvas";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import { memo, useEffect, useState } from "react";
@@ -459,7 +458,9 @@ function DashboardPage() {
           </div>
         )}
         {activeSection === "biblioteca" ? (
-          <BibliotecaPage />
+          <section className="dash-w-full-px-6-5ebeye">
+            <h1 className="text-2xl font-semibold text-white">Biblioteca</h1>
+          </section>
         ) : activeSection === "overview" ? (
           <DashboardOverview />
         ) : activeSection === "admin-panel" && isAdmin ? (
