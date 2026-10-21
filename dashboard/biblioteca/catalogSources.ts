@@ -153,11 +153,11 @@ async function searchLastFm(query: string): Promise<CatalogItem[]> {
   const text = await fetchViaJina(`https://www.last.fm/search?q=${encodeURIComponent(query)}`);
   const results: CatalogItem[] = [];
   const sections = [
-    { name: "artist", text: (text.split(/##\\s*\\[Artists\\]/)[1] || "").split(/##\\s*\\[Albums\\]/)[0] },
-    { name: "album", text: (text.split(/##\\s*\\[Albums\\]/)[1] || "").split(/##\\s*\\[Tracks\\]/)[0] },
+    { name: "artist", text: (text.split(/##\s*\[Artists\]/)[1] || "").split(/##\s*\[Albums\]/)[0] },
+    { name: "album", text: (text.split(/##\s*\[Albums\]/)[1] || "").split(/##\s*\[Tracks\]/)[0] },
   ];
   for (const section of sections) {
-    const re = /!\\[Image \\d+: Image for '([^']+)'\\]\\((https:\\/\\/lastfm-img[^)]+)\\)/g;
+    const re = /!\[Image \d+: Image for '([^']+)'\]\((https:\/\/lastfm-img[^)]+)\)/g;
     let match: RegExpExecArray | null;
     while ((match = re.exec(section.text)) !== null) {
       results.push({ title: match[1], type: section.name, source: "Last.fm", thumbnail: match[2] });
@@ -169,7 +169,7 @@ async function searchLastFm(query: string): Promise<CatalogItem[]> {
 async function searchJamendo(query: string): Promise<CatalogItem[]> {
   const text = await fetchViaJina(`https://www.jamendo.com/search?q=${encodeURIComponent(query)}`);
   const results: CatalogItem[] = [];
-  const re = /\\[([^\\]]+?)\\s+by\\s+([^\\]]+)\\]\\(https:\\/\\/www\\.jamendo\\.com\\/track\\/(\\d+)\\/[^)]*\\)/g;
+  const re = /\[([^\]]+?)\s+by\s+([^\]]+)\]\(https:\/\/www\.jamendo\.com\/track\/(\d+)\/[^)]*\)/g;
   let match: RegExpExecArray | null;
   while ((match = re.exec(text)) !== null) {
     results.push({ id: match[3], title: match[1].trim(), artist: match[2].trim(), type: "song", source: "Jamendo", url: `https://www.jamendo.com/track/${match[3]}` });
@@ -182,7 +182,7 @@ async function searchBandcamp(query: string): Promise<CatalogItem[]> {
   const results: CatalogItem[] = [];
   const seen = new Set<string>();
   const lines = text.split("\\n");
-  const re = /\\[!\\[Image \\d+\\]\\((https:\\/\\/f4\\.bcbits\\.com\\/img\\/[^)]+)\\)\\]\\((https:\\/\\/[^)]+\\.bandcamp\\.com\\/(album|track)\\/[^)]+)\\)(ALBUM|TRACK|ARTIST)/;
+  const re = /\[!\[Image \d+\]\((https:\/\/f4\.bcbits\.com\/img\/[^)]+)\)\]\((https:\/\/[^)]+\.bandcamp\.com\/(album|track)\/[^)]+)\)(ALBUM|TRACK|ARTIST)/;
   for (let i = 0; i < lines.length; i++) {
     const match = lines[i].match(re);
     if (!match) continue;
@@ -191,12 +191,12 @@ async function searchBandcamp(query: string): Promise<CatalogItem[]> {
     seen.add(url);
     const kind = match[3];
     const slug = decodeURIComponent((match[2].split(`/${kind}/`)[1] || "").split("?")[0]);
-    const title = slug.replace(/-/g, " ").replace(/\\b\\w/g, (letter) => letter.toUpperCase()).trim();
+    const title = slug.replace(/-/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase()).trim();
     let artist = "";
     const sourceTags: string[] = [];
     for (let j = i + 1; j < Math.min(i + 8, lines.length); j++) {
-      if (!artist) artist = (lines[j].match(/^by\\s+(.+)$/i) || lines[j].match(/from\\s+.+\\s+by\\s+(.+)$/i))?.[1]?.trim() || "";
-      const tags = lines[j].match(/^tags:\\s*(.+)$/i)?.[1];
+      if (!artist) artist = (lines[j].match(/^by\s+(.+)$/i) || lines[j].match(/from\s+.+\s+by\s+(.+)$/i))?.[1]?.trim() || "";
+      const tags = lines[j].match(/^tags:\s*(.+)$/i)?.[1];
       if (tags) sourceTags.push(...tags.split(",").map((tag) => tag.trim()).filter(Boolean));
       if (artist && sourceTags.length) break;
     }
@@ -215,12 +215,12 @@ async function searchDeezer(query: string): Promise<CatalogItem[]> {
   const lines = section.split("\\n");
   const seenTitles = new Set<string>();
   for (let i = 0; i < lines.length; i++) {
-    const imageMatch = lines[i].match(/!\\[Image \\d+\\]\\((https:\\/\\/cdn-images\\.dzcdn\\.net\\/[^)]+)\\)/);
+    const imageMatch = lines[i].match(/!\[Image \d+\]\((https:\/\/cdn-images\.dzcdn\.net\/[^)]+)\)/);
     if (!imageMatch) continue;
     let title = "";
     for (let j = i + 1; j < Math.min(i + 4, lines.length); j++) {
       const candidate = lines[j].trim();
-      if (candidate && !/^\\d{1,2}:\\d{2}$/.test(candidate) && !candidate.startsWith("![") && !candidate.startsWith("###")) { title = candidate; break; }
+      if (candidate && !/^\d{1,2}:\d{2}$/.test(candidate) && !candidate.startsWith("![") && !candidate.startsWith("###")) { title = candidate; break; }
     }
     if (title && !seenTitles.has(title)) {
       seenTitles.add(title);
