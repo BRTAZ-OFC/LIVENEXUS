@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { AlertCircle, Disc3, History, Library, Link2, ListMusic, LoaderCircle, Music2, Plus, Search, Trash2, UserRound, X } from "lucide-react";
+import { AlertCircle, ArrowLeft, Disc3, History, Library, Link2, ListMusic, LoaderCircle, Music2, Pause, Play, Plus, Search, Trash2, UserRound, X } from "lucide-react";
 import MusicCarousel from "./MusicCarousel";
 import type { CatalogItem } from "./catalogSources";
+import { playTrack, playTracks, type MusicTrack } from "./musicPlayerEngine";
 
 type Category = "songs" | "albums" | "artists" | "playlists";
 type View = "categories" | "history" | "personal";
@@ -87,6 +88,9 @@ export default function BibliotecaSearch() {
   const [loadingHome, setLoadingHome] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [detailItem, setDetailItem] = useState<CatalogItem | null>(null);
+  const [detailData, setDetailData] = useState<any>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
   const libraryRef = useRef<PersonalLibrary>(EMPTY);
   const rowKeyRef = useRef("");
   const writes = useRef<Promise<void>>(Promise.resolve());
@@ -189,11 +193,55 @@ export default function BibliotecaSearch() {
   const addItem = useCallback((item: CatalogItem) => {
     const kind = itemCategory(item);
     const id = itemId(item);
-    if (!id) return;
-    void mutateLibrary((current) => isSaved(item)
-      ? { ...current, [kind]: current[kind].filter((saved) => itemId(saved) !== id) }
-      : { ...current, [kind]: [...current[kind], { ...item, id: item.id || id, type: kind === "songs" ? "song" : kind === "albums" ? "album" : kind === "artists" ? "artist" : "playlist" }] });
+    if (!id || isSaved(item)) return;
+    void mutateLibrary((current) => ({
+      ...current,
+      [kind]: [...current[kind], { ...item, id: item.id || id, type: kind === "songs" ? "song" : kind === "albums" ? "album" : kind === "artists" ? "artist" : "playlist" }],
+    }));
   }, [isSaved, mutateLibrary]);
+
+  const openItem = useCallback(async (item: CatalogItem) => {
+    setDetailItem(item);
+    setDetailData(null);
+    setDetailLoading(true);
+    setError("");
+    const kind = itemCategory(item);
+    const browseId = item.browseId || (item.playlistId ? (String(item.playlistId).startsWith("VL") ? item.playlistId : `VL${item.playlistId}`) : "");
+    if (kind === "songs" || !browseId) {
+      setDetailData({ ok: true, title: item.title || item.name, tracks: item.videoId ? [item] : [], sections: [] });
+      setDetailLoading(false);
+      return;
+    }
+    try {
+      const response = await fetch(`/api/ytmusic/browse?browseId=${encodeURIComponent(browseId)}`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || "Não foi possível abrir os detalhes deste item.");
+      setDetailData({ ...data, itemType: kind });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível carregar os detalhes.");
+      setDetailData({ ok: false, tracks: [], sections: [] });
+    } finally {
+      setDetailLoading(false);
+    }
+  }, []);
+
+  const playDetailTrack = (track: any, list?: any[]) => {
+    const normalized = { ...track, videoId: track.videoId, title: track.title || track.name || "Música", artist: track.artist || track.subtitle || detailItem?.artist || detailItem?.name || "", thumbnail: track.thumbnail || detailItem?.thumbnail };
+    if (list?.length) playTracks(list.map((entry) => ({ ...entry, title: entry.title || entry.name || "Música" })) as MusicTrack[], list.findIndex((entry) => entry.videoId === track.videoId));
+    else playTrack(normalized as MusicTrack);
+  };
+
+  const playDetailCollection = (tracks: any[]) => {
+    const playable = (tracks || []).filter((track) => track?.videoId).map((track) => ({ ...track, title: track.title || track.name || "Música" })) as MusicTrack[];
+    if (playable.length) playTracks(playable, 0);
+    else setError("Não há músicas reproduzíveis neste item.");
+  };
+
+  const openSectionItem = (entry: any, sectionTitle: string) => {
+    const lower = String(sectionTitle || "").toLowerCase();
+    const type = /álbum|album|lançamento|release/.test(lower) ? "album" : /playlist|lista/.test(lower) ? "playlist" : entry.videoId ? "song" : "artist";
+    void openItem({ ...entry, title: entry.title || entry.name || sectionTitle, type, name: entry.title || entry.name, source: "YouTube Music" } as CatalogItem);
+  };
 
   async function runSearch(term = query) {
     const clean = term.trim();
@@ -247,13 +295,54 @@ export default function BibliotecaSearch() {
     <nav className="mb-6 flex gap-2 overflow-x-auto border-b border-white/10 pb-3" aria-label="Navegação da biblioteca">
       {([{ key: "categories", label: "CATEGORIAS", icon: Music2 }, { key: "history", label: "HISTORICO", icon: History }, { key: "personal", label: "BIBLIOTECA PESSOAL", icon: Library }] as const).map((entry) => {
         const Icon = entry.icon;
-        return <button key={entry.key} type="button" onClick={() => { setView(entry.key); if (entry.key === "categories") setSearched(""); setError(""); setNotice(""); }} aria-pressed={view === entry.key} className={`inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-2 text-xs font-bold tracking-wide transition ${view === entry.key ? "border-cyan-300 text-cyan-200" : "border-transparent text-slate-400 hover:text-white"}`}><Icon className="h-4 w-4" />{entry.label}</button>;
+        return <button key={entry.key} type="button" onClick={() => { setView(entry.key); setDetailItem(null); setDetailData(null); if (entry.key === "categories") setSearched(""); setError(""); setNotice(""); }} aria-pressed={view === entry.key} className={`inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-2 text-xs font-bold tracking-wide transition ${view === entry.key ? "border-cyan-300 text-cyan-200" : "border-transparent text-slate-400 hover:text-white"}`}><Icon className="h-4 w-4" />{entry.label}</button>;
       })}
     </nav>
     {error && <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border border-red-400/20 bg-red-400/5 p-3 text-sm text-red-200"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /><span>{error}</span><button type="button" onClick={() => setError("")} aria-label="Fechar erro" className="ml-auto"><X className="h-4 w-4" /></button></div>}
     {notice && <p role="status" className="mb-4 text-xs text-cyan-200">{notice}</p>}
 
-    {view === "categories" && <div className="space-y-8">
+    {detailItem && <section className="mb-8 space-y-5 rounded-2xl border border-white/10 bg-[#0d1120] p-4 sm:p-6">
+      <div className="flex items-center justify-between gap-3">
+        <button type="button" onClick={() => { setDetailItem(null); setDetailData(null); setError(""); }} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white"><ArrowLeft className="h-4 w-4" />Voltar ao catálogo</button>
+        <button type="button" disabled={isSaved(detailItem)} onClick={() => addItem(detailItem)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-cyan-200 disabled:opacity-50"><Plus className="h-3.5 w-3.5" />{isSaved(detailItem) ? "Na biblioteca" : "Adicionar à biblioteca"}</button>
+      </div>
+      <div className="flex flex-col gap-4 sm:flex-row">
+        {detailItem.thumbnail ? <img src={detailItem.thumbnail} alt="" className={`h-36 w-36 shrink-0 rounded-xl object-cover ${itemCategory(detailItem) === "artists" ? "rounded-full" : ""}`} /> : <div className="flex h-36 w-36 shrink-0 items-center justify-center rounded-xl bg-white/5"><Music2 className="h-10 w-10 text-cyan-200" /></div>}
+        <div className="min-w-0 flex-1 self-center">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">{CATEGORIES.find((entry) => entry.key === itemCategory(detailItem))?.label}</p>
+          <h2 className="mt-1 break-words text-xl font-bold text-white">{detailData?.title || detailData?.name || detailItem.title || detailItem.name || "Detalhes"}</h2>
+          <p className="mt-1 text-sm text-slate-400">{detailData?.subtitle || detailData?.description || detailItem.artist || detailItem.author || detailItem.source}</p>
+          {detailItem.videoId && <button type="button" onClick={() => playDetailTrack(detailItem)} className="mt-3 inline-flex items-center gap-2 rounded-lg bg-cyan-300 px-3 py-2 text-xs font-bold text-slate-950"><Play className="h-4 w-4" />Reproduzir música</button>}
+          {Array.isArray(detailData?.tracks) && detailData.tracks.length > 1 && <button type="button" onClick={() => playDetailCollection(detailData.tracks)} className="mt-3 inline-flex items-center gap-2 rounded-lg bg-cyan-300 px-3 py-2 text-xs font-bold text-slate-950"><Play className="h-4 w-4" />Reproduzir tudo ({detailData.tracks.length})</button>}
+        </div>
+      </div>
+      {detailLoading && <div className="flex items-center gap-2 text-sm text-slate-400"><LoaderCircle className="h-4 w-4 animate-spin" />Carregando conteúdo do YouTube Music...</div>}
+      {!detailLoading && Array.isArray(detailData?.tracks) && detailData.tracks.length > 0 && <section className="space-y-2">
+        <h3 className="text-sm font-bold text-white">Músicas ({detailData.tracks.length})</h3>
+        {detailData.tracks.map((track: any, index: number) => <div key={track.videoId || index} className="flex items-center gap-3 rounded-lg border border-white/5 px-3 py-2">
+          {track.thumbnail && <img src={track.thumbnail} alt="" className="h-10 w-10 rounded object-cover" />}
+          <div className="min-w-0 flex-1"><p className="truncate text-xs font-semibold text-white">{track.title || "Música"}</p><p className="truncate text-[11px] text-slate-400">{track.artist || detailData.subtitle || detailItem.artist || ""}</p></div>
+          <button type="button" onClick={() => playDetailTrack(track, detailData.tracks)} title="Reproduzir música" className="rounded-md p-2 text-cyan-200 hover:bg-white/10"><Play className="h-4 w-4" /></button>
+        </div>)}
+      </section>}
+      {!detailLoading && Array.isArray(detailData?.sections) && detailData.sections.map((section: any, sectionIndex: number) => <section key={section.title || sectionIndex} className="space-y-2">
+        <h3 className="text-sm font-bold text-white">{section.title || "Conteúdo"}</h3>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {(section.items || []).map((entry: any, entryIndex: number) => {
+            const isTrack = Boolean(entry.videoId);
+            return <article key={entry.videoId || entry.browseId || entryIndex} className="min-w-0 rounded-xl border border-white/10 bg-black/20 p-2">
+              <button type="button" onClick={() => isTrack ? playDetailTrack(entry, section.items) : openSectionItem(entry, section.title)} className="block w-full text-left">
+                {entry.thumbnail ? <img src={entry.thumbnail} alt="" className="mb-2 aspect-square w-full rounded-lg object-cover" /> : <div className="mb-2 flex aspect-square items-center justify-center rounded-lg bg-white/5"><Music2 className="h-6 w-6 text-slate-500" /></div>}
+                <p className="truncate text-xs font-semibold text-white">{entry.title || entry.name || "Item"}</p><p className="truncate text-[11px] text-slate-400">{entry.subtitle || section.title}</p>
+              </button>
+              {isTrack && <button type="button" onClick={() => playDetailTrack(entry, section.items)} className="mt-2 inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-cyan-200 hover:bg-white/10"><Play className="h-3 w-3" />Reproduzir</button>}
+            </article>;
+          })}
+        </div>
+      </section>)}
+      {!detailLoading && !detailData?.tracks?.length && !detailData?.sections?.length && !detailItem.videoId && <p className="text-sm text-slate-500">Não há detalhes disponíveis para este item.</p>}
+    </section>}
+    {view === "categories" && !detailItem && <div className="space-y-8">
       <form className="flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); void runSearch(); }}>
         <label className="flex min-w-0 flex-1 items-center gap-3 rounded-xl border border-white/10 bg-[#0d1120] px-4"><Search className="h-5 w-5 shrink-0 text-slate-500" /><input aria-label="Pesquisar catálogo" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar música, álbum, artista ou playlist..." className="h-12 min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-slate-500" /></label>
         <button type="submit" disabled={loading || !query.trim()} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-cyan-300 px-5 text-sm font-bold text-slate-950 disabled:opacity-50">{loading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}Pesquisar</button>
@@ -270,22 +359,22 @@ export default function BibliotecaSearch() {
           return <article key={itemId(item)} className="min-w-0 rounded-xl border border-white/10 bg-[#0d1120] p-3">
             {item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className={`mb-2 aspect-square w-full rounded-lg object-cover ${itemCategory(item) === "artists" ? "rounded-full" : ""}`} /> : <div className="mb-2 flex aspect-square items-center justify-center rounded-lg bg-white/5 text-slate-500"><Icon className="h-7 w-7" /></div>}
             <p className="truncate text-xs font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p><p className="mt-1 truncate text-[11px] text-slate-400">{item.artist || item.author || item.source}</p>
-            <button type="button" disabled={libraryBusy} onClick={() => addItem(item)} className={`mt-2 inline-flex w-full items-center justify-center gap-1 rounded-lg border px-2 py-1.5 text-[11px] font-semibold disabled:opacity-50 ${saved ? "border-cyan-300/30 text-cyan-200" : "border-white/10 text-slate-300 hover:bg-white/10"}`}>{saved ? <Library className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}{saved ? "Na biblioteca" : "Adicionar à biblioteca"}</button>
+            <button type="button" disabled={libraryBusy || saved} onClick={() => addItem(item)} className={`mt-2 inline-flex w-full items-center justify-center gap-1 rounded-lg border px-2 py-1.5 text-[11px] font-semibold disabled:opacity-50 ${saved ? "border-cyan-300/30 text-cyan-200" : "border-white/10 text-slate-300 hover:bg-white/10"}`}>{saved ? <Library className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}{saved ? "Na biblioteca" : "Adicionar à biblioteca"}</button>
           </article>;
         })}</div>
       </section> : <>
         {loadingHome && <div className="flex items-center gap-2 text-sm text-slate-500"><LoaderCircle className="h-4 w-4 animate-spin" />Carregando carrosséis...</div>}
-        {CATEGORIES.map((entry) => <MusicCarousel key={entry.key} title={entry.label} items={home[entry.key]} isSaved={isSaved} onAdd={addItem} />)}
+        {CATEGORIES.map((entry) => <MusicCarousel key={entry.key} title={entry.label} items={home[entry.key]} isSaved={isSaved} onAdd={addItem} onOpen={openItem} />)}
         {!loadingHome && CATEGORIES.every((entry) => !home[entry.key].length) && <p className="text-sm text-slate-500">Não foi possível carregar os destaques agora.</p>}
       </>}
     </div>}
 
-    {view === "history" && <section className="space-y-3">
+    {view === "history" && !detailItem && <section className="space-y-3">
       <header className="flex items-center justify-between"><h2 className="text-sm font-bold text-white">Histórico de pesquisas</h2><button type="button" onClick={() => { setHistory([]); try { localStorage.removeItem("livenexus_music_search_history"); } catch {} }} className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-white"><Trash2 className="h-3.5 w-3.5" />Limpar histórico</button></header>
       {!history.length ? <p className="text-sm text-slate-500">Nenhuma pesquisa no histórico.</p> : history.map((item) => <div key={item.query} className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0d1120] p-3"><History className="h-4 w-4 shrink-0 text-slate-500" /><button type="button" onClick={() => { setQuery(item.query); void runSearch(item.query); }} className="min-w-0 flex-1 truncate text-left text-sm text-slate-200 hover:text-cyan-200">{item.query}</button><button type="button" onClick={() => setHistory((current) => { const next = current.filter((h) => h.query !== item.query); try { localStorage.setItem("livenexus_music_search_history", JSON.stringify(next)); } catch {} return next; })} aria-label={`Remover histórico ${item.query}`} className="text-slate-500 hover:text-white"><X className="h-4 w-4" /></button></div>)}
     </section>}
 
-    {view === "personal" && <div className="space-y-6">
+    {view === "personal" && !detailItem && <div className="space-y-6">
       <section className="rounded-xl border border-white/10 bg-[#0d1120] p-4"><h2 className="text-sm font-bold text-white">Biblioteca pessoal</h2><p className="mt-1 text-xs text-slate-400">Cole um link de música, álbum, artista ou playlist do YouTube ou YouTube Music.</p>
         <form onSubmit={(event) => void handleAddLink(event)} className="mt-4 space-y-3">
           <label className="block"><span className="mb-1 block text-xs text-slate-400">Link</span><input value={link} onChange={(event) => setLink(event.target.value)} required type="url" placeholder="https://music.youtube.com/watch?v=..." className="h-11 w-full rounded-lg border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-cyan-300/50" /></label>
