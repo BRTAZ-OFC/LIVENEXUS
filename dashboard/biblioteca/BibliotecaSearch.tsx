@@ -306,7 +306,7 @@ export default function BibliotecaSearch() {
     const version = ++requestVersionRef.current;
     setSearched(clean); setView("categories"); setLoading(true); setLoadingMore(false); setError(""); setResults([]); setContinuations({}); pushHistory(clean);
     try {
-      const response = await fetch(`/api/ytmusic/bundle?q=${encodeURIComponent(clean)}&mode=initial`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
+      const response = await fetch(`/api/ytmusic/bundle?q=${encodeURIComponent(clean)}`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
       const data = await response.json();
       if (version !== requestVersionRef.current) return;
       if (!response.ok || !data.ok) throw new Error(data.error || "A busca do catálogo falhou.");
@@ -462,15 +462,21 @@ export default function BibliotecaSearch() {
         <div className="flex items-center justify-between"><h2 className="text-sm font-bold text-white">Resultados: {searched}</h2><button type="button" onClick={() => { setSearched(""); setResults([]); }} className="text-xs text-slate-400 hover:text-white">Limpar busca</button></div>
         {loading && <p className="text-xs text-slate-500">Buscando no YouTube e YouTube Music...</p>}
         {!loading && !visibleResults.length && <p className="text-sm text-slate-500">Nenhum resultado nesta categoria.</p>}
-        <div className="space-y-2">{visibleResults.map((item) => {
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">{visibleResults.map((item) => {
           const Icon = CATEGORIES.find((entry) => entry.key === itemCategory(item))?.icon || Music2;
-          return <article key={itemId(item)} className="flex min-w-0 items-center gap-3 rounded-lg border border-white/10 bg-[#0d1120] px-3 py-2">
-            <button type="button" onClick={() => void openItem(item)} aria-label={`Abrir detalhes: ${item.title || item.name || "item"}`} className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/5">
+          const saved = isSaved(item);
+          return <article key={itemId(item)} className="flex min-w-0 items-center gap-3 rounded-xl border border-white/10 bg-[#0d1120] p-3">
+            <button type="button" onClick={() => void openItem(item)} aria-label={`Abrir detalhes: ${item.title || item.name || "item"}`} title="Ver músicas e detalhes" className="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-white/5">
               {item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className={`h-full w-full object-cover ${itemCategory(item) === "artists" ? "rounded-full" : ""}`} /> : <span className="flex h-full w-full items-center justify-center text-slate-500"><Icon className="h-5 w-5" /></span>}
             </button>
             <button type="button" onClick={() => void openItem(item)} className="min-w-0 flex-1 text-left">
               <p className="truncate text-sm font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p>
               <p className="truncate text-xs text-slate-400">{item.artist || item.author || item.source || ""}</p>
+              <p className="mt-1 truncate text-[10px] text-slate-500">{item.source}</p>
+            </button>
+            <button type="button" disabled={libraryBusy || saved} onClick={() => addItem(item)} title={saved ? "Já está na biblioteca" : "Adicionar à biblioteca"} className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-cyan-300/20 px-2 py-1.5 text-[11px] text-cyan-200 hover:bg-cyan-300/10 disabled:cursor-not-allowed disabled:opacity-50">
+              {saved ? <Library className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+              {saved ? "Adicionado" : "Adicionar à biblioteca"}
             </button>
           </article>;
         })}</div>
