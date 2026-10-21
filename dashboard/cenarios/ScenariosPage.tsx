@@ -52,7 +52,6 @@ function getScenarioConfig(row: ScenarioRecord): ScenarioConfig {
       : isObject(row.data) && Object.keys(row.data).length
         ? row.data
         : row as unknown as JsonObject;
-  const visualizerSize: JsonObject = isObject(source["visualizerSize"]) ? source["visualizerSize"] : {};
   const background: JsonObject = isObject(source["background"]) ? source["background"] : {};
 
   return {
