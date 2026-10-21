@@ -946,7 +946,21 @@ export default function OverlayCanvas() {
           />
         </div>
       </div>
-      <Overlay_Editor catalog={catalog} onAddFragment={addWidgetComponent} onAddText={addTextInstance} onFontChange={(fontFamily) => applyTextStyleToSelectedText({ fontFamily })} onTextStyleChange={applyTextStyleToSelectedText} />
+      <Overlay_Editor
+        catalog={catalog}
+        onAddFragment={addWidgetComponent}
+        onAddText={addTextInstance}
+        onFontChange={(fontFamily) => applyTextStyleToSelectedText({ fontFamily })}
+        onTextStyleChange={applyTextStyleToSelectedText}
+        selectedInstanceWidgetId={config.instances?.find((item, index) => (item.id || `${item.widgetId}-${index}`) === selectedInstanceId)?.widgetId ?? null}
+        selectedInstanceConfig={config.instances?.find((item, index) => (item.id || `${item.widgetId}-${index}`) === selectedInstanceId)?.config ?? null}
+        onUpdateSelectedConfig={(patch) => {
+          if (!selectedInstanceId) return;
+          const selected = (config.instances || []).find((item, index) => (item.id || `${item.widgetId}-${index}`) === selectedInstanceId);
+          if (!selected) return;
+          updateInstance(selectedInstanceId, { config: { ...(selected.config || {}), ...patch } });
+        }}
+      />
     </section>
   );
 }
