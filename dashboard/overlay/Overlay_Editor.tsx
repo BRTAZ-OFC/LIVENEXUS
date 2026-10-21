@@ -504,7 +504,8 @@ export default function Overlay_Editor({
                   <p className="mb-1 shrink-0 text-[9px] font-semibold uppercase tracking-wide text-slate-400">Animações</p>
                   <div className="grid min-h-0 min-w-0 flex-1 grid-cols-5 grid-rows-5 gap-0.5 overflow-hidden">
                     {[
-                      { id: "cascata", label: "Cascata" },
+                      { id: "cascata", label: "Cascata Cima" },
+                      { id: "cascata-baixo", label: "Cascata Baixo" },
                       { id: "casanique", label: "Casanique" },
                       { id: "rolar", label: "Rolar" },
                       { id: "encarrilha", label: "Encarrilha" },
@@ -545,7 +546,9 @@ export default function Overlay_Editor({
                 <section aria-label="Tempo e repetição da animação" className="flex min-h-0 min-w-0 flex-col gap-1 overflow-hidden pl-1">
                   <p className="mb-0 shrink-0 text-[9px] font-semibold uppercase tracking-wide text-slate-400">Tempo da animação</p>
                   <label className="flex min-w-0 flex-col gap-0.5 text-[9px] leading-3 text-slate-300">
-                    Intervalo entre letras (ms)
+                    {["slide-in-cima", "slide-in-baixo", "slide-in-esquerda", "slide-in-direita", "reveal", "flip-in", "bounce-in", "blur-in", "light-speed-in"].includes(String(selectedInstanceConfig?.animationType || ""))
+                      ? "Intervalo entre repetições (ms)"
+                      : "Intervalo entre letras (ms)"}
                     <input
                       type="number" min="0" step="100"
                       disabled={selectedInstanceWidgetId !== "__livenexus_text__" || !selectedInstanceConfig}
@@ -555,7 +558,9 @@ export default function Overlay_Editor({
                     />
                   </label>
                   <label className="flex min-w-0 flex-col gap-0.5 text-[9px] leading-3 text-slate-300">
-                    Duração de cada letra (ms)
+                    {["slide-in-cima", "slide-in-baixo", "slide-in-esquerda", "slide-in-direita", "reveal", "flip-in", "bounce-in", "blur-in", "light-speed-in"].includes(String(selectedInstanceConfig?.animationType || ""))
+                      ? "Duração do texto (ms)"
+                      : "Duração de cada letra (ms)"}
                     <input
                       type="number" min="50" step="50"
                       disabled={selectedInstanceWidgetId !== "__livenexus_text__" || !selectedInstanceConfig}
