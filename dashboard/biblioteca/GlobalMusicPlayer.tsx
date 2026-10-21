@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Music2, Pause, Play, SkipBack, SkipForward, Volume2 } from "lucide-react";
+import { ListMusic, Music2, Pause, Play, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Volume2 } from "lucide-react";
 import {
-  connectMusicPlayerFrame, getMusicPlayerState, nextMusicTrack, previousMusicTrack,
-  seekMusicTo, setMusicVolume, subscribeMusicPlayer, toggleMusicPlayback, type MusicTrack,
+  connectMusicPlayerFrame, cycleMusicRepeat, getMusicPlayerState, nextMusicTrack, previousMusicTrack,
+  seekMusicTo, setMusicVolume, subscribeMusicPlayer, toggleMusicPlayback, toggleMusicShuffle, type MusicTrack,
 } from "./musicPlayerEngine";
 
 function timeLabel(seconds: number) {
@@ -29,9 +29,12 @@ export default function GlobalMusicPlayer() {
         <p className="truncate text-xs font-semibold text-white" title={track?.title}>{track?.title || "Nenhuma música"}</p>
         <p className="truncate text-[10px] text-slate-400">{track?.artist || (track ? "YouTube Music" : "Player musical")}</p>
       </div>
+      <button type="button" onClick={toggleMusicShuffle} title={player.shuffle ? "Desativar aleatório" : "Ativar aleatório"} aria-label="Alternar reprodução aleatória" className={`hidden rounded-md p-1.5 sm:block ${player.shuffle ? "bg-cyan-300/15 text-cyan-200" : "text-slate-400 hover:bg-white/10"}`}><Shuffle className="h-4 w-4" /></button>
       <button type="button" onClick={previousMusicTrack} disabled={!track} title="Anterior" aria-label="Faixa anterior" className="rounded-md p-1.5 text-slate-300 hover:bg-white/10 disabled:opacity-30"><SkipBack className="h-4 w-4" /></button>
       <button type="button" onClick={toggleMusicPlayback} disabled={!track} title={player.isPlaying ? "Pausar" : "Reproduzir"} aria-label={player.isPlaying ? "Pausar música" : "Reproduzir música"} className="rounded-full bg-cyan-300 p-2 text-slate-950 hover:bg-cyan-200 disabled:opacity-30">{player.isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}</button>
       <button type="button" onClick={nextMusicTrack} disabled={!track || player.index + 1 >= player.queue.length} title="Próxima" aria-label="Próxima faixa" className="rounded-md p-1.5 text-slate-300 hover:bg-white/10 disabled:opacity-30"><SkipForward className="h-4 w-4" /></button>
+      <button type="button" onClick={cycleMusicRepeat} title={`Repetição: ${player.repeat}`} aria-label="Alternar repetição" className={`hidden rounded-md p-1.5 sm:block ${player.repeat !== "off" ? "bg-cyan-300/15 text-cyan-200" : "text-slate-400 hover:bg-white/10"}`}>{player.repeat === "one" ? <Repeat1 className="h-4 w-4" /> : <Repeat className="h-4 w-4" />}</button>
+      <span title={`${player.queue.length} faixa(s) na fila`} className="hidden items-center gap-1 text-[10px] text-slate-400 md:flex"><ListMusic className="h-3.5 w-3.5" />{player.queue.length}</span>
       <div className="hidden min-w-24 max-w-44 flex-1 items-center gap-1.5 lg:flex">
         <span className="w-8 text-right font-mono text-[9px] text-slate-400">{timeLabel(player.currentTime)}</span>
         <input aria-label="Posição da música" type="range" min={0} max={Math.max(1, player.duration)} step={1} value={Math.min(player.currentTime, player.duration || 0)} onChange={(event) => seekMusicTo(Number(event.target.value))} className="w-full accent-cyan-300" />
