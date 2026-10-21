@@ -32,8 +32,10 @@ type OverlayEditorProps = {
   globalStyleConfig: { borderEnabled: boolean; borderWidth: number; borderColor?: string; borderRadius?: number; texture: string; colorEffectEnabled: boolean; colorEffect: string };
   backgroundColor: string;
   backgroundMode: "transparent" | "solid";
+  backgroundOpacity: number;
   onUpdateBackgroundColor: (color: string) => void;
   onUpdateBackgroundMode: (mode: "transparent" | "solid") => void;
+  onUpdateBackgroundOpacity: (opacity: number) => void;
   onUpdateGlobalStyleConfig: (patch: Partial<{ borderEnabled: boolean; borderWidth: number; borderColor: string; borderRadius: number; texture: string; colorEffectEnabled: boolean; colorEffect: string }>) => void;
   layers: Array<{ id: string; name: string; widgetId: string; visible: boolean; locked: boolean; selected: boolean; zIndex: number }>;
   onSelectLayer: (id: string) => void;
@@ -179,8 +181,10 @@ export default function Overlay_Editor({
   globalStyleConfig,
   backgroundColor,
   backgroundMode,
+  backgroundOpacity,
   onUpdateBackgroundColor,
   onUpdateBackgroundMode,
+  onUpdateBackgroundOpacity,
   onUpdateGlobalStyleConfig,
   layers,
   onSelectLayer,
@@ -699,22 +703,15 @@ export default function Overlay_Editor({
                     {SHAPE_OPTIONS.map((item) => <button key={item.id} type="button" title={item.label} onClick={() => onAddShape(item.id)} className="flex h-full min-h-0 min-w-0 flex-col items-center justify-center gap-px overflow-hidden rounded border border-white/10 bg-slate-900/80 px-0.5 text-center text-[7px] leading-[8px] text-slate-200 hover:border-violet-400 hover:bg-violet-500/15"><ShapeIcon shape={item.id}/><span className="w-full min-w-0 truncate">{item.label}</span></button>)}
                   </div>
                 </section>
-                <section className="flex min-w-0 flex-col gap-1.5 overflow-hidden">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Cor e efeitos de cor</p>
-                  <div className="grid min-w-0 grid-cols-[auto_minmax(2rem,0.8fr)_auto_minmax(2rem,0.8fr)_auto_3.5rem_auto_minmax(0,1.4fr)] items-center gap-1">
-                    <label className="flex min-w-0 items-center gap-1 whitespace-nowrap text-[9px] leading-tight text-slate-300">Fundo <input aria-label="Cor de fundo sólido do canvas ou elemento" type="color" value={backgroundColor} onChange={(event) => onUpdateBackgroundColor(event.target.value)} className="h-6 w-8 shrink-0 rounded border border-white/10 bg-slate-900 p-0.5"/></label>
-                    <label className="flex min-w-0 items-center gap-1 whitespace-nowrap text-[9px] leading-tight text-slate-300">Contorno <input aria-label="Cor do contorno da forma" type="color" value={String(selectedInstanceConfig?.strokeColor || "#ddd6fe")} disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} onChange={(event) => onUpdateSelectedConfig({ strokeColor: event.target.value })} className="h-6 w-8 shrink-0 rounded border border-white/10 bg-slate-900 p-0.5 disabled:opacity-40"/></label>
-                    <label className="flex min-w-0 items-center gap-1 whitespace-nowrap text-[9px] leading-tight text-slate-300">Espessura <input aria-label="Espessura do contorno" type="number" min={0} max={24} value={Number(selectedInstanceConfig?.strokeWidth ?? 2)} disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} onChange={(event) => onUpdateSelectedConfig({ strokeWidth: Math.max(0, Math.min(24, Number(event.target.value) || 0)) })} className="h-6 w-14 min-w-0 rounded border border-white/10 bg-slate-900 px-1 text-[10px] text-white disabled:opacity-40"/></label>
-                    <label className="flex min-w-0 items-center gap-1 whitespace-nowrap text-[9px] leading-tight text-slate-300">Opacidade <span className="flex min-w-0 flex-1 items-center gap-1"><input aria-label="Opacidade da forma" type="range" min={0} max={100} value={Number(selectedInstanceConfig?.opacity ?? 100)} disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} onChange={(event) => onUpdateSelectedConfig({ opacity: Number(event.target.value) })} className="h-6 min-w-0 flex-1 accent-violet-500 disabled:opacity-40"/><span className="w-7 shrink-0 text-right text-[9px]">{Number(selectedInstanceConfig?.opacity ?? 100)}%</span></span></label>
-                  </div>
-                </section>
+                <section aria-label="Coluna vazia" className="min-w-0" />
+
               </div>
             )}
             {activeMenu === "FUNDO" && (
               <div className="grid h-full min-h-0 min-w-0 grid-cols-2 gap-3 overflow-hidden">
                 <section className="flex min-h-0 min-w-0 flex-col gap-3 border-r border-white/10 pr-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Configurações do fundo</p>
-                  <div className="grid grid-cols-4 grid-rows-2 gap-2">
+                  <div className="grid grid-cols-4 grid-rows-3 gap-2">
                     <label className="flex min-w-0 items-center gap-1.5 rounded border border-white/10 bg-slate-900/70 p-2 text-[10px] text-slate-200"><input type="checkbox" checked={globalStyleConfig.borderEnabled} onChange={(event) => onUpdateGlobalStyleConfig({ borderEnabled: event.target.checked })} className="accent-violet-500"/>Ativar borda</label>
                     <label className="flex min-w-0 items-center justify-between gap-1.5 rounded border border-white/10 bg-slate-900/70 p-2 text-[10px] text-slate-200">Cor da borda <input aria-label="Cor da borda global" type="color" value={String(globalStyleConfig.borderColor || "#dce6ff")} onChange={(event) => onUpdateGlobalStyleConfig({ borderColor: event.target.value })} className="h-6 w-8 shrink-0 rounded border border-white/10 bg-slate-900 p-0.5"/></label>
                     <label className="flex min-w-0 items-center justify-between gap-1.5 rounded border border-white/10 bg-slate-900/70 p-2 text-[10px] text-slate-200">Arredondamento <input aria-label="Arredondamento global da borda" type="number" min={1} max={100} value={Number(globalStyleConfig.borderRadius ?? 16)} onChange={(event) => onUpdateGlobalStyleConfig({ borderRadius: Math.max(1, Math.min(100, Number(event.target.value) || 1)) })} className="h-6 w-14 min-w-0 rounded border border-white/10 bg-slate-950 px-1 text-[10px] text-white"/></label>
@@ -722,10 +719,12 @@ export default function Overlay_Editor({
                     <button type="button" aria-pressed={backgroundMode === "transparent"} onClick={() => onUpdateBackgroundMode("transparent")} className={backgroundMode === "transparent" ? activeButtonClass : buttonClass}>Transparente</button>
                     <button type="button" aria-pressed={backgroundMode === "solid"} onClick={() => onUpdateBackgroundMode("solid")} className={backgroundMode === "solid" ? activeButtonClass : buttonClass}>Sólido</button>
                     <label className="col-span-2 flex items-center gap-2 rounded border border-white/10 bg-slate-900/70 p-2 text-[10px] text-slate-200"><input type="checkbox" checked={globalStyleConfig.colorEffectEnabled} onChange={(event) => onUpdateGlobalStyleConfig({ colorEffectEnabled: event.target.checked })} className="accent-violet-500"/>Efeitos de coloração</label>
+                    <label className="col-span-2 flex min-w-0 items-center justify-between gap-2 rounded border border-white/10 bg-slate-900/70 p-2 text-[10px] text-slate-200">Fundo <input aria-label="Cor sólida do fundo" type="color" value={backgroundColor} onChange={(event) => onUpdateBackgroundColor(event.target.value)} className="h-6 w-10 shrink-0 rounded border border-white/10 bg-slate-900 p-0.5"/></label>
+                    <label className="col-span-2 flex min-w-0 items-center gap-2 rounded border border-white/10 bg-slate-900/70 p-2 text-[10px] text-slate-200">Opacidade <input aria-label="Opacidade do fundo" type="range" min={0} max={100} value={backgroundOpacity} onChange={(event) => onUpdateBackgroundOpacity(Number(event.target.value))} className="min-w-0 flex-1 accent-violet-500"/><span className="w-8 shrink-0 text-right">{backgroundOpacity}%</span></label>
                   </div>
                 </section>
                 <section className="flex min-h-0 min-w-0 flex-col gap-2 overflow-hidden">
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Efeitos de coloração</p>
+                  <div className="flex items-center justify-between gap-2"><p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Efeitos de coloração</p><button type="button" title="Limpar efeitos de coloração" aria-label="Limpar efeitos de coloração" onClick={() => onUpdateGlobalStyleConfig({ colorEffectEnabled: false, colorEffect: "glass" })} className="rounded border border-white/15 px-2 py-1 text-[9px] text-slate-300 hover:border-rose-400 hover:text-white">Limpar efeitos</button></div>
                   <div className="grid min-h-0 flex-1 grid-cols-7 grid-rows-3 gap-1 overflow-hidden">
                     {COLOR_EFFECTS.map((effect) => <button key={effect.id} type="button" title={effect.label} aria-pressed={globalStyleConfig.colorEffect === effect.id} onClick={() => onUpdateGlobalStyleConfig({ colorEffect: effect.id, colorEffectEnabled: true })} className={"flex min-h-0 min-w-0 items-center justify-center rounded border px-0.5 text-center text-[9px] leading-tight text-white " + (globalStyleConfig.colorEffect === effect.id ? "border-violet-300 ring-1 ring-violet-400" : "border-white/10 hover:border-violet-400")} style={{ backgroundImage: "linear-gradient(135deg, rgba(255,255,255,.5), rgba(80,80,100,.35), rgba(255,255,255,.08))", backgroundColor: ["gold","copper","ruby"].includes(effect.id) ? "#8a4c32" : ["sapphire","chrome","mirror"].includes(effect.id) ? "#315b85" : ["emerald","glass","crystal"].includes(effect.id) ? "#247b70" : "#624d8f" }}>{effect.label}</button>)}
                   </div>
