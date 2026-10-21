@@ -103,5 +103,16 @@ export function readSession(source) {
 }
 
 export function clearSessionCookie() {
-  return COOKIE_NAME + "=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0";
+  return [
+    COOKIE_NAME +
+      "=; Path=/; HttpOnly; Secure; SameSite=None; Partitioned; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+    COOKIE_NAME +
+      "=; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+    COOKIE_NAME +
+      "=; Path=/; HttpOnly; Secure; SameSite=Lax; Partitioned; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+    COOKIE_NAME +
+      "=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+    COOKIE_NAME + "=; Path=/; HttpOnly; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+    COOKIE_NAME + "=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+  ];
 }

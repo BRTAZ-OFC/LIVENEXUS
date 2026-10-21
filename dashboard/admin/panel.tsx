@@ -18,6 +18,8 @@ import {
   CheckCircle2,
   Sliders,
   Tv,
+  Terminal,
+  Trash2,
 } from "lucide-react";
 import DatabasePage from "./banco";
 import ReviewsManager from "./reviews-manager";
@@ -49,6 +51,7 @@ type ReviewRow = {
 export default function AdminPanel() {
   const [subTab, setSubTab] = useState<
     | "inicial"
+    | "erros"
     | "galeria"
     | "overlay"
     | "cenarios"
@@ -135,6 +138,7 @@ export default function AdminPanel() {
 
   const subtabsList = [
     { id: "inicial", label: "Inicial", icon: House },
+    { id: "erros", label: "Ver Erros", icon: Terminal },
     { id: "galeria", label: "Galeria", icon: Image },
     { id: "overlay", label: "Overlay", icon: Layers },
     { id: "cenarios", label: "Cenários", icon: Clapperboard },
@@ -203,6 +207,7 @@ export default function AdminPanel() {
       <div className="rounded-2xl bg-slate-900/60 border border-white/10 p-6 backdrop-blur-xl">
         {subTab === "conexoes" && <AdminConnectionsPage />}
         {subTab === "widgets" && <WidgetsSection />}
+        {subTab === "erros" && <ErrorLogsEmbedded />}
 
         {subTab === "inicial" && (
           <div className="space-y-6">
@@ -670,6 +675,75 @@ export default function AdminPanel() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function ErrorLogsEmbedded() {
+  const [errors, setErrors] = useState<unknown[]>(
+    typeof window !== "undefined" ? window.__LIVENEXUS_ERRORS__ || [] : [],
+  );
+
+  const handleClear = () => {
+    if (typeof window !== "undefined") {
+      window.__LIVENEXUS_ERRORS__ = [];
+    }
+    setErrors([]);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-base font-bold text-white flex items-center gap-2">
+            <Terminal className="h-5 w-5 text-red-500" />
+            Logs de Erros do Sistema
+          </h2>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Registro centralizado de falhas e exceções ocorridas no navegador.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={handleClear}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-900/50 hover:bg-red-800 text-red-200 text-xs font-semibold transition border border-red-700/50"
+        >
+          <Trash2 className="h-3.5 w-3.5" /> Limpar Logs
+        </button>
+      </div>
+
+      {errors.length === 0 ? (
+        <div className="text-center py-12 bg-slate-950/60 rounded-xl border border-white/10">
+          <p className="text-sm text-slate-400">Nenhum erro registrado nesta sessão.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {errors.map((err) => (
+            <div
+              key={err.id}
+              className="p-4 rounded-xl bg-slate-950 border border-red-900/40 space-y-2"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-red-400 uppercase">
+                  {err.type} - {err.name}
+                </span>
+                <span className="text-[10px] text-slate-500 font-mono">{err.timestamp}</span>
+              </div>
+              <p className="text-sm text-white font-medium">{err.message}</p>
+              {err.filename && (
+                <div className="text-[10px] text-slate-400 font-mono text-slate-400">
+                  {err.filename}:{err.lineno}:{err.colno}
+                </div>
+              )}
+              {err.stack && (
+                <pre className="p-2 bg-black rounded text-[10px] text-red-300/80 overflow-x-auto font-mono">
+                  {err.stack}
+                </pre>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

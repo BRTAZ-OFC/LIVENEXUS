@@ -1,6 +1,7 @@
 /* BLOCO 1 — Imports de rota, estados React, ícones e painel de dados. */
 import DatabasePage from "./admin/banco";
 import AdminPanel from "./admin/panel";
+import ErrorLogsPage from "./admin/ErrorLogsPage";
 import TTSPage from "./tts";
 import PlatformBioConnections from "./conexao/PlatformBioConnections";
 import OverlayCanvas from "./overlay/Overlay_Canvas";
@@ -18,12 +19,14 @@ import {
   Database,
   ChevronRight,
   ChevronLeft,
+  ArrowLeft,
   Layers,
   Clock3,
   MessageSquare,
   Eye,
   LayoutGrid,
   Volume2,
+  Terminal,
 } from "lucide-react";
 
 const MemoPlatformBioConnections = memo(PlatformBioConnections);
@@ -285,11 +288,17 @@ function DashboardPage() {
       <aside
         className={`dash-flex-min-h-screen-16w20hu ${sidebarExpanded ? "dash-w-52-p3mf56" : "dash-w-16-1j20ogi"}`}
       >
-        <div className="dash-flex-h-73px-1rxqrjy">
-          <span className="dash-flex-h-9-y3vg7y">
-            <AudioLines className="dash-h-5-w-5-8794lx" />
-          </span>
-        </div>
+        <a
+          href="/"
+          title="Voltar à página inicial"
+          aria-label="Voltar à página inicial"
+          className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} dash-text-slate-300 hover:text-white hover:bg-white/5 transition mb-2 border-b border-white/10`}
+        >
+          <ArrowLeft className="dash-h-2-5-w-2-5-16znhny" />
+          {sidebarExpanded && (
+            <span className="dash-text-7px-font-semibold-r7z1tv">Página Inicial</span>
+          )}
+        </a>
         <nav className="dash-flex-flex-1-xgledq">
           <button
             type="button"
@@ -357,6 +366,7 @@ function DashboardPage() {
                   <span className="dash-text-7px-font-semibold-r7z1tv">Painel Admin</span>
                 )}
               </button>
+
               <button
                 type="button"
                 onClick={() => handleSelectSection("database")}
@@ -402,10 +412,17 @@ function DashboardPage() {
               type="button"
               onClick={async () => {
                 try {
-                  await fetch("/api/auth/logout", { method: "POST" });
+                  await fetch("/api/auth/logout", {
+                    method: "POST",
+                    credentials: "include",
+                    cache: "no-store",
+                  });
                 } finally {
-                  sessionStorage.removeItem("livenexus_role");
-                  window.location.href = "/login";
+                  sessionStorage.clear();
+                  localStorage.clear();
+                  document.cookie =
+                    "livenexus_session=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT";
+                  window.location.href = "/";
                 }
               }}
               className="dash-inline-flex-items-center-11vpqzb"

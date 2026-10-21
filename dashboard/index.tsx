@@ -77,6 +77,43 @@ function HomePage() {
   const [loadingAvaliacoes, setLoadingAvaliacoes] = useState(true);
   const [viewMode, setViewMode] = useState<"home" | "all">("home");
   const [activeFilter, setActiveFilter] = useState<string>("recentes");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    let ativo = true;
+    async function checkAuth() {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include", cache: "no-store" });
+        const data = await res.json();
+        if (ativo) {
+          setIsLoggedIn(Boolean(res.ok && data.ok && data.user?.user_id));
+        }
+      } catch {
+        if (ativo) setIsLoggedIn(false);
+      }
+    }
+    void checkAuth();
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+        cache: "no-store",
+      });
+    } finally {
+      sessionStorage.clear();
+      localStorage.clear();
+      document.cookie =
+        "livenexus_session=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      setIsLoggedIn(false);
+      window.location.href = "/";
+    }
+  };
 
   // Carrega as avaliações já registradas no servidor
   useEffect(() => {
@@ -316,12 +353,29 @@ function HomePage() {
           </div>
 
           <div className="home-flex-shrink-0-1mm3j93">
-            <a href="/login" className="home-rounded-xl-border-bnh4rt">
-              Entrar
-            </a>
-            <a href="/login/registro" className="home-rounded-xl-bg-gradient-t-iu534x">
-              Cadastrar
-            </a>
+            {isLoggedIn ? (
+              <>
+                <a href="/dashboard" className="home-rounded-xl-border-bnh4rt">
+                  Painel
+                </a>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="home-rounded-xl-bg-gradient-t-iu534x cursor-pointer"
+                >
+                  Sair
+                </button>
+              </>
+            ) : (
+              <>
+                <a href="/login" className="home-rounded-xl-border-bnh4rt">
+                  Entrar
+                </a>
+                <a href="/login/registro" className="home-rounded-xl-bg-gradient-t-iu534x">
+                  Cadastrar
+                </a>
+              </>
+            )}
           </div>
         </nav>
       </header>
@@ -765,12 +819,29 @@ function HomePage() {
             Uma plataforma para conectar streamers e comunidades.
           </p>
           <div className="home-flex-items-center-yqfmxc">
-            <a href="/login" className="home-text-white-1j10sj9">
-              Entrar
-            </a>
-            <a href="/login/registro" className="home-text-white-1j10sj9">
-              Cadastrar
-            </a>
+            {isLoggedIn ? (
+              <>
+                <a href="/dashboard" className="home-text-white-1j10sj9">
+                  Painel
+                </a>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="home-text-white-1j10sj9 bg-transparent border-0 cursor-pointer"
+                >
+                  Sair
+                </button>
+              </>
+            ) : (
+              <>
+                <a href="/login" className="home-text-white-1j10sj9">
+                  Entrar
+                </a>
+                <a href="/login/registro" className="home-text-white-1j10sj9">
+                  Cadastrar
+                </a>
+              </>
+            )}
           </div>
         </div>
       </footer>

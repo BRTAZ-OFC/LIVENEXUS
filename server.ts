@@ -96,6 +96,7 @@ const PUBLIC_API_ENDPOINTS = new Set([
   "POST /api/auth/register",
   "POST /api/auth/login",
   "POST /api/auth/logout",
+  "GET /api/auth/logout",
   "GET /api/check-username",
   "GET /api/avaliacoes",
   "POST /api/avaliacoes",
@@ -167,7 +168,14 @@ app.post("/api/auth/login", async (req: Request, res: Response) => {
 
 app.post("/api/auth/logout", (_req: Request, res: Response) => {
   res.setHeader("Set-Cookie", clearSessionCookie());
-  return res.json({ ok: true });
+  res.setHeader("Clear-Site-Data", '"cookies", "storage"');
+  return res.set(NO_CACHE).json({ ok: true });
+});
+
+app.get("/api/auth/logout", (_req: Request, res: Response) => {
+  res.setHeader("Set-Cookie", clearSessionCookie());
+  res.setHeader("Clear-Site-Data", '"cookies", "storage"');
+  return res.set(NO_CACHE).redirect("/");
 });
 
 /* Verifica se um nome de usuário já está em uso. */
@@ -1056,17 +1064,22 @@ app.use(
 
 if (!isDevServer && !isApiOnly) {
   app.use(express.static(distDir));
-  
+
   // Proteger rotas do dashboard
   app.get("/dashboard", requireSession, (_req: Request, res: Response) => {
     res.sendFile(resolve(distDir, "index.html"));
   });
-  
+
   // Proteger rotas administrativas
-  app.get("/dashboard/admin/*", requireSession, requireAdminPage, (_req: Request, res: Response) => {
-    res.sendFile(resolve(distDir, "index.html"));
-  });
-  
+  app.get(
+    "/dashboard/admin/*",
+    requireSession,
+    requireAdminPage,
+    (_req: Request, res: Response) => {
+      res.sendFile(resolve(distDir, "index.html"));
+    },
+  );
+
   app.get(/.*/, (_req: Request, res: Response) => {
     res.sendFile(resolve(distDir, "index.html"));
   });

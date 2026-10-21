@@ -30,7 +30,7 @@ function LoginPage() {
           }
         }
         setPassword("");
-        navigate("/dashboard");
+        navigate("/");
         return;
       }
       setMessage(result.message);
