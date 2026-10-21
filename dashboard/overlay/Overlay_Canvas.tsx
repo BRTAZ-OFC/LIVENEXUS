@@ -631,12 +631,12 @@ export default function OverlayCanvas() {
   const selectedElementBackgroundColor = selectedCanvasInstance
     ? String(selectedCanvasInstance.widgetId === SHAPE_WIDGET_ID
       ? selectedCanvasInstance.config?.fillColor || selectedCanvasInstance.config?.color || "#8b5cf6"
-      : selectedCanvasInstance.config?.backgroundColor && selectedCanvasInstance.config.backgroundColor !== "transparent" ? selectedCanvasInstance.config.backgroundColor : "#020617")
-    : String(config.background?.type === "solid" ? config.background.color || "#020617" : "#020617");
+      : selectedCanvasInstance.config?.backgroundColor || "#020617")
+    : String(config.background?.color || "#020617");
   const selectedBackgroundMode: "transparent" | "solid" = selectedCanvasInstance
     ? selectedCanvasInstance.widgetId === SHAPE_WIDGET_ID
       ? selectedCanvasInstance.config?.fillEnabled === false || Number(selectedCanvasInstance.config?.fillOpacity ?? 100) === 0 ? "transparent" : "solid"
-      : !selectedCanvasInstance.config?.backgroundColor || selectedCanvasInstance.config.backgroundColor === "transparent" ? "transparent" : "solid"
+      : selectedCanvasInstance.config?.backgroundTransparent === true || !selectedCanvasInstance.config?.backgroundColor ? "transparent" : "solid"
     : config.background?.type === "solid" ? "solid" : "transparent";
 
   function updateSelectedBackgroundColor(color: string) {
@@ -646,7 +646,7 @@ export default function OverlayCanvas() {
     }
     const nextConfig = selectedCanvasInstance.widgetId === SHAPE_WIDGET_ID
       ? { ...(selectedCanvasInstance.config || {}), fillColor: color, color, fillOpacity: 100, fillEnabled: true, opacity: 100 }
-      : { ...(selectedCanvasInstance.config || {}), backgroundColor: color };
+      : { ...(selectedCanvasInstance.config || {}), backgroundColor: color, backgroundTransparent: false };
     updateInstance(selectedInstanceId, { config: nextConfig });
   }
 
@@ -660,7 +660,7 @@ export default function OverlayCanvas() {
       updateInstance(selectedInstanceId, { config: { ...(selectedCanvasInstance.config || {}), fillEnabled: mode === "solid", fillOpacity: mode === "solid" ? 100 : 0 } });
       return;
     }
-    updateInstance(selectedInstanceId, { config: { ...(selectedCanvasInstance.config || {}), backgroundColor: mode === "solid" ? selectedElementBackgroundColor : "transparent" } });
+    updateInstance(selectedInstanceId, { config: { ...(selectedCanvasInstance.config || {}), backgroundColor: selectedElementBackgroundColor, backgroundTransparent: mode === "transparent" } });
   }
 
   return (
@@ -918,7 +918,7 @@ export default function OverlayCanvas() {
                       widgetPointer.current = null;
                     }}
                   >
-                    <div className="h-full w-full overflow-hidden" style={instance.widgetId !== SHAPE_WIDGET_ID && widgetConfig["backgroundColor"] ? { backgroundColor: String(widgetConfig["backgroundColor"]) } : undefined}>
+                    <div className="h-full w-full overflow-hidden" style={instance.widgetId !== SHAPE_WIDGET_ID && widgetConfig["backgroundColor"] && widgetConfig["backgroundTransparent"] !== true ? { backgroundColor: String(widgetConfig["backgroundColor"]) } : undefined}>
                       <style>{'[data-overlay-instance="' + instanceId + '"] :is(p,span,h1,h2,h3,h4,h5,h6,label,li,a,strong,em,small) { font-family: "' + String(widgetConfig["fontFamily"] || "Inter").replace(/"/g, "") + '", sans-serif !important; font-size: ' + Math.max(1, Number(widgetConfig["fontSize"]) || 16) + 'px !important; color: ' + String(widgetConfig["color"] || widgetConfig["textColor"] || "#ffffff") + ' !important; }'}</style>
                       {instance.widgetId === SHAPE_WIDGET_ID ? (
                         <div className="h-full w-full" style={{ opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100 }}><OverlayShape shape={String(widgetConfig["shape"] || instance.elementKey || "rectangle")} color={String(widgetConfig["fillColor"] || widgetConfig["color"] || "#8b5cf6")} strokeColor={String(widgetConfig["strokeColor"] || "#ddd6fe")} strokeWidth={Math.max(0, Number(widgetConfig["strokeWidth"] ?? 2))} fillEnabled={widgetConfig["fillEnabled"] !== false}/></div>
