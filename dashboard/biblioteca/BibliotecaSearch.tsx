@@ -4,7 +4,7 @@ import MusicCarousel from "./MusicCarousel";
 import type { CatalogItem } from "./catalogSources";
 
 type Category = "songs" | "albums" | "artists" | "playlists";
-type View = "categories" | "history" | "library" | "personal";
+type View = "categories" | "history" | "personal";
 type PersonalLibrary = { songs: CatalogItem[]; albums: CatalogItem[]; artists: CatalogItem[]; playlists: CatalogItem[]; user_id?: string };
 type HistoryItem = { query: string; date: number };
 const CATEGORIES: { key: Category; label: string; icon: typeof Music2 }[] = [
@@ -245,7 +245,7 @@ export default function BibliotecaSearch() {
   return <section className="w-full min-w-0 px-4 py-6 sm:px-8">
     <header className="mb-5"><p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-300">Catálogo musical</p><h1 className="mt-2 text-3xl font-extrabold tracking-tight text-white">Biblioteca</h1><p className="mt-2 text-sm text-slate-400">Catálogo do YouTube e YouTube Music, com carrosséis e biblioteca pessoal.</p></header>
     <nav className="mb-6 flex gap-2 overflow-x-auto border-b border-white/10 pb-3" aria-label="Navegação da biblioteca">
-      {([{ key: "categories", label: "CATEGORIAS", icon: Music2 }, { key: "history", label: "HISTORICO", icon: History }, { key: "library", label: "BIBLIOTECA", icon: Library }, { key: "personal", label: "PESSOAL", icon: UserRound }] as const).map((entry) => {
+      {([{ key: "categories", label: "CATEGORIAS", icon: Music2 }, { key: "history", label: "HISTORICO", icon: History }, { key: "personal", label: "BIBLIOTECA PESSOAL", icon: Library }] as const).map((entry) => {
         const Icon = entry.icon;
         return <button key={entry.key} type="button" onClick={() => { setView(entry.key); if (entry.key === "categories") setSearched(""); setError(""); setNotice(""); }} aria-pressed={view === entry.key} className={`inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-2 text-xs font-bold tracking-wide transition ${view === entry.key ? "border-cyan-300 text-cyan-200" : "border-transparent text-slate-400 hover:text-white"}`}><Icon className="h-4 w-4" />{entry.label}</button>;
       })}
@@ -285,10 +285,8 @@ export default function BibliotecaSearch() {
       {!history.length ? <p className="text-sm text-slate-500">Nenhuma pesquisa no histórico.</p> : history.map((item) => <div key={item.query} className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0d1120] p-3"><History className="h-4 w-4 shrink-0 text-slate-500" /><button type="button" onClick={() => { setQuery(item.query); void runSearch(item.query); }} className="min-w-0 flex-1 truncate text-left text-sm text-slate-200 hover:text-cyan-200">{item.query}</button><button type="button" onClick={() => setHistory((current) => { const next = current.filter((h) => h.query !== item.query); try { localStorage.setItem("livenexus_music_search_history", JSON.stringify(next)); } catch {} return next; })} aria-label={`Remover histórico ${item.query}`} className="text-slate-500 hover:text-white"><X className="h-4 w-4" /></button></div>)}
     </section>}
 
-    {view === "library" && <div className="space-y-4"><h2 className="text-sm font-bold text-white">Biblioteca salva</h2>{librarySections()}</div>}
-
     {view === "personal" && <div className="space-y-6">
-      <section className="rounded-xl border border-white/10 bg-[#0d1120] p-4"><h2 className="text-sm font-bold text-white">Adicionar por link</h2><p className="mt-1 text-xs text-slate-400">Cole um link de música, álbum, artista ou playlist do YouTube ou YouTube Music.</p>
+      <section className="rounded-xl border border-white/10 bg-[#0d1120] p-4"><h2 className="text-sm font-bold text-white">Biblioteca pessoal</h2><p className="mt-1 text-xs text-slate-400">Cole um link de música, álbum, artista ou playlist do YouTube ou YouTube Music.</p>
         <form onSubmit={(event) => void handleAddLink(event)} className="mt-4 space-y-3">
           <label className="block"><span className="mb-1 block text-xs text-slate-400">Link</span><input value={link} onChange={(event) => setLink(event.target.value)} required type="url" placeholder="https://music.youtube.com/watch?v=..." className="h-11 w-full rounded-lg border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-cyan-300/50" /></label>
           <label className="block"><span className="mb-1 block text-xs text-slate-400">Nome (opcional)</span><input value={linkTitle} onChange={(event) => setLinkTitle(event.target.value)} placeholder="Nome para exibir na biblioteca" className="h-11 w-full rounded-lg border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-cyan-300/50" /></label>
