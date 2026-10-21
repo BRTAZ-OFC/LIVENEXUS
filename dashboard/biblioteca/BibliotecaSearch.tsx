@@ -79,7 +79,6 @@ export default function BibliotecaSearch() {
   const [results, setResults] = useState<CatalogItem[]>([]);
   const [continuations, setContinuations] = useState<Record<string, string>>({});
   const [loadingMore, setLoadingMore] = useState(false);
-  const [requestVersion, setRequestVersion] = useState(0);
   const requestVersionRef = useRef(0);
   const [home, setHome] = useState<Record<Category, CatalogItem[]>>({ songs: [], albums: [], artists: [], playlists: [] });
   const [library, setLibrary] = useState<PersonalLibrary>(EMPTY);
@@ -135,16 +134,54 @@ export default function BibliotecaSearch() {
 
   useEffect(() => {
     let active = true;
+    const loadHomeCategory = async (entry: typeof CATEGORIES[number]) => {
+      const collected: CatalogItem[] = [];
+      try {
+        const response = await fetch(`/api/ytmusic/bundle?q=${encodeURIComponent(SEEDS[entry.key])}&mode=initial`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok || !data.ok) return collected;
+        collected.push(...normalizeBundle(data).filter((item) => itemCategory(item) === entry.key));
+        const tokens: Record<string, string> = { ...(data.continuations || {}) };
+        const keys = entry.key === "songs" ? ["songs", "youtube"] : [entry.key];
+        while (active && collected.length < 400 && keys.some((key) => Boolean(tokens[key]))) {
+          const pages = await Promise.all(keys.filter((key) => Boolean(tokens[key])).map(async (tokenKey) => {
+            const endpoint = tokenKey === "youtube" ? "youtube" : "search";
+            const params = new URLSearchParams({ q: SEEDS[entry.key], continuation: tokens[tokenKey], step: "true" });
+            if (endpoint === "search") params.set("type", tokenKey);
+            const pageResponse = await fetch(`/api/ytmusic/${endpoint}?${params.toString()}`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
+            const pageData = await pageResponse.json();
+            if (!pageResponse.ok || !pageData.ok) return { tokenKey, items: [] as CatalogItem[], continuation: "" };
+            const items = (Array.isArray(pageData.items) ? pageData.items : []).map((item: any) => {
+              if (tokenKey === "youtube") return { ...item, type: item.type || "song", source: "YouTube" };
+              if (tokenKey === "playlists") {
+                const id = String(item.playlistId || "");
+                return { ...item, type: id.startsWith("RD") ? "mix" : id.startsWith("PL") ? "community_playlist" : "playlist", source: item.source || "YouTube Music" };
+              }
+              return { ...item, type: tokenKey === "songs" ? "song" : tokenKey.slice(0, -1), source: "YouTube Music" };
+            });
+            return { tokenKey, items, continuation: pageData.continuation || "" };
+          }));
+          const before = collected.length;
+          for (const page of pages) {
+            tokens[page.tokenKey] = page.continuation;
+            collected.push(...page.items.filter((item) => itemCategory(item) === entry.key));
+          }
+          const deduped = unique(collected);
+          collected.splice(0, collected.length, ...deduped.slice(0, 400));
+          if (collected.length === before && pages.every((page) => !page.continuation)) break;
+          if (pages.every((page) => !page.continuation)) break;
+        }
+      } catch { /* cada carrossel pode carregar independentemente */ }
+      return unique(collected).slice(0, 400);
+    };
     (async () => {
-      const next: Record<Category, CatalogItem[]> = { songs: [], albums: [], artists: [], playlists: [] };
-      await Promise.all(CATEGORIES.map(async (entry) => {
-        try {
-          const response = await fetch(`/api/ytmusic/bundle?q=${encodeURIComponent(SEEDS[entry.key])}`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
-          const data = await response.json();
-          if (response.ok && data.ok) next[entry.key] = normalizeBundle(data).filter((item) => itemCategory(item) === entry.key).slice(0, 18);
-        } catch { /* cada carrossel pode carregar independentemente */ }
-      }));
-      if (active) { setHome(next); setLoadingHome(false); }
+      const pairs = await Promise.all(CATEGORIES.map(async (entry) => [entry.key, await loadHomeCategory(entry)] as const));
+      if (active) {
+        const next: Record<Category, CatalogItem[]> = { songs: [], albums: [], artists: [], playlists: [] };
+        for (const [key, items] of pairs) next[key] = items;
+        setHome(next);
+        setLoadingHome(false);
+      }
     })();
     return () => { active = false; };
   }, []);
@@ -266,7 +303,6 @@ export default function BibliotecaSearch() {
     const clean = term.trim();
     if (!clean) { setError("Digite o nome de uma música, álbum, artista ou playlist."); return; }
     const version = ++requestVersionRef.current;
-    setRequestVersion(version);
     setSearched(clean); setView("categories"); setLoading(true); setLoadingMore(false); setError(""); setResults([]); setContinuations({}); pushHistory(clean);
     try {
       const response = await fetch(`/api/ytmusic/bundle?q=${encodeURIComponent(clean)}&mode=initial`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
@@ -434,7 +470,7 @@ export default function BibliotecaSearch() {
         {canLoadMore && <div className="flex justify-center pt-3"><button type="button" disabled={loadingMore || loading} onClick={() => void loadMore()} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10 disabled:opacity-50">{loadingMore ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}{loadingMore ? "Carregando..." : "Carregar mais resultados"}</button></div>}
       </section> : <>
         {loadingHome && <div className="flex items-center gap-2 text-sm text-slate-500"><LoaderCircle className="h-4 w-4 animate-spin" />Carregando carrosséis...</div>}
-        {CATEGORIES.map((entry) => <MusicCarousel key={entry.key} title={entry.label} items={home[entry.key]} isSaved={isSaved} onAdd={addItem} onOpen={openItem} />)}
+        {CATEGORIES.map((entry) => <MusicCarousel key={entry.key} title={entry.label} items={home[entry.key]} onOpen={openItem} />)}
         {!loadingHome && CATEGORIES.every((entry) => !home[entry.key].length) && <p className="text-sm text-slate-500">Não foi possível carregar os destaques agora.</p>}
       </>}
     </div>}
