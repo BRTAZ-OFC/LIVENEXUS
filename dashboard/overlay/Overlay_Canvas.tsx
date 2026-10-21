@@ -481,7 +481,7 @@ export default function OverlayCanvas() {
   );
 
   return (
-    <section className="relative flex w-full min-w-0 flex-col items-center gap-4 overflow-hidden px-2 pb-6 pt-4">
+    <section className="relative flex w-full min-w-0 flex-col items-center gap-4 px-2 pb-6 pt-4">
       <button type="button" onClick={() => void saveOverlay()} disabled={saving || loading} title="Salvar overlay" aria-label="Salvar overlay" className="fixed right-4 top-20 z-[100] inline-flex h-9 w-9 items-center justify-center rounded-lg bg-violet-600 text-white shadow-lg hover:bg-violet-500 disabled:opacity-50"><Save size={16} /></button>
       <button type="button" onClick={() => void deleteOverlay()} disabled={saving || !activeOverlayId} title="Excluir overlay" aria-label="Excluir overlay" className="fixed right-16 top-20 z-[100] inline-flex h-9 w-9 items-center justify-center rounded-lg border border-rose-400/30 bg-slate-950 text-rose-200 shadow-lg hover:bg-rose-500/10 disabled:opacity-40"><Trash2 size={16} /></button>
       {error && <p role="alert" className="w-full text-xs text-rose-200">{error}</p>}
@@ -695,11 +695,8 @@ export default function OverlayCanvas() {
                         } else {
                           instances[targetIndex] = {
                             ...item,
-                            width: Math.max(40, Math.min(size.width - drag.left, drag.width + dx)),
-                            height: Math.max(
-                              20,
-                              Math.min(size.height - drag.top, drag.height + dy),
-                            ),
+                            width: Math.max(1, drag.width + dx),
+                            height: Math.max(1, drag.height + dy),
                           };
                         }
                         return { ...current, instances };
