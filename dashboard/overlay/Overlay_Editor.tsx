@@ -31,6 +31,12 @@ type OverlayEditorProps = {
   onAddGuide: (orientation: "vertical" | "horizontal") => void;
   globalStyleConfig: { borderEnabled: boolean; borderWidth: number; texture: string; colorEffectEnabled: boolean; colorEffect: string };
   onUpdateGlobalStyleConfig: (patch: Partial<{ borderEnabled: boolean; borderWidth: number; texture: string; colorEffectEnabled: boolean; colorEffect: string }>) => void;
+  layers: Array<{ id: string; name: string; widgetId: string; visible: boolean; locked: boolean; selected: boolean; zIndex: number }>;
+  onSelectLayer: (id: string) => void;
+  onMoveLayer: (id: string, delta: number) => void;
+  onToggleLayerVisibility: (id: string) => void;
+  onToggleLayerLock: (id: string) => void;
+  onDeleteLayer: (id: string) => void;
 };
 
 const MENUS = ["INICIO", "TEXTO", "ANIMACAO", "IMAGEMS", "ALINHAMENTO", "FORMAS", "EMOJES", "CAMADAS"] as const;
@@ -168,6 +174,12 @@ export default function Overlay_Editor({
   onAddGuide,
   globalStyleConfig,
   onUpdateGlobalStyleConfig,
+  layers,
+  onSelectLayer,
+  onMoveLayer,
+  onToggleLayerVisibility,
+  onToggleLayerLock,
+  onDeleteLayer,
 }: OverlayEditorProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuName>("INICIO");
@@ -701,7 +713,40 @@ export default function Overlay_Editor({
                 </section>
               </div>
             )}
-            {!["INICIO", "TEXTO", "ANIMACAO", "ALINHAMENTO", "FORMAS"].includes(activeMenu) && (
+            {activeMenu === "CAMADAS" && (
+              <div className="flex h-full min-h-0 min-w-0 flex-col gap-2 overflow-hidden">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Camadas do canvas</p>
+                  <span className="text-[9px] text-slate-500">{layers.length} elemento(s)</span>
+                </div>
+                <div className="grid min-h-0 flex-1 grid-cols-3 gap-2 overflow-y-auto">
+                  {[0, 1, 2].map((column) => (
+                    <div key={column} className="flex min-w-0 flex-col gap-1 rounded border border-white/10 bg-slate-950/40 p-1">
+                      <p className="text-center text-[9px] font-semibold text-slate-500">Coluna {column + 1}</p>
+                      {layers.filter((_, index) => index % 3 === column).map((layer) => {
+                        const index = layers.findIndex((item) => item.id === layer.id);
+                        return (
+                          <div key={layer.id} className={"min-w-0 rounded border p-1 " + (layer.selected ? "border-violet-400 bg-violet-500/15" : "border-white/10 bg-slate-900/80")}>
+                            <button type="button" onClick={() => onSelectLayer(layer.id)} title={layer.name} className="block w-full truncate text-left text-[9px] font-medium text-slate-200">{index + 1}. {layer.name}</button>
+                            <div className="mt-1 grid grid-cols-4 gap-0.5">
+                              <button type="button" title="Mover para cima" aria-label={"Mover camada " + layer.name + " para cima"} disabled={index === 0} onClick={() => onMoveLayer(layer.id, -1)} className="rounded border border-white/10 text-[10px] text-slate-300 disabled:opacity-25">↑</button>
+                              <button type="button" title="Mover para baixo" aria-label={"Mover camada " + layer.name + " para baixo"} disabled={index === layers.length - 1} onClick={() => onMoveLayer(layer.id, 1)} className="rounded border border-white/10 text-[10px] text-slate-300 disabled:opacity-25">↓</button>
+                              <button type="button" title="Mover para a coluna anterior" aria-label={"Mover camada " + layer.name + " para a esquerda"} disabled={index === 0} onClick={() => onMoveLayer(layer.id, -3)} className="rounded border border-white/10 text-[10px] text-slate-300 disabled:opacity-25">←</button>
+                              <button type="button" title="Mover para a próxima coluna" aria-label={"Mover camada " + layer.name + " para a direita"} disabled={index >= layers.length - 3} onClick={() => onMoveLayer(layer.id, 3)} className="rounded border border-white/10 text-[10px] text-slate-300 disabled:opacity-25">→</button>
+                              <button type="button" title={layer.visible ? "Ocultar camada" : "Exibir camada"} aria-label={layer.visible ? "Ocultar " + layer.name : "Exibir " + layer.name} onClick={() => onToggleLayerVisibility(layer.id)} className={"rounded border border-white/10 text-[10px] " + (layer.visible ? "text-emerald-300" : "text-slate-500")}>{layer.visible ? "◉" : "○"}</button>
+                              <button type="button" title={layer.locked ? "Desbloquear camada" : "Bloquear camada"} aria-label={layer.locked ? "Desbloquear " + layer.name : "Bloquear " + layer.name} onClick={() => onToggleLayerLock(layer.id)} className={"rounded border border-white/10 text-[10px] " + (layer.locked ? "text-amber-300" : "text-slate-400")}>{layer.locked ? "🔒" : "🔓"}</button>
+                              <button type="button" title="Excluir camada" aria-label={"Excluir camada " + layer.name} onClick={() => onDeleteLayer(layer.id)} className="col-span-2 rounded border border-rose-400/20 text-[10px] text-rose-300">Excluir</button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[9px] leading-tight text-slate-500">Cada camada representa um elemento. As setas alteram a ordem e a coluna; o cadeado impede movimentação no canvas.</p>
+              </div>
+            )}
+            {!["INICIO", "TEXTO", "ANIMACAO", "ALINHAMENTO", "FORMAS", "CAMADAS"].includes(activeMenu) && (
               <div className="flex h-full items-center justify-center text-xs text-slate-500">
                 Este menu ficará vazio nesta etapa.
               </div>
