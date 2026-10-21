@@ -1,158 +1,76 @@
+// Widgets cujo renderer não implementa renderização de fragmentos independentes.
 export const NON_FRAGMENTABLE_WIDGET_IDS = [
-  "chat-live",
-  "chat-topspeakers",
-  "goals-combined",
-  "tts-status",
-  "tts-active-indicator",
-  "media-current-music", // Caso especial: Player Completo vs Somente Música
   "manual-pix-widget",
+  "react-hub-widget",
+  "multi-viewers-counter",
+  "twitch-chat-box",
+  "twitch-alerts",
+  "twitch-event-list",
+  "twitch-bits-goal",
+  "twitch-raid-goal",
+  "twitch-latest-sub",
+  "twitch-latest-cheer",
+  "twitch-latest-raid",
+  "twitch-top-cheer",
+  "twitch-sub-counter",
+  "twitch-bits-counter",
+  "twitch-chat-speed",
+  "twitch-hype-meter",
+  "twitch-chat-vibe",
+  "twitch-viewers-chart",
+  "twitch-chatter-leaderboard",
+  "twitch-poll",
+  "twitch-raffle",
+  "twitch-sub-train",
+  "twitch-word-cloud",
+  "twitch-emote-shower",
+  "twitch-uptime",
+  "twitch-commands-list",
+  "twitch-milestones",
+  "twitch-rules",
+  "twitch-schedule",
+  "twitch-schedule-ticker",
+  "twitch-moderator-feed",
 ];
 
+// Apenas fragmentos com suporte explícito no renderer/componentes reais.
+// Os valores dinâmicos são obtidos pela própria widget (dados da live, relógio, etc.).
 export const WIDGET_ELEMENTS_MAP = {
-  "manual-death-counter": [{ key: "count", label: "Número de Mortes" }],
+  "manual-death-counter": [{ key: "count", label: "Contagem de mortes" }],
   "manual-clock": [
-    { key: "time", label: "Horário" },
-    { key: "date", label: "Data" },
+    { key: "time", label: "Hora atual" },
+    { key: "date", label: "Data atual" },
   ],
-  "manual-timer": [{ key: "timer", label: "Tempo Restante" }],
+  "manual-timer": [{ key: "timer", label: "Temporizador" }],
   "manual-now-playing": [
-    { key: "title", label: "Nome da Faixa" },
+    { key: "title", label: "Nome da faixa" },
     { key: "artist", label: "Artista" },
-    { key: "cover", label: "Capa" },
-  ],
-  "manual-pix-widget": [{ key: "full_widget", label: "Widget Pix" }],
-  // CHAT FRAGMENTÁVEIS
-  "chat-highlight": [
-    { key: "author", label: "Nome / Usuário" },
-    { key: "text", label: "Conteúdo da Mensagem" },
-  ],
-  "chat-last": [
-    { key: "author", label: "Nome / Usuário" },
-    { key: "text", label: "Conteúdo da Mensagem" },
-  ],
-
-  // AUDIÊNCIA FRAGMENTÁVEIS
-  "audience-viewer-counter": [
-    { key: "twitch_counter", label: "Twitch (Ícone + Contador)" },
-    { key: "kick_counter", label: "Kick (Ícone + Contador)" },
-    { key: "youtube_counter", label: "YouTube (Ícone + Contador)" },
-  ],
-  "audience-viewer-goal": [
-    { key: "current", label: "Espectadores Atuais" },
-    { key: "target", label: "Meta de Espectadores" },
-    { key: "progress_bar", label: "Barra de Progresso" },
-    { key: "percentage", label: "Porcentagem (%)" },
-  ],
-  "audience-peak": [{ key: "peak_count", label: "Pico de Espectadores" }],
-  "audience-status": [{ key: "status_badge", label: "Status Online / Offline" }],
-
-  // EVENTOS FRAGMENTÁVEIS
-  "events-list": [{ key: "feed", label: "Feed de Eventos" }],
-  "events-last-follow": [{ key: "user", label: "Nome do Seguidor" }],
-  "events-last-sub": [
-    { key: "user", label: "Nome do Inscrito" },
-    { key: "tier", label: "Nível / Tier" },
-  ],
-  "events-last-resub": [
-    { key: "user", label: "Nome do Usuário" },
-    { key: "months", label: "Meses de Renovação" },
-  ],
-  "events-last-gift": [
-    { key: "user", label: "Doador de Gift" },
-    { key: "count", label: "Quantidade" },
-  ],
-  "events-last-bits": [
-    { key: "user", label: "Doador de Bits" },
-    { key: "amount", label: "Quantidade de Bits" },
-  ],
-  "events-last-raid": [
-    { key: "raider", label: "Nome do Raider" },
-    { key: "viewers", label: "Espectadores" },
-  ],
-  "events-last-announcement": [
-    { key: "author", label: "Autor" },
-    { key: "text", label: "Texto do Anúncio" },
-  ],
-
-  // METAS FRAGMENTÁVEIS
-  "goals-main": [
-    { key: "title", label: "Título da Meta" },
-    { key: "current", label: "Valor Atual" },
-    { key: "target", label: "Valor da Meta" },
-    { key: "progress_bar", label: "Barra de Progresso" },
-  ],
-  "goals-follows": [
-    { key: "current", label: "Seguidores Atuais" },
-    { key: "target", label: "Meta de Seguidores" },
-    { key: "progress_bar", label: "Barra de Progresso" },
-  ],
-  "goals-subs": [
-    { key: "current", label: "Subs Atuais" },
-    { key: "target", label: "Meta de Subs" },
-    { key: "progress_bar", label: "Barra de Progresso" },
-  ],
-  "goals-bits": [
-    { key: "current", label: "Bits Atuais" },
-    { key: "target", label: "Meta de Bits" },
-    { key: "progress_bar", label: "Barra de Progresso" },
-  ],
-
-  // INFORMAÇÕES DA LIVE FRAGMENTÁVEIS
-  "live-info-title": [{ key: "title", label: "Título da Live" }],
-  "live-info-category": [{ key: "category", label: "Categoria / Jogo" }],
-  "live-info-uptime": [{ key: "uptime", label: "Tempo de Live (Uptime)" }],
-  "live-info-channel": [{ key: "channel_name", label: "Nome do Canal" }],
-  "live-info-platform-status": [{ key: "status", label: "Status das Plataformas" }],
-
-  // TTS
-  "tts-queue": [{ key: "queue_count", label: "Mensagens na Fila" }],
-
-  // UTILITÁRIOS / VISUAIS
-  "utility-clock": [
-    { key: "time", label: "Hora Atual" },
-    { key: "date", label: "Data" },
-  ],
-  "utility-custom-text": [{ key: "text", label: "Texto Personalizado" }],
-  "utility-image": [{ key: "image", label: "Imagem" }],
-  "utility-stopwatch": [{ key: "timer", label: "Tempo do Cronômetro" }],
-  "utility-countdown": [{ key: "timer", label: "Tempo Regressivo" }],
-  "utility-progress-bar": [{ key: "progress_bar", label: "Barra de Progresso" }],
-
-  // TWITCH FRAGMENTÁVEIS
-  "react-hub-widget": [
-    { key: "chat_area", label: "Chat da Transmissão" },
-    { key: "queue_list", label: "Vídeos da Fila" },
-  ],
-  "react-hub": [
-    { key: "chat_area", label: "Chat da Transmissão" },
-    { key: "queue_list", label: "Vídeos da Fila" },
+    { key: "cover", label: "Capa da faixa" },
   ],
   "twitch-status-label": [
-    { key: "status_badge", label: "Status Ao Vivo/Offline" },
-    { key: "viewers_count", label: "Contador de Espectadores" },
-    { key: "stream_title", label: "Título da Transmissão (Marquee)" },
-    { key: "stream_game", label: "Categoria / Jogo" },
+    { key: "status_badge", label: "Status ao vivo/offline" },
+    { key: "viewers_count", label: "Contador de espectadores" },
+    { key: "stream_title", label: "Título real da transmissão" },
+    { key: "stream_game", label: "Categoria/jogo real" },
   ],
   "youtube-native-poll": [
-    { key: "poll_question", label: "Pergunta da Enquete" },
-    { key: "poll_options", label: "Opções da Enquete" },
-    { key: "poll_status", label: "Estado da Enquete" },
+    { key: "poll_question", label: "Pergunta da enquete" },
+    { key: "poll_options", label: "Opções reais da enquete" },
+    { key: "poll_status", label: "Estado real da enquete" },
   ],
   "twitch-sub-goal": [
-    { key: "goal_title", label: "Título da Meta" },
-    { key: "goal_progress_bar", label: "Barra de Progresso" },
-    { key: "goal_values", label: "Valores Atuais/Meta" },
+    { key: "goal_title", label: "Título da meta de inscritos" },
+    { key: "goal_progress_bar", label: "Barra real de progresso" },
   ],
 };
 
 export function isWidgetFragmentable(widgetId) {
-  if (!widgetId) return false;
-  if (NON_FRAGMENTABLE_WIDGET_IDS.includes(widgetId)) return false;
+  if (!widgetId || NON_FRAGMENTABLE_WIDGET_IDS.includes(widgetId)) return false;
   return Boolean(WIDGET_ELEMENTS_MAP[widgetId]);
 }
 
 export function getWidgetInternalElements(widgetId) {
-  if (!widgetId) return [];
+  if (!widgetId || !isWidgetFragmentable(widgetId)) return [];
   return WIDGET_ELEMENTS_MAP[widgetId] || [];
 }
 
@@ -163,7 +81,6 @@ export function getWidgetDefaultDimensions(widgetId, isFullWidget) {
 
   switch (widgetId) {
     case "react-hub-widget":
-    case "react-hub":
       return { width: 420, height: 640 };
     case "twitch-chat-box":
       return { width: 380, height: 560 };
@@ -194,11 +111,7 @@ export function getWidgetDefaultDimensions(widgetId, isFullWidget) {
       if (widgetId?.includes("event") || widgetId?.includes("list") || widgetId?.includes("feed"))
         return { width: 440, height: 460 };
       if (widgetId?.includes("goal")) return { width: 380, height: 120 };
-      if (
-        widgetId?.includes("status") ||
-        widgetId?.includes("label") ||
-        widgetId?.includes("counter")
-      )
+      if (widgetId?.includes("status") || widgetId?.includes("label") || widgetId?.includes("counter"))
         return { width: 300, height: 80 };
       return { width: 360, height: 240 };
     }
