@@ -22,12 +22,64 @@ const KEYFRAMES = {
     { opacity: 0, transform: "translateX(-0.35em)" },
     { opacity: 1, transform: "translateX(0)" },
   ],
+  "slide-in-cima": [
+    { opacity: 0, transform: "translate3d(0, 100%, 0)" },
+    { opacity: 1, transform: "translate3d(0, 0, 0)" },
+  ],
+  "slide-in-baixo": [
+    { opacity: 0, transform: "translate3d(0, -100%, 0)" },
+    { opacity: 1, transform: "translate3d(0, 0, 0)" },
+  ],
+  "slide-in-esquerda": [
+    { opacity: 0, transform: "translate3d(100%, 0, 0)" },
+    { opacity: 1, transform: "translate3d(0, 0, 0)" },
+  ],
+  "slide-in-direita": [
+    { opacity: 0, transform: "translate3d(-100%, 0, 0)" },
+    { opacity: 1, transform: "translate3d(0, 0, 0)" },
+  ],
+  reveal: [
+    { opacity: 0, clipPath: "inset(0 100% 0 0)" },
+    { opacity: 1, clipPath: "inset(0 0 0 0)" },
+  ],
+  "flip-in": [
+    { opacity: 0, transform: "perspective(500px) rotateX(90deg) scale(0.8)" },
+    { opacity: 1, transform: "perspective(500px) rotateX(-12deg) scale(1.02)", offset: 0.75 },
+    { opacity: 1, transform: "perspective(500px) rotateX(0deg) scale(1)" },
+  ],
+  "bounce-in": [
+    { opacity: 0, transform: "scale3d(0.3, 0.3, 0.3)" },
+    { opacity: 1, transform: "scale3d(1.1, 1.1, 1.1)", offset: 0.2 },
+    { opacity: 1, transform: "scale3d(0.9, 0.9, 0.9)", offset: 0.4 },
+    { opacity: 1, transform: "scale3d(1.03, 1.03, 1.03)", offset: 0.6 },
+    { opacity: 1, transform: "scale3d(0.97, 0.97, 0.97)", offset: 0.8 },
+    { opacity: 1, transform: "scale3d(1, 1, 1)" },
+  ],
+  "blur-in": [
+    { opacity: 0, filter: "blur(12px)", transform: "scale(1.04)" },
+    { opacity: 1, filter: "blur(0)", transform: "scale(1)" },
+  ],
+  "light-speed-in": [
+    { opacity: 0, transform: "translate3d(100%, 0, 0) skewX(-30deg)" },
+    { opacity: 1, transform: "skewX(20deg)", offset: 0.6 },
+    { opacity: 1, transform: "skewX(-5deg)", offset: 0.8 },
+    { opacity: 1, transform: "translate3d(0, 0, 0) skewX(0deg)" },
+  ],
 };
 
 const EASING = {
   cascata: "cubic-bezier(0.22, 0.75, 0.35, 1)",
   rolar: "ease-in-out",
   encarrilha: "steps(1, end)",
+  "slide-in-cima": "cubic-bezier(0.22, 1, 0.36, 1)",
+  "slide-in-baixo": "cubic-bezier(0.22, 1, 0.36, 1)",
+  "slide-in-esquerda": "cubic-bezier(0.22, 1, 0.36, 1)",
+  "slide-in-direita": "cubic-bezier(0.22, 1, 0.36, 1)",
+  reveal: "cubic-bezier(0.22, 1, 0.36, 1)",
+  "flip-in": "cubic-bezier(0.22, 0.61, 0.36, 1)",
+  "bounce-in": "cubic-bezier(0.215, 0.61, 0.355, 1)",
+  "blur-in": "ease-out",
+  "light-speed-in": "cubic-bezier(0.23, 1, 0.32, 1)",
 };
 
 export default function AnimacoesTexto({
@@ -46,7 +98,11 @@ export default function AnimacoesTexto({
   const [versao, setVersao] = useState(0);
   const [embaralhados, setEmbaralhados] = useState({});
 
-  const tipoValido = ["cascata", "casanique", "rolar", "encarrilha"].includes(tipo)
+  const tipoValido = [
+    "cascata", "casanique", "rolar", "encarrilha",
+    "slide-in-cima", "slide-in-baixo", "slide-in-esquerda", "slide-in-direita",
+    "reveal", "flip-in", "bounce-in", "blur-in", "light-speed-in",
+  ].includes(tipo)
     ? tipo
     : "cascata";
   const duracaoSegura = Math.max(50, Number(duracao) || 650);
