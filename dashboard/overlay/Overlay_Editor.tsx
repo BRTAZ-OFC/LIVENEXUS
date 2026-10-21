@@ -482,7 +482,7 @@ export default function Overlay_Editor({
                   </div>
                   {selectedWidget && ["manual-death-counter", "manual-clock", "manual-timer", "manual-now-playing"].includes(selectedWidget.id) ? (
                     <div className="grid min-h-0 grid-cols-3 content-start gap-2 overflow-y-auto pr-1">
-                      {(selectedWidget.id === "manual-now-playing"
+                      {((selectedWidget.id === "manual-now-playing"
                         ? [
                             { id: "01", label: "Padrão", layout: "default" },
                             { id: "02", label: "Quadrado", layout: "square" },
@@ -513,7 +513,7 @@ export default function Overlay_Editor({
                                 { id: "04", label: "Neon" },
                                 { id: "05", label: "Minimal" },
                               ]
-                      as Array<{ id: string; label: string; layout?: string }>).map((preset) => {
+                      ) as Array<{ id: string; label: string; layout?: string }>).map((preset) => {
                         const activePreset = String(editableConfig.structuralPreset ?? (selectedWidget.id === "manual-now-playing" ? "01" : "01")) === preset.id;
                         return (
                           <button
