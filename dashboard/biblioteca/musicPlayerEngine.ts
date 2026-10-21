@@ -151,10 +151,7 @@ export function previousMusicTrack() {
   if (state.history.length) {
     const previous = state.history.pop()!;
     const target = previous >= 0 && previous < state.queue.length ? previous : Math.max(0, state.index - 1);
-    const current = state.index;
-    state.index = target;
     playQueueIndex(target);
-    state.history = state.history.filter((index) => index !== current);
   } else if (state.index > 0) playQueueIndex(state.index - 1);
   else if (state.track) { post("seekTo", [0, true]); post("playVideo"); state.currentTime = 0; state.isPlaying = true; emit(); }
 }
