@@ -260,7 +260,14 @@ export default function OverlayCanvas() {
 
       if (event.key === "Delete" || event.key === "Backspace") {
         event.preventDefault();
-        deleteInstance(selectedInstanceId);
+        setConfig((current) => ({
+          ...current,
+          instances: (current.instances || []).filter(
+            (item, index) =>
+              (item.id || `${item.widgetId}-${index}`) !== selectedInstanceId,
+          ),
+        }));
+        setSelectedInstanceId(null);
         return;
       }
 
