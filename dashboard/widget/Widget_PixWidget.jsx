@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { useStreaming } from '../runtime';
+import { useStreaming } from './runtime';
 
 // Função utilitária para gerar payload Pix BR Code (EMV QRCPS) padrão Banco Central
 export function generatePixPayload(key = '', name = 'LIVENEXUS STREAMER', city = 'SAO PAULO', txid = '***', amount = '') {
