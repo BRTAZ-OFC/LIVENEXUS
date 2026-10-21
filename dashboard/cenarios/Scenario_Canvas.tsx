@@ -191,6 +191,62 @@ export default function ScenarioCanvas({
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    function handleCanvasKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      if (
+        !selectedId ||
+        !scenario ||
+        target?.closest("input,textarea,select,button,a,[contenteditable='true'],[role='textbox']")
+      ) {
+        return;
+      }
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+
+      if (event.key === "Delete" || event.key === "Backspace") {
+        event.preventDefault();
+        setScenario((current) =>
+          current
+            ? {
+                ...current,
+                instances: current.instances.filter(
+                  (item, index) =>
+                    String(item.id ?? String(item.widgetId) + "-" + index) !== selectedId,
+                ),
+              }
+            : current,
+        );
+        setSelectedId(null);
+        setNotice("");
+        return;
+      }
+
+      const step = event.shiftKey ? 10 : 1;
+      const selected = scenario.instances.find(
+        (item, index) =>
+          String(item.id ?? String(item.widgetId) + "-" + index) === selectedId,
+      );
+      if (!selected) return;
+
+      let dx = 0;
+      let dy = 0;
+      if (event.key === "ArrowLeft") dx = -step;
+      else if (event.key === "ArrowRight") dx = step;
+      else if (event.key === "ArrowUp") dy = -step;
+      else if (event.key === "ArrowDown") dy = step;
+      else return;
+
+      event.preventDefault();
+      updateInstance(selectedId, {
+        x: Math.max(0, Math.min(CANVAS_WIDTH - Math.max(1, Number(selected.width) || 320), (Number(selected.x) || 0) + dx)),
+        y: Math.max(0, Math.min(CANVAS_HEIGHT - Math.max(1, Number(selected.height) || 120), (Number(selected.y) || 0) + dy)),
+      });
+    }
+
+    window.addEventListener("keydown", handleCanvasKeyDown);
+    return () => window.removeEventListener("keydown", handleCanvasKeyDown);
+  }, [scenario, selectedId]);
+
   const canvasBackground = useMemo(
     () => backgroundStyle(scenario?.background ?? { type: "transparent" }),
     [scenario?.background],
@@ -516,6 +572,9 @@ export default function ScenarioCanvas({
           <span>Pré-visualização responsiva · proporção 16:9</span>
           <span>
             {CANVAS_WIDTH} × {CANVAS_HEIGHT} px
+          </span>
+          <span className="basis-full text-cyan-300/80">
+            Atalhos: Delete remove · setas movem 1 px · Shift + setas movem 10 px
           </span>
         </div>
         <div
