@@ -424,7 +424,7 @@ export default function Overlay_Editor({
                       {selectedWidget.id === "manual-clock" && (
                         <label className="flex flex-col gap-1 text-[10px] text-slate-300"><span>Fuso horário (IANA; vazio = local)</span><input type="text" value={String(editableConfig.timeZone ?? "")} disabled={!hasSelectedInstance} placeholder="America/Sao_Paulo" onChange={(event) => onUpdateSelectedConfig({ timeZone: event.target.value })} className="h-7 rounded border border-white/10 bg-slate-900 px-2 text-xs text-white disabled:opacity-50" /></label>
                       )}
-                      {editableEntries.length ? editableEntries.filter(([key]) => !(/^(fontFamily|fontSize|color|textColor|textColour|fontWeight|fontStyle|textDecoration|lineHeight|letterSpacing|textAlign)$/i.test(key) ||
+                      {editableEntries.length ? editableEntries.filter(([key]) => !(/^(fontFamily|fontSize|color|textColor|textColour|fontWeight|fontStyle|textDecoration|lineHeight|letterSpacing|textAlign|backgroundColor|backgroundTransparent|isTransparent|bgMode|effBgActiveType|effBgType)$/i.test(key) ||
                         selectedWidget.id === "manual-death-counter" && key === "deathCount" ||
                         ["twitch-rules", "twitch-schedule", "twitch-schedule-ticker"].includes(selectedWidget.id) && ["rules", "schedule", "news", "newsText", "text"].includes(key) ||
                         ["twitch-sub-goal", "twitch-bits-goal", "twitch-raid-goal"].includes(selectedWidget.id) && ["startValue", "targetValue"].includes(key) ||
