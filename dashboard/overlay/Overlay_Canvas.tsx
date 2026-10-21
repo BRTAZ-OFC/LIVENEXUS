@@ -763,7 +763,7 @@ export default function OverlayCanvas() {
 
   return (
     <section className="relative flex w-full min-w-0 flex-col items-center gap-4 px-2 pb-40 pt-4">
-      <div className="fixed right-4 top-20 z-[100] flex flex-col items-stretch gap-2">
+      <div className="fixed right-4 top-20 z-[100] flex flex-row items-center gap-2">
         {!editorOpen && (
           <button
             type="button"
