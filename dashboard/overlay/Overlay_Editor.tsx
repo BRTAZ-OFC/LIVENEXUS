@@ -498,7 +498,76 @@ export default function Overlay_Editor({
                 </div>
               </div>
             )}
-            {!["INICIO", "TEXTO"].includes(activeMenu) && (
+            {activeMenu === "ANIMACAO" && (
+              <div className="grid h-full min-h-[150px] grid-cols-3 gap-2">
+                <section aria-label="Animações" className="flex min-w-0 flex-col border-r border-white/10 pr-2">
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Animações</p>
+                  <div className="grid min-h-0 flex-1 grid-cols-5 grid-rows-5 content-start gap-1">
+                    {[
+                      { id: "cascata", label: "Cascata" },
+                      { id: "casanique", label: "Casanique" },
+                      { id: "rolar", label: "Rolar" },
+                      { id: "encarrilha", label: "Encarrilha" },
+                      ...Array.from({ length: 21 }, (_, index) => ({ id: `em-breve-${index + 5}`, label: "" })),
+                    ].map((animation) => {
+                      const active = String(selectedInstanceConfig?.animationType || "nenhuma") === animation.id;
+                      const disabled = !animation.label || !selectedInstanceWidgetId || !selectedInstanceConfig;
+                      return (
+                        <button
+                          key={animation.id}
+                          type="button"
+                          disabled={disabled}
+                          onClick={() => onUpdateSelectedConfig({ animationType: animation.id })}
+                          aria-pressed={active}
+                          title={animation.label || "Animação ainda não criada"}
+                          className={`flex min-h-7 min-w-0 items-center justify-center overflow-hidden rounded border px-1 py-1 text-[10px] leading-3 transition disabled:cursor-default disabled:opacity-20 ${active ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-800/80 text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/20"}`}
+                        >
+                          {animation.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </section>
+
+                <section aria-label="Efeitos" className="flex min-w-0 flex-col border-r border-white/10 px-1">
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Efeitos</p>
+                </section>
+
+                <section aria-label="Tempo e repetição da animação" className="flex min-w-0 flex-col gap-2 pl-1">
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Tempo da animação</p>
+                  <label className="flex flex-col gap-1 text-[10px] text-slate-300">
+                    Intervalo entre letras (ms)
+                    <input
+                      type="number" min="0" step="100"
+                      disabled={!selectedInstanceWidgetId || !selectedInstanceConfig}
+                      value={Number(selectedInstanceConfig?.animationDelayMs ?? 1000)}
+                      onChange={(event) => onUpdateSelectedConfig({ animationDelayMs: Math.max(0, Number(event.target.value) || 0) })}
+                      className="h-7 w-full rounded border border-white/10 bg-slate-950 px-2 text-xs text-white disabled:opacity-40"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1 text-[10px] text-slate-300">
+                    Duração de cada letra (ms)
+                    <input
+                      type="number" min="50" step="50"
+                      disabled={!selectedInstanceWidgetId || !selectedInstanceConfig}
+                      value={Number(selectedInstanceConfig?.animationDurationMs ?? 650)}
+                      onChange={(event) => onUpdateSelectedConfig({ animationDurationMs: Math.max(50, Number(event.target.value) || 650) })}
+                      className="h-7 w-full rounded border border-white/10 bg-slate-950 px-2 text-xs text-white disabled:opacity-40"
+                    />
+                  </label>
+                  <label className="flex items-center gap-2 text-[10px] text-slate-300">
+                    <input type="checkbox" disabled={!selectedInstanceWidgetId || !selectedInstanceConfig} checked={Boolean(selectedInstanceConfig?.animationInfinite)} onChange={(event) => onUpdateSelectedConfig({ animationInfinite: event.target.checked })} />
+                    Repetir infinitamente
+                  </label>
+                  <label className="flex items-center gap-2 text-[10px] text-slate-300">
+                    <input type="checkbox" disabled={!selectedInstanceWidgetId || !selectedInstanceConfig} checked={Boolean(selectedInstanceConfig?.animationAlternate)} onChange={(event) => onUpdateSelectedConfig({ animationAlternate: event.target.checked })} />
+                    Vai e volta (ex.: sobe e desce)
+                  </label>
+                  {!selectedInstanceWidgetId && <p className="text-[10px] text-slate-500">Selecione um elemento no canvas.</p>}
+                </section>
+              </div>
+            )}
+            {!["INICIO", "TEXTO", "ANIMACAO"].includes(activeMenu) && (
               <div className="flex h-full items-center justify-center text-xs text-slate-500">
                 Este menu ficará vazio nesta etapa.
               </div>
