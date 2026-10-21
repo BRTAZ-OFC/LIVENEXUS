@@ -411,12 +411,19 @@ export default function OverlayCanvas() {
       visible: true,
       config: { ...(definition.defaultConfig || {}) },
     };
+    // Cada submenu selecionado representa uma overlay independente neste editor provisório.
+    // Não acrescentar a nova widget à overlay que estava aberta.
+    setActiveOverlayId(null);
     setConfig((current) => ({
       ...current,
-      name: current.instances?.length ? current.name : definition.name,
-      instances: [...(current.instances || []), nextInstance],
+      id: undefined,
+      name: definition.name,
+      instances: [nextInstance],
+      background: current.background || EMPTY_BACKGROUND,
     }));
     setSelectedInstanceId(nextInstance.id || null);
+    setError("");
+    setNotice("");
   }
 
   function addWidgetComponent(definition: WidgetDefinition, elementKey: string, label: string) {
@@ -438,11 +445,18 @@ export default function OverlayCanvas() {
       visible: true,
       config: { ...(definition.defaultConfig || {}) },
     };
+    // Elementos escolhidos por submenu também recebem canvas/overlay próprios.
+    setActiveOverlayId(null);
     setConfig((current) => ({
       ...current,
-      instances: [...(current.instances || []), nextInstance],
+      id: undefined,
+      name: nextInstance.name || definition.name,
+      instances: [nextInstance],
+      background: current.background || EMPTY_BACKGROUND,
     }));
     setSelectedInstanceId(nextInstance.id || null);
+    setError("");
+    setNotice("");
   }
 
   function updateInstance(instanceId: string, patch: Partial<CanvasInstance>) {
