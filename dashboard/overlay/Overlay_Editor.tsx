@@ -127,9 +127,9 @@ export default function Overlay_Editor({
             )}
 
             {activeMenu === "TEXTO" && (
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-end gap-2">
-                  <label className="flex min-w-[180px] flex-1 flex-col gap-1 text-[11px] text-slate-400">
+              <div className="flex min-w-0 flex-col gap-1.5">
+                <div className="flex min-w-0 items-end gap-2">
+                  <label className="flex min-w-[160px] flex-1 flex-col gap-1 text-[10px] text-slate-400">
                     Texto
                     <input
                       value={textValue}
@@ -138,7 +138,7 @@ export default function Overlay_Editor({
                       className="h-8 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
                     />
                   </label>
-                  <label className="flex w-24 flex-col gap-1 text-[11px] text-slate-400">
+                  <label className="flex w-[72px] shrink-0 flex-col gap-1 text-[10px] text-slate-400">
                     Tamanho
                     <input
                       type="number"
@@ -149,7 +149,7 @@ export default function Overlay_Editor({
                       className="h-8 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
                     />
                   </label>
-                  <label className="flex w-20 flex-col gap-1 text-[11px] text-slate-400">
+                  <label className="flex w-[58px] shrink-0 flex-col gap-1 text-[10px] text-slate-400">
                     Cor
                     <input
                       type="color"
@@ -168,9 +168,9 @@ export default function Overlay_Editor({
                   </button>
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <p className="text-[11px] text-slate-400">Categorias de fontes</p>
-                  <div className="flex flex-wrap gap-2">
+                <div className="flex min-w-0 flex-col gap-1">
+                  <p className="text-[10px] leading-4 text-slate-400">Categorias de fontes</p>
+                  <HorizontalMenu ariaLabel="Categorias de fontes" trackClassName="overflow-hidden">
                     {(Object.keys(FONT_CATEGORIES) as Array<keyof typeof FONT_CATEGORIES>).map((category) => (
                       <button
                         key={category}
@@ -182,27 +182,29 @@ export default function Overlay_Editor({
                         {category}
                       </button>
                     ))}
-                  </div>
+                  </HorizontalMenu>
                   {selectedFontCategory && (
-                    <div className="flex flex-wrap gap-2 border-t border-white/10 pt-2">
-                      {FONT_CATEGORIES[selectedFontCategory].map((font) => (
-                        <button
-                          key={font}
-                          type="button"
-                          onClick={() => chooseFont(font)}
-                          aria-pressed={selectedFont === font}
-                          title={font}
-                          style={{ fontFamily: `"${font}", sans-serif` }}
-                          className={selectedFont === font ? activeButtonClass : buttonClass}
-                        >
-                          <span className="mr-1 text-[10px] text-slate-400">{font}</span>
-                          <span style={{ fontFamily: `"${font}", sans-serif` }}>Aa Bb 123</span>
-                        </button>
-                      ))}
+                    <div className="min-w-0 border-t border-white/10 pt-1">
+                      <HorizontalMenu ariaLabel="Famílias de fontes" trackClassName="overflow-hidden">
+                        {FONT_CATEGORIES[selectedFontCategory].map((font) => (
+                          <button
+                            key={font}
+                            type="button"
+                            onClick={() => chooseFont(font)}
+                            aria-pressed={selectedFont === font}
+                            title={font}
+                            style={{ fontFamily: `"${font}", sans-serif` }}
+                            className={selectedFont === font ? activeButtonClass : buttonClass}
+                          >
+                            <span className="mr-1 text-[10px] text-slate-400">{font}</span>
+                            <span style={{ fontFamily: `"${font}", sans-serif` }}>Aa Bb 123</span>
+                          </button>
+                        ))}
+                      </HorizontalMenu>
                     </div>
                   )}
                 </div>
-                <p className="text-[10px] text-slate-500">O texto adicionado ao canvas pode ser editado com duplo clique dentro da própria caixa.</p>
+                <p className="text-[10px] leading-3 text-slate-500">Duplo clique no texto do canvas para editar.</p>
               </div>
             )}
 
