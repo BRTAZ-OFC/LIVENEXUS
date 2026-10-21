@@ -51,15 +51,15 @@ function getScenarioConfig(row: ScenarioRecord): ScenarioConfig {
       ? row.config
       : isObject(row.data) && Object.keys(row.data).length
         ? row.data
-        : {};
+        : row as unknown as JsonObject;
   const visualizerSize: JsonObject = isObject(source["visualizerSize"]) ? source["visualizerSize"] : {};
   const background: JsonObject = isObject(source["background"]) ? source["background"] : {};
 
   return {
     name: String(source["name"] ?? row.name ?? "Cenário"),
     visualizerSize: {
-      width: Math.max(1, Number(visualizerSize["width"]) || 800),
-      height: Math.max(1, Number(visualizerSize["height"]) || 480),
+      width: 1920,
+      height: 1080,
     },
     instances: Array.isArray(source["instances"]) ? source["instances"] as ScenarioInstance[] : [],
     background: {
@@ -163,17 +163,17 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
       setLoading(true);
       setError("");
       try {
-        const response = await fetch("/api/overlay/canvas", {
+        const response = await fetch("/api/cenarios", {
           method: "GET",
           credentials: "include",
           headers: { Accept: "application/json" },
           cache: "no-store",
         });
-        const payload = await response.json() as { ok?: boolean; overlays?: ScenarioRecord[]; message?: string };
-        if (!response.ok || !payload.ok || !Array.isArray(payload.overlays)) {
-          throw new Error(payload.message || "Não foi possível carregar os cenários.");
+        const payload = await response.json() as { ok?: boolean; items?: ScenarioRecord[]; error?: string };
+        if (!response.ok || !payload.ok || !Array.isArray(payload.items)) {
+          throw new Error(payload.error || "Não foi possível carregar os cenários.");
         }
-        if (!cancelled) setScenarios(payload.overlays);
+        if (!cancelled) setScenarios(payload.items);
       } catch (cause) {
         if (!cancelled) setError(cause instanceof Error ? cause.message : "Erro ao carregar os cenários.");
       } finally {
@@ -200,29 +200,29 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
     setError("");
     try {
       const id = `scenario-${Date.now()}`;
-      const response = await fetch("/api/overlay/canvas", {
-        method: "PUT",
+      const response = await fetch("/api/cenarios", {
+        method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
-          createNew: true,
-          overlay: {
+          record: {
             id,
             name,
-            visualizerSize: { width: 800, height: 480 },
+            visualizerSize: { width: 1920, height: 1080 },
             instances: [],
             background: { type: "transparent", opacity: 100 },
           },
         }),
       });
-      const payload = await response.json() as { ok?: boolean; overlay?: ScenarioRecord; message?: string };
-      if (!response.ok || !payload.ok || !payload.overlay) {
-        throw new Error(payload.message || "Não foi possível criar o cenário.");
+      const payload = await response.json() as { ok?: boolean; item?: ScenarioRecord; error?: string };
+      if (!response.ok || !payload.ok || !payload.item) {
+        throw new Error(payload.error || "Não foi possível criar o cenário.");
       }
 
-      setScenarios((current) => [...current, payload.overlay!]);
+      setScenarios((current) => [...current, payload.item!]);
       setShowCreateDialog(false);
       setScenarioName("");
+      onOpenScenario(id);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Não foi possível criar o cenário.");
     } finally {
