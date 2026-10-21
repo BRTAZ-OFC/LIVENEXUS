@@ -1,21 +1,19 @@
 import { useRef } from "react";
-import { Check, ChevronLeft, ChevronRight, Music2, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Music2 } from "lucide-react";
 import type { CatalogItem } from "./catalogSources";
 
 type Props = {
   title: string;
   items: CatalogItem[];
-  isSaved: (item: CatalogItem) => boolean;
-  onAdd: (item: CatalogItem) => void;
   onOpen: (item: CatalogItem) => void;
 };
 const keyOf = (item: CatalogItem) => item.videoId || item.playlistId || item.browseId || item.id || item.title || "";
 
-export default function MusicCarousel({ title, items, isSaved, onAdd, onOpen }: Props) {
+export default function MusicCarousel({ title, items, onOpen }: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
   const count = items.length;
-  const width = 144;
-  const gap = 12;
+  const width = 104;
+  const gap = 10;
   const step = width + gap;
   if (!count) return null;
   const shift = (direction: number) => trackRef.current?.scrollBy({ left: direction * step, behavior: "smooth" });
@@ -30,9 +28,8 @@ export default function MusicCarousel({ title, items, isSaved, onAdd, onOpen }: 
     </header>
     <div ref={trackRef} className="overflow-x-auto" style={{ scrollbarWidth: "none" }}><div className="flex w-max">
       {items.map((item, offset) => {
-        const saved = isSaved(item);
         return <article key={`${keyOf(item)}-${offset}`} className="group min-w-0 shrink-0" style={{ width, marginRight: gap }}>
-          <button type="button" onClick={() => onOpen(item)} aria-label={`Abrir detalhes: ${item.title || item.name || title}`} className="mb-1.5 block w-full overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]" style={{ height: width }}>
+          <button type="button" onClick={() => onOpen(item)} aria-label={`Abrir detalhes: ${item.title || item.name || title}`} className="mx-auto mb-1.5 block overflow-hidden rounded-lg border border-white/10 bg-white/[0.04]" style={{ width: 72, height: 72 }}>
             {item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-slate-500"><Music2 className="h-7 w-7" /></div>}
           </button>
           <div className="flex items-start gap-1">
@@ -40,7 +37,6 @@ export default function MusicCarousel({ title, items, isSaved, onAdd, onOpen }: 
               <p className="truncate text-xs font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p>
               <p className="truncate text-[11px] text-slate-400">{item.artist || item.author || item.source || title}</p>
             </button>
-            <button type="button" disabled={saved} onClick={() => onAdd(item)} title={saved ? "Já está na biblioteca" : "Adicionar à biblioteca"} aria-label={saved ? "Já está na biblioteca" : "Adicionar à biblioteca"} className={`shrink-0 rounded-md p-1 transition-colors ${saved ? "text-cyan-200/70" : "text-slate-300 hover:bg-white/10 hover:text-white"} disabled:cursor-default`}>{saved ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}</button>
           </div>
         </article>;
       })}
