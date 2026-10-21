@@ -25,27 +25,33 @@ export function useStreaming() {
   }, [snapshot]);
 
   const liveActivity = useMemo(
-    () => ({
-      items: snapshot.messages.map((message) => ({
+    () => {
+      const items = snapshot.messages.map((message) => ({
         ...message,
-        eventMeta: null,
+        eventMeta: message.eventMeta || null,
         eventType: message.eventType || null,
         text: message.text,
         author: message.author,
         timestamp: message.timestamp,
-      })),
-    }),
+      }));
+      return {
+        items,
+        lastMessage: items.find((item) => !item.eventType) || null,
+        lastEvent: items.find((item) => !!item.eventType) || null,
+      };
+    },
     [snapshot.messages],
   );
 
   const streamMeta = useMemo(() => {
-    const result: Record<string, { title: string; channelName: string; startedAt: null }> = {};
+    const result: Record<string, { title: string; channelName: string; startedAt: unknown; game?: unknown; streamId?: unknown; streamUrl?: unknown }> = {};
     for (const platform of PLATFORMS) {
       const source = snapshot.statuses[platform];
       result[platform] = {
-        title: source.meta || "",
-        channelName: snapshot.channels[platform] || "",
-        startedAt: null,
+        ...(source.streamMeta || {}),
+        title: String(source.streamMeta?.title || source.meta || ""),
+        channelName: String(source.streamMeta?.channelName || snapshot.channels[platform] || ""),
+        startedAt: source.streamMeta?.startedAt || null,
       };
     }
     return result;
