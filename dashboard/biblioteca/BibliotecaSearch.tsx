@@ -77,6 +77,10 @@ export default function BibliotecaSearch() {
   const [searched, setSearched] = useState("");
   const [category, setCategory] = useState<Category>("songs");
   const [results, setResults] = useState<CatalogItem[]>([]);
+  const [continuations, setContinuations] = useState<Record<string, string>>({});
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [requestVersion, setRequestVersion] = useState(0);
+  const requestVersionRef = useRef(0);
   const [home, setHome] = useState<Record<Category, CatalogItem[]>>({ songs: [], albums: [], artists: [], playlists: [] });
   const [library, setLibrary] = useState<PersonalLibrary>(EMPTY);
   const [libraryReady, setLibraryReady] = useState(false);
@@ -261,15 +265,62 @@ export default function BibliotecaSearch() {
   async function runSearch(term = query) {
     const clean = term.trim();
     if (!clean) { setError("Digite o nome de uma música, álbum, artista ou playlist."); return; }
-    setSearched(clean); setView("categories"); setLoading(true); setError(""); pushHistory(clean);
+    const version = ++requestVersionRef.current;
+    setRequestVersion(version);
+    setSearched(clean); setView("categories"); setLoading(true); setLoadingMore(false); setError(""); setResults([]); setContinuations({}); pushHistory(clean);
     try {
-      const response = await fetch(`/api/ytmusic/bundle?q=${encodeURIComponent(clean)}`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
+      const response = await fetch(`/api/ytmusic/bundle?q=${encodeURIComponent(clean)}&mode=initial`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
       const data = await response.json();
+      if (version !== requestVersionRef.current) return;
       if (!response.ok || !data.ok) throw new Error(data.error || "A busca do catálogo falhou.");
       setResults(normalizeBundle(data));
-    } catch (err) { setError(err instanceof Error ? err.message : "Falha ao pesquisar."); setResults([]); }
-    finally { setLoading(false); }
+      setContinuations(data.continuations && typeof data.continuations === "object" ? data.continuations : {});
+    } catch (err) { if (version === requestVersionRef.current) { setError(err instanceof Error ? err.message : "Falha ao pesquisar."); setResults([]); } }
+    finally { if (version === requestVersionRef.current) setLoading(false); }
   }
+
+  async function loadMore() {
+    const tokenKeys = category === "songs"
+      ? ["songs", "youtube"].filter((key) => Boolean(continuations[key]))
+      : [category].filter((key) => Boolean(continuations[key]));
+    if (!tokenKeys.length || loadingMore || !searched) return;
+    const version = requestVersionRef.current;
+    setLoadingMore(true);
+    setError("");
+    try {
+      const pages = await Promise.all(tokenKeys.map(async (tokenKey) => {
+        const endpoint = tokenKey === "youtube" ? "youtube" : "search";
+        const params = new URLSearchParams({ q: searched, continuation: continuations[tokenKey], step: "true" });
+        if (endpoint === "search") params.set("type", tokenKey);
+        const response = await fetch(`/api/ytmusic/${endpoint}?${params.toString()}`, { headers: { Accept: "application/json" }, credentials: "same-origin", cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data.error || "Não foi possível carregar mais resultados.");
+        const incoming = (Array.isArray(data.items) ? data.items : []).map((item: any) => {
+          if (tokenKey === "playlists") {
+            const id = String(item.playlistId || "");
+            return { ...item, type: id.startsWith("RD") ? "mix" : id.startsWith("PL") ? "community_playlist" : "playlist", source: item.source || "YouTube Music" };
+          }
+          if (tokenKey === "youtube") return { ...item, type: item.type || "song", source: "YouTube" };
+          return { ...item, type: tokenKey === "songs" ? "song" : tokenKey.slice(0, -1), source: "YouTube Music" };
+        });
+        return { tokenKey, items: incoming, continuation: data.continuation || "" };
+      }));
+      if (version !== requestVersionRef.current) return;
+      setResults((current) => unique([...current, ...pages.flatMap((page) => page.items)]));
+      setContinuations((current) => {
+        const next = { ...current };
+        for (const page of pages) next[page.tokenKey] = page.continuation;
+        return next;
+      });
+    } catch (err) {
+      if (version === requestVersionRef.current) setError(err instanceof Error ? err.message : "Falha ao carregar mais resultados.");
+    } finally {
+      if (version === requestVersionRef.current) setLoadingMore(false);
+    }
+  }
+  const canLoadMore = category === "songs"
+    ? Boolean(continuations.songs || continuations.youtube)
+    : Boolean(continuations[category]);
   const visibleResults = useMemo(() => results.filter((item) => itemCategory(item) === category), [results, category]);
   const removeItem = (item: CatalogItem) => void mutateLibrary((current) => {
     const kind = itemCategory(item); const id = itemId(item);
@@ -321,7 +372,7 @@ export default function BibliotecaSearch() {
         <button type="button" disabled={libraryBusy || isSaved(detailItem)} onClick={() => addItem(detailItem)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-cyan-200 disabled:opacity-50"><Plus className="h-3.5 w-3.5" />{isSaved(detailItem) ? "Na biblioteca" : "Adicionar à biblioteca"}</button>
       </div>
       <div className="flex flex-col gap-4 sm:flex-row">
-        {detailItem.thumbnail ? <img src={detailItem.thumbnail} alt="" className={`h-36 w-36 shrink-0 rounded-xl object-cover ${itemCategory(detailItem) === "artists" ? "rounded-full" : ""}`} /> : <div className="flex h-36 w-36 shrink-0 items-center justify-center rounded-xl bg-white/5"><Music2 className="h-10 w-10 text-cyan-200" /></div>}
+        {detailItem.thumbnail ? <img src={detailItem.thumbnail} alt="" className={`h-20 w-20 shrink-0 rounded-lg object-cover ${itemCategory(detailItem) === "artists" ? "rounded-full" : ""}`} /> : <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-white/5"><Music2 className="h-10 w-10 text-cyan-200" /></div>}
         <div className="min-w-0 flex-1 self-center">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">{CATEGORIES.find((entry) => entry.key === itemCategory(detailItem))?.label}</p>
           <h2 className="mt-1 break-words text-xl font-bold text-white">{detailData?.title || detailData?.name || detailItem.title || detailItem.name || "Detalhes"}</h2>
@@ -368,13 +419,19 @@ export default function BibliotecaSearch() {
         <div className="flex items-center justify-between"><h2 className="text-sm font-bold text-white">Resultados: {searched}</h2><button type="button" onClick={() => { setSearched(""); setResults([]); }} className="text-xs text-slate-400 hover:text-white">Limpar busca</button></div>
         {loading && <p className="text-xs text-slate-500">Buscando no YouTube e YouTube Music...</p>}
         {!loading && !visibleResults.length && <p className="text-sm text-slate-500">Nenhum resultado nesta categoria.</p>}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{visibleResults.map((item) => {
-          const saved = isSaved(item); const Icon = CATEGORIES.find((entry) => entry.key === itemCategory(item))?.icon || Music2;
-          return <article key={itemId(item)} className="min-w-0 rounded-xl border border-white/10 bg-[#0d1120] p-3">
-            <button type="button" onClick={() => void openItem(item)} className="block w-full text-left">{item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className={`mb-2 aspect-square w-full rounded-lg object-cover ${itemCategory(item) === "artists" ? "rounded-full" : ""}`} /> : <div className="mb-2 flex aspect-square items-center justify-center rounded-lg bg-white/5 text-slate-500"><Icon className="h-7 w-7" /></div>}<p className="truncate text-xs font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p></button><p className="mt-1 truncate text-[11px] text-slate-400">{item.artist || item.author || item.source}</p>
-            <button type="button" disabled={libraryBusy || saved} onClick={() => addItem(item)} className={`mt-2 inline-flex w-full items-center justify-center gap-1 rounded-lg border px-2 py-1.5 text-[11px] font-semibold disabled:opacity-50 ${saved ? "border-cyan-300/30 text-cyan-200" : "border-white/10 text-slate-300 hover:bg-white/10"}`}>{saved ? <Library className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}{saved ? "Na biblioteca" : "Adicionar à biblioteca"}</button>
+        <div className="space-y-2">{visibleResults.map((item) => {
+          const Icon = CATEGORIES.find((entry) => entry.key === itemCategory(item))?.icon || Music2;
+          return <article key={itemId(item)} className="flex min-w-0 items-center gap-3 rounded-lg border border-white/10 bg-[#0d1120] px-3 py-2">
+            <button type="button" onClick={() => void openItem(item)} aria-label={`Abrir detalhes: ${item.title || item.name || "item"}`} className="h-14 w-14 shrink-0 overflow-hidden rounded-md border border-white/10 bg-white/5">
+              {item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className={`h-full w-full object-cover ${itemCategory(item) === "artists" ? "rounded-full" : ""}`} /> : <span className="flex h-full w-full items-center justify-center text-slate-500"><Icon className="h-5 w-5" /></span>}
+            </button>
+            <button type="button" onClick={() => void openItem(item)} className="min-w-0 flex-1 text-left">
+              <p className="truncate text-sm font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p>
+              <p className="truncate text-xs text-slate-400">{item.artist || item.author || item.source || ""}</p>
+            </button>
           </article>;
         })}</div>
+        {canLoadMore && <div className="flex justify-center pt-3"><button type="button" disabled={loadingMore || loading} onClick={() => void loadMore()} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10 disabled:opacity-50">{loadingMore ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}{loadingMore ? "Carregando..." : "Carregar mais resultados"}</button></div>}
       </section> : <>
         {loadingHome && <div className="flex items-center gap-2 text-sm text-slate-500"><LoaderCircle className="h-4 w-4 animate-spin" />Carregando carrosséis...</div>}
         {CATEGORIES.map((entry) => <MusicCarousel key={entry.key} title={entry.label} items={home[entry.key]} isSaved={isSaved} onAdd={addItem} onOpen={openItem} />)}
