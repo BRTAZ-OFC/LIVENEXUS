@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
-import { AlertCircle, ArrowLeft, Disc3, History, Library, Link2, ListMusic, LoaderCircle, Music2, Pause, Play, Plus, Search, Trash2, UserRound, X } from "lucide-react";
+import { AlertCircle, ArrowLeft, Disc3, History, Library, Link2, ListMusic, LoaderCircle, Music2, Play, Plus, Search, Trash2, UserRound, X } from "lucide-react";
 import MusicCarousel from "./MusicCarousel";
 import type { CatalogItem } from "./catalogSources";
 import { playTrack, playTracks, type MusicTrack } from "./musicPlayerEngine";
@@ -278,8 +278,7 @@ export default function BibliotecaSearch() {
         <header className="flex items-center gap-2 text-white"><Icon className="h-4 w-4 text-cyan-300" /><h2 className="text-sm font-bold">{entry.label}</h2><span className="text-xs text-slate-500">{items.length}</span></header>
         {items.length ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {items.map((item) => <article key={itemId(item)} className="min-w-0 rounded-xl border border-white/10 bg-[#0d1120] p-3">
-            {item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className={`mb-2 aspect-square w-full rounded-lg object-cover ${entry.key === "artists" ? "rounded-full" : ""}`} /> : <div className="mb-2 flex aspect-square items-center justify-center rounded-lg bg-white/5 text-slate-500"><Icon className="h-7 w-7" /></div>}
-            <p className="truncate text-xs font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p>
+            <button type="button" onClick={() => void openItem(item)} className="block w-full text-left">{item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className={`mb-2 aspect-square w-full rounded-lg object-cover ${entry.key === "artists" ? "rounded-full" : ""}`} /> : <div className="mb-2 flex aspect-square items-center justify-center rounded-lg bg-white/5 text-slate-500"><Icon className="h-7 w-7" /></div>}<p className="truncate text-xs font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p></button>
             <p className="mt-1 truncate text-[11px] text-slate-400">{item.artist || item.author || item.source || itemUrl(item)}</p>
             {itemUrl(item) && <a className="mt-2 block truncate text-[11px] text-cyan-300 hover:underline" href={itemUrl(item)} target="_blank" rel="noreferrer">Abrir link</a>}
             <button type="button" disabled={libraryBusy} onClick={() => removeItem(item)} className="mt-2 inline-flex items-center gap-1 rounded-lg border border-rose-400/20 px-2 py-1.5 text-[11px] text-rose-200 hover:bg-rose-400/10 disabled:opacity-50"><Trash2 className="h-3 w-3" />Remover</button>
@@ -357,8 +356,7 @@ export default function BibliotecaSearch() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{visibleResults.map((item) => {
           const saved = isSaved(item); const Icon = CATEGORIES.find((entry) => entry.key === itemCategory(item))?.icon || Music2;
           return <article key={itemId(item)} className="min-w-0 rounded-xl border border-white/10 bg-[#0d1120] p-3">
-            {item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className={`mb-2 aspect-square w-full rounded-lg object-cover ${itemCategory(item) === "artists" ? "rounded-full" : ""}`} /> : <div className="mb-2 flex aspect-square items-center justify-center rounded-lg bg-white/5 text-slate-500"><Icon className="h-7 w-7" /></div>}
-            <p className="truncate text-xs font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p><p className="mt-1 truncate text-[11px] text-slate-400">{item.artist || item.author || item.source}</p>
+            <button type="button" onClick={() => void openItem(item)} className="block w-full text-left">{item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className={`mb-2 aspect-square w-full rounded-lg object-cover ${itemCategory(item) === "artists" ? "rounded-full" : ""}`} /> : <div className="mb-2 flex aspect-square items-center justify-center rounded-lg bg-white/5 text-slate-500"><Icon className="h-7 w-7" /></div>}<p className="truncate text-xs font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p></button><p className="mt-1 truncate text-[11px] text-slate-400">{item.artist || item.author || item.source}</p>
             <button type="button" disabled={libraryBusy || saved} onClick={() => addItem(item)} className={`mt-2 inline-flex w-full items-center justify-center gap-1 rounded-lg border px-2 py-1.5 text-[11px] font-semibold disabled:opacity-50 ${saved ? "border-cyan-300/30 text-cyan-200" : "border-white/10 text-slate-300 hover:bg-white/10"}`}>{saved ? <Library className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}{saved ? "Na biblioteca" : "Adicionar à biblioteca"}</button>
           </article>;
         })}</div>
