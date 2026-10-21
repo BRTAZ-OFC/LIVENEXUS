@@ -177,7 +177,7 @@ export default function Overlay_Editor({
                   {selectedFontCategory && (
                     <div className="min-h-0 min-w-0 border-t border-white/10 pt-1">
                       <p className="mb-0.5 text-[10px] leading-3 text-slate-400">Famílias de fontes</p>
-                      <div className="grid min-w-0 grid-cols-2 gap-1">
+                      <div className="flex min-w-0 flex-col gap-0.5 overflow-hidden">
                         {FONT_CATEGORIES[selectedFontCategory].map((font) => (
                           <button
                             key={font}
@@ -186,7 +186,7 @@ export default function Overlay_Editor({
                             aria-pressed={selectedFont === font}
                             title={font}
                             style={{ fontFamily: `"${font}", sans-serif` }}
-                            className={`flex h-7 min-w-0 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap rounded-md border px-2 py-1 text-[11px] transition ${selectedFont === font ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-800/80 text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"}`}
+                            className={`flex h-5 w-full min-w-0 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap rounded border px-1.5 py-0 text-[10px] leading-4 transition ${selectedFont === font ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-800/80 text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"}`}
                           >
                             <span className="block min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{font}</span>
                           </button>
