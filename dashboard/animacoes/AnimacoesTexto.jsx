@@ -219,7 +219,7 @@ export default function AnimacoesTexto({
     const timer = setTimeout(() => {
       setEmbaralhados({});
       setVersao((atual) => atual + 1);
-    }, duracaoCiclo + duracaoSaida);
+    }, duracaoCiclo + duracaoSaida + (ANIMACOES_TEXTO_INTEIRO.has(tipoValido) ? atrasoSeguro : 0));
     return () => clearTimeout(timer);
   }, [repetir, caracteres.length, atrasoSeguro, duracaoSegura, vaiEVem, tipoValido, versao]);
 
