@@ -499,7 +499,7 @@ export default function OverlayCanvas() {
       ...current,
       instances: (current.instances || []).map((item, index) =>
         (item.id || `${item.widgetId}-${index}`) === selectedInstanceId
-          ? { ...item, config: { ...(item.config || {}), ...patch } }
+          ? { ...item, config: { ...(item.config || {}), ...patch, ...(patch.color ? { textColor: patch.color } : {}) } }
           : item,
       ),
     }));
