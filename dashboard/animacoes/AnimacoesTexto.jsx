@@ -97,7 +97,7 @@ export default function AnimacoesTexto({
           style={{
             "--animacao-atraso": `${indice * atraso}ms`,
             "--animacao-duracao": `${Math.max(50, Number(duracao) || 650)}ms`,
-            "--animacao-iteracoes": infinita ? "infinite" : "1",
+            "--animacao-iteracoes": infinita ? "infinite" : vaiEVem ? "2" : "1",
             "--animacao-direcao": vaiEVem ? "alternate" : "normal",
           }}
         >
