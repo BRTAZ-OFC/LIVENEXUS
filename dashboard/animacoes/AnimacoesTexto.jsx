@@ -2,6 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./animacoes.css";
 
 const GLIFOS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
+const ANIMACOES_TEXTO_INTEIRO = new Set([
+  "slide-in-cima", "slide-in-baixo", "slide-in-esquerda", "slide-in-direita",
+  "reveal", "flip-in", "bounce-in", "blur-in", "light-speed-in",
+]);
 
 function embaralharCaractere() {
   return GLIFOS[Math.floor(Math.random() * GLIFOS.length)];
@@ -11,6 +15,11 @@ const KEYFRAMES = {
   cascata: [
     { opacity: 0, transform: "translate3d(0, -1.5em, 0) scale(0.92)" },
     { opacity: 1, transform: "translate3d(0, 0.12em, 0) scale(1.02)", offset: 0.72 },
+    { opacity: 1, transform: "translate3d(0, 0, 0) scale(1)" },
+  ],
+  "cascata-baixo": [
+    { opacity: 0, transform: "translate3d(0, 1.5em, 0) scale(0.92)" },
+    { opacity: 1, transform: "translate3d(0, -0.12em, 0) scale(1.02)", offset: 0.72 },
     { opacity: 1, transform: "translate3d(0, 0, 0) scale(1)" },
   ],
   rolar: [
@@ -69,6 +78,7 @@ const KEYFRAMES = {
 
 const EASING = {
   cascata: "cubic-bezier(0.22, 0.75, 0.35, 1)",
+  "cascata-baixo": "cubic-bezier(0.22, 0.75, 0.35, 1)",
   rolar: "ease-in-out",
   encarrilha: "steps(1, end)",
   "slide-in-cima": "cubic-bezier(0.22, 1, 0.36, 1)",
@@ -95,11 +105,12 @@ export default function AnimacoesTexto({
 }) {
   const caracteres = useMemo(() => Array.from(String(texto ?? "")), [texto]);
   const letterRefs = useRef([]);
+  const wholeTextRef = useRef(null);
   const [versao, setVersao] = useState(0);
   const [embaralhados, setEmbaralhados] = useState({});
 
   const tipoValido = [
-    "cascata", "casanique", "rolar", "encarrilha",
+    "cascata", "cascata-baixo", "casanique", "rolar", "encarrilha",
     "slide-in-cima", "slide-in-baixo", "slide-in-esquerda", "slide-in-direita",
     "reveal", "flip-in", "bounce-in", "blur-in", "light-speed-in",
   ].includes(tipo)
@@ -108,37 +119,53 @@ export default function AnimacoesTexto({
   const duracaoSegura = Math.max(50, Number(duracao) || 650);
   const atrasoSeguro = Math.max(0, Number(atraso) || 0);
 
-  // No modo vai e vem, conclui a entrada de todas as letras antes de recolhê-las
-  // em sequência, da primeira até a última.
+  // Os efeitos Slide/Reveal/Flip/Bounce/Blur/Light Speed animam o texto inteiro.
+  // Cascata, Casanique, Rolar e Encarrilha mantêm o comportamento por letra.
   useEffect(() => {
     const animations = [];
     const timers = [];
     let cancelled = false;
     if (tipoValido === "casanique") return undefined;
 
-    const elements = caracteres.map((caractere, indice) => ({
-      caractere, indice, element: letterRefs.current[indice],
-    })).filter(({ caractere, element }) => element && !/\s/.test(caractere));
-    const tempoEntrada = Math.max(0, caracteres.length - 1) * atrasoSeguro + duracaoSegura;
-
-    const runCycle = () => {
-      if (cancelled) return;
-      elements.forEach(({ element, indice }) => {
-        animations.push(element.animate(KEYFRAMES[tipoValido], {
-          duration: duracaoSegura, delay: indice * atrasoSeguro, iterations: 1, fill: "both", easing: EASING[tipoValido],
-        }));
-        if (tipoValido === "rolar") element.style.backfaceVisibility = "hidden";
-      });
+    if (ANIMACOES_TEXTO_INTEIRO.has(tipoValido)) {
+      const element = wholeTextRef.current;
+      if (!element || !caracteres.length) return undefined;
+      animations.push(element.animate(KEYFRAMES[tipoValido], {
+        duration: duracaoSegura, iterations: 1, fill: "both", easing: EASING[tipoValido],
+      }));
       if (vaiEVem) timers.push(setTimeout(() => {
-        if (cancelled) return;
-        elements.forEach(({ element, indice }) => animations.push(element.animate([
+        if (!cancelled) animations.push(element.animate([
           { opacity: 1, transform: "scale(1)" },
           { opacity: 0, transform: "scale(0.65)" },
-        ], { duration: duracaoSegura, delay: indice * atrasoSeguro, iterations: 1, fill: "both", easing: "ease-in" })));
-      }, tempoEntrada));
-    };
+        ], { duration: duracaoSegura, iterations: 1, fill: "both", easing: "ease-in" }));
+      }, duracaoSegura));
+      return () => {
+        cancelled = true;
+        timers.forEach(clearTimeout);
+        animations.forEach((animation) => animation.cancel());
+      };
+    }
 
-    runCycle();
+    const elements = caracteres.map((caractere, indice) => ({
+      caractere, indice, element: letterRefs.current[indice],
+    })).filter(({ caractere, element }) => element && !/\\s/.test(caractere));
+    const tempoEntrada = Math.max(0, caracteres.length - 1) * atrasoSeguro + duracaoSegura;
+
+    elements.forEach(({ element, indice }) => {
+      animations.push(element.animate(KEYFRAMES[tipoValido], {
+        duration: duracaoSegura, delay: indice * atrasoSeguro, iterations: 1,
+        fill: "both", easing: EASING[tipoValido],
+      }));
+      if (tipoValido === "rolar") element.style.backfaceVisibility = "hidden";
+    });
+    if (vaiEVem) timers.push(setTimeout(() => {
+      if (cancelled) return;
+      elements.forEach(({ element, indice }) => animations.push(element.animate([
+        { opacity: 1, transform: "scale(1)" },
+        { opacity: 0, transform: "scale(0.65)" },
+      ], { duration: duracaoSegura, delay: indice * atrasoSeguro, iterations: 1, fill: "both", easing: "ease-in" })));
+    }, tempoEntrada));
+
     return () => {
       cancelled = true;
       timers.forEach(clearTimeout);
@@ -183,14 +210,18 @@ export default function AnimacoesTexto({
 
   useEffect(() => {
     if (!repetir || caracteres.length === 0) return undefined;
-    const duracaoCiclo = Math.max(0, caracteres.length - 1) * atrasoSeguro + duracaoSegura;
-    const duracaoSaida = vaiEVem ? duracaoCiclo : 0;
+    const duracaoCiclo = ANIMACOES_TEXTO_INTEIRO.has(tipoValido)
+      ? duracaoSegura
+      : Math.max(0, caracteres.length - 1) * atrasoSeguro + duracaoSegura;
+    const duracaoSaida = vaiEVem
+      ? (ANIMACOES_TEXTO_INTEIRO.has(tipoValido) ? duracaoSegura : duracaoCiclo)
+      : 0;
     const timer = setTimeout(() => {
       setEmbaralhados({});
       setVersao((atual) => atual + 1);
     }, duracaoCiclo + duracaoSaida);
     return () => clearTimeout(timer);
-  }, [repetir, caracteres.length, atrasoSeguro, duracaoSegura, vaiEVem, versao]);
+  }, [repetir, caracteres.length, atrasoSeguro, duracaoSegura, vaiEVem, tipoValido, versao]);
 
   return (
     <span
@@ -198,7 +229,11 @@ export default function AnimacoesTexto({
       style={style}
       aria-label={String(texto ?? "")}
     >
-      {caracteres.map((caractere, indice) => (
+      {ANIMACOES_TEXTO_INTEIRO.has(tipoValido) ? (
+        <span ref={wholeTextRef} className="animacao-texto__conteudo">
+          {String(texto ?? "")}
+        </span>
+      ) : caracteres.map((caractere, indice) => (
         <span
           aria-hidden="true"
           className="animacao-texto__letra"
@@ -210,13 +245,13 @@ export default function AnimacoesTexto({
             backfaceVisibility: tipoValido === "rolar" ? "hidden" : undefined,
           }}
         >
-          {tipoValido === "casanique" && !/\s/.test(caractere)
+          {tipoValido === "casanique" && !/\\s/.test(caractere)
             ? (embaralhados[indice] ?? caractere)
             : caractere === " "
-              ? "\u00a0"
+              ? "\\u00a0"
               : caractere}
         </span>
-      ))}
+      ))})}
     </span>
   );
 }
