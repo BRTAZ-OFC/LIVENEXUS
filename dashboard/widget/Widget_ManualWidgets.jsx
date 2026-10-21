@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getCurrentTrack } from '@dashboard/biblioteca/Library_youtubePlayer';
-import { playerEvents } from '@dashboard/biblioteca/Library_playerEvents';
+import { getCurrentTrack } from './Library_youtubePlayer';
+import { playerEvents } from './Library_playerEvents';
 
 const shells = [
   'rounded-xl bg-slate-950/90 text-white p-4',
