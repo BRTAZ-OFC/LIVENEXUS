@@ -7,6 +7,10 @@ const ANIMACOES_TEXTO_INTEIRO = new Set([
   "reveal", "flip-in", "bounce-in", "blur-in", "light-speed-in",
 ]);
 
+function inverterKeyframes(keyframes) {
+  return [...keyframes].reverse().map(({ offset, ...frame }) => frame);
+}
+
 function embaralharCaractere() {
   return GLIFOS[Math.floor(Math.random() * GLIFOS.length)];
 }
@@ -134,10 +138,9 @@ export default function AnimacoesTexto({
         duration: duracaoSegura, iterations: 1, fill: "both", easing: EASING[tipoValido],
       }));
       if (vaiEVem) timers.push(setTimeout(() => {
-        if (!cancelled) animations.push(element.animate([
-          { opacity: 1, transform: "scale(1)" },
-          { opacity: 0, transform: "scale(0.65)" },
-        ], { duration: duracaoSegura, iterations: 1, fill: "both", easing: "ease-in" }));
+        if (!cancelled) animations.push(element.animate(inverterKeyframes(KEYFRAMES[tipoValido]), {
+          duration: duracaoSegura, iterations: 1, fill: "both", easing: EASING[tipoValido],
+        }));
       }, duracaoSegura));
       return () => {
         cancelled = true;
@@ -160,10 +163,10 @@ export default function AnimacoesTexto({
     });
     if (vaiEVem) timers.push(setTimeout(() => {
       if (cancelled) return;
-      elements.forEach(({ element, indice }) => animations.push(element.animate([
-        { opacity: 1, transform: "scale(1)" },
-        { opacity: 0, transform: "scale(0.65)" },
-      ], { duration: duracaoSegura, delay: indice * atrasoSeguro, iterations: 1, fill: "both", easing: "ease-in" })));
+      elements.forEach(({ element, indice }) => animations.push(element.animate(
+        inverterKeyframes(KEYFRAMES[tipoValido]),
+        { duration: duracaoSegura, delay: indice * atrasoSeguro, iterations: 1, fill: "both", easing: EASING[tipoValido] },
+      )));
     }, tempoEntrada));
 
     return () => {
