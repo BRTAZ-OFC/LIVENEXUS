@@ -20,6 +20,9 @@ type OverlayEditorProps = {
   onAddText: (text: string, fontSize: number, color: string, fontFamily: string) => void;
   onFontChange: (fontFamily: string) => void;
   onTextStyleChange: (patch: { fontSize?: number; color?: string; fontFamily?: string }) => void;
+  selectedInstanceWidgetId?: string | null;
+  selectedInstanceConfig?: Record<string, unknown> | null;
+  onUpdateSelectedConfig: (patch: Record<string, unknown>) => void;
 };
 
 const MENUS = ["INICIO", "TEXTO", "ANIMACAO", "IMAGEMS", "ALINHAMENTO", "FORMAS", "EMOJES", "CAMADAS"] as const;
@@ -36,6 +39,9 @@ export default function Overlay_Editor({
   onAddText,
   onFontChange,
   onTextStyleChange,
+  selectedInstanceWidgetId = null,
+  selectedInstanceConfig = null,
+  onUpdateSelectedConfig,
 }: OverlayEditorProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuName>("INICIO");
@@ -54,6 +60,13 @@ export default function Overlay_Editor({
   const fragmentableWidgets = catalog.filter((widget) => widget.implemented !== false && isWidgetFragmentable(widget.id));
   const selectedWidget = fragmentableWidgets.find((widget) => widget.id === selectedWidgetId);
   const fragments = selectedWidget ? getWidgetInternalElements(selectedWidget.id) : [];
+  const editingWidget = selectedWidget && selectedInstanceWidgetId === selectedWidget.id ? selectedWidget : null;
+  const editableConfig = editingWidget
+    ? { ...(editingWidget.defaultConfig || {}), ...(selectedInstanceConfig || {}) }
+    : {};
+  const editableEntries = Object.entries(editableConfig).filter(([, value]) =>
+    value === null || ["string", "number", "boolean"].includes(typeof value) || Array.isArray(value) || (typeof value === "object" && value !== null)
+  );
 
   useEffect(() => {
     if (!selectedFontCategory) return;
@@ -106,36 +119,85 @@ export default function Overlay_Editor({
 
           <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-1">
             {activeMenu === "INICIO" && (
-              <div className="flex flex-col gap-2">
-                <p className="text-[11px] text-slate-400">Fragmentos das widgets</p>
-                <HorizontalMenu ariaLabel="Widgets fragmentáveis">
-                  {fragmentableWidgets.map((widget) => (
-                    <button
-                      key={widget.id}
-                      type="button"
-                      onClick={() => setSelectedWidgetId(widget.id)}
-                      aria-pressed={selectedWidgetId === widget.id}
-                      className={selectedWidgetId === widget.id ? activeButtonClass : buttonClass}
-                    >
-                      {widget.name}
-                    </button>
-                  ))}
-                </HorizontalMenu>
-                {selectedWidget && (
-                  <div className="flex flex-wrap gap-2">
-                    {fragments.map((fragment) => (
+              <div className="grid h-full min-h-0 grid-cols-[minmax(150px,0.9fr)_minmax(160px,1fr)_minmax(220px,1.35fr)] gap-2">
+                <section aria-label="Widgets fragmentáveis" className="flex min-h-0 min-w-0 flex-col border-r border-white/10 pr-2">
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Widgets</p>
+                  <div className="grid min-h-0 grid-cols-3 grid-rows-5 content-start gap-1 overflow-y-auto pr-1">
+                    {fragmentableWidgets.map((widget) => (
                       <button
-                        key={fragment.key}
+                        key={widget.id}
                         type="button"
-                        onClick={() => onAddFragment(selectedWidget, fragment.key, fragment.label)}
-                        title={`Adicionar ${fragment.label} ao canvas`}
-                        className={buttonClass}
+                        onClick={() => setSelectedWidgetId(widget.id)}
+                        aria-pressed={selectedWidgetId === widget.id}
+                        title={widget.name}
+                        className={`min-w-0 overflow-hidden rounded border px-1 py-1 text-[10px] leading-3 transition ${selectedWidgetId === widget.id ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-800/80 text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/20"}`}
                       >
-                        {fragment.label}
+                        <span className="block overflow-hidden text-ellipsis whitespace-nowrap">{widget.name}</span>
                       </button>
                     ))}
                   </div>
-                )}
+                </section>
+
+                <section aria-label="Fragmentos da widget" className="flex min-h-0 min-w-0 flex-col border-r border-white/10 pr-2">
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Fragmentos</p>
+                  {selectedWidget ? (
+                    <div className="flex min-h-0 flex-col gap-1 overflow-y-auto pr-1">
+                      {fragments.map((fragment) => (
+                        <button
+                          key={fragment.key}
+                          type="button"
+                          onClick={() => onAddFragment(selectedWidget, fragment.key, fragment.label)}
+                          title={`Adicionar ${fragment.label} ao canvas`}
+                          className={buttonClass}
+                        >
+                          {fragment.label}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-500">Selecione uma widget na primeira coluna.</p>
+                  )}
+                </section>
+
+                <section aria-label="Campos editáveis da widget" className="flex min-h-0 min-w-0 flex-col">
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Conteúdo editável</p>
+                  {editingWidget && selectedInstanceConfig ? (
+                    <div className="flex min-h-0 flex-col gap-1.5 overflow-y-auto pr-1">
+                      {editableEntries.length ? editableEntries.map(([key, value]) => {
+                        const label = key.replace(/([A-Z])/g, " $1").replace(/[_-]+/g, " ").replace(/^./, (letter) => letter.toUpperCase());
+                        const isColor = typeof value === "string" && /(?:color|colour)$/i.test(key) && /^#[0-9a-f]{6}$/i.test(value);
+                        return (
+                          <label key={key} className="flex min-w-0 flex-col gap-1 text-[10px] text-slate-300">
+                            <span>{label}</span>
+                            {typeof value === "boolean" ? (
+                              <input type="checkbox" checked={value} onChange={(event) => onUpdateSelectedConfig({ [key]: event.target.checked })} className="h-4 w-4 accent-violet-500" />
+                            ) : typeof value === "number" ? (
+                              <input type="number" value={value} onChange={(event) => onUpdateSelectedConfig({ [key]: Number(event.target.value) })} className="h-7 w-full rounded border border-white/10 bg-slate-900 px-2 text-xs text-white outline-none focus:border-violet-400" />
+                            ) : Array.isArray(value) || (typeof value === "object" && value !== null) ? (
+                              <textarea
+                                value={JSON.stringify(value, null, 2)}
+                                onChange={(event) => {
+                                  try { onUpdateSelectedConfig({ [key]: JSON.parse(event.target.value) }); } catch { /* Mantém o JSON atual até a entrada ficar válida. */ }
+                                }}
+                                rows={3}
+                                className="w-full rounded border border-white/10 bg-slate-900 p-2 font-mono text-[10px] text-white outline-none focus:border-violet-400"
+                              />
+                            ) : isColor ? (
+                              <div className="flex items-center gap-2">
+                                <input type="color" value={value as string} onChange={(event) => onUpdateSelectedConfig({ [key]: event.target.value })} className="h-7 w-10 rounded border border-white/10 bg-slate-900 p-1" />
+                                <input type="text" value={value as string} onChange={(event) => onUpdateSelectedConfig({ [key]: event.target.value })} className="h-7 min-w-0 flex-1 rounded border border-white/10 bg-slate-900 px-2 text-xs text-white outline-none focus:border-violet-400" />
+                              </div>
+                            ) : (
+                              <input type="text" value={String(value ?? "")} onChange={(event) => onUpdateSelectedConfig({ [key]: event.target.value })} className="h-7 w-full rounded border border-white/10 bg-slate-900 px-2 text-xs text-white outline-none focus:border-violet-400" />
+                            )}
+                          </label>
+                        );
+                      }) : <p className="text-[11px] text-slate-500">Esta widget não declara campos de configuração editáveis.</p>}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-slate-500">Adicione um fragmento ao canvas para exibir e editar os campos reais de configuração da widget.</p>
+                  )}
+                </section>
               </div>
             )}
 
