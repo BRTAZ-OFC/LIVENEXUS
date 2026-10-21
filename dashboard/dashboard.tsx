@@ -8,6 +8,7 @@ import OverlayCanvas from "./overlay/Overlay_Canvas";
 import ScenariosPage from "./cenarios/ScenariosPage";
 import ScenarioCanvas from "./cenarios/Scenario_Canvas";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
+import BibliotecaSearch from "./biblioteca/BibliotecaSearch";
 import { memo, useEffect, useState } from "react";
 import {
   AudioLines,
@@ -458,9 +459,7 @@ function DashboardPage() {
           </div>
         )}
         {activeSection === "biblioteca" ? (
-          <section className="dash-w-full-px-6-5ebeye">
-            <h1 className="text-2xl font-semibold text-white">Biblioteca</h1>
-          </section>
+          <BibliotecaSearch />
         ) : activeSection === "overview" ? (
           <DashboardOverview />
         ) : activeSection === "admin-panel" && isAdmin ? (
