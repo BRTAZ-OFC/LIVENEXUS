@@ -67,7 +67,7 @@ type CanvasConfig = {
   visualizerSize?: { width?: number; height?: number };
   instances?: CanvasInstance[];
   background?: CanvasBackground;
-  globalStyleConfig?: { borderEnabled?: boolean; borderWidth?: number; borderColor?: string; roundedBorder?: boolean; texture?: string; colorEffectEnabled?: boolean; colorEffect?: string };
+  globalStyleConfig?: { borderEnabled?: boolean; borderWidth?: number; borderColor?: string; borderRadius?: number; texture?: string; colorEffectEnabled?: boolean; colorEffect?: string };
 };
 type OverlayRow = {
   id?: string;
@@ -222,7 +222,7 @@ export default function OverlayCanvas() {
     visualizerSize: DEFAULT_SIZE,
     instances: [],
     background: EMPTY_BACKGROUND,
-    globalStyleConfig: { borderEnabled: false, borderWidth: 1, borderColor: "#dce6ff", roundedBorder: false, texture: "none", colorEffectEnabled: false, colorEffect: "glass" },
+    globalStyleConfig: { borderEnabled: false, borderWidth: 1, borderColor: "#dce6ff", borderRadius: 16, texture: "none", colorEffectEnabled: false, colorEffect: "glass" },
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -681,7 +681,7 @@ export default function OverlayCanvas() {
             marginInline: "auto",
             height: size.height,
             border: config.globalStyleConfig?.borderEnabled ? `${Math.max(1, Math.min(100, Number(config.globalStyleConfig.borderWidth) || 1))}px solid ${String(config.globalStyleConfig.borderColor || "#dce6ff")}` : undefined,
-            borderRadius: config.globalStyleConfig?.roundedBorder ? "16px" : undefined,
+            borderRadius: config.globalStyleConfig?.borderRadius ? `${Math.max(1, Math.min(100, Number(config.globalStyleConfig.borderRadius) || 16))}px` : undefined,
             boxSizing: "border-box",
           }}
           aria-label="Canvas de Overlay"
@@ -693,11 +693,11 @@ export default function OverlayCanvas() {
               height: size.height,
               transform: `scale(${scale})`,
               transformOrigin: "top left",
-              borderRadius: config.globalStyleConfig?.roundedBorder ? "16px" : undefined,
+              borderRadius: config.globalStyleConfig?.borderRadius ? `${Math.max(1, Math.min(100, Number(config.globalStyleConfig.borderRadius) || 16))}px` : undefined,
             }}
           >
-            <div className="absolute inset-0" style={{ ...canvasBackground, filter: config.globalStyleConfig?.colorEffectEnabled ? (COLOR_EFFECT_FILTERS[String(config.globalStyleConfig.colorEffect || "glass")] || "none") : undefined, borderRadius: config.globalStyleConfig?.roundedBorder ? "16px" : undefined }} />
-            {config.globalStyleConfig?.texture && config.globalStyleConfig.texture !== "none" && <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-30" style={{ ...getGlobalTextureStyle(String(config.globalStyleConfig.texture)), borderRadius: config.globalStyleConfig?.roundedBorder ? "16px" : undefined }} />}
+            <div className="absolute inset-0" style={{ ...canvasBackground, filter: config.globalStyleConfig?.colorEffectEnabled ? (COLOR_EFFECT_FILTERS[String(config.globalStyleConfig.colorEffect || "glass")] || "none") : undefined, borderRadius: config.globalStyleConfig?.borderRadius ? `${Math.max(1, Math.min(100, Number(config.globalStyleConfig.borderRadius) || 16))}px` : undefined }} />
+            {config.globalStyleConfig?.texture && config.globalStyleConfig.texture !== "none" && <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-30" style={{ ...getGlobalTextureStyle(String(config.globalStyleConfig.texture)), borderRadius: config.globalStyleConfig?.borderRadius ? `${Math.max(1, Math.min(100, Number(config.globalStyleConfig.borderRadius) || 16))}px` : undefined }} />}
             {gridSettings.showGrid && (
               <div
                 aria-hidden="true"
@@ -774,7 +774,7 @@ export default function OverlayCanvas() {
                   opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100,
                   filter: config.globalStyleConfig?.colorEffectEnabled ? (COLOR_EFFECT_FILTERS[String(config.globalStyleConfig.colorEffect || "glass")] || "none") : undefined,
                   border: config.globalStyleConfig?.borderEnabled ? (Math.max(1, Math.min(100, Number(config.globalStyleConfig.borderWidth) || 1)) + "px solid " + String(config.globalStyleConfig.borderColor || "#dce6ff")) : undefined,
-                  borderRadius: config.globalStyleConfig?.roundedBorder || widgetConfig["roundedBorder"] ? "16px" : undefined,
+                  borderRadius: config.globalStyleConfig?.borderRadius ? `${Math.max(1, Math.min(100, Number(config.globalStyleConfig.borderRadius) || 16))}px` : widgetConfig["roundedBorder"] ? "16px" : undefined,
                   boxSizing: "border-box",
                   transform: transform || undefined,
                   outline: isSelected ? "1px solid #a78bfa" : "none",
@@ -1056,8 +1056,8 @@ export default function OverlayCanvas() {
         onAddShape={addShapeInstance}
         gridSettings={gridSettings}
         onUpdateGridSettings={updateGridSettings}
-        globalStyleConfig={{ borderEnabled: Boolean(config.globalStyleConfig?.borderEnabled), borderWidth: Math.max(1, Math.min(100, Number(config.globalStyleConfig?.borderWidth) || 1)), borderColor: String(config.globalStyleConfig?.borderColor || "#dce6ff"), roundedBorder: Boolean(config.globalStyleConfig?.roundedBorder), texture: String(config.globalStyleConfig?.texture || "none"), colorEffectEnabled: Boolean(config.globalStyleConfig?.colorEffectEnabled), colorEffect: String(config.globalStyleConfig?.colorEffect || "glass") }}
-        onUpdateGlobalStyleConfig={(patch) => setConfig((current) => ({ ...current, globalStyleConfig: { borderEnabled: false, borderWidth: 1, borderColor: "#dce6ff", roundedBorder: false, texture: "none", colorEffectEnabled: false, colorEffect: "glass", ...(current.globalStyleConfig || {}), ...patch } }))}
+        globalStyleConfig={{ borderEnabled: Boolean(config.globalStyleConfig?.borderEnabled), borderWidth: Math.max(1, Math.min(100, Number(config.globalStyleConfig?.borderWidth) || 1)), borderColor: String(config.globalStyleConfig?.borderColor || "#dce6ff"), borderRadius: Math.max(1, Math.min(100, Number(config.globalStyleConfig?.borderRadius) || 16)), texture: String(config.globalStyleConfig?.texture || "none"), colorEffectEnabled: Boolean(config.globalStyleConfig?.colorEffectEnabled), colorEffect: String(config.globalStyleConfig?.colorEffect || "glass") }}
+        onUpdateGlobalStyleConfig={(patch) => setConfig((current) => ({ ...current, globalStyleConfig: { borderEnabled: false, borderWidth: 1, borderColor: "#dce6ff", borderRadius: 16, texture: "none", colorEffectEnabled: false, colorEffect: "glass", ...(current.globalStyleConfig || {}), ...patch } }))}
         layers={(config.instances || []).map((instance, index) => ({
           id: instance.id || `${instance.widgetId}-${index}`,
           name: String(instance.name || (instance.widgetId === TEXT_WIDGET_ID ? instance.config?.text : "") || catalog.find((item) => item.id === instance.widgetId)?.name || instance.widgetId || `Elemento ${index + 1}`),
