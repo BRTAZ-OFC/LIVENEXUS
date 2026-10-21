@@ -8,7 +8,7 @@ import {
   Search,
   UserRound,
 } from "lucide-react";
-import { searchCatalogSources, type CatalogItem } from "./catalogSources";
+import { type CatalogItem } from "./catalogSources";
 
 type LibraryCategory = "songs" | "artists" | "albums" | "playlists" | "mixes";
 type Continuations = Record<string, string>;
@@ -118,7 +118,6 @@ export default function BibliotecaSearch() {
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [continuations, setContinuations] = useState<Continuations>({});
   const [loading, setLoading] = useState(false);
-  const [loadingSources, setLoadingSources] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const requestVersion = useRef(0);
@@ -138,7 +137,6 @@ export default function BibliotecaSearch() {
     const version = ++requestVersion.current;
     setSubmittedQuery(term);
     setLoading(true);
-    setLoadingSources(false);
     setLoadingMore(false);
     setError("");
     setItems([]);
@@ -160,17 +158,6 @@ export default function BibliotecaSearch() {
       setContinuations(data.continuations && typeof data.continuations === "object" ? data.continuations : {});
       setLoading(false);
 
-      // Fontes de metadados independentes: cada falha é isolada e não derruba
-      // os resultados do YouTube Music/YouTube.
-      setLoadingSources(true);
-      void searchCatalogSources(term).then((extraItems) => {
-        if (version !== requestVersion.current) return;
-        setItems((current) => uniqueItems([...current, ...extraItems]));
-      }).catch(() => {
-        // Fontes auxiliares são best-effort; o catálogo principal continua utilizável.
-      }).finally(() => {
-        if (version === requestVersion.current) setLoadingSources(false);
-      });
     } catch (err) {
       if (version === requestVersion.current) {
         setError(err instanceof Error ? err.message : "Falha ao pesquisar.");
@@ -295,15 +282,15 @@ export default function BibliotecaSearch() {
         <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /><span>{error}</span>
       </div>}
 
-      {(loading || loadingSources) && <p className="mt-4 text-xs text-slate-500">
-        {loading ? "Buscando nas categorias do YouTube Music e YouTube..." : "Completando metadados de outras fontes..."}
+      {loading && <p className="mt-4 text-xs text-slate-500">
+        Buscando nas categorias do YouTube Music e YouTube...
       </p>}
 
       {loading && items.length === 0 ? (
         <div className="flex min-h-48 items-center justify-center gap-3 text-sm text-slate-400">
           <LoaderCircle className="h-5 w-5 animate-spin" /> Pesquisando catálogo...
         </div>
-      ) : submittedQuery && visibleItems.length === 0 && !error && !loadingSources ? (
+      ) : submittedQuery && visibleItems.length === 0 && !error && !loading ? (
         <div className="mt-8 rounded-xl border border-white/10 bg-[#0d1120] p-8 text-center text-sm text-slate-400">
           Nenhum resultado encontrado nesta categoria.
         </div>
