@@ -10,6 +10,7 @@ import { Save, Trash2 } from "lucide-react";
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
 import HorizontalMenu from "../components/HorizontalMenu";
+import Overlay_Editor from "./Overlay_Editor";
 
 type JsonObject = Record<string, unknown>;
 type CanvasInstance = {
@@ -495,7 +496,7 @@ export default function OverlayCanvas() {
   );
 
   return (
-    <section className="relative flex w-full min-w-0 flex-col items-center gap-4 px-2 pb-6 pt-4">
+    <section className="relative flex w-full min-w-0 flex-col items-center gap-4 px-2 pb-40 pt-4">
       <button type="button" onClick={() => void saveOverlay()} disabled={saving || loading} title="Salvar overlay" aria-label="Salvar overlay" className="fixed right-4 top-20 z-[100] inline-flex h-9 w-9 items-center justify-center rounded-lg bg-violet-600 text-white shadow-lg hover:bg-violet-500 disabled:opacity-50"><Save size={16} /></button>
       <button type="button" onClick={() => void deleteOverlay()} disabled={saving || !activeOverlayId} title="Excluir overlay" aria-label="Excluir overlay" className="fixed right-16 top-20 z-[100] inline-flex h-9 w-9 items-center justify-center rounded-lg border border-rose-400/30 bg-slate-950 text-rose-200 shadow-lg hover:bg-rose-500/10 disabled:opacity-40"><Trash2 size={16} /></button>
       {error && <p role="alert" className="w-full text-xs text-rose-200">{error}</p>}
@@ -826,6 +827,7 @@ export default function OverlayCanvas() {
           />
         </div>
       </div>
+      <Overlay_Editor />
     </section>
   );
 }
