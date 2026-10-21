@@ -413,6 +413,7 @@ export default function OverlayCanvas() {
     };
     setConfig((current) => ({
       ...current,
+      name: current.instances?.length ? current.name : definition.name,
       instances: [...(current.instances || []), nextInstance],
     }));
     setSelectedInstanceId(nextInstance.id || null);
