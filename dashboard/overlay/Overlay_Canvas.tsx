@@ -88,16 +88,13 @@ const EMPTY_BACKGROUND: CanvasBackground = { type: "transparent", opacity: 100 }
 function transparentWidgetConfig(config: JsonObject = {}): JsonObject {
   return {
     ...config,
-    backgroundColor: "transparent",
+    // Mantém as configurações originais usadas pelo conteúdo interno da widget.
+    // A transparência é aplicada pelo renderizador ao contêiner externo.
     backgroundTransparent: true,
     isTransparent: true,
     bgMode: "transparent",
     effBgActiveType: "bg-transparent",
     effBgType: "transparent",
-    effBgColor: undefined,
-    effGradientActiveType: undefined,
-    effGlassActiveType: undefined,
-    effAnimBgActiveType: undefined,
   };
 }
 
