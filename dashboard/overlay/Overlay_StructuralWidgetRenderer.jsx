@@ -25,6 +25,8 @@ const LEGACY_PRESET_MAP = {
   "central-card": "08",
   "lower-third": "09",
   "asymmetric-offset": "10",
+  "badge-pill": "11",
+  "floating-glass": "12",
 };
 
 export default function StructuralWidgetRenderer({

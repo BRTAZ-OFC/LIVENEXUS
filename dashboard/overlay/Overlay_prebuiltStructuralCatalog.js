@@ -111,6 +111,26 @@ export const STRUCTURAL_PREMOLDS_ARCHETYPES = [
     defaultHeight: 120,
     badge: "Offset Gamer",
   },
+  {
+    id: "badge-pill",
+    number: 11,
+    name: "Badge / Pílula",
+    description: "Design de pílula arredondada com realce futurista e detalhes destacados.",
+    aspectRatio: "200x50",
+    defaultWidth: 200,
+    defaultHeight: 50,
+    badge: "Pílula Tag",
+  },
+  {
+    id: "floating-glass",
+    number: 12,
+    name: "Flutuante / Glass",
+    description: "Composição translúcida com visual fosco, bordas sutis e profundidade refinada.",
+    aspectRatio: "260x100",
+    defaultWidth: 260,
+    defaultHeight: 100,
+    badge: "Glass Glow",
+  },
 ];
 
 export const WIDGET_STRUCTURAL_TYPES = [

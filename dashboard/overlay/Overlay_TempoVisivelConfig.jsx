@@ -22,15 +22,21 @@ export default function TempoVisivelConfig({ instance, onUpdateInstance }) {
       config: {
         ...config,
         tempoVisivel: mode,
+        widgetDisplayMode: mode,
       },
     });
   };
 
   const handleUpdateField = (field, value) => {
+    const legacyPatch = {};
+    if (field === "tempoVisivelDuracao" || field === "tempoVisivelEventoDuracao") {
+      legacyPatch.widgetDisplayTimeValue = value;
+    }
     onUpdateInstance(instance.id, {
       config: {
         ...config,
         [field]: value,
+        ...legacyPatch,
       },
     });
   };
@@ -38,7 +44,10 @@ export default function TempoVisivelConfig({ instance, onUpdateInstance }) {
   const handleTestAppearance = () => {
     window.dispatchEvent(
       new CustomEvent("livenexus:trigger-tempo-visivel", {
-        detail: { instanceId: instance.id },
+        detail: {
+          instanceId: instance.id,
+          duration: currentMode === "event" ? eventDuration : intervalDuration,
+        },
       }),
     );
   };
