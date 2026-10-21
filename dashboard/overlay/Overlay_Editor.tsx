@@ -127,49 +127,51 @@ export default function Overlay_Editor({
             )}
 
             {activeMenu === "TEXTO" && (
-              <div className="flex min-w-0 flex-col gap-0.5">
-                <div className="flex min-w-0 items-end gap-2">
-                  <label className="flex min-w-[160px] flex-1 flex-col gap-1 text-[10px] text-slate-400">
-                    Texto
+              <div className="grid h-full min-h-0 min-w-0 grid-cols-[minmax(180px,0.38fr)_minmax(0,0.62fr)] gap-3">
+                <div className="flex min-w-0 flex-col justify-start gap-1.5 border-r border-white/10 pr-3">
+                  <label className="flex min-w-0 items-center gap-2 text-[11px] text-slate-300">
+                    <span className="w-[66px] shrink-0">Texto</span>
                     <input
                       value={textValue}
                       onChange={(event) => setTextValue(event.target.value)}
                       placeholder="Digite o texto"
-                      className="h-7 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
+                      className="h-7 min-w-0 flex-1 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
                     />
                   </label>
-                  <label className="flex w-[72px] shrink-0 flex-col gap-1 text-[10px] text-slate-400">
-                    Tamanho
+                  <label className="flex items-center gap-2 text-[11px] text-slate-300">
+                    <span className="w-[66px] shrink-0">Tamanho</span>
                     <input
                       type="number"
                       min={1}
                       max={300}
                       value={fontSize}
                       onChange={(event) => setFontSize(Math.max(1, Math.min(300, Number(event.target.value) || 1)))}
-                      className="h-8 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
+                      className="h-7 w-20 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
                     />
                   </label>
-                  <label className="flex w-[58px] shrink-0 flex-col gap-1 text-[10px] text-slate-400">
-                    Cor
+                  <label className="flex items-center gap-2 text-[11px] text-slate-300">
+                    <span className="w-[66px] shrink-0">Coloração</span>
                     <input
                       type="color"
                       value={textColor}
                       onChange={(event) => setTextColor(event.target.value)}
                       aria-label="Cor do texto"
-                      className="h-7 w-full cursor-pointer rounded-md border border-white/10 bg-slate-900 p-1"
+                      className="h-7 w-20 cursor-pointer rounded-md border border-white/10 bg-slate-900 p-1"
                     />
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => onAddText(textValue.trim() || "Texto", fontSize, textColor, selectedFont)}
-                    className="inline-flex h-7 items-center gap-1 rounded-md bg-violet-600 px-3 text-xs font-medium text-white transition hover:bg-violet-500"
-                  >
-                    <Plus size={14} /> Adicionar texto
-                  </button>
+                  <div className="flex justify-end pt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => onAddText(textValue.trim() || "Texto", fontSize, textColor, selectedFont)}
+                      className="inline-flex h-7 items-center gap-1 rounded-md bg-violet-600 px-3 text-xs font-medium text-white transition hover:bg-violet-500"
+                    >
+                      <Plus size={14} /> Adicionar texto
+                    </button>
+                  </div>
                 </div>
 
-                <div className="flex min-w-0 flex-col gap-1">
-                  <p className="text-[10px] leading-4 text-slate-400">Categorias de fontes</p>
+                <div className="flex min-h-0 min-w-0 flex-col gap-1 overflow-hidden">
+                  <p className="text-[10px] leading-3 text-slate-400">Categorias de fontes</p>
                   <HorizontalMenu ariaLabel="Categorias de fontes" trackClassName="overflow-hidden">
                     {(Object.keys(FONT_CATEGORIES) as Array<keyof typeof FONT_CATEGORIES>).map((category) => (
                       <button
@@ -184,8 +186,9 @@ export default function Overlay_Editor({
                     ))}
                   </HorizontalMenu>
                   {selectedFontCategory && (
-                    <div className="min-w-0 border-t border-white/10 pt-0.5">
-                      <HorizontalMenu ariaLabel="Famílias de fontes" trackClassName="overflow-hidden">
+                    <div className="min-h-0 min-w-0 border-t border-white/10 pt-1">
+                      <p className="mb-0.5 text-[10px] leading-3 text-slate-400">Famílias de fontes</p>
+                      <div className="flex min-w-0 flex-wrap gap-1.5 overflow-y-auto">
                         {FONT_CATEGORIES[selectedFontCategory].map((font) => (
                           <button
                             key={font}
@@ -200,14 +203,12 @@ export default function Overlay_Editor({
                             <span style={{ fontFamily: `"${font}", sans-serif` }}>Aa Bb 123</span>
                           </button>
                         ))}
-                      </HorizontalMenu>
+                      </div>
                     </div>
                   )}
                 </div>
-                <p className="hidden">Duplo clique no texto do canvas para editar.</p>
               </div>
             )}
-
             {!["INICIO", "TEXTO"].includes(activeMenu) && (
               <div className="flex h-full items-center justify-center text-xs text-slate-500">
                 Este menu ficará vazio nesta etapa.
