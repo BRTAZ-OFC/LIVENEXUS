@@ -161,23 +161,23 @@ export default function Overlay_Editor({
 
                 <div className="flex min-h-0 min-w-0 flex-col gap-1 overflow-hidden">
                   <p className="text-[10px] leading-3 text-slate-400">Categorias de fontes</p>
-                  <HorizontalMenu ariaLabel="Categorias de fontes" trackClassName="overflow-hidden">
+                  <div className="flex min-w-0 flex-wrap gap-1">
                     {(Object.keys(FONT_CATEGORIES) as Array<keyof typeof FONT_CATEGORIES>).map((category) => (
                       <button
                         key={category}
                         type="button"
                         onClick={() => setSelectedFontCategory(category)}
                         aria-pressed={selectedFontCategory === category}
-                        className={selectedFontCategory === category ? activeButtonClass : buttonClass}
+                        className={selectedFontCategory === category ? "shrink-0 rounded border border-violet-400 bg-violet-500/20 px-1.5 py-0.5 text-[10px] leading-3 text-white" : "shrink-0 rounded border border-white/10 bg-slate-800/80 px-1.5 py-0.5 text-[10px] leading-3 text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"}
                       >
                         {category}
                       </button>
                     ))}
-                  </HorizontalMenu>
+                  </div>
                   {selectedFontCategory && (
                     <div className="min-h-0 min-w-0 border-t border-white/10 pt-1">
                       <p className="mb-0.5 text-[10px] leading-3 text-slate-400">Famílias de fontes</p>
-                      <div className="flex min-w-0 flex-col gap-0.5 overflow-hidden">
+                      <div className="flex min-w-0 flex-wrap content-start gap-1 overflow-y-auto overflow-x-hidden">
                         {FONT_CATEGORIES[selectedFontCategory].map((font) => (
                           <button
                             key={font}
@@ -186,9 +186,9 @@ export default function Overlay_Editor({
                             aria-pressed={selectedFont === font}
                             title={font}
                             style={{ fontFamily: `"${font}", sans-serif` }}
-                            className={`flex h-5 w-full min-w-0 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap rounded border px-1.5 py-0 text-[10px] leading-4 transition ${selectedFont === font ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-800/80 text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"}`}
+                            className={`h-5 max-w-full shrink rounded border px-1.5 py-0 text-[10px] leading-4 transition ${selectedFont === font ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-800/80 text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"}`}
                           >
-                            <span className="block min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{font}</span>
+                            <span className="block overflow-hidden text-ellipsis whitespace-nowrap">{font}</span>
                           </button>
                         ))}
                       </div>
