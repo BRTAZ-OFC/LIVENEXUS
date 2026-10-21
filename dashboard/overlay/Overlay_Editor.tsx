@@ -175,6 +175,8 @@ export default function Overlay_Editor({
   onUpdateGridSettings,
   onAddGuide,
   globalStyleConfig,
+  backgroundColor,
+  onUpdateBackgroundColor,
   onUpdateGlobalStyleConfig,
   layers,
   onSelectLayer,
