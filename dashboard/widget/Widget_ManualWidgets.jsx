@@ -125,7 +125,6 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
 
   // 1. PADRÃO (FAIXA SUPERIOR)
   if (layout === 'default') {
-    const textRepeated = `${title} • `.repeat(15);
     return (
       <div 
         className="w-full h-full flex items-center p-3 select-none relative overflow-hidden"
@@ -151,7 +150,6 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
 
   // 2. QUADRADO
   if (layout === 'square') {
-    const textRepeated = `${title} • `.repeat(10);
     return (
       <div 
         className="w-full h-full flex flex-col justify-between p-4 select-none relative overflow-hidden"
@@ -248,7 +246,6 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
 
   // 4. VINIL
   if (layout === 'vinil') {
-    const textRepeated = `${title} • ${artist} • `.repeat(4);
     return (
       <div 
         className="w-full h-full flex flex-col items-center justify-center p-3 select-none relative overflow-hidden"
@@ -337,10 +334,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
           </svg>
         </span>
         <div className="flex-1 overflow-hidden whitespace-nowrap relative">
-          {marqueeAnimation}
-          <span className="inline-block font-bold text-white text-sm tracking-wide" style={marqueeStyle}>
-            {textRepeated}
-          </span>
+          <TrackMarquee text={`${title} • `} className="font-bold text-white text-sm tracking-wide" />
         </div>
       </div>
     );
