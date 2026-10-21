@@ -252,7 +252,8 @@ export default function OverlayCanvas() {
       const target = event.target as HTMLElement | null;
       if (
         !selectedInstanceId ||
-        target?.closest("input,textarea,select,button,a,[contenteditable='true'],[role='textbox']")
+        !frameRef.current?.contains(target) ||
+        target?.closest("input,textarea,select,a,[contenteditable='true'],[role='textbox']")
       ) {
         return;
       }
@@ -417,6 +418,13 @@ export default function OverlayCanvas() {
       <div className="relative flex w-full min-w-0 justify-center overflow-hidden">
         <div
           ref={frameRef}
+          tabIndex={-1}
+          onPointerDownCapture={(event) => {
+            const target = event.target as HTMLElement;
+            if (!target.closest("input,textarea,select,button,a,[contenteditable='true'],[role='textbox']")) {
+              frameRef.current?.focus({ preventScroll: true });
+            }
+          }}
           className="relative mx-auto shrink-0 overflow-hidden bg-transparent"
           style={{
             width: size.width,
