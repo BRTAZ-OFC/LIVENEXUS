@@ -26,7 +26,13 @@ export default function GlobalMusicPlayer() {
         ? <img src={track.thumbnail} alt="" className="hidden h-9 w-9 shrink-0 rounded-md object-cover sm:block" />
         : <Music2 className="hidden h-5 w-5 shrink-0 text-cyan-300 sm:block" />}
       <div className="min-w-0 max-w-48 flex-1">
-        <p className="truncate text-xs font-semibold text-white" title={track?.title}>{track?.title || "Nenhuma música"}</p>
+                <div className="w-full min-w-0 overflow-hidden text-xs font-semibold text-white" title={track?.title || "Nenhuma música"}>
+          <div className="flex w-max" style={{ animation: "global-player-title-marquee 12s linear infinite" }}>
+            <span className="shrink-0 pr-8">{track?.title || "Nenhuma música"}</span>
+            <span className="shrink-0 pr-8" aria-hidden="true">{track?.title || "Nenhuma música"}</span>
+          </div>
+          <style>{`@keyframes global-player-title-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }`}</style>
+        </div>
         <p className="truncate text-[10px] text-slate-400">{track?.artist || (track ? "YouTube Music" : "Player musical")}</p>
       </div>
       <button type="button" onClick={toggleMusicShuffle} title={player.shuffle ? "Desativar aleatório" : "Ativar aleatório"} aria-label="Alternar reprodução aleatória" className={`hidden rounded-md p-1.5 sm:block ${player.shuffle ? "bg-cyan-300/15 text-cyan-200" : "text-slate-400 hover:bg-white/10"}`}><Shuffle className="h-4 w-4" /></button>
