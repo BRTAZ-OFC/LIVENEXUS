@@ -741,13 +741,14 @@ app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
       (row: Record<string, unknown>) => String(row["user_id"] ?? "") === session.user_id,
     );
     const requestedId = String(input.id ?? "").trim();
+    const currentId = String(req.body?.currentId ?? "").trim();
     const name = String(input.name ?? "").trim();
     const createNew = req.body?.createNew === true;
     if (!name || !requestedId) return res.status(400).set(NO_CACHE).json({ ok: false, message: "Nome e ID textual da overlay são obrigatórios." });
-    if (createNew && ownedRows.some((row: Record<string, unknown>) => String(row["id"] ?? "") === requestedId)) {
+    if (ownedRows.some((row: Record<string, unknown>) => String(row["id"] ?? "") === requestedId && String(row["id"] ?? "") !== currentId)) {
       return res.status(409).set(NO_CACHE).json({ ok: false, message: "Já existe uma overlay com esse ID. Escolha outro nome." });
     }
-    const existing = createNew ? undefined : ownedRows.find((row: Record<string, unknown>) => String(row["id"] ?? "") === requestedId);
+    const existing = createNew ? undefined : ownedRows.find((row: Record<string, unknown>) => String(row["id"] ?? "") === currentId);
     if (!createNew && !existing) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Overlay não encontrada. Se deseja criar outra, use Nova." });
 
     const settings = { ...input } as Record<string, unknown>;
@@ -757,7 +758,7 @@ app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
 
     const record = {
       ...(existing || {}),
-      id: String(existing?.["id"] ?? requestedId),
+      id: requestedId,
       user_id: session.user_id,
       name,
       settings,
