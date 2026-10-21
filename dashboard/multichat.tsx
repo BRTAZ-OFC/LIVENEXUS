@@ -15,6 +15,9 @@ export type MultiChatMessage = {
   timestamp: number;
   eventType?: string | null;
   emotes?: unknown;
+  eventMeta?: Record<string, unknown> | null;
+  authorId?: string | null;
+  firstMsg?: boolean;
   ttsAllowed?: boolean;
   ttsFilterReason?: string;
 };
@@ -23,6 +26,7 @@ export type PlatformState = {
   detail: string;
   viewers: number | null;
   meta: string;
+  streamMeta: Record<string, unknown>;
 };
 export type MultiChatSnapshot = {
   channels: Record<ChatPlatform, string>;
@@ -33,9 +37,9 @@ type ConnectorHandle = { disconnect: () => void };
 
 const PLATFORMS: ChatPlatform[] = ["Twitch", "Kick", "YouTube"];
 const initialStatus = (): Record<ChatPlatform, PlatformState> => ({
-  Twitch: { status: "idle", detail: "Desconectado", viewers: null, meta: "" },
-  Kick: { status: "idle", detail: "Desconectado", viewers: null, meta: "" },
-  YouTube: { status: "idle", detail: "Desconectado", viewers: null, meta: "" },
+  Twitch: { status: "idle", detail: "Desconectado", viewers: null, meta: "", streamMeta: {} },
+  Kick: { status: "idle", detail: "Desconectado", viewers: null, meta: "", streamMeta: {} },
+  YouTube: { status: "idle", detail: "Desconectado", viewers: null, meta: "", streamMeta: {} },
 });
 let snapshot: MultiChatSnapshot = {
   channels: { Twitch: "", Kick: "", YouTube: "" },
@@ -136,6 +140,9 @@ export function connectMultiChatPlatform(platform: ChatPlatform) {
       timestamp: typeof raw["timestamp"] === "number" ? raw["timestamp"] : Date.now(),
       eventType: typeof raw["eventType"] === "string" ? raw["eventType"] : null,
       emotes: raw["emotes"],
+      eventMeta: raw["eventMeta"] && typeof raw["eventMeta"] === "object" ? (raw["eventMeta"] as Record<string, unknown>) : null,
+      authorId: typeof raw["authorId"] === "string" ? raw["authorId"] : null,
+      firstMsg: raw["firstMsg"] === true,
     };
     const decision = evaluateTtsFilters(message);
     const displayMessage: MultiChatMessage = {
@@ -162,10 +169,11 @@ export function connectMultiChatPlatform(platform: ChatPlatform) {
         : meta;
     patchPlatform(platform, {
       viewers:
-        typeof meta["viewers"] === "number" ? meta["viewers"] : snapshot.statuses[platform].viewers,
+        typeof meta["viewers"] === "number" ? meta["viewers"] : meta["offline"] ? null : snapshot.statuses[platform].viewers,
       meta: String(
-        details["title"] ?? details["channelName"] ?? (meta["offline"] ? "Live offline" : ""),
+        details["title"] ?? details["channelName"] ?? (meta["offline"] ? "Live offline" : snapshot.statuses[platform].meta),
       ),
+      streamMeta: meta["offline"] ? {} : { ...snapshot.statuses[platform].streamMeta, ...details },
     });
   };
   try {
