@@ -16,7 +16,7 @@ export function TextMarquee({
   }
 
   const str = String(text || "");
-  if (!forceMarquee && str.length <= 22) {
+  if (!forceMarquee && str.length <= 35) {
     return (
       <div
         className={className}
