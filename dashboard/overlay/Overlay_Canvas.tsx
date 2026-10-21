@@ -494,7 +494,7 @@ export default function OverlayCanvas() {
     const selected = (config.instances || []).find((item, index) =>
       (item.id || `${item.widgetId}-${index}`) === selectedInstanceId,
     );
-    if (!selected || selected.widgetId !== TEXT_WIDGET_ID) return;
+    if (!selected) return;
     setConfig((current) => ({
       ...current,
       instances: (current.instances || []).map((item, index) =>
@@ -530,7 +530,7 @@ export default function OverlayCanvas() {
     setConfig((current) => ({
       ...current,
       instances: (current.instances || []).map((item, index) =>
-        (item.id || `${item.widgetId}-${index}`) === instanceId ? { ...item, ...patch } : item,
+        (item.id || `${item.widgetId}-${index}`) === instanceId ? { ...item, ...patch, ...(patch.color ? { textColor: patch.color } : {}) } : item,
       ),
     }));
   }
@@ -705,6 +705,9 @@ export default function OverlayCanvas() {
                   outline: isSelected ? "1px solid #a78bfa" : "none",
                   cursor: "move",
                   touchAction: "none",
+                  fontFamily: String(widgetConfig["fontFamily"] || "Inter, sans-serif"),
+                  fontSize: `${Math.max(1, Number(widgetConfig["fontSize"]) || 16)}px`,
+                  color: String(widgetConfig["color"] || widgetConfig["textColor"] || "#ffffff"),
                 };
                 return (
                   <div
