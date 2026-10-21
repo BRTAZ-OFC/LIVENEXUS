@@ -52,13 +52,13 @@ export const TWITCH_WIDGETS_CATALOG = [
     id: 'react-hub-widget',
     name: 'React Hub',
     implemented: true,
-    category: 'twitch',
+    category: 'manual',
     component: ReactHubWidget,
     defaultWidth: 420,
     defaultHeight: 640,
     defaultConfig: {
       defaultMode: 'split',
-      backgroundColor: 'rgba(2, 6, 23, 0.9)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -90,7 +90,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultConfig: {
       fontSize: '13px',
       textColor: '#ffffff',
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -118,7 +118,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 440,
     defaultHeight: 460,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -135,7 +135,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultConfig: {
       fontSize: '12px',
       textColor: '#ffffff',
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -158,14 +158,14 @@ export const TWITCH_WIDGETS_CATALOG = [
     id: 'twitch-sub-goal',
     name: 'Meta de Subs da Twitch',
     implemented: true,
-    category: 'twitch',
+    category: 'manual',
     component: TwitchSubGoal,
     defaultWidth: 380,
     defaultHeight: 120,
     defaultConfig: {
       startValue: 0,
       targetValue: 50,
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -175,14 +175,14 @@ export const TWITCH_WIDGETS_CATALOG = [
     id: 'twitch-bits-goal',
     name: 'Meta de Bits da Twitch',
     implemented: true,
-    category: 'twitch',
+    category: 'manual',
     component: TwitchBitsGoal,
     defaultWidth: 380,
     defaultHeight: 120,
     defaultConfig: {
       startValue: 0,
       targetValue: 2500,
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -192,14 +192,14 @@ export const TWITCH_WIDGETS_CATALOG = [
     id: 'twitch-raid-goal',
     name: 'Meta de Raids da Twitch',
     implemented: true,
-    category: 'twitch',
+    category: 'manual',
     component: TwitchRaidGoal,
     defaultWidth: 380,
     defaultHeight: 120,
     defaultConfig: {
       startValue: 0,
       targetValue: 5,
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -217,7 +217,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultHeight: 70,
     defaultConfig: {
       placeholder: 'Nenhum inscrito registrado',
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -233,7 +233,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultHeight: 70,
     defaultConfig: {
       placeholder: 'Nenhum cheer enviado',
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -249,7 +249,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultHeight: 70,
     defaultConfig: {
       placeholder: 'Sem raids recentes',
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -265,7 +265,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultHeight: 70,
     defaultConfig: {
       placeholder: 'Nenhum cheer registrado',
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -281,7 +281,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultHeight: 80,
     defaultConfig: {
       startValue: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -297,7 +297,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultHeight: 80,
     defaultConfig: {
       startValue: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -315,7 +315,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultHeight: 120,
     defaultConfig: {
       minValue: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -330,7 +330,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 320,
     defaultHeight: 140,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -345,7 +345,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 320,
     defaultHeight: 120,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -360,7 +360,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 380,
     defaultHeight: 200,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -377,7 +377,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 340,
     defaultHeight: 400,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -387,7 +387,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     id: 'twitch-poll',
     name: 'Enquete Interativa',
     implemented: true,
-    category: 'twitch',
+    category: 'manual',
     component: TwitchPoll,
     defaultWidth: 380,
     defaultHeight: 260,
@@ -399,7 +399,7 @@ export const TWITCH_WIDGETS_CATALOG = [
         { text: 'Mais ou menos', label: '3' },
         { text: 'Ruim', label: '4' }
       ],
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -409,12 +409,12 @@ export const TWITCH_WIDGETS_CATALOG = [
     id: 'twitch-raffle',
     name: 'Sorteio de Chat',
     implemented: true,
-    category: 'twitch',
+    category: 'manual',
     component: TwitchRaffle,
     defaultWidth: 360,
     defaultHeight: 240,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -429,7 +429,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 380,
     defaultHeight: 130,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -446,7 +446,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 380,
     defaultHeight: 260,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -461,7 +461,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 400,
     defaultHeight: 300,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -478,7 +478,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 260,
     defaultHeight: 70,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -488,12 +488,12 @@ export const TWITCH_WIDGETS_CATALOG = [
     id: 'twitch-commands-list',
     name: 'Lista de Comandos',
     implemented: true,
-    category: 'twitch',
+    category: 'manual',
     component: TwitchCommandsList,
     defaultWidth: 340,
     defaultHeight: 380,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -508,7 +508,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 340,
     defaultHeight: 260,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -518,12 +518,12 @@ export const TWITCH_WIDGETS_CATALOG = [
     id: 'twitch-rules',
     name: 'Regras do Canal',
     implemented: true,
-    category: 'twitch',
+    category: 'manual',
     component: TwitchRules,
     defaultWidth: 340,
     defaultHeight: 380,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -533,12 +533,12 @@ export const TWITCH_WIDGETS_CATALOG = [
     id: 'twitch-schedule',
     name: 'Agenda de Streams',
     implemented: true,
-    category: 'twitch',
+    category: 'manual',
     component: TwitchSchedule,
     defaultWidth: 360,
     defaultHeight: 320,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -548,12 +548,12 @@ export const TWITCH_WIDGETS_CATALOG = [
     id: 'twitch-schedule-ticker',
     name: 'Letreiro de Agenda',
     implemented: true,
-    category: 'twitch',
+    category: 'manual',
     component: TwitchScheduleTicker,
     defaultWidth: 500,
     defaultHeight: 60,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
@@ -568,7 +568,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 380,
     defaultHeight: 420,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.45)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
