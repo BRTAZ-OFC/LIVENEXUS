@@ -26,6 +26,9 @@ type OverlayEditorProps = {
   selectedInstanceConfig?: Record<string, unknown> | null;
   onUpdateSelectedConfig: (patch: Record<string, unknown>) => void;
   onSelectWidget: (widgetId: string) => void;
+  gridSettings: { showGrid: boolean; snapToGrid: boolean; gridSize: number; showSafeAreas: boolean; verticalGuides: { id: string; x: number }[]; horizontalGuides: { id: string; y: number }[] };
+  onUpdateGridSettings: (patch: { showGrid?: boolean; snapToGrid?: boolean; gridSize?: number; showSafeAreas?: boolean; verticalGuides?: { id: string; x: number }[]; horizontalGuides?: { id: string; y: number }[] }) => void;
+  onAddGuide: (orientation: "vertical" | "horizontal") => void;
 };
 
 const MENUS = ["INICIO", "TEXTO", "ANIMACAO", "IMAGEMS", "ALINHAMENTO", "FORMAS", "EMOJES", "CAMADAS"] as const;
@@ -155,6 +158,9 @@ export default function Overlay_Editor({
   selectedInstanceConfig = null,
   onUpdateSelectedConfig,
   onSelectWidget,
+  gridSettings,
+  onUpdateGridSettings,
+  onAddGuide,
 }: OverlayEditorProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuName>("INICIO");
@@ -611,6 +617,53 @@ export default function Overlay_Editor({
                 </section>
               </div>
             )}
+            {activeMenu === "ALINHAMENTO" && (
+              <div className="grid h-full min-h-0 min-w-0 grid-cols-2 gap-3 overflow-hidden">
+                <section className="flex min-h-0 min-w-0 flex-col gap-3 border-r border-white/10 pr-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Grade e área segura</p>
+                  <label className="flex items-center gap-2 text-xs text-slate-200">
+                    <input type="checkbox" checked={gridSettings.showGrid} onChange={(event) => onUpdateGridSettings({ showGrid: event.target.checked })} className="h-4 w-4 accent-violet-500" />
+                    Exibir Grade
+                  </label>
+                  <label className="flex items-center gap-2 text-xs text-slate-200">
+                    <input type="checkbox" checked={gridSettings.snapToGrid} onChange={(event) => onUpdateGridSettings({ snapToGrid: event.target.checked })} className="h-4 w-4 accent-violet-500" />
+                    Alinhar à Grade (Snap)
+                  </label>
+                  <label className="flex flex-col gap-1 text-xs text-slate-200">
+                    <span className="flex items-center justify-between"><span>Tamanho da Grade</span><span className="tabular-nums">{gridSettings.gridSize} px</span></span>
+                    <input type="range" min={5} max={100} step={1} value={gridSettings.gridSize} onChange={(event) => onUpdateGridSettings({ gridSize: Number(event.target.value) })} aria-label="Tamanho da Grade em pixels" className="w-full accent-violet-500" />
+                  </label>
+                  <label className="flex items-center gap-2 text-xs text-slate-200">
+                    <input type="checkbox" checked={gridSettings.showSafeAreas} onChange={(event) => onUpdateGridSettings({ showSafeAreas: event.target.checked })} className="h-4 w-4 accent-violet-500" />
+                    Exibir Área Segura (Safe Area)
+                  </label>
+                </section>
+                <section className="flex min-h-0 min-w-0 flex-col gap-2 overflow-y-auto">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Linhas-guia manuais sem limite</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" onClick={() => onAddGuide("vertical")} className={buttonClass}>+ Linha Guia Vertical</button>
+                    <button type="button" onClick={() => onAddGuide("horizontal")} className={buttonClass}>+ Linha Guia Horizontal</button>
+                  </div>
+                  <p className="text-[10px] text-slate-400">As linhas novas começam no centro do canvas. Você pode adicionar quantas precisar.</p>
+                  {(gridSettings.verticalGuides.length > 0 || gridSettings.horizontalGuides.length > 0) && (
+                    <div className="flex min-w-0 flex-col gap-1">
+                      {gridSettings.verticalGuides.map((guide, index) => (
+                        <div key={guide.id} className="flex items-center justify-between gap-2 rounded border border-white/10 px-2 py-1 text-[10px] text-slate-200">
+                          <span>Linha vertical {index + 1} — {Math.round(guide.x)} px</span>
+                          <button type="button" aria-label={`Excluir linha guia vertical ${index + 1}`} onClick={() => onUpdateGridSettings({ verticalGuides: gridSettings.verticalGuides.filter((item) => item.id !== guide.id) })} className="text-rose-300">Excluir</button>
+                        </div>
+                      ))}
+                      {gridSettings.horizontalGuides.map((guide, index) => (
+                        <div key={guide.id} className="flex items-center justify-between gap-2 rounded border border-white/10 px-2 py-1 text-[10px] text-slate-200">
+                          <span>Linha horizontal {index + 1} — {Math.round(guide.y)} px</span>
+                          <button type="button" aria-label={`Excluir linha guia horizontal ${index + 1}`} onClick={() => onUpdateGridSettings({ horizontalGuides: gridSettings.horizontalGuides.filter((item) => item.id !== guide.id) })} className="text-rose-300">Excluir</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              </div>
+            )}
             {activeMenu === "FORMAS" && (
               <div className="grid h-full min-h-0 min-w-0 grid-cols-2 gap-3 overflow-hidden">
                 <section className="flex min-h-0 min-w-0 flex-col border-r border-white/10 pr-2">
@@ -630,7 +683,7 @@ export default function Overlay_Editor({
                 </section>
               </div>
             )}
-            {!["INICIO", "TEXTO", "ANIMACAO", "FORMAS"].includes(activeMenu) && (
+            {!["INICIO", "TEXTO", "ANIMACAO", "ALINHAMENTO", "FORMAS"].includes(activeMenu) && (
               <div className="flex h-full items-center justify-center text-xs text-slate-500">
                 Este menu ficará vazio nesta etapa.
               </div>
