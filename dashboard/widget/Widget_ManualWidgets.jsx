@@ -108,12 +108,19 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
   else if (config.structuralPreset === '04') layout = 'vinil';
   else if (config.structuralPreset === '05') layout = 'marquee';
   
-  const marqueeAnimation = <style>{`@keyframes ln-track-marquee { 0% { transform: translateX(0%); } 100% { transform: translateX(-33.33%); } }`}</style>;
-  const marqueeStyle = { animation: 'ln-track-marquee 15s linear infinite' };
+  const TrackMarquee = ({ text, className = '' }) => (
+    <div className={`w-full min-w-0 overflow-hidden whitespace-nowrap ${className}`}>
+      <div className="flex w-max" style={{ animation: 'ln-track-marquee 15s linear infinite' }}>
+        <span className="shrink-0 pr-8">{text}</span>
+        <span className="shrink-0 pr-8" aria-hidden="true">{text}</span>
+      </div>
+      <style>{`@keyframes ln-track-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }`}</style>
+    </div>
+  );
 
   // Lógica de Fragmentação (para templates customizados)
   if (elementKey === 'cover') return <img src={image} alt="Capa" className="h-full w-full object-cover rounded" />;
-  if (elementKey === 'title') return <div className="w-full overflow-hidden">{marqueeAnimation}<span className="inline-block font-bold text-lg text-white whitespace-nowrap" style={marqueeStyle}>{title}</span></div>;
+  if (elementKey === 'title') return <TrackMarquee text={`${title} • `} className="font-bold text-lg text-white" />;
   if (elementKey === 'artist') return <span className="text-sm font-medium text-slate-400 truncate">{artist}</span>;
 
   // 1. PADRÃO (FAIXA SUPERIOR)
@@ -136,10 +143,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
           </svg>
         </span>
         <div className="flex-1 overflow-hidden whitespace-nowrap relative">
-          {marqueeAnimation}
-          <span className="inline-block font-bold text-white text-sm tracking-wide" style={marqueeStyle}>
-            {textRepeated}
-          </span>
+          <TrackMarquee text={`${title} • `} className="font-bold text-white text-sm tracking-wide" />
         </div>
       </div>
     );
@@ -185,10 +189,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
             <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
           </svg>
           <div className="flex-1 overflow-hidden whitespace-nowrap">
-            {marqueeAnimation}
-            <span className="inline-block font-semibold text-slate-100 text-xs tracking-wide" style={marqueeStyle}>
-              {textRepeated}
-            </span>
+            <TrackMarquee text={`${title} • `} className="font-semibold text-slate-100 text-xs tracking-wide" />
           </div>
         </div>
       </div>
@@ -222,10 +223,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
               <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
             </svg>
             <div className="flex-1 overflow-hidden whitespace-nowrap">
-              {marqueeAnimation}
-              <span className="inline-block font-bold text-white text-sm" style={marqueeStyle}>
-                {textRepeated}
-              </span>
+              <TrackMarquee text={`${title} • `} className="font-bold text-white text-sm" />
             </div>
           </div>
 
