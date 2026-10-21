@@ -1020,6 +1020,13 @@ export default function OverlayCanvas() {
         onAddFragment={addWidgetComponent}
         onAddText={addTextInstance}
         onAddShape={addShapeInstance}
+        gridSettings={gridSettings}
+        onUpdateGridSettings={updateGridSettings}
+        onAddGuide={(orientation) => {
+          const id = `guide-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+          if (orientation === "vertical") updateGridSettings({ verticalGuides: [...gridSettings.verticalGuides, { id, x: Math.round(size.width / 2) }] });
+          else updateGridSettings({ horizontalGuides: [...gridSettings.horizontalGuides, { id, y: Math.round(size.height / 2) }] });
+        }}
         onFontChange={(fontFamily) => applyTextStyleToSelectedText({ fontFamily })}
         onTextStyleChange={applyTextStyleToSelectedText}
         selectedInstanceWidgetId={config.instances?.find((item, index) => (item.id || `${item.widgetId}-${index}`) === selectedInstanceId)?.widgetId ?? null}
