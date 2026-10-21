@@ -1,9 +1,11 @@
-import { getMusicPlayerState, playTrack as playGlobalTrack } from "../biblioteca/musicPlayerEngine";
+import { getMusicPlayerState } from "../biblioteca/musicPlayerEngine";
+
+let fallbackTrack = null;
 
 export function getCurrentTrack() {
-  return getMusicPlayerState().track;
+  return getMusicPlayerState().track || fallbackTrack;
 }
 
 export function setCurrentTrack(track) {
-  if (track?.videoId) playGlobalTrack(track);
+  fallbackTrack = track || null;
 }
