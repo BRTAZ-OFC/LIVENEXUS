@@ -66,6 +66,7 @@ type CanvasConfig = {
   visualizerSize?: { width?: number; height?: number };
   instances?: CanvasInstance[];
   background?: CanvasBackground;
+  globalStyleConfig?: { borderEnabled?: boolean; borderWidth?: number; texture?: string; colorEffectEnabled?: boolean; colorEffect?: string };
 };
 type OverlayRow = {
   id?: string;
@@ -82,6 +83,22 @@ const DEFAULT_SIZE = { width: 800, height: 480 };
 const TEXT_WIDGET_ID = "__livenexus_text__";
 const SHAPE_WIDGET_ID = "__livenexus_shape__";
 const EMPTY_BACKGROUND: CanvasBackground = { type: "transparent", opacity: 100 };
+
+const COLOR_EFFECT_FILTERS: Record<string, string> = {"glass":"saturate(1.25) contrast(1.04) brightness(1.04)","chrome":"saturate(0.35) contrast(1.35) brightness(1.08)","mirror":"saturate(1.4) contrast(1.2)","crystal":"saturate(1.3) brightness(1.12) contrast(0.92)","hologram":"hue-rotate(38deg) saturate(1.8) contrast(1.08)","neon":"saturate(2.2) contrast(1.25) brightness(1.08)","iridescent":"hue-rotate(75deg) saturate(1.55)","metal":"grayscale(0.65) contrast(1.35) brightness(1.12)","liquid":"saturate(1.65) contrast(1.08)","frost":"saturate(0.65) brightness(1.1) contrast(0.9)","gold":"sepia(0.8) saturate(1.8) contrast(1.12)","silver":"grayscale(0.85) contrast(1.2) brightness(1.12)","copper":"sepia(0.65) saturate(1.35) hue-rotate(-12deg)","ruby":"hue-rotate(315deg) saturate(1.8) contrast(1.12)","sapphire":"hue-rotate(190deg) saturate(1.7) contrast(1.1)","emerald":"hue-rotate(95deg) saturate(1.65) contrast(1.08)","amethyst":"hue-rotate(250deg) saturate(1.55)","duotone":"grayscale(0.8) sepia(0.35) hue-rotate(180deg) saturate(1.5)","thermal":"hue-rotate(155deg) saturate(2) contrast(1.15)","vintage":"sepia(0.55) saturate(0.8) contrast(0.95)","dream":"hue-rotate(22deg) saturate(1.35) brightness(1.12)"};
+function getGlobalTextureStyle(texture: string): CSSProperties {
+  const textures: Record<string, CSSProperties> = {
+    glass: { backgroundImage: "linear-gradient(135deg, rgba(255,255,255,.34), rgba(255,255,255,.03) 45%, rgba(160,220,255,.16))", backdropFilter: "blur(1px)", mixBlendMode: "screen" },
+    "brushed-metal": { backgroundImage: "repeating-linear-gradient(0deg, rgba(255,255,255,.12) 0px, rgba(255,255,255,.02) 1px, transparent 2px, transparent 4px)", mixBlendMode: "screen" },
+    carbon: { backgroundImage: "repeating-linear-gradient(45deg, rgba(255,255,255,.12) 0 2px, transparent 2px 5px), repeating-linear-gradient(-45deg, rgba(0,0,0,.18) 0 2px, transparent 2px 5px)", mixBlendMode: "overlay" },
+    noise: { backgroundImage: "radial-gradient(rgba(255,255,255,.22) .7px, transparent .8px)", backgroundSize: "4px 4px", mixBlendMode: "overlay" },
+    stripes: { backgroundImage: "repeating-linear-gradient(135deg, rgba(255,255,255,.14) 0 2px, transparent 2px 7px)", mixBlendMode: "overlay" },
+    dots: { backgroundImage: "radial-gradient(rgba(255,255,255,.35) 1px, transparent 1.5px)", backgroundSize: "7px 7px", mixBlendMode: "screen" },
+    holographic: { backgroundImage: "linear-gradient(120deg, rgba(255,0,180,.18), rgba(0,220,255,.22), rgba(255,220,0,.16), rgba(130,80,255,.2))", mixBlendMode: "color-dodge" },
+    marble: { backgroundImage: "repeating-radial-gradient(ellipse at 20% 30%, transparent 0 9px, rgba(255,255,255,.15) 10px 11px, transparent 12px 20px)", mixBlendMode: "screen" },
+  };
+  return textures[texture] || {};
+}
+
 
 
 function OverlayShape({ shape, color, strokeColor, strokeWidth, fillEnabled }: { shape: string; color: string; strokeColor: string; strokeWidth: number; fillEnabled: boolean }) {
@@ -203,6 +220,7 @@ export default function OverlayCanvas() {
     visualizerSize: DEFAULT_SIZE,
     instances: [],
     background: EMPTY_BACKGROUND,
+    globalStyleConfig: { borderEnabled: false, borderWidth: 1, texture: "none", colorEffectEnabled: false, colorEffect: "glass" },
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -746,6 +764,9 @@ export default function OverlayCanvas() {
                   zIndex: Number(instance.zIndex) || index + 1,
                   overflow: "visible",
                   opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100,
+                  filter: config.globalStyleConfig?.colorEffectEnabled ? (COLOR_EFFECT_FILTERS[String(config.globalStyleConfig.colorEffect || "glass")] || "none") : undefined,
+                  border: config.globalStyleConfig?.borderEnabled ? (Math.max(1, Math.min(100, Number(config.globalStyleConfig.borderWidth) || 1)) + "px solid rgba(220, 230, 255, 0.9)") : undefined,
+                  boxSizing: "border-box",
                   transform: transform || undefined,
                   outline: isSelected ? "1px solid #a78bfa" : "none",
                   cursor: "move",
@@ -925,6 +946,9 @@ export default function OverlayCanvas() {
                         />
                       )}
                     </div>
+                    {config.globalStyleConfig?.texture && config.globalStyleConfig.texture !== "none" && (
+                      <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20" style={getGlobalTextureStyle(String(config.globalStyleConfig.texture))} />
+                    )}
                     {isSelected && (
                       <div
                         role="separator"
@@ -1022,6 +1046,8 @@ export default function OverlayCanvas() {
         onAddShape={addShapeInstance}
         gridSettings={gridSettings}
         onUpdateGridSettings={updateGridSettings}
+        globalStyleConfig={{ borderEnabled: Boolean(config.globalStyleConfig?.borderEnabled), borderWidth: Math.max(1, Math.min(100, Number(config.globalStyleConfig?.borderWidth) || 1)), texture: String(config.globalStyleConfig?.texture || "none"), colorEffectEnabled: Boolean(config.globalStyleConfig?.colorEffectEnabled), colorEffect: String(config.globalStyleConfig?.colorEffect || "glass") }}
+        onUpdateGlobalStyleConfig={(patch) => setConfig((current) => ({ ...current, globalStyleConfig: { borderEnabled: false, borderWidth: 1, texture: "none", colorEffectEnabled: false, colorEffect: "glass", ...(current.globalStyleConfig || {}), ...patch } }))}
         onAddGuide={(orientation) => {
           const id = `guide-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
           if (orientation === "vertical") updateGridSettings({ verticalGuides: [...gridSettings.verticalGuides, { id, x: Math.round(size.width / 2) }] });
