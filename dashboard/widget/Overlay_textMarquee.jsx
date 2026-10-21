@@ -16,7 +16,7 @@ export function TextMarquee({ text = '', isMainChat = false, forceMarquee = fals
 
   return (
     <div className={`overflow-hidden whitespace-nowrap relative ${className}`} style={style}>
-      <div className="inline-block animate-marquee" style={{ display: 'inline-block', paddingLeft: '100%', animation: 'marquee 12s linear infinite' }}>
+      <div className="ln-marquee-motion inline-block animate-marquee" style={{ display: 'inline-block', paddingLeft: '100%', animation: 'marquee 12s linear infinite' }}>
         {str}
       </div>
       <style>{`
