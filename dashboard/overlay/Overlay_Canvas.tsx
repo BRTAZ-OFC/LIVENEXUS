@@ -679,16 +679,30 @@ export default function OverlayCanvas() {
   }
 
   function updateSelectedBackgroundMode(mode: "transparent" | "solid") {
+    if (mode === "transparent") {
+      // O modo transparente é global: remove o fundo do canvas, das formas e de todas as widgets.
+      updateBackground({ type: "transparent", opacity: 100, gradient: undefined, image: undefined });
+      setConfig((current) => ({
+        ...current,
+        background: { ...(current.background || {}), type: "transparent", opacity: 100, gradient: undefined, image: undefined },
+        instances: (current.instances || []).map((instance) => ({
+          ...instance,
+          config: instance.widgetId === SHAPE_WIDGET_ID
+            ? { ...(instance.config || {}), fillEnabled: false, fillOpacity: 0 }
+            : { ...(instance.config || {}), backgroundTransparent: true, backgroundOpacity: 0 },
+        })),
+      }));
+      return;
+    }
     if (!selectedInstanceId || !selectedCanvasInstance) {
-      if (mode === "transparent") updateBackground({ type: "transparent", opacity: 100, gradient: undefined, image: undefined });
-      else updateBackground({ type: "solid", color: selectedElementBackgroundColor || "#020617", opacity: 100, gradient: undefined, image: undefined });
+      updateBackground({ type: "solid", color: selectedElementBackgroundColor || "#020617", opacity: 100, gradient: undefined, image: undefined });
       return;
     }
     if (selectedCanvasInstance.widgetId === SHAPE_WIDGET_ID) {
-      updateInstance(selectedInstanceId, { config: { ...(selectedCanvasInstance.config || {}), fillEnabled: mode === "solid", fillOpacity: mode === "solid" ? 100 : 0 } });
+      updateInstance(selectedInstanceId, { config: { ...(selectedCanvasInstance.config || {}), fillEnabled: true, fillOpacity: 100 } });
       return;
     }
-    updateInstance(selectedInstanceId, { config: { ...(selectedCanvasInstance.config || {}), backgroundColor: selectedElementBackgroundColor, backgroundTransparent: mode === "transparent" } });
+    updateInstance(selectedInstanceId, { config: { ...(selectedCanvasInstance.config || {}), backgroundColor: selectedElementBackgroundColor, backgroundTransparent: false, backgroundOpacity: 100 } });
   }
 
   function updateSelectedBackgroundOpacity(opacity: number) {
@@ -960,8 +974,8 @@ export default function OverlayCanvas() {
                       widgetPointer.current = null;
                     }}
                   >
-                    <div className="h-full w-full overflow-hidden" style={instance.widgetId !== SHAPE_WIDGET_ID && widgetConfig["backgroundColor"] && widgetConfig["backgroundTransparent"] !== true ? { backgroundColor: `color-mix(in srgb, ${String(widgetConfig["backgroundColor"])} ${Math.max(0, Math.min(100, Number(widgetConfig["backgroundOpacity"] ?? 100)))}%, transparent)` } : undefined}>
-                      <style>{'[data-overlay-instance="' + instanceId + '"] :is(p,span,h1,h2,h3,h4,h5,h6,label,li,a,strong,em,small) { font-family: "' + String(widgetConfig["fontFamily"] || "Inter").replace(/"/g, "") + '", sans-serif !important; font-size: ' + Math.max(1, Number(widgetConfig["fontSize"]) || 16) + 'px !important; color: ' + String(widgetConfig["color"] || widgetConfig["textColor"] || "#ffffff") + ' !important; }'}</style>
+                    <div className="h-full w-full overflow-hidden" style={instance.widgetId !== SHAPE_WIDGET_ID && widgetConfig["backgroundTransparent"] !== true && widgetConfig["backgroundColor"] ? { backgroundColor: `color-mix(in srgb, ${String(widgetConfig["backgroundColor"])} ${Math.max(0, Math.min(100, Number(widgetConfig["backgroundOpacity"] ?? 100)))}%, transparent)` } : undefined}>
+                      <style>{'[data-overlay-instance="' + instanceId + '"] :is(p,span,h1,h2,h3,h4,h5,h6,label,li,a,strong,em,small) { font-family: "' + String(widgetConfig["fontFamily"] || "Inter").replace(/"/g, "") + '", sans-serif !important; font-size: ' + Math.max(1, Number(widgetConfig["fontSize"]) || 16) + 'px !important; color: ' + String(widgetConfig["color"] || widgetConfig["textColor"] || "#ffffff") + ' !important; }' + (widgetConfig["backgroundTransparent"] === true ? '[data-overlay-instance="' + instanceId + '"], [data-overlay-instance="' + instanceId + '"] * { background-color: transparent !important; background-image: none !important; box-shadow: none !important; }' : '')}</style>
                       {instance.widgetId === SHAPE_WIDGET_ID ? (
                         <div className="h-full w-full" style={{ opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100 }}><OverlayShape shape={String(widgetConfig["shape"] || instance.elementKey || "rectangle")} color={String(widgetConfig["fillColor"] || widgetConfig["color"] || "#8b5cf6")} strokeColor={String(widgetConfig["strokeColor"] || "#ddd6fe")} strokeWidth={Math.max(0, Number(widgetConfig["strokeWidth"] ?? 2))} fillEnabled={widgetConfig["fillEnabled"] !== false} fillOpacity={Number(widgetConfig["fillOpacity"] ?? 100)}/></div>
                       ) : instance.widgetId === TEXT_WIDGET_ID ? (
