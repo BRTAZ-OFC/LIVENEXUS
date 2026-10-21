@@ -192,7 +192,7 @@ function DashboardPage() {
   // BLOCO 5 — Atualiza a seção selecionada e persiste a escolha.
   function handleSelectSection(
     section:
-      "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios",
+      "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios" | "biblioteca",
   ) {
     setActiveSection(section);
     setActiveScenarioId(null);
