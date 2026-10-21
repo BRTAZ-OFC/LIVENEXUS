@@ -16,13 +16,8 @@ export default function HorizontalScrollContainer({
   contentClassName = "",
 }: Props) {
   return (
-    <HorizontalMenu
-      ariaLabel="Opções do editor de Overlay"
-      className={className}
-    >
-      <div className={`flex w-max min-w-max items-center ${contentClassName}`}>
-        {children}
-      </div>
+    <HorizontalMenu ariaLabel="Opções do editor de Overlay" className={className}>
+      <div className={`flex w-max min-w-max items-center ${contentClassName}`}>{children}</div>
     </HorizontalMenu>
   );
 }

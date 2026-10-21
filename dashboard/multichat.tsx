@@ -75,13 +75,21 @@ export function useMultiChatSnapshot() {
 
 // Assinatura seletiva para telas que só precisam do estado dos canais, não das mensagens.
 export function useMultiChatStatusSnapshot() {
-  const [value, setValue] = useState(() => ({ channels: snapshot.channels, statuses: snapshot.statuses }));
-  useEffect(() => subscribeMultiChat((next) => {
-    setValue((current) => {
-      if (current.channels === next.channels && current.statuses === next.statuses) return current;
-      return { channels: next.channels, statuses: next.statuses };
-    });
-  }), []);
+  const [value, setValue] = useState(() => ({
+    channels: snapshot.channels,
+    statuses: snapshot.statuses,
+  }));
+  useEffect(
+    () =>
+      subscribeMultiChat((next) => {
+        setValue((current) => {
+          if (current.channels === next.channels && current.statuses === next.statuses)
+            return current;
+          return { channels: next.channels, statuses: next.statuses };
+        });
+      }),
+    [],
+  );
   return value;
 }
 export function setMultiChatChannel(platform: ChatPlatform, channel: string) {
@@ -179,7 +187,9 @@ export function connectMultiChatPlatform(platform: ChatPlatform) {
 export function disconnectMultiChatPlatform(platform: ChatPlatform) {
   try {
     handles[platform]?.disconnect();
-  } catch {}
+  } catch {
+    /* ignora erro de desconexão */
+  }
   delete handles[platform];
   patchPlatform(platform, { status: "idle", detail: "Desconectado", viewers: null, meta: "" });
 }

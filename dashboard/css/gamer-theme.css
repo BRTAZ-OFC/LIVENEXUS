@@ -48,7 +48,10 @@ body {
 
 a {
   text-underline-offset: 3px;
-  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
 }
 
 button,
@@ -112,8 +115,7 @@ hr {
 
 .auth-card,
 .not-found-card {
-  background:
-    linear-gradient(145deg, rgb(17 29 46 / 96%), rgb(9 15 27 / 98%));
+  background: linear-gradient(145deg, rgb(17 29 46 / 96%), rgb(9 15 27 / 98%));
   border-color: rgb(34 211 238 / 24%);
   box-shadow:
     0 24px 70px rgb(0 0 0 / 36%),
@@ -172,7 +174,9 @@ hr {
 .home-relative-overflow-hidden-li6lbx {
   border-color: rgb(34 211 238 / 21%);
   background: linear-gradient(145deg, rgb(15 24 40 / 96%), rgb(8 13 24 / 98%));
-  box-shadow: 0 28px 80px rgb(0 0 0 / 38%), 0 0 40px rgb(34 211 238 / 5%);
+  box-shadow:
+    0 28px 80px rgb(0 0 0 / 38%),
+    0 0 40px rgb(34 211 238 / 5%);
 }
 
 .home-inline-flex-items-center-1a3j2x0,

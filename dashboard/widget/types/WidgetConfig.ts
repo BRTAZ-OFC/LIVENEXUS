@@ -36,11 +36,11 @@ export interface WidgetConfig {
   effBorderGlow?: number;
   effAnimBgActiveType?: string;
   effGlowPulsing?: boolean;
-  commands?: any[];
-  rules?: any[];
-  schedule?: any[];
+  commands?: unknown[];
+  rules?: unknown[];
+  schedule?: unknown[];
   news?: boolean;
   newsText?: string;
   text?: string;
-  [key: string]: any; // Allow other properties for robustness
+  [key: string]: unknown; // Allow other properties for robustness
 }

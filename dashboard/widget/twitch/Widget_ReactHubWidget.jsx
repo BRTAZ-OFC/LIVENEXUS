@@ -1,34 +1,31 @@
-import React, { useState, useEffect, useMemo, useLayoutEffect, useRef } from 'react';
-import TwitchChatBox from './Widget_TwitchChatBox';
-import { useStreaming } from '../runtime';
+import React, { useState, useEffect, useMemo, useLayoutEffect, useRef } from "react";
+import TwitchChatBox from "./Widget_TwitchChatBox";
+import { useStreaming } from "../runtime";
 import {
   getStoredReactQueue,
   getStoredActiveReactVideo,
-  syncVideosFromChatMessages
-} from '../../cenarios/Scenario_reactVideoService';
-import { 
-  MessageSquare, Film, SplitSquareVertical, 
-  CheckCircle2, Radio
-} from 'lucide-react';
+  syncVideosFromChatMessages,
+} from "../../cenarios/Scenario_reactVideoService";
+import { MessageSquare, Film, SplitSquareVertical, CheckCircle2, Radio } from "lucide-react";
 
 export default function ReactHubWidget({ config = {} }) {
   const { liveActivity } = useStreaming();
 
   const [queue, setQueue] = useState(() => getStoredReactQueue());
   const [activeVideo, setActiveVideo] = useState(() => getStoredActiveReactVideo());
-  
+
   const containerRef = useRef(null);
 
   // Sync queue and active video with BroadcastChannel and storage events
   useEffect(() => {
     let channel = null;
     try {
-      if ('BroadcastChannel' in window) {
-        channel = new BroadcastChannel('scenario_react_bus');
+      if ("BroadcastChannel" in window) {
+        channel = new BroadcastChannel("scenario_react_bus");
         channel.onmessage = (event) => {
-          if (event.data?.type === 'QUEUE_UPDATED') {
+          if (event.data?.type === "QUEUE_UPDATED") {
             setQueue(event.data.payload || []);
-          } else if (event.data?.type === 'ACTIVE_VIDEO_CHANGED') {
+          } else if (event.data?.type === "ACTIVE_VIDEO_CHANGED") {
             setActiveVideo(event.data.payload || null);
           }
         };
@@ -38,14 +35,14 @@ export default function ReactHubWidget({ config = {} }) {
     }
 
     const handleStorage = (e) => {
-      if (e.key === 'scenario_react_queue') {
+      if (e.key === "scenario_react_queue") {
         try {
           const parsed = e.newValue ? JSON.parse(e.newValue) : [];
           setQueue(Array.isArray(parsed) ? parsed : []);
         } catch {
           // ignore
         }
-      } else if (e.key === 'scenario_react_active_video') {
+      } else if (e.key === "scenario_react_active_video") {
         try {
           const parsed = e.newValue ? JSON.parse(e.newValue) : null;
           setActiveVideo(parsed);
@@ -55,7 +52,7 @@ export default function ReactHubWidget({ config = {} }) {
       }
     };
 
-    window.addEventListener('storage', handleStorage);
+    window.addEventListener("storage", handleStorage);
 
     const interval = setInterval(() => {
       setQueue(getStoredReactQueue());
@@ -63,10 +60,14 @@ export default function ReactHubWidget({ config = {} }) {
     }, 1000);
 
     return () => {
-      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener("storage", handleStorage);
       clearInterval(interval);
       if (channel) {
-        try { channel.close(); } catch { /* ignore */ }
+        try {
+          channel.close();
+        } catch {
+          /* ignore */
+        }
       }
     };
   }, []);
@@ -80,7 +81,7 @@ export default function ReactHubWidget({ config = {} }) {
   }, [liveActivity?.items]);
 
   const queueKey = useMemo(() => {
-    return queue.map(q => q.id).join(',');
+    return queue.map((q) => q.id).join(",");
   }, [queue]);
 
   // Adjust visibility of elements based on container bounds directly in DOM to avoid state update loops
@@ -88,7 +89,7 @@ export default function ReactHubWidget({ config = {} }) {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
-    
+
     // Create a ResizeObserver to trigger visibility adjustments on layout resize
     const observer = new ResizeObserver(() => {
       requestAnimationFrame(() => {
@@ -105,8 +106,8 @@ export default function ReactHubWidget({ config = {} }) {
       if (children.length === 0) return;
 
       // First, restore display of all children to measure them properly
-      children.forEach(child => {
-        child.style.display = 'flex';
+      children.forEach((child) => {
+        child.style.display = "flex";
       });
 
       let totalHeight = 0;
@@ -119,7 +120,7 @@ export default function ReactHubWidget({ config = {} }) {
       for (let i = 0; i < children.length; i++) {
         const child = children[i];
         if (hasOverflowed) {
-          child.style.display = 'none';
+          child.style.display = "none";
           continue;
         }
 
@@ -131,7 +132,7 @@ export default function ReactHubWidget({ config = {} }) {
           fitCount++;
         } else {
           hasOverflowed = true;
-          child.style.display = 'none';
+          child.style.display = "none";
         }
       }
     }
@@ -144,18 +145,18 @@ export default function ReactHubWidget({ config = {} }) {
   }, [queue, queueKey]);
 
   const pendingCount = useMemo(() => {
-    return queue.filter(item => item.status === 'pending').length;
+    return queue.filter((item) => item.status === "pending").length;
   }, [queue]);
 
-  const borderRadius = config.borderRadius || '12px';
-  const backgroundColor = config.backgroundColor || 'rgba(15, 23, 42, 0.9)';
+  const borderRadius = config.borderRadius || "12px";
+  const backgroundColor = config.backgroundColor || "rgba(15, 23, 42, 0.9)";
 
   return (
     <div
       style={{
         borderRadius,
         background: backgroundColor,
-        fontFamily: config.fontFamily || 'Inter, sans-serif',
+        fontFamily: config.fontFamily || "Inter, sans-serif",
       }}
       className="w-full h-full flex flex-col overflow-hidden text-slate-100 shadow-2xl select-none"
     >
@@ -182,7 +183,9 @@ export default function ReactHubWidget({ config = {} }) {
             <span>Chat da Transmissão</span>
           </div>
           <div className="flex-1 overflow-hidden">
-            <TwitchChatBox config={{ ...config, backgroundColor: 'transparent', showBorder: false }} />
+            <TwitchChatBox
+              config={{ ...config, backgroundColor: "transparent", showBorder: false }}
+            />
           </div>
         </div>
 
@@ -199,7 +202,7 @@ export default function ReactHubWidget({ config = {} }) {
               )}
             </div>
             <span className="text-[10px] text-slate-400 font-mono">
-              {queue.length} {queue.length === 1 ? 'vídeo' : 'vídeos'}
+              {queue.length} {queue.length === 1 ? "vídeo" : "vídeos"}
             </span>
           </div>
 
@@ -212,16 +215,14 @@ export default function ReactHubWidget({ config = {} }) {
   // Sub-component: List of user-submitted video links for the stream view
   function renderVideoQueueList() {
     return (
-      <div 
+      <div
         ref={containerRef}
         className="flex-1 overflow-hidden space-y-1.5 pr-1 scrollbar-none relative h-full"
       >
         {queue.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-4 text-slate-500 space-y-1.5">
             <Film className="w-8 h-8 text-slate-600 stroke-[1.5]" />
-            <p className="text-xs font-medium text-slate-400">
-              Nenhum vídeo enviado ainda.
-            </p>
+            <p className="text-xs font-medium text-slate-400">Nenhum vídeo enviado ainda.</p>
             <p className="text-[11px] text-slate-500 max-w-[240px]">
               Envie links do YouTube pelo painel Config ou envie no chat da transmissão.
             </p>
@@ -229,32 +230,32 @@ export default function ReactHubWidget({ config = {} }) {
         ) : (
           queue.map((item) => {
             const isPlaying = activeVideo && activeVideo.id === item.id;
-            const isWatched = item.status === 'watched';
+            const isWatched = item.status === "watched";
 
             return (
               <div
                 key={item.id}
                 className={`p-2 rounded-lg border transition-all text-left flex flex-col gap-1 shrink-0 w-full min-w-0 overflow-hidden ${
                   isPlaying
-                    ? 'bg-blue-950/80 border-blue-500/80 shadow-md shadow-blue-950/50 ring-1 ring-blue-500/40'
+                    ? "bg-blue-950/80 border-blue-500/80 shadow-md shadow-blue-950/50 ring-1 ring-blue-500/40"
                     : isWatched
-                    ? 'bg-slate-900/40 border-white/5 opacity-60'
-                    : 'bg-slate-900/80 border-slate-700/60'
+                      ? "bg-slate-900/40 border-white/5 opacity-60"
+                      : "bg-slate-900/80 border-slate-700/60"
                 }`}
               >
                 {/* Top line: Author & Platform badge */}
                 <div className="flex items-center justify-between gap-1 w-full min-w-0">
                   <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
                     <span
-                      style={{ backgroundColor: item.parsed?.badgeColor || '#ef4444' }}
+                      style={{ backgroundColor: item.parsed?.badgeColor || "#ef4444" }}
                       className="px-1.5 py-0.2 rounded text-[9px] font-bold text-white uppercase shrink-0"
                     >
-                      {item.parsed?.platform || 'YouTube'}
+                      {item.parsed?.platform || "YouTube"}
                     </span>
                     <span className="text-xs font-semibold text-slate-200 truncate whitespace-nowrap">
                       {item.author}
                     </span>
-                    {item.source === 'chat' && (
+                    {item.source === "chat" && (
                       <span className="text-[9px] px-1 bg-purple-900/60 text-purple-300 rounded font-mono shrink-0">
                         chat
                       </span>
@@ -277,7 +278,7 @@ export default function ReactHubWidget({ config = {} }) {
                 </div>
 
                 {/* Middle line: URL / Title - GUARANTEED SINGLE LINE WITH ELLIPSIS (...) */}
-                <div 
+                <div
                   className="text-[11px] text-slate-300 font-mono truncate block whitespace-nowrap overflow-hidden text-ellipsis w-full min-w-0"
                   title={item.title || item.url}
                 >

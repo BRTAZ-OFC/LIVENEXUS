@@ -8,7 +8,10 @@ export function useStreaming() {
   const snapshot = useMultiChatSnapshot();
 
   const connections = useMemo(() => {
-    const result: Record<string, { status: string; viewers: number | null; detail: string; channel: string }> = {};
+    const result: Record<
+      string,
+      { status: string; viewers: number | null; detail: string; channel: string }
+    > = {};
     for (const platform of PLATFORMS) {
       const source = snapshot.statuses[platform];
       result[platform] = {
@@ -21,16 +24,19 @@ export function useStreaming() {
     return result;
   }, [snapshot]);
 
-  const liveActivity = useMemo(() => ({
-    items: snapshot.messages.map((message) => ({
-      ...message,
-      eventMeta: null,
-      eventType: message.eventType || null,
-      text: message.text,
-      author: message.author,
-      timestamp: message.timestamp,
-    })),
-  }), [snapshot.messages]);
+  const liveActivity = useMemo(
+    () => ({
+      items: snapshot.messages.map((message) => ({
+        ...message,
+        eventMeta: null,
+        eventType: message.eventType || null,
+        text: message.text,
+        author: message.author,
+        timestamp: message.timestamp,
+      })),
+    }),
+    [snapshot.messages],
+  );
 
   const streamMeta = useMemo(() => {
     const result: Record<string, { title: string; channelName: string; startedAt: null }> = {};

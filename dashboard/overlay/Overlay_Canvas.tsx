@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+  type CSSProperties,
+} from "react";
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
 import HorizontalMenu from "../components/HorizontalMenu";
@@ -28,7 +35,14 @@ type WidgetDefinition = {
   category?: string;
   implemented?: boolean;
 };
-type CanvasGridSettings = { showGrid: boolean; snapToGrid: boolean; gridSize: number; showSafeAreas: boolean; verticalGuides: { id: string; x: number }[]; horizontalGuides: { id: string; y: number }[] };
+type CanvasGridSettings = {
+  showGrid: boolean;
+  snapToGrid: boolean;
+  gridSize: number;
+  showSafeAreas: boolean;
+  verticalGuides: { id: string; x: number }[];
+  horizontalGuides: { id: string; y: number }[];
+};
 type CanvasBackground = {
   type?: string;
   color?: string;
@@ -67,23 +81,24 @@ function isObject(value: unknown): value is JsonObject {
 }
 
 function getCanvasConfig(row: OverlayRow): CanvasConfig {
-  const source = isObject(row.settings) && Object.keys(row.settings).length
-    ? row.settings
-    : isObject(row.config) && Object.keys(row.config).length
-      ? row.config
-      : isObject(row.data) && Object.keys(row.data).length
-        ? row.data
-        : row as unknown as JsonObject;
+  const source =
+    isObject(row.settings) && Object.keys(row.settings).length
+      ? row.settings
+      : isObject(row.config) && Object.keys(row.config).length
+        ? row.config
+        : isObject(row.data) && Object.keys(row.data).length
+          ? row.data
+          : (row as unknown as JsonObject);
   return {
     ...source,
     ...(typeof row.id === "string" ? { id: row.id } : {}),
     name: String(source["name"] ?? row.name ?? "Overlay"),
     visualizerSize: isObject(source["visualizerSize"])
-      ? source["visualizerSize"] as CanvasConfig["visualizerSize"]
+      ? (source["visualizerSize"] as CanvasConfig["visualizerSize"])
       : DEFAULT_SIZE,
-    instances: Array.isArray(source["instances"]) ? source["instances"] as CanvasInstance[] : [],
+    instances: Array.isArray(source["instances"]) ? (source["instances"] as CanvasInstance[]) : [],
     background: isObject(source["background"])
-      ? source["background"] as CanvasBackground
+      ? (source["background"] as CanvasBackground)
       : EMPTY_BACKGROUND,
   };
 }
@@ -93,7 +108,8 @@ function backgroundStyle(background: CanvasBackground): CSSProperties {
   if (background.type === "solid") {
     style.backgroundColor = background.color || "#020617";
   } else if (background.type === "gradient") {
-    style.backgroundImage = background.gradient || "linear-gradient(135deg, #1e1b4b 0%, #311042 100%)";
+    style.backgroundImage =
+      background.gradient || "linear-gradient(135deg, #1e1b4b 0%, #311042 100%)";
   } else if (background.type === "image" && background.image) {
     style.backgroundImage = `url("${background.image.replace(/"/g, "%22")}")`;
     style.backgroundSize = "cover";
@@ -113,9 +129,12 @@ function backgroundStyle(background: CanvasBackground): CSSProperties {
   style.opacity = Math.max(0, Math.min(100, Number(background.opacity ?? 100))) / 100;
   const filters: string[] = [];
   if (Number(background.blur) > 0) filters.push(`blur(${Number(background.blur)}px)`);
-  if (background.brightness != null && Number(background.brightness) !== 100) filters.push(`brightness(${Number(background.brightness)}%)`);
-  if (background.contrast != null && Number(background.contrast) !== 100) filters.push(`contrast(${Number(background.contrast)}%)`);
-  if (background.saturate != null && Number(background.saturate) !== 100) filters.push(`saturate(${Number(background.saturate)}%)`);
+  if (background.brightness != null && Number(background.brightness) !== 100)
+    filters.push(`brightness(${Number(background.brightness)}%)`);
+  if (background.contrast != null && Number(background.contrast) !== 100)
+    filters.push(`contrast(${Number(background.contrast)}%)`);
+  if (background.saturate != null && Number(background.saturate) !== 100)
+    filters.push(`saturate(${Number(background.saturate)}%)`);
   if (filters.length) style.filter = filters.join(" ");
   return style;
 }
@@ -129,8 +148,24 @@ export default function OverlayCanvas() {
   const [scale, setScale] = useState(1);
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
-  const [gridSettings, setGridSettings] = useState<CanvasGridSettings>({ showGrid: false, snapToGrid: false, gridSize: 20, showSafeAreas: false, verticalGuides: [], horizontalGuides: [] });
-  const widgetPointer = useRef<{ instanceId: string; mode: "move" | "resize"; x: number; y: number; left: number; top: number; width: number; height: number } | null>(null);
+  const [gridSettings, setGridSettings] = useState<CanvasGridSettings>({
+    showGrid: false,
+    snapToGrid: false,
+    gridSize: 20,
+    showSafeAreas: false,
+    verticalGuides: [],
+    horizontalGuides: [],
+  });
+  const widgetPointer = useRef<{
+    instanceId: string;
+    mode: "move" | "resize";
+    x: number;
+    y: number;
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  } | null>(null);
   const [config, setConfig] = useState<CanvasConfig>({
     name: "Overlay",
     visualizerSize: DEFAULT_SIZE,
@@ -163,34 +198,40 @@ export default function OverlayCanvas() {
         const requestedScenario = requestedScenarioId
           ? rows.find((row) => String(row.id ?? "") === requestedScenarioId)
           : undefined;
-        const firstConfigured = requestedScenario
-          || rows.find((row) => getCanvasConfig(row).instances.length > 0)
-          || rows[0];
+        const firstConfigured =
+          requestedScenario ||
+          rows.find((row) => getCanvasConfig(row).instances.length > 0) ||
+          rows[0];
         if (!cancelled && firstConfigured) {
           setConfig(getCanvasConfig(firstConfigured));
           if (requestedScenario) sessionStorage.removeItem("livenexus_active_scenario_id");
-        } else if (!cancelled) setConfig({
-          name: "Overlay",
-          visualizerSize: DEFAULT_SIZE,
-          instances: [],
-          background: EMPTY_BACKGROUND,
-        });
+        } else if (!cancelled)
+          setConfig({
+            name: "Overlay",
+            visualizerSize: DEFAULT_SIZE,
+            instances: [],
+            background: EMPTY_BACKGROUND,
+          });
       } catch (cause) {
-        if (!cancelled) setError(cause instanceof Error ? cause.message : "Erro ao carregar o canvas.");
+        if (!cancelled)
+          setError(cause instanceof Error ? cause.message : "Erro ao carregar o canvas.");
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
     void loadOverlay();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-
-
-  const size = useMemo(() => ({
-    width: Math.max(320, Number(config.visualizerSize?.width) || DEFAULT_SIZE.width),
-    height: Math.max(180, Number(config.visualizerSize?.height) || DEFAULT_SIZE.height),
-  }), [config.visualizerSize]);
+  const size = useMemo(
+    () => ({
+      width: Math.max(320, Number(config.visualizerSize?.width) || DEFAULT_SIZE.width),
+      height: Math.max(180, Number(config.visualizerSize?.height) || DEFAULT_SIZE.height),
+    }),
+    [config.visualizerSize],
+  );
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -225,7 +266,10 @@ export default function OverlayCanvas() {
       visible: true,
       config: { ...(definition.defaultConfig || {}) },
     };
-    setConfig((current) => ({ ...current, instances: [...(current.instances || []), nextInstance] }));
+    setConfig((current) => ({
+      ...current,
+      instances: [...(current.instances || []), nextInstance],
+    }));
     setSelectedInstanceId(nextInstance.id || null);
   }
 
@@ -248,7 +292,10 @@ export default function OverlayCanvas() {
       visible: true,
       config: { ...(definition.defaultConfig || {}) },
     };
-    setConfig((current) => ({ ...current, instances: [...(current.instances || []), nextInstance] }));
+    setConfig((current) => ({
+      ...current,
+      instances: [...(current.instances || []), nextInstance],
+    }));
     setSelectedInstanceId(nextInstance.id || null);
   }
 
@@ -256,7 +303,7 @@ export default function OverlayCanvas() {
     setConfig((current) => ({
       ...current,
       instances: (current.instances || []).map((item, index) =>
-        (item.id || `${item.widgetId}-${index}`) === instanceId ? { ...item, ...patch } : item
+        (item.id || `${item.widgetId}-${index}`) === instanceId ? { ...item, ...patch } : item,
       ),
     }));
   }
@@ -264,11 +311,11 @@ export default function OverlayCanvas() {
   function deleteInstance(instanceId: string) {
     setConfig((current) => ({
       ...current,
-      instances: (current.instances || []).filter((item, index) =>
-        (item.id || `${item.widgetId}-${index}`) !== instanceId
+      instances: (current.instances || []).filter(
+        (item, index) => (item.id || `${item.widgetId}-${index}`) !== instanceId,
       ),
     }));
-    setSelectedInstanceId((current) => current === instanceId ? null : current);
+    setSelectedInstanceId((current) => (current === instanceId ? null : current));
   }
 
   function updateGridSettings(patch: Partial<CanvasGridSettings>) {
@@ -276,7 +323,10 @@ export default function OverlayCanvas() {
   }
 
   function updateBackground(patch: Partial<CanvasBackground>) {
-    setConfig((current) => ({ ...current, background: { ...(current.background || EMPTY_BACKGROUND), ...patch } }));
+    setConfig((current) => ({
+      ...current,
+      background: { ...(current.background || EMPTY_BACKGROUND), ...patch },
+    }));
   }
 
   const canvasBackground = useMemo(
@@ -288,235 +338,316 @@ export default function OverlayCanvas() {
     <section className="flex w-full min-w-0 flex-col items-center gap-2 overflow-hidden">
       <div className="w-full min-w-0">
         <HorizontalMenu ariaLabel="Widgets de Overlay" className="w-full">
-          {catalog.filter((widget) => widget.implemented !== false).map((widget) => (
-            <button
-              key={widget.id}
-              type="button"
-              onClick={() => addWidget(widget)}
-              title={`Adicionar ${widget.name} ao canvas`}
-              className="shrink-0 rounded-md border border-white/10 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"
-            >
-              {widget.name}
-            </button>
-          ))}
+          {catalog
+            .filter((widget) => widget.implemented !== false)
+            .map((widget) => (
+              <button
+                key={widget.id}
+                type="button"
+                onClick={() => addWidget(widget)}
+                title={`Adicionar ${widget.name} ao canvas`}
+                className="shrink-0 rounded-md border border-white/10 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"
+              >
+                {widget.name}
+              </button>
+            ))}
         </HorizontalMenu>
       </div>
       <div className="relative flex w-full min-w-0 justify-center overflow-hidden">
-      <div
-        ref={frameRef}
-        className="relative mx-auto shrink-0 overflow-hidden bg-transparent"
-        style={{ width: size.width, maxWidth: "100%", height: size.height, boxSizing: "border-box" }}
-        aria-label="Canvas de Overlay"
-      >
         <div
-          className="absolute left-0 top-0 overflow-hidden"
-          style={{ width: size.width, height: size.height, transform: `scale(${scale})`, transformOrigin: "top left" }}
+          ref={frameRef}
+          className="relative mx-auto shrink-0 overflow-hidden bg-transparent"
+          style={{
+            width: size.width,
+            maxWidth: "100%",
+            height: size.height,
+            boxSizing: "border-box",
+          }}
+          aria-label="Canvas de Overlay"
         >
-          <div className="absolute inset-0" style={canvasBackground} />
-          {gridSettings.showGrid && (
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                backgroundImage: "linear-gradient(to right, rgba(167,139,250,.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(167,139,250,.2) 1px, transparent 1px)",
-                backgroundSize: `${Math.max(5, Number(gridSettings.gridSize) || 20)}px ${Math.max(5, Number(gridSettings.gridSize) || 20)}px`,
-              }}
-            />
-          )}
-          {gridSettings.showSafeAreas && (
-            <div aria-hidden="true" className="absolute inset-[5%] pointer-events-none border border-dashed border-emerald-400/60" />
-          )}
-          {(gridSettings.verticalGuides || []).map((guide: { id: string; x: number }) => (
-            <div key={guide.id} aria-hidden="true" className="absolute top-0 bottom-0 z-30 pointer-events-none border-l border-cyan-400/80" style={{ left: guide.x }} />
-          ))}
-          {(gridSettings.horizontalGuides || []).map((guide: { id: string; y: number }) => (
-            <div key={guide.id} aria-hidden="true" className="absolute left-0 right-0 z-30 pointer-events-none border-t border-cyan-400/80" style={{ top: guide.y }} />
-          ))}
-          {config.instances
-            ?.filter((instance) => instance.visible !== false)
-            .slice()
-            .sort((a, b) => (Number(a.zIndex) || 0) - (Number(b.zIndex) || 0))
-            .map((instance, index) => {
-              const definition = catalog.find((item) => item.id === instance.widgetId);
-              if (!definition) return null;
-              const width = Math.max(1, Number(instance.width) || definition.defaultWidth || 280);
-              const height = Math.max(1, Number(instance.height) || definition.defaultHeight || 120);
-              const widgetConfig = { ...(definition.defaultConfig || {}), ...(instance.config || {}) };
-              const transform = [
-                widgetConfig["rotation"] ? `rotate(${Number(widgetConfig["rotation"])}deg)` : "",
-                widgetConfig["flipH"] ? "scaleX(-1)" : "",
-                widgetConfig["flipV"] ? "scaleY(-1)" : "",
-              ].filter(Boolean).join(" ");
-              const instanceId = instance.id || `${instance.widgetId}-${index}`;
-              const isSelected = selectedInstanceId === instanceId;
-              const instanceStyle: CSSProperties = {
-                position: "absolute",
-                left: Number(instance.x) || 0,
-                top: Number(instance.y) || 0,
-                width,
-                height,
-                zIndex: Number(instance.zIndex) || index + 1,
-                overflow: "visible",
-                opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100,
-                transform: transform || undefined,
-                outline: isSelected ? "1px solid #a78bfa" : "none",
-                cursor: "move",
-                touchAction: "none",
-              };
-              return (
-                <div
-                  key={instanceId}
-                  style={instanceStyle}
-                  onPointerDown={(event) => {
-                    setSelectedInstanceId(instanceId);
-                    if ((event.target as HTMLElement).closest("button,input,textarea,select,a,[data-no-widget-drag]")) return;
-                    event.preventDefault();
-                    event.stopPropagation();
-                    widgetPointer.current = {
-                      instanceId,
-                      mode: "move",
-                      x: event.clientX,
-                      y: event.clientY,
-                      left: Number(instance.x) || 0,
-                      top: Number(instance.y) || 0,
-                      width,
-                      height,
-                    };
-                    event.currentTarget.setPointerCapture(event.pointerId);
-                    setConfig((current) => {
-                      const instances = [...(current.instances || [])];
-                      const maxZ = instances.reduce((max, item) => Math.max(max, Number(item.zIndex) || 0), 0);
-                      if (instances[index]) instances[index] = { ...instances[index], zIndex: maxZ + 1 };
-                      return { ...current, instances };
-                    });
-                  }}
-                  onPointerMove={(event) => {
-                    const drag = widgetPointer.current;
-                    if (!drag || drag.instanceId !== instanceId || !(event.buttons & 1)) return;
-                    const dx = (event.clientX - drag.x) / scale;
-                    const dy = (event.clientY - drag.y) / scale;
-                    setConfig((current) => {
-                      const instances = [...(current.instances || [])];
-                      const targetIndex = instances.findIndex((item, itemIndex) =>
-                        (item.id || `${item.widgetId}-${itemIndex}`) === drag.instanceId
-                      );
-                      if (targetIndex < 0) return current;
-                      const item = instances[targetIndex];
-                      if (drag.mode === "move") {
-                        const gridSize = Math.max(1, Number(gridSettings.gridSize) || 20);
-                        const rawX = Math.max(0, Math.min(size.width - drag.width, drag.left + dx));
-                        const rawY = Math.max(0, Math.min(size.height - drag.height, drag.top + dy));
-                        const nextX = gridSettings.snapToGrid ? Math.round(rawX / gridSize) * gridSize : rawX;
-                        const nextY = gridSettings.snapToGrid ? Math.round(rawY / gridSize) * gridSize : rawY;
-                        instances[targetIndex] = {
-                          ...item,
-                          x: Math.max(0, Math.min(size.width - drag.width, nextX)),
-                          y: Math.max(0, Math.min(size.height - drag.height, nextY)),
-                        };
-                      } else {
-                        instances[targetIndex] = {
-                          ...item,
-                          width: Math.max(40, Math.min(size.width - drag.left, drag.width + dx)),
-                          height: Math.max(20, Math.min(size.height - drag.top, drag.height + dy)),
-                        };
-                      }
-                      return { ...current, instances };
-                    });
-                  }}
-                  onPointerUp={() => { widgetPointer.current = null; }}
-                  onPointerCancel={() => { widgetPointer.current = null; }}
-                >
-                  <div className="h-full w-full overflow-hidden">
-                    <OverlayWidgetElementRenderer
-                      widgetId={instance.widgetId}
-                      elementKey={instance.elementKey || "full_widget"}
-                      isFullWidget={instance.isFullWidget !== false}
-                      config={widgetConfig}
-                      isEditing={false}
-                      onUpdateConfig={() => undefined}
-                      onFinishEditing={() => undefined}
-                      instanceId={instance.id}
-                      instanceName={instance.name}
-                    />
-                  </div>
-                  {isSelected && (
-                    <div
-                      role="separator"
-                      aria-label={`Redimensionar ${instance.name || definition.name}`}
-                      title="Arraste para ajustar o tamanho"
-                      className="absolute bottom-0 right-0 z-50 h-3 w-3 cursor-se-resize border border-white bg-violet-500"
-                      style={{ touchAction: "none" }}
-                      onPointerDown={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        widgetPointer.current = {
-                          instanceId,
-                          mode: "resize",
-                          x: event.clientX,
-                          y: event.clientY,
-                          left: Number(instance.x) || 0,
-                          top: Number(instance.y) || 0,
-                          width,
-                          height,
-                        };
-                        event.currentTarget.parentElement?.setPointerCapture(event.pointerId);
-                      }}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          {!loading && !error && (!config.instances || config.instances.filter((item) => item.visible !== false).length === 0) && (
-            <div className="absolute inset-0 z-40 flex items-center justify-center bg-slate-950/20 p-6 text-center">
-              <p className="max-w-sm text-xs text-slate-400">Nenhuma overlay salva para esta conta.</p>
-            </div>
-          )}
-          {loading && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/50 text-xs text-slate-300">
-              Carregando canvas…
-            </div>
-          )}
-          {error && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-6 text-center">
-              <p role="alert" className="max-w-lg text-xs text-rose-300">{error}</p>
-            </div>
-          )}
-        </div>
-        <div
-          role="separator"
-          aria-label="Redimensionar canvas"
-          title="Arraste para redimensionar (mínimo 40 × 20 px)"
-          className="absolute bottom-0 right-0 z-[70] h-4 w-4 cursor-se-resize touch-none opacity-60 hover:opacity-100"
-          style={{ background: "linear-gradient(135deg, transparent 50%, #a78bfa 50%, #a78bfa 62%, transparent 62%, transparent 74%, #a78bfa 74%, #a78bfa 86%, transparent 86%)" }}
-          onPointerDown={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            resizeStart.current = {
-              x: event.clientX,
-              y: event.clientY,
+          <div
+            className="absolute left-0 top-0 overflow-hidden"
+            style={{
               width: size.width,
               height: size.height,
-            };
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }}
-          onPointerMove={(event) => {
-            const start = resizeStart.current;
-            if (!start || !(event.buttons & 1)) return;
-            const parentWidth = frameRef.current?.parentElement?.clientWidth ?? 2400;
-            setConfig((current) => ({
-              ...current,
-              visualizerSize: {
-                width: Math.round(Math.max(40, Math.min(2400, parentWidth, start.width + event.clientX - start.x))),
-                height: Math.round(Math.max(20, Math.min(1600, start.height + event.clientY - start.y))),
-              }
-            }));
-          }}
-          onPointerUp={() => { resizeStart.current = null; }}
-          onPointerCancel={() => { resizeStart.current = null; }}
-        />
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+            }}
+          >
+            <div className="absolute inset-0" style={canvasBackground} />
+            {gridSettings.showGrid && (
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to right, rgba(167,139,250,.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(167,139,250,.2) 1px, transparent 1px)",
+                  backgroundSize: `${Math.max(5, Number(gridSettings.gridSize) || 20)}px ${Math.max(5, Number(gridSettings.gridSize) || 20)}px`,
+                }}
+              />
+            )}
+            {gridSettings.showSafeAreas && (
+              <div
+                aria-hidden="true"
+                className="absolute inset-[5%] pointer-events-none border border-dashed border-emerald-400/60"
+              />
+            )}
+            {(gridSettings.verticalGuides || []).map((guide: { id: string; x: number }) => (
+              <div
+                key={guide.id}
+                aria-hidden="true"
+                className="absolute top-0 bottom-0 z-30 pointer-events-none border-l border-cyan-400/80"
+                style={{ left: guide.x }}
+              />
+            ))}
+            {(gridSettings.horizontalGuides || []).map((guide: { id: string; y: number }) => (
+              <div
+                key={guide.id}
+                aria-hidden="true"
+                className="absolute left-0 right-0 z-30 pointer-events-none border-t border-cyan-400/80"
+                style={{ top: guide.y }}
+              />
+            ))}
+            {config.instances
+              ?.filter((instance) => instance.visible !== false)
+              .slice()
+              .sort((a, b) => (Number(a.zIndex) || 0) - (Number(b.zIndex) || 0))
+              .map((instance, index) => {
+                const definition = catalog.find((item) => item.id === instance.widgetId);
+                if (!definition) return null;
+                const width = Math.max(1, Number(instance.width) || definition.defaultWidth || 280);
+                const height = Math.max(
+                  1,
+                  Number(instance.height) || definition.defaultHeight || 120,
+                );
+                const widgetConfig = {
+                  ...(definition.defaultConfig || {}),
+                  ...(instance.config || {}),
+                };
+                const transform = [
+                  widgetConfig["rotation"] ? `rotate(${Number(widgetConfig["rotation"])}deg)` : "",
+                  widgetConfig["flipH"] ? "scaleX(-1)" : "",
+                  widgetConfig["flipV"] ? "scaleY(-1)" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ");
+                const instanceId = instance.id || `${instance.widgetId}-${index}`;
+                const isSelected = selectedInstanceId === instanceId;
+                const instanceStyle: CSSProperties = {
+                  position: "absolute",
+                  left: Number(instance.x) || 0,
+                  top: Number(instance.y) || 0,
+                  width,
+                  height,
+                  zIndex: Number(instance.zIndex) || index + 1,
+                  overflow: "visible",
+                  opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100,
+                  transform: transform || undefined,
+                  outline: isSelected ? "1px solid #a78bfa" : "none",
+                  cursor: "move",
+                  touchAction: "none",
+                };
+                return (
+                  <div
+                    key={instanceId}
+                    style={instanceStyle}
+                    onPointerDown={(event) => {
+                      setSelectedInstanceId(instanceId);
+                      if (
+                        (event.target as HTMLElement).closest(
+                          "button,input,textarea,select,a,[data-no-widget-drag]",
+                        )
+                      )
+                        return;
+                      event.preventDefault();
+                      event.stopPropagation();
+                      widgetPointer.current = {
+                        instanceId,
+                        mode: "move",
+                        x: event.clientX,
+                        y: event.clientY,
+                        left: Number(instance.x) || 0,
+                        top: Number(instance.y) || 0,
+                        width,
+                        height,
+                      };
+                      event.currentTarget.setPointerCapture(event.pointerId);
+                      setConfig((current) => {
+                        const instances = [...(current.instances || [])];
+                        const maxZ = instances.reduce(
+                          (max, item) => Math.max(max, Number(item.zIndex) || 0),
+                          0,
+                        );
+                        if (instances[index])
+                          instances[index] = { ...instances[index], zIndex: maxZ + 1 };
+                        return { ...current, instances };
+                      });
+                    }}
+                    onPointerMove={(event) => {
+                      const drag = widgetPointer.current;
+                      if (!drag || drag.instanceId !== instanceId || !(event.buttons & 1)) return;
+                      const dx = (event.clientX - drag.x) / scale;
+                      const dy = (event.clientY - drag.y) / scale;
+                      setConfig((current) => {
+                        const instances = [...(current.instances || [])];
+                        const targetIndex = instances.findIndex(
+                          (item, itemIndex) =>
+                            (item.id || `${item.widgetId}-${itemIndex}`) === drag.instanceId,
+                        );
+                        if (targetIndex < 0) return current;
+                        const item = instances[targetIndex];
+                        if (drag.mode === "move") {
+                          const gridSize = Math.max(1, Number(gridSettings.gridSize) || 20);
+                          const rawX = Math.max(
+                            0,
+                            Math.min(size.width - drag.width, drag.left + dx),
+                          );
+                          const rawY = Math.max(
+                            0,
+                            Math.min(size.height - drag.height, drag.top + dy),
+                          );
+                          const nextX = gridSettings.snapToGrid
+                            ? Math.round(rawX / gridSize) * gridSize
+                            : rawX;
+                          const nextY = gridSettings.snapToGrid
+                            ? Math.round(rawY / gridSize) * gridSize
+                            : rawY;
+                          instances[targetIndex] = {
+                            ...item,
+                            x: Math.max(0, Math.min(size.width - drag.width, nextX)),
+                            y: Math.max(0, Math.min(size.height - drag.height, nextY)),
+                          };
+                        } else {
+                          instances[targetIndex] = {
+                            ...item,
+                            width: Math.max(40, Math.min(size.width - drag.left, drag.width + dx)),
+                            height: Math.max(
+                              20,
+                              Math.min(size.height - drag.top, drag.height + dy),
+                            ),
+                          };
+                        }
+                        return { ...current, instances };
+                      });
+                    }}
+                    onPointerUp={() => {
+                      widgetPointer.current = null;
+                    }}
+                    onPointerCancel={() => {
+                      widgetPointer.current = null;
+                    }}
+                  >
+                    <div className="h-full w-full overflow-hidden">
+                      <OverlayWidgetElementRenderer
+                        widgetId={instance.widgetId}
+                        elementKey={instance.elementKey || "full_widget"}
+                        isFullWidget={instance.isFullWidget !== false}
+                        config={widgetConfig}
+                        isEditing={false}
+                        onUpdateConfig={() => undefined}
+                        onFinishEditing={() => undefined}
+                        instanceId={instance.id}
+                        instanceName={instance.name}
+                      />
+                    </div>
+                    {isSelected && (
+                      <div
+                        role="separator"
+                        aria-label={`Redimensionar ${instance.name || definition.name}`}
+                        title="Arraste para ajustar o tamanho"
+                        className="absolute bottom-0 right-0 z-50 h-3 w-3 cursor-se-resize border border-white bg-violet-500"
+                        style={{ touchAction: "none" }}
+                        onPointerDown={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          widgetPointer.current = {
+                            instanceId,
+                            mode: "resize",
+                            x: event.clientX,
+                            y: event.clientY,
+                            left: Number(instance.x) || 0,
+                            top: Number(instance.y) || 0,
+                            width,
+                            height,
+                          };
+                          event.currentTarget.parentElement?.setPointerCapture(event.pointerId);
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            {!loading &&
+              !error &&
+              (!config.instances ||
+                config.instances.filter((item) => item.visible !== false).length === 0) && (
+                <div className="absolute inset-0 z-40 flex items-center justify-center bg-slate-950/20 p-6 text-center">
+                  <p className="max-w-sm text-xs text-slate-400">
+                    Nenhuma overlay salva para esta conta.
+                  </p>
+                </div>
+              )}
+            {loading && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/50 text-xs text-slate-300">
+                Carregando canvas…
+              </div>
+            )}
+            {error && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-6 text-center">
+                <p role="alert" className="max-w-lg text-xs text-rose-300">
+                  {error}
+                </p>
+              </div>
+            )}
+          </div>
+          <div
+            role="separator"
+            aria-label="Redimensionar canvas"
+            title="Arraste para redimensionar (mínimo 40 × 20 px)"
+            className="absolute bottom-0 right-0 z-[70] h-4 w-4 cursor-se-resize touch-none opacity-60 hover:opacity-100"
+            style={{
+              background:
+                "linear-gradient(135deg, transparent 50%, #a78bfa 50%, #a78bfa 62%, transparent 62%, transparent 74%, #a78bfa 74%, #a78bfa 86%, transparent 86%)",
+            }}
+            onPointerDown={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              resizeStart.current = {
+                x: event.clientX,
+                y: event.clientY,
+                width: size.width,
+                height: size.height,
+              };
+              event.currentTarget.setPointerCapture(event.pointerId);
+            }}
+            onPointerMove={(event) => {
+              const start = resizeStart.current;
+              if (!start || !(event.buttons & 1)) return;
+              const parentWidth = frameRef.current?.parentElement?.clientWidth ?? 2400;
+              setConfig((current) => ({
+                ...current,
+                visualizerSize: {
+                  width: Math.round(
+                    Math.max(
+                      40,
+                      Math.min(2400, parentWidth, start.width + event.clientX - start.x),
+                    ),
+                  ),
+                  height: Math.round(
+                    Math.max(20, Math.min(1600, start.height + event.clientY - start.y)),
+                  ),
+                },
+              }));
+            }}
+            onPointerUp={() => {
+              resizeStart.current = null;
+            }}
+            onPointerCancel={() => {
+              resizeStart.current = null;
+            }}
+          />
+        </div>
       </div>
-      </div>
-
     </section>
   );
 }

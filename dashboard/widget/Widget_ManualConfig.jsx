@@ -1,56 +1,59 @@
-import React, { useEffect, useState } from 'react';
-import { triggerReloadRTC } from './ReloadRTC';
+import React, { useEffect, useState } from "react";
+import { triggerReloadRTC } from "./ReloadRTC";
 
-const zones = typeof Intl.supportedValuesOf === 'function'
-  ? Intl.supportedValuesOf('timeZone')
-  : ['America/Sao_Paulo', 'America/New_York', 'Europe/Lisbon', 'UTC'];
+const zones =
+  typeof Intl.supportedValuesOf === "function"
+    ? Intl.supportedValuesOf("timeZone")
+    : ["America/Sao_Paulo", "America/New_York", "Europe/Lisbon", "UTC"];
 
 export default function ManualWidgetConfig({ instance, onUpdateInstance }) {
   const id = instance.widgetId;
   const config = instance.config || {};
-  const save = patch => onUpdateInstance(instance.id, { config: { ...config, ...patch } });
+  const save = (patch) => onUpdateInstance(instance.id, { config: { ...config, ...patch } });
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    if (id !== 'manual-timer' || !config.timerRunning) return undefined;
+    if (id !== "manual-timer" || !config.timerRunning) return undefined;
     const interval = setInterval(() => setNow(Date.now()), 250);
     return () => clearInterval(interval);
   }, [id, config.timerRunning]);
 
-  if (id === 'manual-pix-widget') {
-    const title = config.title || 'Apoie com Pix';
-    const pixKey = config.pixKey || '';
-    const pixName = config.pixName || 'LIVENEXUS STREAMER';
-    const pixCity = config.pixCity || 'SAO PAULO';
-    const pixAmount = config.pixAmount || '';
+  if (id === "manual-pix-widget") {
+    const title = config.title || "Apoie com Pix";
+    const pixKey = config.pixKey || "";
+    const pixName = config.pixName || "LIVENEXUS STREAMER";
+    const pixCity = config.pixCity || "SAO PAULO";
+    const pixAmount = config.pixAmount || "";
 
     const handleSavePix = (e) => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
-      const testTitle = formData.get('title') || 'Apoie com Pix';
-      const testKey = formData.get('pixKey') || '';
-      const testName = formData.get('pixName') || 'LIVENEXUS STREAMER';
-      const testCity = formData.get('pixCity') || 'SAO PAULO';
-      const testAmount = formData.get('pixAmount') || '';
+      const testTitle = formData.get("title") || "Apoie com Pix";
+      const testKey = formData.get("pixKey") || "";
+      const testName = formData.get("pixName") || "LIVENEXUS STREAMER";
+      const testCity = formData.get("pixCity") || "SAO PAULO";
+      const testAmount = formData.get("pixAmount") || "";
 
       save({
         title: testTitle,
         pixKey: testKey,
         pixName: testName,
         pixCity: testCity,
-        pixAmount: testAmount
+        pixAmount: testAmount,
       });
 
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('livenexus:trigger-tempo-visivel', {
-          detail: { instanceId: instance.id }
-        }));
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("livenexus:trigger-tempo-visivel", {
+            detail: { instanceId: instance.id },
+          }),
+        );
       }
     };
 
     return (
       <form key={instance.id} onSubmit={handleSavePix} className="space-y-3 text-xs text-slate-300">
         <span className="block font-semibold text-white text-sm">Configuração do Pix</span>
-        
+
         <label className="block space-y-1">
           <span className="text-slate-400 font-medium">Título do Widget</span>
           <input
@@ -63,7 +66,9 @@ export default function ManualWidgetConfig({ instance, onUpdateInstance }) {
         </label>
 
         <label className="block space-y-1">
-          <span className="text-slate-400 font-medium">Chave Pix (CPF, CNPJ, E-mail ou Aleatória)</span>
+          <span className="text-slate-400 font-medium">
+            Chave Pix (CPF, CNPJ, E-mail ou Aleatória)
+          </span>
           <input
             type="text"
             name="pixKey"
@@ -74,7 +79,9 @@ export default function ManualWidgetConfig({ instance, onUpdateInstance }) {
         </label>
 
         <label className="block space-y-1">
-          <span className="text-slate-400 font-medium">Valor do Pix (Opcional - ex: 5.00 ou 10)</span>
+          <span className="text-slate-400 font-medium">
+            Valor do Pix (Opcional - ex: 5.00 ou 10)
+          </span>
           <input
             type="text"
             name="pixAmount"
@@ -115,34 +122,35 @@ export default function ManualWidgetConfig({ instance, onUpdateInstance }) {
         </button>
 
         <p className="text-[10px] text-slate-500 italic mt-1 leading-normal">
-          O QR Code Pix é gerado localmente em conformidade com o Banco Central e acionado pelo comando de chat <strong className="text-purple-400 font-mono">!pix</strong>.
+          O QR Code Pix é gerado localmente em conformidade com o Banco Central e acionado pelo
+          comando de chat <strong className="text-purple-400 font-mono">!pix</strong>.
         </p>
       </form>
     );
   }
 
-  if (id === 'manual-death-counter') {
+  if (id === "manual-death-counter") {
     const count = Math.max(0, Number(config.deathCount) || 0);
     const handleDelta = (delta) => {
       const next = Math.max(0, count + delta);
       save({ deathCount: next });
-      triggerReloadRTC('visual-button-death-counter');
-      if (typeof window !== 'undefined') {
+      triggerReloadRTC("visual-button-death-counter");
+      if (typeof window !== "undefined") {
         window.dispatchEvent(
-          new CustomEvent('livenexus:death-counter-updated', {
-            detail: { count: next, instanceId: instance.id, timestamp: Date.now() }
-          })
+          new CustomEvent("livenexus:death-counter-updated", {
+            detail: { count: next, instanceId: instance.id, timestamp: Date.now() },
+          }),
         );
       }
     };
     const handleReset = () => {
       save({ deathCount: 0 });
-      triggerReloadRTC('visual-button-death-counter');
-      if (typeof window !== 'undefined') {
+      triggerReloadRTC("visual-button-death-counter");
+      if (typeof window !== "undefined") {
         window.dispatchEvent(
-          new CustomEvent('livenexus:death-counter-updated', {
-            detail: { count: 0, instanceId: instance.id, timestamp: Date.now() }
-          })
+          new CustomEvent("livenexus:death-counter-updated", {
+            detail: { count: 0, instanceId: instance.id, timestamp: Date.now() },
+          }),
         );
       }
     };
@@ -188,7 +196,7 @@ export default function ManualWidgetConfig({ instance, onUpdateInstance }) {
     );
   }
 
-  if (id === 'multi-viewers-counter') {
+  if (id === "multi-viewers-counter") {
     const showTotal = config.showTotal !== false;
     const showTwitch = config.showTwitch !== false;
     const showKick = config.showKick !== false;
@@ -239,58 +247,108 @@ export default function ManualWidgetConfig({ instance, onUpdateInstance }) {
     );
   }
 
-  if (id === 'manual-clock') return <label className="block space-y-2 text-xs text-slate-300">
-    <span>Fuso horário do relógio</span>
-    <select value={config.timeZone || ''} onChange={event => save({ timeZone: event.target.value })}
-      className="w-full rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white">
-      <option value="">Fuso do dispositivo</option>
-      {!zones.includes('UTC') && <option value="UTC">UTC</option>}
-      {zones.map(zone => <option key={zone} value={zone}>{zone.replaceAll('_', ' ')}</option>)}
-    </select>
-  </label>;
+  if (id === "manual-clock")
+    return (
+      <label className="block space-y-2 text-xs text-slate-300">
+        <span>Fuso horário do relógio</span>
+        <select
+          value={config.timeZone || ""}
+          onChange={(event) => save({ timeZone: event.target.value })}
+          className="w-full rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white"
+        >
+          <option value="">Fuso do dispositivo</option>
+          {!zones.includes("UTC") && <option value="UTC">UTC</option>}
+          {zones.map((zone) => (
+            <option key={zone} value={zone}>
+              {zone.replaceAll("_", " ")}
+            </option>
+          ))}
+        </select>
+      </label>
+    );
 
-  if (id !== 'manual-timer') return null;
+  if (id !== "manual-timer") return null;
 
   const duration = Math.max(0, Number(config.durationSeconds ?? 300));
-  const remaining = config.timerRunning && Number.isFinite(Number(config.timerEndAt))
-    ? Math.max(0, (Number(config.timerEndAt) - now) / 1000)
-    : Math.max(0, Number(config.remainingSeconds ?? duration));
+  const remaining =
+    config.timerRunning && Number.isFinite(Number(config.timerEndAt))
+      ? Math.max(0, (Number(config.timerEndAt) - now) / 1000)
+      : Math.max(0, Number(config.remainingSeconds ?? duration));
   const running = Boolean(config.timerRunning && remaining > 0);
   const updateDuration = (minutes, seconds) => {
     const total = Math.max(0, Math.floor(minutes) * 60 + Math.floor(seconds));
-    save({ durationSeconds: total, remainingSeconds: total, timerRunning: false, timerEndAt: null });
+    save({
+      durationSeconds: total,
+      remainingSeconds: total,
+      timerRunning: false,
+      timerEndAt: null,
+    });
   };
   const start = () => {
     const seconds = remaining > 0 ? remaining : duration;
     if (seconds <= 0) return;
     const currentTime = Date.now();
     setNow(currentTime);
-    save({ timerRunning: true, timerEndAt: currentTime + seconds * 1000, remainingSeconds: seconds });
+    save({
+      timerRunning: true,
+      timerEndAt: currentTime + seconds * 1000,
+      remainingSeconds: seconds,
+    });
   };
   const pause = () => save({ timerRunning: false, remainingSeconds: remaining, timerEndAt: null });
   const reset = () => save({ timerRunning: false, remainingSeconds: duration, timerEndAt: null });
-  return <div className="space-y-2 text-xs text-slate-300">
-    <span>Tempo inicial do temporizador</span>
-    <div className="grid grid-cols-2 gap-2">
-      <label className="space-y-1"><span className="block">Minutos</span>
-        <input type="number" min="0" max="9999" value={Math.floor(duration / 60)}
-          onChange={event => updateDuration(Number(event.target.value) || 0, duration % 60)}
-          className="w-full rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white" />
-      </label>
-      <label className="space-y-1"><span className="block">Segundos</span>
-        <input type="number" min="0" max="59" value={duration % 60}
-          onChange={event => updateDuration(Math.floor(duration / 60), Math.min(59, Number(event.target.value) || 0))}
-          className="w-full rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white" />
-      </label>
+  return (
+    <div className="space-y-2 text-xs text-slate-300">
+      <span>Tempo inicial do temporizador</span>
+      <div className="grid grid-cols-2 gap-2">
+        <label className="space-y-1">
+          <span className="block">Minutos</span>
+          <input
+            type="number"
+            min="0"
+            max="9999"
+            value={Math.floor(duration / 60)}
+            onChange={(event) => updateDuration(Number(event.target.value) || 0, duration % 60)}
+            className="w-full rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white"
+          />
+        </label>
+        <label className="space-y-1">
+          <span className="block">Segundos</span>
+          <input
+            type="number"
+            min="0"
+            max="59"
+            value={duration % 60}
+            onChange={(event) =>
+              updateDuration(
+                Math.floor(duration / 60),
+                Math.min(59, Number(event.target.value) || 0),
+              )
+            }
+            className="w-full rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white"
+          />
+        </label>
+      </div>
+      <div className="flex items-center gap-2 pt-1">
+        <output className="min-w-16 text-base font-bold tabular-nums text-white">
+          {Math.ceil(remaining)}s
+        </output>
+        <button
+          type="button"
+          onClick={running ? pause : start}
+          disabled={!running && duration <= 0}
+          className="rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white hover:bg-slate-800 disabled:opacity-50"
+        >
+          {running ? "Pausar" : "Iniciar"}
+        </button>
+        <button
+          type="button"
+          onClick={reset}
+          className="rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white hover:bg-slate-800"
+        >
+          Resetar
+        </button>
+      </div>
     </div>
-    <div className="flex items-center gap-2 pt-1">
-      <output className="min-w-16 text-base font-bold tabular-nums text-white">{Math.ceil(remaining)}s</output>
-      <button type="button" onClick={running ? pause : start} disabled={!running && duration <= 0}
-        className="rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white hover:bg-slate-800 disabled:opacity-50">
-        {running ? 'Pausar' : 'Iniciar'}
-      </button>
-      <button type="button" onClick={reset}
-        className="rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white hover:bg-slate-800">Resetar</button>
-    </div>
-  </div>;
+  );
 }

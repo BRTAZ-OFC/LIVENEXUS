@@ -32,9 +32,5 @@ dist-ssr
 *.sw?
 .env
 
-# Bun lockfiles (force npm)
-bun.lock
-bun.lockb
-.bun
-bunfig.toml
+
 

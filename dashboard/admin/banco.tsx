@@ -99,19 +99,108 @@ function getAuthHeaders(): HeadersInit {
 
 type JsonRow = Record<string, unknown> & { __rowKey: string };
 
-const JSON_TABLES: Array<{ id: string; title: string; file: string; description: string; fields: string[] }> = [
-  { id: "auth_activation", title: "Ativações", file: "auth_activation.json", description: "Códigos temporários de ativação.", fields: ["email", "code", "expiresAt", "created_at"] },
-  { id: "biblioteca", title: "Biblioteca", file: "biblioteca.json", description: "Músicas, álbuns, artistas e playlists por usuário.", fields: ["user_id", "songs", "albums", "artists", "playlists"] },
-  { id: "cenarios", title: "Cenários", file: "cenarios.json", description: "Cenários salvos por usuário.", fields: ["id", "user_id", "name", "config", "created_at"] },
-  { id: "galeria", title: "Galeria", file: "galeria.json", description: "Registros de mídia da galeria.", fields: ["id", "user_id", "filename", "url", "size", "uploadedAt"] },
-  { id: "galeria_usuarios", title: "Galeria de usuários", file: "galeria-usuarios.json", description: "Itens de galeria agrupados por usuário.", fields: ["user_id", "id", "filename", "url", "size", "uploadedAt"] },
-  { id: "image_store", title: "Armazenamento de imagens", file: "image_store.json", description: "Metadados e conteúdo de imagens.", fields: ["filename", "user_id", "data", "updatedAt", "id", "source"] },
-  { id: "messages", title: "Mensagens", file: "messages.json", description: "Mensagens recebidas pelo sistema.", fields: ["id", "user_id", "name", "email", "category", "message", "status", "created_date"] },
-  { id: "metricas", title: "Métricas", file: "metricas.json", description: "Métricas agrupadas por usuário.", fields: ["id", "user_id", "type", "data", "created_date"] },
-  { id: "vods", title: "VODs e sessões", file: "vods.json", description: "VODs e sessões de transmissão agrupados por usuário.", fields: ["id", "user_id", "title", "url", "vodStatus", "created_date", "updated_date"] },
-  { id: "overlays", title: "Overlays", file: "overlays.json", description: "Overlays e configurações por usuário.", fields: ["id", "user_id", "name", "type", "settings", "created_at"] },
-  { id: "rtc_registry", title: "Identidades RTC", file: "rtc_registry.json", description: "Identificadores RTC associados ao user_id local.", fields: ["user_id", "id", "rtcId", "created_at", "updated_at"] },
-  { id: "templates", title: "Modelos", file: "templates.json", description: "Catálogo de modelos visuais.", fields: ["id", "name", "originalName", "localPath", "url", "format", "category", "role", "sourceRepository", "size"] },
+const JSON_TABLES: Array<{
+  id: string;
+  title: string;
+  file: string;
+  description: string;
+  fields: string[];
+}> = [
+  {
+    id: "auth_activation",
+    title: "Ativações",
+    file: "auth_activation.json",
+    description: "Códigos temporários de ativação.",
+    fields: ["email", "code", "expiresAt", "created_at"],
+  },
+  {
+    id: "biblioteca",
+    title: "Biblioteca",
+    file: "biblioteca.json",
+    description: "Músicas, álbuns, artistas e playlists por usuário.",
+    fields: ["user_id", "songs", "albums", "artists", "playlists"],
+  },
+  {
+    id: "cenarios",
+    title: "Cenários",
+    file: "cenarios.json",
+    description: "Cenários salvos por usuário.",
+    fields: ["id", "user_id", "name", "config", "created_at"],
+  },
+  {
+    id: "galeria",
+    title: "Galeria",
+    file: "galeria.json",
+    description: "Registros de mídia da galeria.",
+    fields: ["id", "user_id", "filename", "url", "size", "uploadedAt"],
+  },
+  {
+    id: "galeria_usuarios",
+    title: "Galeria de usuários",
+    file: "galeria-usuarios.json",
+    description: "Itens de galeria agrupados por usuário.",
+    fields: ["user_id", "id", "filename", "url", "size", "uploadedAt"],
+  },
+  {
+    id: "image_store",
+    title: "Armazenamento de imagens",
+    file: "image_store.json",
+    description: "Metadados e conteúdo de imagens.",
+    fields: ["filename", "user_id", "data", "updatedAt", "id", "source"],
+  },
+  {
+    id: "messages",
+    title: "Mensagens",
+    file: "messages.json",
+    description: "Mensagens recebidas pelo sistema.",
+    fields: ["id", "user_id", "name", "email", "category", "message", "status", "created_date"],
+  },
+  {
+    id: "metricas",
+    title: "Métricas",
+    file: "metricas.json",
+    description: "Métricas agrupadas por usuário.",
+    fields: ["id", "user_id", "type", "data", "created_date"],
+  },
+  {
+    id: "vods",
+    title: "VODs e sessões",
+    file: "vods.json",
+    description: "VODs e sessões de transmissão agrupados por usuário.",
+    fields: ["id", "user_id", "title", "url", "vodStatus", "created_date", "updated_date"],
+  },
+  {
+    id: "overlays",
+    title: "Overlays",
+    file: "overlays.json",
+    description: "Overlays e configurações por usuário.",
+    fields: ["id", "user_id", "name", "type", "settings", "created_at"],
+  },
+  {
+    id: "rtc_registry",
+    title: "Identidades RTC",
+    file: "rtc_registry.json",
+    description: "Identificadores RTC associados ao user_id local.",
+    fields: ["user_id", "id", "rtcId", "created_at", "updated_at"],
+  },
+  {
+    id: "templates",
+    title: "Modelos",
+    file: "templates.json",
+    description: "Catálogo de modelos visuais.",
+    fields: [
+      "id",
+      "name",
+      "originalName",
+      "localPath",
+      "url",
+      "format",
+      "category",
+      "role",
+      "sourceRepository",
+      "size",
+    ],
+  },
 ];
 
 function jsonColumnLabel(field: string) {
@@ -167,10 +256,15 @@ function jsonColumnLabel(field: string) {
 
 function readableJsonValue(value: unknown): string {
   if (value === null || value === undefined || value === "") return "—";
-  if (Array.isArray(value)) return value.length ? value.map(readableJsonValue).join(", ") : "Lista vazia";
+  if (Array.isArray(value))
+    return value.length ? value.map(readableJsonValue).join(", ") : "Lista vazia";
   if (typeof value === "object") {
     const entries = Object.entries(value as Record<string, unknown>);
-    return entries.length ? entries.map(([key, item]) => `${jsonColumnLabel(key)}: ${readableJsonValue(item)}`).join(" · ") : "Sem campos";
+    return entries.length
+      ? entries
+          .map(([key, item]) => `${jsonColumnLabel(key)}: ${readableJsonValue(item)}`)
+          .join(" · ")
+      : "Sem campos";
   }
   return String(value);
 }
@@ -185,23 +279,72 @@ function createEmptyJsonRecord(tableId: string, fields: string[]): Record<string
   const record: Record<string, unknown> = {};
   for (const field of fields) {
     if (["songs", "albums", "artists", "playlists", "fields"].includes(field)) record[field] = [];
-    else if (["created_at", "created_date", "updated_at", "updated_date", "uploadedAt", "updatedAt", "data_criacao", "data_atualizacao"].includes(field)) record[field] = now;
+    else if (
+      [
+        "created_at",
+        "created_date",
+        "updated_at",
+        "updated_date",
+        "uploadedAt",
+        "updatedAt",
+        "data_criacao",
+        "data_atualizacao",
+      ].includes(field)
+    )
+      record[field] = now;
     else if (field === "size") record[field] = 0;
     else record[field] = "";
   }
-  if (tableId === "biblioteca") Object.assign(record, { user_id: "", songs: [], albums: [], artists: [], playlists: [] });
-  if (tableId === "cenarios") Object.assign(record, { user_id: "", name: "", config: {}, created_at: now });
-  if (tableId === "metricas") Object.assign(record, { user_id: "", type: "", data: {}, created_date: now });
-  if (tableId === "overlays") Object.assign(record, { user_id: "", name: "", type: "", settings: {}, created_at: now });
-  if (tableId === "rtc_registry") Object.assign(record, { user_id: "", rtcId: "", created_at: now, updated_at: now });
-  if (tableId === "auth_activation") Object.assign(record, { email: "", code: "", expiresAt: "", created_at: now });
+  if (tableId === "biblioteca")
+    Object.assign(record, { user_id: "", songs: [], albums: [], artists: [], playlists: [] });
+  if (tableId === "cenarios")
+    Object.assign(record, { user_id: "", name: "", config: {}, created_at: now });
+  if (tableId === "metricas")
+    Object.assign(record, { user_id: "", type: "", data: {}, created_date: now });
+  if (tableId === "overlays")
+    Object.assign(record, { user_id: "", name: "", type: "", settings: {}, created_at: now });
+  if (tableId === "rtc_registry")
+    Object.assign(record, { user_id: "", rtcId: "", created_at: now, updated_at: now });
+  if (tableId === "auth_activation")
+    Object.assign(record, { email: "", code: "", expiresAt: "", created_at: now });
   if (tableId === "schemas") Object.assign(record, { id: "", name: "", fields: [] });
-  if (tableId === "image_store") Object.assign(record, { filename: "", user_id: "", data: "", source: "admin" });
-  if (tableId === "galeria") Object.assign(record, { id: "", user_id: "", filename: "", url: "", size: 0, uploadedAt: now });
-  if (tableId === "galeria_usuarios") Object.assign(record, { user_id: "", id: "", filename: "", url: "", size: 0, uploadedAt: now });
-  if (tableId === "messages") Object.assign(record, { id: "", user_id: "", name: "", email: "", category: "Sugestão", message: "", status: "novo", created_date: now });
-  if (tableId === "templates") Object.assign(record, { id: "", name: "", originalName: "", localPath: "", url: "", format: "PNG", category: "other" });
-  if (tableId === "vods") Object.assign(record, { id: "", user_id: "", title: "", url: "", vodStatus: "", created_date: now, updated_date: now });
+  if (tableId === "image_store")
+    Object.assign(record, { filename: "", user_id: "", data: "", source: "admin" });
+  if (tableId === "galeria")
+    Object.assign(record, { id: "", user_id: "", filename: "", url: "", size: 0, uploadedAt: now });
+  if (tableId === "galeria_usuarios")
+    Object.assign(record, { user_id: "", id: "", filename: "", url: "", size: 0, uploadedAt: now });
+  if (tableId === "messages")
+    Object.assign(record, {
+      id: "",
+      user_id: "",
+      name: "",
+      email: "",
+      category: "Sugestão",
+      message: "",
+      status: "novo",
+      created_date: now,
+    });
+  if (tableId === "templates")
+    Object.assign(record, {
+      id: "",
+      name: "",
+      originalName: "",
+      localPath: "",
+      url: "",
+      format: "PNG",
+      category: "other",
+    });
+  if (tableId === "vods")
+    Object.assign(record, {
+      id: "",
+      user_id: "",
+      title: "",
+      url: "",
+      vodStatus: "",
+      created_date: now,
+      updated_date: now,
+    });
   return record;
 }
 
@@ -215,25 +358,57 @@ type JsonValueFieldProps = {
 function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProps) {
   const [newPropertyName, setNewPropertyName] = useState("");
   const label = jsonColumnLabel(name);
-  const inputClass = "w-full rounded-md border border-white/15 bg-[#101525] px-2 py-1.5 text-[11px] text-white outline-none focus:border-cyan-400";
+  const inputClass =
+    "w-full rounded-md border border-white/15 bg-[#101525] px-2 py-1.5 text-[11px] text-white outline-none focus:border-cyan-400";
 
   if (Array.isArray(value)) {
-    const newItem = value[0] && typeof value[0] === "object" && !Array.isArray(value[0]) ? {} : /^(fields)$/i.test(name) ? { name: "", type: "texto" } : "";
+    const newItem =
+      value[0] && typeof value[0] === "object" && !Array.isArray(value[0])
+        ? {}
+        : /^(fields)$/i.test(name)
+          ? { name: "", type: "texto" }
+          : "";
     return (
-      <fieldset className={`min-w-0 rounded-lg border border-white/10 p-3 ${depth > 0 ? "mt-2" : ""}`}>
+      <fieldset
+        className={`min-w-0 rounded-lg border border-white/10 p-3 ${depth > 0 ? "mt-2" : ""}`}
+      >
         <legend className="px-1 text-[10px] font-semibold text-slate-300">{label}</legend>
         {value.length === 0 && <p className="text-[10px] text-slate-500">Lista vazia</p>}
         <div className="space-y-2">
           {value.map((item, index) => (
             <div key={index} className="flex min-w-0 items-start gap-2">
               <div className="min-w-0 flex-1">
-                <JsonValueField name={`Item ${index + 1}`} value={item} depth={depth + 1} onChange={(next) => onChange(value.map((current, currentIndex) => currentIndex === index ? next : current))} />
+                <JsonValueField
+                  name={`Item ${index + 1}`}
+                  value={item}
+                  depth={depth + 1}
+                  onChange={(next) =>
+                    onChange(
+                      value.map((current, currentIndex) =>
+                        currentIndex === index ? next : current,
+                      ),
+                    )
+                  }
+                />
               </div>
-              <button type="button" onClick={() => onChange(value.filter((_, currentIndex) => currentIndex !== index))} className="mt-1 rounded border border-rose-500/20 px-2 py-1 text-[10px] text-rose-300" aria-label={`Remover item ${index + 1}`}>Remover</button>
+              <button
+                type="button"
+                onClick={() => onChange(value.filter((_, currentIndex) => currentIndex !== index))}
+                className="mt-1 rounded border border-rose-500/20 px-2 py-1 text-[10px] text-rose-300"
+                aria-label={`Remover item ${index + 1}`}
+              >
+                Remover
+              </button>
             </div>
           ))}
         </div>
-        <button type="button" onClick={() => onChange([...value, newItem])} className="mt-2 rounded border border-white/10 px-2 py-1 text-[10px] text-slate-300 hover:text-white">Adicionar item</button>
+        <button
+          type="button"
+          onClick={() => onChange([...value, newItem])}
+          className="mt-2 rounded border border-white/10 px-2 py-1 text-[10px] text-slate-300 hover:text-white"
+        >
+          Adicionar item
+        </button>
       </fieldset>
     );
   }
@@ -241,41 +416,110 @@ function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProp
   if (value !== null && typeof value === "object") {
     const record = value as Record<string, unknown>;
     return (
-      <fieldset className={`min-w-0 rounded-lg border border-white/10 p-3 ${depth > 0 ? "mt-2" : ""}`}>
+      <fieldset
+        className={`min-w-0 rounded-lg border border-white/10 p-3 ${depth > 0 ? "mt-2" : ""}`}
+      >
         <legend className="px-1 text-[10px] font-semibold text-slate-300">{label}</legend>
-        {Object.entries(record).length === 0 && <p className="text-[10px] text-slate-500">Nenhum campo adicionado</p>}
+        {Object.entries(record).length === 0 && (
+          <p className="text-[10px] text-slate-500">Nenhum campo adicionado</p>
+        )}
         <div className="space-y-2">
           {Object.entries(record).map(([childName, childValue]) => (
             <div key={childName} className="min-w-0">
-              <JsonValueField name={childName} value={childValue} depth={depth + 1} onChange={(next) => onChange({ ...record, [childName]: next })} />
-              <button type="button" onClick={() => { const next = { ...record }; delete next[childName]; onChange(next); }} className="mt-1 text-[10px] text-rose-300">Remover campo</button>
+              <JsonValueField
+                name={childName}
+                value={childValue}
+                depth={depth + 1}
+                onChange={(next) => onChange({ ...record, [childName]: next })}
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const next = { ...record };
+                  delete next[childName];
+                  onChange(next);
+                }}
+                className="mt-1 text-[10px] text-rose-300"
+              >
+                Remover campo
+              </button>
             </div>
           ))}
         </div>
         <div className="mt-3 flex gap-2">
-          <input value={newPropertyName} onChange={(event) => setNewPropertyName(event.target.value)} className={inputClass} placeholder="Nome do novo campo" aria-label={`Nome do novo campo em ${label}`} />
-          <button type="button" disabled={!newPropertyName.trim() || Object.prototype.hasOwnProperty.call(record, newPropertyName.trim())} onClick={() => {
-            const key = newPropertyName.trim();
-            if (!key || Object.prototype.hasOwnProperty.call(record, key)) return;
-            onChange({ ...record, [key]: "" });
-            setNewPropertyName("");
-          }} className="shrink-0 rounded border border-white/10 px-2 py-1 text-[10px] text-slate-300 disabled:opacity-40">Adicionar campo</button>
+          <input
+            value={newPropertyName}
+            onChange={(event) => setNewPropertyName(event.target.value)}
+            className={inputClass}
+            placeholder="Nome do novo campo"
+            aria-label={`Nome do novo campo em ${label}`}
+          />
+          <button
+            type="button"
+            disabled={
+              !newPropertyName.trim() ||
+              Object.prototype.hasOwnProperty.call(record, newPropertyName.trim())
+            }
+            onClick={() => {
+              const key = newPropertyName.trim();
+              if (!key || Object.prototype.hasOwnProperty.call(record, key)) return;
+              onChange({ ...record, [key]: "" });
+              setNewPropertyName("");
+            }}
+            className="shrink-0 rounded border border-white/10 px-2 py-1 text-[10px] text-slate-300 disabled:opacity-40"
+          >
+            Adicionar campo
+          </button>
         </div>
       </fieldset>
     );
   }
 
   if (typeof value === "boolean") {
-    return <label className="flex min-w-0 items-center gap-2 rounded-lg border border-white/10 p-2 text-[10px] text-slate-300"><span className="min-w-0 flex-1">{label}</span><input type="checkbox" checked={value} onChange={(event) => onChange(event.target.checked)} /></label>;
+    return (
+      <label className="flex min-w-0 items-center gap-2 rounded-lg border border-white/10 p-2 text-[10px] text-slate-300">
+        <span className="min-w-0 flex-1">{label}</span>
+        <input
+          type="checkbox"
+          checked={value}
+          onChange={(event) => onChange(event.target.checked)}
+        />
+      </label>
+    );
   }
 
   const stringValue = value === null || value === undefined ? "" : String(value);
   const isNumber = typeof value === "number";
-  const useTextarea = typeof value === "string" && (stringValue.length > 80 || /^(message|mensagem|resposta_admin|description|descricao|prompt|content)$/i.test(name));
+  const useTextarea =
+    typeof value === "string" &&
+    (stringValue.length > 80 ||
+      /^(message|mensagem|resposta_admin|description|descricao|prompt|content)$/i.test(name));
   return (
     <label className="block min-w-0 space-y-1 text-[10px] text-slate-400">
       <span>{label}</span>
-      {useTextarea ? <textarea value={stringValue} onChange={(event) => onChange(event.target.value)} rows={3} className={inputClass} /> : <input type={isNumber ? "number" : "text"} value={stringValue} onChange={(event) => onChange(isNumber ? (event.target.value === "" ? "" : Number(event.target.value)) : event.target.value)} className={inputClass} />}
+      {useTextarea ? (
+        <textarea
+          value={stringValue}
+          onChange={(event) => onChange(event.target.value)}
+          rows={3}
+          className={inputClass}
+        />
+      ) : (
+        <input
+          type={isNumber ? "number" : "text"}
+          value={stringValue}
+          onChange={(event) =>
+            onChange(
+              isNumber
+                ? event.target.value === ""
+                  ? ""
+                  : Number(event.target.value)
+                : event.target.value,
+            )
+          }
+          className={inputClass}
+        />
+      )}
     </label>
   );
 }
@@ -291,7 +535,6 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   const [isAdmin, setIsAdmin] = useState(embedded);
   const selectedJsonId = selectedTable.startsWith("json:") ? selectedTable.slice(5) : "";
   const selectedJsonTable = JSON_TABLES.find((table) => table.id === selectedJsonId);
-
 
   function handleSelectTable(table: string) {
     setSelectedTable(table);
@@ -322,11 +565,12 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   const [genericDraft, setGenericDraft] = useState<Record<string, unknown>>({});
   const [genericEditingKey, setGenericEditingKey] = useState<string | null>(null);
   const [genericEditorMode, setGenericEditorMode] = useState<"create" | "edit" | null>(null);
-  const genericColumns = Array.from(new Set([
-    ...(selectedJsonTable?.fields ?? []),
-    ...genericRows.flatMap((row) => Object.keys(row).filter((key) => key !== "__rowKey")),
-  ]));
-
+  const genericColumns = Array.from(
+    new Set([
+      ...(selectedJsonTable?.fields ?? []),
+      ...genericRows.flatMap((row) => Object.keys(row).filter((key) => key !== "__rowKey")),
+    ]),
+  );
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -369,7 +613,8 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
         cache: "no-store",
       });
       const result = await response.json();
-      if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível carregar a tabela JSON.");
+      if (!response.ok || !result.ok)
+        throw new Error(result.message || "Não foi possível carregar a tabela JSON.");
       setGenericRows(Array.isArray(result.rows) ? result.rows : []);
       setGenericEditingKey(null);
       setGenericDraft({});
@@ -404,15 +649,21 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     setError("");
     setMessage("");
     try {
-      const record = Object.fromEntries(Object.entries(genericDraft).filter(([key]) => key !== "__rowKey"));
-      const response = await fetch(`/api/database/json-tables/${encodeURIComponent(selectedJsonId)}`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-        credentials: "include",
-        body: JSON.stringify({ record }),
-      });
+      const record = Object.fromEntries(
+        Object.entries(genericDraft).filter(([key]) => key !== "__rowKey"),
+      );
+      const response = await fetch(
+        `/api/database/json-tables/${encodeURIComponent(selectedJsonId)}`,
+        {
+          method: "POST",
+          headers: getAuthHeaders(),
+          credentials: "include",
+          body: JSON.stringify({ record }),
+        },
+      );
       const result = await response.json();
-      if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível criar o registro.");
+      if (!response.ok || !result.ok)
+        throw new Error(result.message || "Não foi possível criar o registro.");
       setGenericEditorMode(null);
       setGenericDraft({});
       await loadJsonTable(selectedJsonId);
@@ -430,15 +681,21 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     setError("");
     setMessage("");
     try {
-      const record = Object.fromEntries(Object.entries(genericDraft).filter(([key]) => key !== "__rowKey"));
-      const response = await fetch(`/api/database/json-tables/${encodeURIComponent(selectedJsonId)}`, {
-        method: "PATCH",
-        headers: getAuthHeaders(),
-        credentials: "include",
-        body: JSON.stringify({ rowKey, record }),
-      });
+      const record = Object.fromEntries(
+        Object.entries(genericDraft).filter(([key]) => key !== "__rowKey"),
+      );
+      const response = await fetch(
+        `/api/database/json-tables/${encodeURIComponent(selectedJsonId)}`,
+        {
+          method: "PATCH",
+          headers: getAuthHeaders(),
+          credentials: "include",
+          body: JSON.stringify({ rowKey, record }),
+        },
+      );
       const result = await response.json();
-      if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível atualizar o registro.");
+      if (!response.ok || !result.ok)
+        throw new Error(result.message || "Não foi possível atualizar o registro.");
       setGenericEditorMode(null);
       setGenericEditingKey(null);
       setGenericDraft({});
@@ -452,19 +709,27 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   }
 
   async function deleteGenericRow(rowKey: string) {
-    if (!selectedJsonId || (typeof window !== "undefined" && !window.confirm("Excluir este registro do arquivo JSON?"))) return;
+    if (
+      !selectedJsonId ||
+      (typeof window !== "undefined" && !window.confirm("Excluir este registro do arquivo JSON?"))
+    )
+      return;
     setDeleting(true);
     setError("");
     setMessage("");
     try {
-      const response = await fetch(`/api/database/json-tables/${encodeURIComponent(selectedJsonId)}`, {
-        method: "DELETE",
-        headers: getAuthHeaders(),
-        credentials: "include",
-        body: JSON.stringify({ rowKey }),
-      });
+      const response = await fetch(
+        `/api/database/json-tables/${encodeURIComponent(selectedJsonId)}`,
+        {
+          method: "DELETE",
+          headers: getAuthHeaders(),
+          credentials: "include",
+          body: JSON.stringify({ rowKey }),
+        },
+      );
       const result = await response.json();
-      if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível excluir o registro.");
+      if (!response.ok || !result.ok)
+        throw new Error(result.message || "Não foi possível excluir o registro.");
       setMessage("Registro excluído do JSON.");
       await loadJsonTable(selectedJsonId);
     } catch (err) {
@@ -880,7 +1145,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     ? "Avaliações"
                     : selectedTable === "plataformas"
                       ? "Plataformas"
-                      : selectedJsonTable?.title ?? "Tabela JSON"}
+                      : (selectedJsonTable?.title ?? "Tabela JSON")}
               </h1>
               <p className="db-mt-1-text-11px-fgeh1h">
                 {selectedTable === "usuarios"
@@ -889,7 +1154,8 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     ? "Registros da tabela Avaliações. Edite as avaliações ou adicione respostas administrativas oficiais."
                     : selectedTable === "plataformas"
                       ? "Registros do arquivo conect-plataform.json."
-                      : selectedJsonTable?.description ?? "Registros do arquivo JSON selecionado."}
+                      : (selectedJsonTable?.description ??
+                        "Registros do arquivo JSON selecionado.")}
               </p>
             </div>
             <button
@@ -898,7 +1164,8 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                 if (selectedTable === "usuarios") void loadUsers();
                 else if (selectedTable === "avaliacoes") void loadReviews();
                 else if (selectedTable === "plataformas") void loadPlatforms();
-                else if (selectedTable.startsWith("json:")) void loadJsonTable(selectedTable.slice(5));
+                else if (selectedTable.startsWith("json:"))
+                  void loadJsonTable(selectedTable.slice(5));
               }}
               disabled={loading || deleting}
               className="db-inline-flex-items-center-39j1c2"
@@ -1292,71 +1559,203 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
             <div className="db-mt-3-overflow-hidden-1sbx6fp">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-white/[0.02] p-3">
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-white">{selectedJsonTable?.title ?? "Tabela selecionada"}</p>
-                  <p className="mt-1 text-[10px] text-slate-400">{selectedJsonTable?.description ?? "Registros da tabela selecionada."}</p>
+                  <p className="text-xs font-semibold text-white">
+                    {selectedJsonTable?.title ?? "Tabela selecionada"}
+                  </p>
+                  <p className="mt-1 text-[10px] text-slate-400">
+                    {selectedJsonTable?.description ?? "Registros da tabela selecionada."}
+                  </p>
                 </div>
-                <button type="button" onClick={startCreateGenericRow} disabled={saving || deleting} className="rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">Novo registro</button>
+                <button
+                  type="button"
+                  onClick={startCreateGenericRow}
+                  disabled={saving || deleting}
+                  className="rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                >
+                  Novo registro
+                </button>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-0 table-fixed border-collapse text-left text-xs">
                   <thead className="border-b border-white/10 bg-white/5 text-slate-300">
                     <tr>
-                      {genericColumns.map((field) => <th key={field} className="break-words px-3 py-2 font-medium">{jsonColumnLabel(field)}</th>)}
+                      {genericColumns.map((field) => (
+                        <th key={field} className="break-words px-3 py-2 font-medium">
+                          {jsonColumnLabel(field)}
+                        </th>
+                      ))}
                       <th className="w-28 px-3 py-2 font-medium">AÇÕES</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {loading && genericRows.length === 0 && <tr><td className="px-4 py-10 text-center text-slate-500" colSpan={genericColumns.length + 1}>Carregando registros…</td></tr>}
-                    {!loading && genericRows.length === 0 && !error && <tr><td className="px-4 py-10 text-center text-slate-500" colSpan={genericColumns.length + 1}>Esta tabela ainda não possui registros.</td></tr>}
+                    {loading && genericRows.length === 0 && (
+                      <tr>
+                        <td
+                          className="px-4 py-10 text-center text-slate-500"
+                          colSpan={genericColumns.length + 1}
+                        >
+                          Carregando registros…
+                        </td>
+                      </tr>
+                    )}
+                    {!loading && genericRows.length === 0 && !error && (
+                      <tr>
+                        <td
+                          className="px-4 py-10 text-center text-slate-500"
+                          colSpan={genericColumns.length + 1}
+                        >
+                          Esta tabela ainda não possui registros.
+                        </td>
+                      </tr>
+                    )}
                     {genericRows.map((row) => (
                       <tr key={row.__rowKey} className="align-top hover:bg-white/[0.02]">
                         {genericColumns.map((field) => (
-                          <td key={field} className="max-w-0 px-3 py-2 text-slate-300" title={readableJsonValue(row[field])}>
-                            <span className="block overflow-hidden text-ellipsis whitespace-nowrap">{jsonCellValue(row[field])}</span>
+                          <td
+                            key={field}
+                            className="max-w-0 px-3 py-2 text-slate-300"
+                            title={readableJsonValue(row[field])}
+                          >
+                            <span className="block overflow-hidden text-ellipsis whitespace-nowrap">
+                              {jsonCellValue(row[field])}
+                            </span>
                           </td>
                         ))}
                         <td className="px-2 py-2 align-top">
                           <div className="flex flex-wrap gap-1">
-                            <button type="button" onClick={() => startEditingGenericRow(row)} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-200 disabled:opacity-50"><Pencil size={12} />Editar</button>
-                            <button type="button" onClick={() => void deleteGenericRow(row.__rowKey)} disabled={saving || deleting} className="inline-flex items-center gap-1 rounded-lg border border-red-500/20 px-2 py-1 text-[10px] text-red-300 disabled:opacity-50"><Trash2 size={12} />Excluir</button>
+                            <button
+                              type="button"
+                              onClick={() => startEditingGenericRow(row)}
+                              disabled={saving || deleting}
+                              className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-[10px] text-slate-200 disabled:opacity-50"
+                            >
+                              <Pencil size={12} />
+                              Editar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void deleteGenericRow(row.__rowKey)}
+                              disabled={saving || deleting}
+                              className="inline-flex items-center gap-1 rounded-lg border border-red-500/20 px-2 py-1 text-[10px] text-red-300 disabled:opacity-50"
+                            >
+                              <Trash2 size={12} />
+                              Excluir
+                            </button>
                           </div>
                         </td>
                       </tr>
                     ))}
-                    {!loading && genericRows.length === 0 && error && <tr><td className="px-4 py-10 text-center text-red-300" colSpan={genericColumns.length + 1}>Não foi possível carregar os registros.</td></tr>}
+                    {!loading && genericRows.length === 0 && error && (
+                      <tr>
+                        <td
+                          className="px-4 py-10 text-center text-red-300"
+                          colSpan={genericColumns.length + 1}
+                        >
+                          Não foi possível carregar os registros.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
 
               {genericEditorMode && (
-                <div role="dialog" aria-modal="true" aria-labelledby="generic-json-record-title" className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-                  <form onSubmit={(event) => {
-                    event.preventDefault();
-                    if (genericEditorMode === "create") void createGenericRow();
-                    else if (genericEditingKey) void saveGenericRow(genericEditingKey);
-                  }} className="w-full max-w-3xl space-y-4 rounded-2xl border border-white/10 bg-[#0d1120] p-5 shadow-2xl">
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="generic-json-record-title"
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+                >
+                  <form
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      if (genericEditorMode === "create") void createGenericRow();
+                      else if (genericEditingKey) void saveGenericRow(genericEditingKey);
+                    }}
+                    className="w-full max-w-3xl space-y-4 rounded-2xl border border-white/10 bg-[#0d1120] p-5 shadow-2xl"
+                  >
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <h3 id="generic-json-record-title" className="text-sm font-bold text-white">{genericEditorMode === "create" ? "Novo registro" : "Editar registro"} · {selectedJsonTable?.title ?? "Tabela"}</h3>
-                        <p className="mt-1 text-[10px] text-slate-400">Preencha os campos do registro. O formato interno do arquivo não é exibido.</p>
+                        <h3 id="generic-json-record-title" className="text-sm font-bold text-white">
+                          {genericEditorMode === "create" ? "Novo registro" : "Editar registro"} ·{" "}
+                          {selectedJsonTable?.title ?? "Tabela"}
+                        </h3>
+                        <p className="mt-1 text-[10px] text-slate-400">
+                          Preencha os campos do registro. O formato interno do arquivo não é
+                          exibido.
+                        </p>
                       </div>
-                      <button type="button" onClick={() => { setGenericEditorMode(null); setGenericEditingKey(null); setGenericDraft({}); }} disabled={saving} aria-label="Fechar" className="rounded border border-white/10 p-1.5 text-slate-300"><X size={14} /></button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGenericEditorMode(null);
+                          setGenericEditingKey(null);
+                          setGenericDraft({});
+                        }}
+                        disabled={saving}
+                        aria-label="Fechar"
+                        className="rounded border border-white/10 p-1.5 text-slate-300"
+                      >
+                        <X size={14} />
+                      </button>
                     </div>
                     <div className="max-h-[65vh] space-y-3 overflow-y-auto pr-1">
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        {Object.entries(genericDraft).filter(([field]) => field !== "__rowKey").map(([field, value]) => (
-                          <div key={field} className="min-w-0">
-                            <JsonValueField name={field} value={value} onChange={(next) => setGenericDraft((current) => ({ ...current, [field]: next }))} />
-                          </div>
-                        ))}
+                        {Object.entries(genericDraft)
+                          .filter(([field]) => field !== "__rowKey")
+                          .map(([field, value]) => (
+                            <div key={field} className="min-w-0">
+                              <JsonValueField
+                                name={field}
+                                value={value}
+                                onChange={(next) =>
+                                  setGenericDraft((current) => ({ ...current, [field]: next }))
+                                }
+                              />
+                            </div>
+                          ))}
                       </div>
-                      {selectedJsonTable?.id && ["biblioteca", "cenarios", "metricas", "overlays", "rtc_registry"].includes(selectedJsonTable.id) && <p className="text-[10px] text-slate-400">Informe um <code>user_id</code> existente em usuario.json. O servidor valida esse vínculo antes de gravar.</p>}
+                      {selectedJsonTable?.id &&
+                        ["biblioteca", "cenarios", "metricas", "overlays", "rtc_registry"].includes(
+                          selectedJsonTable.id,
+                        ) && (
+                          <p className="text-[10px] text-slate-400">
+                            Informe um <code>user_id</code> existente em usuario.json. O servidor
+                            valida esse vínculo antes de gravar.
+                          </p>
+                        )}
                     </div>
-                    {error && <p role="alert" className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-300">{error}</p>}
+                    {error && (
+                      <p
+                        role="alert"
+                        className="rounded-lg border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-300"
+                      >
+                        {error}
+                      </p>
+                    )}
                     <div className="flex justify-end gap-2">
-                      <button type="button" onClick={() => { setGenericEditorMode(null); setGenericEditingKey(null); setGenericDraft({}); }} disabled={saving} className="rounded-lg border border-white/10 px-3 py-2 text-xs text-slate-300">Cancelar</button>
-                      <button type="submit" disabled={saving || deleting} className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50">
-                        {saving ? <RefreshCw size={13} className="animate-spin" /> : <Save size={13} />}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGenericEditorMode(null);
+                          setGenericEditingKey(null);
+                          setGenericDraft({});
+                        }}
+                        disabled={saving}
+                        className="rounded-lg border border-white/10 px-3 py-2 text-xs text-slate-300"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={saving || deleting}
+                        className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                      >
+                        {saving ? (
+                          <RefreshCw size={13} className="animate-spin" />
+                        ) : (
+                          <Save size={13} />
+                        )}
                         {saving ? "Salvando…" : "Salvar"}
                       </button>
                     </div>

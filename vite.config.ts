@@ -8,6 +8,7 @@ const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 /* Vite integrado ao servidor HTTP do Express, seguindo o padrão do BACKUP01. */
 export default defineConfig(() => ({
+  root: rootDir,
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -18,6 +19,12 @@ export default defineConfig(() => ({
     host: "0.0.0.0",
     port: 3000,
     allowedHosts: true,
+    proxy: {
+      "/api": {
+        target: process.env["API_URL"] || "http://localhost:3001",
+        changeOrigin: true,
+      },
+    },
   },
   preview: {
     host: "0.0.0.0",

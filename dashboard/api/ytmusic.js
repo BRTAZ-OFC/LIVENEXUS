@@ -4,44 +4,44 @@
 
 const YT_CONTEXT = {
   client: {
-    clientName: 'WEB_REMIX',
-    clientVersion: '1.20240101.01.00',
-    hl: 'pt',
-    gl: 'BR',
+    clientName: "WEB_REMIX",
+    clientVersion: "1.20240101.01.00",
+    hl: "pt",
+    gl: "BR",
   },
 };
 
 const YT_HEADERS = {
-  'Content-Type': 'application/json',
-  'User-Agent':
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  Referer: 'https://music.youtube.com/',
+  "Content-Type": "application/json",
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+  Referer: "https://music.youtube.com/",
 };
 
 // Parâmetros estruturados dos chips nativos do YouTube Music
 const CATEGORY_PARAMS = {
-  songs: 'EgWKAQIIAWoSEAUQCRAKEAMQDhAEEBAQFRAR',
-  videos: 'EgWKAQIQAWoSEAUQCRAKEAMQDhAEEBAQFRAR',
-  artists: 'EgWKAQIgAWoSEAUQCRAKEAMQDhAEEBAQFRAR',
-  albums: 'EgWKAQIYAWoSEAUQCRAKEAMQDhAEEBAQFRAR',
-  playlists: 'EgeKAQQoAEABahIQBRAJEAoQAxAOEAQQEBAVEBE%3D',
+  songs: "EgWKAQIIAWoSEAUQCRAKEAMQDhAEEBAQFRAR",
+  videos: "EgWKAQIQAWoSEAUQCRAKEAMQDhAEEBAQFRAR",
+  artists: "EgWKAQIgAWoSEAUQCRAKEAMQDhAEEBAQFRAR",
+  albums: "EgWKAQIYAWoSEAUQCRAKEAMQDhAEEBAQFRAR",
+  playlists: "EgeKAQQoAEABahIQBRAJEAoQAxAOEAQQEBAVEBE%3D",
 };
 
 const YT_WEB_CONTEXT = {
   client: {
-    clientName: 'WEB',
-    clientVersion: '2.20240101.01.00',
-    hl: 'pt',
-    gl: 'BR',
+    clientName: "WEB",
+    clientVersion: "2.20240101.01.00",
+    hl: "pt",
+    gl: "BR",
   },
 };
 
 function corsHeaders() {
   return {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json',
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Content-Type": "application/json",
   };
 }
 
@@ -59,65 +59,67 @@ function parseMusicItemRenderer(it, type) {
   // Suporte a musicTwoRowItemRenderer (carrosséis/grades)
   if (it.musicTwoRowItemRenderer) {
     const r = it.musicTwoRowItemRenderer;
-    const title = r.title?.runs?.map((x) => x.text).join('') || '';
-    const subtitle = r.subtitle?.runs?.map((x) => x.text).join('') || '';
-    const videoId =
-      r.navigationEndpoint?.watchEndpoint?.videoId ||
-      r.onTap?.watchEndpoint?.videoId;
+    const title = r.title?.runs?.map((x) => x.text).join("") || "";
+    const subtitle = r.subtitle?.runs?.map((x) => x.text).join("") || "";
+    const videoId = r.navigationEndpoint?.watchEndpoint?.videoId || r.onTap?.watchEndpoint?.videoId;
     const browseId =
       r.navigationEndpoint?.browseEndpoint?.browseId ||
       r.title?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.browseId;
     const thumb =
       r.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails?.slice(-1)?.[0]?.url ||
-      (videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : '');
+      (videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : "");
 
-    if (type === 'songs' || type === 'videos') {
+    if (type === "songs" || type === "videos") {
       if (!videoId) return null;
       const durMatch = subtitle.match(/\b\d{1,2}:\d{2}(?::\d{2})?\b/);
       return {
-        type: 'song',
+        type: "song",
         videoId,
-        title: title || 'Música',
-        artist: subtitle.split('•')[0]?.trim() || (type === 'videos' ? 'YouTube' : 'Artista'),
-        album: subtitle.includes('•') ? subtitle.split('•')[1]?.trim() : '',
-        durationStr: durMatch ? durMatch[0] : '',
+        title: title || "Música",
+        artist: subtitle.split("•")[0]?.trim() || (type === "videos" ? "YouTube" : "Artista"),
+        album: subtitle.includes("•") ? subtitle.split("•")[1]?.trim() : "",
+        durationStr: durMatch ? durMatch[0] : "",
         thumbnail: thumb,
-        source: type === 'videos' ? 'YouTube' : 'YouTube Music',
-        channelTitle: subtitle.split('•')[0]?.trim() || (type === 'videos' ? 'YouTube' : 'Artista'),
+        source: type === "videos" ? "YouTube" : "YouTube Music",
+        channelTitle: subtitle.split("•")[0]?.trim() || (type === "videos" ? "YouTube" : "Artista"),
       };
-    } else if (type === 'artists') {
+    } else if (type === "artists") {
       return {
-        type: 'artist',
-        browseId: browseId || '',
+        type: "artist",
+        browseId: browseId || "",
         name: title || subtitle,
         title: title || subtitle,
         subtitle,
         thumbnail: thumb,
-        source: 'YouTube Music',
+        source: "YouTube Music",
       };
-    } else if (type === 'albums') {
+    } else if (type === "albums") {
       return {
-        type: 'album',
-        browseId: browseId || '',
+        type: "album",
+        browseId: browseId || "",
         title,
-        artist: subtitle.replace(/Álbum\s*•\s*/i, '').split('•')[0]?.trim() || '',
-        year: (subtitle.match(/\b(19\d{2}|20\d{2})\b/) || [])[0] || '',
+        artist:
+          subtitle
+            .replace(/Álbum\s*•\s*/i, "")
+            .split("•")[0]
+            ?.trim() || "",
+        year: (subtitle.match(/\b(19\d{2}|20\d{2})\b/) || [])[0] || "",
         thumbnail: thumb,
-        source: 'YouTube Music',
+        source: "YouTube Music",
       };
-    } else if (type === 'playlists') {
-      const plId = browseId?.replace(/^VL/, '') || '';
-      const isMix = plId.startsWith('RD');
-      const isCommunity = plId.startsWith('PL');
+    } else if (type === "playlists") {
+      const plId = browseId?.replace(/^VL/, "") || "";
+      const isMix = plId.startsWith("RD");
+      const isCommunity = plId.startsWith("PL");
       return {
-        type: isMix ? 'mix' : isCommunity ? 'community_playlist' : 'playlist',
-        browseId: browseId || '',
+        type: isMix ? "mix" : isCommunity ? "community_playlist" : "playlist",
+        browseId: browseId || "",
         playlistId: plId,
         title,
-        author: subtitle.split('•')[0]?.trim() || '',
-        itemCountStr: subtitle.split('•')[1]?.trim() || '',
+        author: subtitle.split("•")[0]?.trim() || "",
+        itemCountStr: subtitle.split("•")[1]?.trim() || "",
         thumbnail: thumb,
-        source: 'YouTube Music',
+        source: "YouTube Music",
       };
     }
     return null;
@@ -131,9 +133,18 @@ function parseMusicItemRenderer(it, type) {
   const flex1 = r.flexColumns?.[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs || [];
   const flex2 = r.flexColumns?.[2]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs || [];
 
-  const title = flex0.map((x) => x.text).join('').trim();
-  const line1 = flex1.map((x) => x.text).join('').trim();
-  const line2 = flex2.map((x) => x.text).join('').trim();
+  const title = flex0
+    .map((x) => x.text)
+    .join("")
+    .trim();
+  const line1 = flex1
+    .map((x) => x.text)
+    .join("")
+    .trim();
+  const line2 = flex2
+    .map((x) => x.text)
+    .join("")
+    .trim();
 
   const videoId =
     r.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer
@@ -145,66 +156,70 @@ function parseMusicItemRenderer(it, type) {
     r.navigationEndpoint?.browseEndpoint?.browseId ||
     flex0[0]?.navigationEndpoint?.browseEndpoint?.browseId ||
     r.thumbnail?.musicThumbnailRenderer?.thumbnail?.navigationEndpoint?.browseEndpoint?.browseId ||
-    '';
+    "";
 
   const navPlaylistId =
     r.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer
       ?.playNavigationEndpoint?.watchEndpoint?.playlistId ||
     r.navigationEndpoint?.watchEndpoint?.playlistId ||
-    '';
+    "";
 
   const thumb =
     r.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails?.slice(-1)?.[0]?.url ||
-    (videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : '');
+    (videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : "");
 
-  if (type === 'songs' || type === 'videos') {
+  if (type === "songs" || type === "videos") {
     if (!videoId) return null;
     const durMatch = `${line1} ${line2}`.match(/\b\d{1,2}:\d{2}(?::\d{2})?\b/);
     return {
-      type: 'song',
+      type: "song",
       videoId,
-      title: title || 'Música',
-      artist: line1.split('•')[0]?.trim() || (type === 'videos' ? 'YouTube' : 'Artista'),
-      album: line1.includes('•') ? line1.split('•')[1]?.trim() : '',
-      durationStr: durMatch ? durMatch[0] : '',
+      title: title || "Música",
+      artist: line1.split("•")[0]?.trim() || (type === "videos" ? "YouTube" : "Artista"),
+      album: line1.includes("•") ? line1.split("•")[1]?.trim() : "",
+      durationStr: durMatch ? durMatch[0] : "",
       thumbnail: thumb,
-      source: type === 'videos' ? 'YouTube' : 'YouTube Music',
-      channelTitle: line1.split('•')[0]?.trim() || (type === 'videos' ? 'YouTube' : 'Artista'),
+      source: type === "videos" ? "YouTube" : "YouTube Music",
+      channelTitle: line1.split("•")[0]?.trim() || (type === "videos" ? "YouTube" : "Artista"),
     };
-  } else if (type === 'artists') {
+  } else if (type === "artists") {
     return {
-      type: 'artist',
-      browseId: browseId || '',
+      type: "artist",
+      browseId: browseId || "",
       name: title || line1,
       title: title || line1,
       subtitle: line1,
       thumbnail: thumb,
-      source: 'YouTube Music',
+      source: "YouTube Music",
     };
-  } else if (type === 'albums') {
+  } else if (type === "albums") {
     return {
-      type: 'album',
-      browseId: browseId || '',
+      type: "album",
+      browseId: browseId || "",
       title,
-      artist: line1.replace(/Álbum\s*•\s*/i, '').split('•')[0]?.trim() || '',
-      year: (line1.match(/\b(19\d{2}|20\d{2})\b/) || [])[0] || '',
+      artist:
+        line1
+          .replace(/Álbum\s*•\s*/i, "")
+          .split("•")[0]
+          ?.trim() || "",
+      year: (line1.match(/\b(19\d{2}|20\d{2})\b/) || [])[0] || "",
       thumbnail: thumb,
-      source: 'YouTube Music',
+      source: "YouTube Music",
     };
-  } else if (type === 'playlists') {
-    const rawPlId = navPlaylistId || browseId?.replace(/^VL/, '') || '';
+  } else if (type === "playlists") {
+    const rawPlId = navPlaylistId || browseId?.replace(/^VL/, "") || "";
     const plId = rawPlId;
-    const isMix = plId.startsWith('RD');
-    const isCommunity = plId.startsWith('PL');
+    const isMix = plId.startsWith("RD");
+    const isCommunity = plId.startsWith("PL");
     return {
-      type: isMix ? 'mix' : isCommunity ? 'community_playlist' : 'playlist',
-      browseId: browseId || (plId ? `VL${plId}` : ''),
+      type: isMix ? "mix" : isCommunity ? "community_playlist" : "playlist",
+      browseId: browseId || (plId ? `VL${plId}` : ""),
       playlistId: plId,
-      title: title || 'Playlist',
-      author: line1.split('•')[0]?.trim() || '',
-      itemCountStr: line1.split('•')[1]?.trim() || '',
+      title: title || "Playlist",
+      author: line1.split("•")[0]?.trim() || "",
+      itemCountStr: line1.split("•")[1]?.trim() || "",
       thumbnail: thumb,
-      source: 'YouTube Music',
+      source: "YouTube Music",
     };
   }
   return null;
@@ -273,7 +288,7 @@ export async function fetchCategoryStep(query, type, continuationToken = null) {
       // ctoken=TOKEN
       const contUrl = `https://music.youtube.com/youtubei/v1/search?continuation=${encodeURIComponent(continuationToken)}&ctoken=${encodeURIComponent(continuationToken)}`;
       const res = await fetch(contUrl, {
-        method: 'POST',
+        method: "POST",
         headers: YT_HEADERS,
         body: JSON.stringify({
           context: YT_CONTEXT,
@@ -301,8 +316,8 @@ export async function fetchCategoryStep(query, type, continuationToken = null) {
       // 1. Na busca inicial, preserve os resultados e extraia:
       // musicShelfRenderer.continuations → nextContinuationData.continuation
       if (!params) return { items: [], continuation: null };
-      const res = await fetch('https://music.youtube.com/youtubei/v1/search', {
-        method: 'POST',
+      const res = await fetch("https://music.youtube.com/youtubei/v1/search", {
+        method: "POST",
         headers: YT_HEADERS,
         body: JSON.stringify({
           context: YT_CONTEXT,
@@ -324,7 +339,10 @@ export async function fetchCategoryStep(query, type, continuationToken = null) {
       }
     }
   } catch (err) {
-    console.warn(`[Connection_music-bridge] fetchCategoryStep (${type}) falhou:`, err?.message || err);
+    console.warn(
+      `[Connection_music-bridge] fetchCategoryStep (${type}) falhou:`,
+      err?.message || err,
+    );
   }
 
   return { items, continuation: nextContinuation };
@@ -396,13 +414,13 @@ export async function fetchYouTubeInnerTubeStep(query, continuationToken = null)
       const contRes = await fetch(
         `https://www.youtube.com/youtubei/v1/search?continuation=${encodeURIComponent(continuationToken)}&ctoken=${encodeURIComponent(continuationToken)}`,
         {
-          method: 'POST',
+          method: "POST",
           headers: YT_HEADERS,
           body: JSON.stringify({
             context: YT_WEB_CONTEXT,
             continuation: continuationToken,
           }),
-        }
+        },
       );
 
       if (contRes.ok) {
@@ -416,20 +434,27 @@ export async function fetchYouTubeInnerTubeStep(query, continuationToken = null)
               const vr = it.videoRenderer;
               const videoId = vr.videoId;
               if (!videoId) continue;
-              const title = vr.title?.runs?.map((x) => x.text).join('') || vr.title?.simpleText || '';
-              const artist = vr.ownerText?.runs?.map((x) => x.text).join('') || vr.shortBylineText?.runs?.map((x) => x.text).join('') || 'YouTube';
-              const durStr = vr.lengthText?.simpleText || vr.lengthText?.runs?.map((x) => x.text).join('') || '';
-              const thumb = vr.thumbnail?.thumbnails?.slice(-1)[0]?.url || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+              const title =
+                vr.title?.runs?.map((x) => x.text).join("") || vr.title?.simpleText || "";
+              const artist =
+                vr.ownerText?.runs?.map((x) => x.text).join("") ||
+                vr.shortBylineText?.runs?.map((x) => x.text).join("") ||
+                "YouTube";
+              const durStr =
+                vr.lengthText?.simpleText || vr.lengthText?.runs?.map((x) => x.text).join("") || "";
+              const thumb =
+                vr.thumbnail?.thumbnails?.slice(-1)[0]?.url ||
+                `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
               if (title) {
                 addItem({
                   videoId,
                   title,
                   artist,
-                  album: '',
+                  album: "",
                   durationStr: durStr,
                   thumbnail: thumb,
-                  type: 'song',
-                  source: 'YouTube',
+                  type: "song",
+                  source: "YouTube",
                   channelTitle: artist,
                 });
               }
@@ -437,29 +462,32 @@ export async function fetchYouTubeInnerTubeStep(query, continuationToken = null)
               const pr = it.playlistRenderer;
               const playlistId = pr.playlistId;
               if (!playlistId) continue;
-              const title = pr.title?.simpleText || pr.title?.runs?.map((x) => x.text).join('') || '';
-              const artist = pr.shortBylineText?.runs?.map((x) => x.text).join('') || 'Comunidade YouTube';
-              const thumb = pr.thumbnails?.[0]?.thumbnails?.slice(-1)[0]?.url || '';
+              const title =
+                pr.title?.simpleText || pr.title?.runs?.map((x) => x.text).join("") || "";
+              const artist =
+                pr.shortBylineText?.runs?.map((x) => x.text).join("") || "Comunidade YouTube";
+              const thumb = pr.thumbnails?.[0]?.thumbnails?.slice(-1)[0]?.url || "";
               if (title) {
                 addItem({
                   playlistId,
                   title,
                   artist,
-                  type: playlistId.startsWith('PL') ? 'community_playlist' : 'playlist',
-                  source: 'YouTube',
+                  type: playlistId.startsWith("PL") ? "community_playlist" : "playlist",
+                  source: "YouTube",
                   thumbnail: thumb,
                 });
               }
             } else if (it.continuationItemRenderer) {
               nextContinuation =
-                it.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token || null;
+                it.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token ||
+                null;
             }
           }
         }
       }
     } else {
-      const res = await fetch('https://www.youtube.com/youtubei/v1/search', {
-        method: 'POST',
+      const res = await fetch("https://www.youtube.com/youtubei/v1/search", {
+        method: "POST",
         headers: YT_HEADERS,
         body: JSON.stringify({
           context: YT_WEB_CONTEXT,
@@ -479,20 +507,27 @@ export async function fetchYouTubeInnerTubeStep(query, continuationToken = null)
               const vr = it.videoRenderer;
               const videoId = vr.videoId;
               if (!videoId) continue;
-              const title = vr.title?.runs?.map((x) => x.text).join('') || vr.title?.simpleText || '';
-              const artist = vr.ownerText?.runs?.map((x) => x.text).join('') || vr.shortBylineText?.runs?.map((x) => x.text).join('') || 'YouTube';
-              const durStr = vr.lengthText?.simpleText || vr.lengthText?.runs?.map((x) => x.text).join('') || '';
-              const thumb = vr.thumbnail?.thumbnails?.slice(-1)[0]?.url || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+              const title =
+                vr.title?.runs?.map((x) => x.text).join("") || vr.title?.simpleText || "";
+              const artist =
+                vr.ownerText?.runs?.map((x) => x.text).join("") ||
+                vr.shortBylineText?.runs?.map((x) => x.text).join("") ||
+                "YouTube";
+              const durStr =
+                vr.lengthText?.simpleText || vr.lengthText?.runs?.map((x) => x.text).join("") || "";
+              const thumb =
+                vr.thumbnail?.thumbnails?.slice(-1)[0]?.url ||
+                `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
               if (title) {
                 addItem({
                   videoId,
                   title,
                   artist,
-                  album: '',
+                  album: "",
                   durationStr: durStr,
                   thumbnail: thumb,
-                  type: 'song',
-                  source: 'YouTube',
+                  type: "song",
+                  source: "YouTube",
                   channelTitle: artist,
                 });
               }
@@ -500,16 +535,18 @@ export async function fetchYouTubeInnerTubeStep(query, continuationToken = null)
               const pr = it.playlistRenderer;
               const playlistId = pr.playlistId;
               if (!playlistId) continue;
-              const title = pr.title?.simpleText || pr.title?.runs?.map((x) => x.text).join('') || '';
-              const artist = pr.shortBylineText?.runs?.map((x) => x.text).join('') || 'Comunidade YouTube';
-              const thumb = pr.thumbnails?.[0]?.thumbnails?.slice(-1)[0]?.url || '';
+              const title =
+                pr.title?.simpleText || pr.title?.runs?.map((x) => x.text).join("") || "";
+              const artist =
+                pr.shortBylineText?.runs?.map((x) => x.text).join("") || "Comunidade YouTube";
+              const thumb = pr.thumbnails?.[0]?.thumbnails?.slice(-1)[0]?.url || "";
               if (title) {
                 addItem({
                   playlistId,
                   title,
                   artist,
-                  type: playlistId.startsWith('PL') ? 'community_playlist' : 'playlist',
-                  source: 'YouTube',
+                  type: playlistId.startsWith("PL") ? "community_playlist" : "playlist",
+                  source: "YouTube",
                   thumbnail: thumb,
                 });
               }
@@ -518,7 +555,8 @@ export async function fetchYouTubeInnerTubeStep(query, continuationToken = null)
 
           if (sec.continuationItemRenderer) {
             nextContinuation =
-              sec.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token || null;
+              sec.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token ||
+              null;
           }
         }
 
@@ -526,13 +564,17 @@ export async function fetchYouTubeInnerTubeStep(query, continuationToken = null)
           const lastSec = sections[sections.length - 1];
           if (lastSec?.continuationItemRenderer) {
             nextContinuation =
-              lastSec.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token || null;
+              lastSec.continuationItemRenderer?.continuationEndpoint?.continuationCommand?.token ||
+              null;
           }
         }
       }
     }
   } catch (err) {
-    console.warn('[Connection_music-bridge] fetchYouTubeInnerTubeStep falhou:', err?.message || err);
+    console.warn(
+      "[Connection_music-bridge] fetchYouTubeInnerTubeStep falhou:",
+      err?.message || err,
+    );
   }
 
   return { items, continuation: nextContinuation };
@@ -568,7 +610,7 @@ export async function fetchYouTubeInnerTube(query) {
   // Fallback InnerTube via vídeos do YouTube Music (com continuation) se YouTube web estiver vazio
   if (items.length === 0) {
     try {
-      const vids = await fetchCategory(q, 'videos');
+      const vids = await fetchCategory(q, "videos");
       for (const v of vids) addItem(v);
     } catch {}
   }
@@ -579,44 +621,47 @@ export async function fetchYouTubeInnerTube(query) {
 // 2. Busca do PACOTE ESTRUTURADO (Músicas, Artistas, Álbuns, Playlists, YouTube)
 // Modo 'initial': entrega a 1ª página imediatamente e devolve os tokens de continuation para carregamento progressivo.
 // Modo 'full': aguarda toda a cadeia de continuation ser percorrida.
-export async function handleSearchBundle(query, mode = 'initial') {
+export async function handleSearchBundle(query, mode = "initial") {
   if (!query || !query.trim()) {
-    return jsonResponse({
-      ok: false,
-      error: 'Termo de busca vazio',
-      query: '',
-      songs: [],
-      artists: [],
-      albums: [],
-      playlists: [],
-      youtube: [],
-      continuations: {},
-      internalRequestsCount: 0,
-    }, 400);
+    return jsonResponse(
+      {
+        ok: false,
+        error: "Termo de busca vazio",
+        query: "",
+        songs: [],
+        artists: [],
+        albums: [],
+        playlists: [],
+        youtube: [],
+        continuations: {},
+        internalRequestsCount: 0,
+      },
+      400,
+    );
   }
 
   const q = query.trim();
 
-  if (mode === 'full') {
+  if (mode === "full") {
     // Executa as buscas completas percorrendo toda a cadeia de continuação
     const [songsRes, artistsRes, albumsRes, playlistsRes, ytRes] = await Promise.allSettled([
-      fetchCategory(q, 'songs'),
-      fetchCategory(q, 'artists'),
-      fetchCategory(q, 'albums'),
-      fetchCategory(q, 'playlists'),
+      fetchCategory(q, "songs"),
+      fetchCategory(q, "artists"),
+      fetchCategory(q, "albums"),
+      fetchCategory(q, "playlists"),
       fetchYouTubeInnerTube(q),
     ]);
 
-    const songs = songsRes.status === 'fulfilled' ? songsRes.value : [];
-    const artists = artistsRes.status === 'fulfilled' ? artistsRes.value : [];
-    const albums = albumsRes.status === 'fulfilled' ? albumsRes.value : [];
-    const playlists = playlistsRes.status === 'fulfilled' ? playlistsRes.value : [];
-    const youtube = ytRes.status === 'fulfilled' ? ytRes.value : [];
+    const songs = songsRes.status === "fulfilled" ? songsRes.value : [];
+    const artists = artistsRes.status === "fulfilled" ? artistsRes.value : [];
+    const albums = albumsRes.status === "fulfilled" ? albumsRes.value : [];
+    const playlists = playlistsRes.status === "fulfilled" ? playlistsRes.value : [];
+    const youtube = ytRes.status === "fulfilled" ? ytRes.value : [];
 
     return jsonResponse({
       ok: true,
       query: q,
-      mode: 'full',
+      mode: "full",
       internalRequestsCount: 5,
       songs,
       artists,
@@ -629,24 +674,34 @@ export async function handleSearchBundle(query, mode = 'initial') {
 
   // Modelo progressivo / lazy loading: executa a 1ª página de cada categoria em paralelo
   // Entrega esses resultados imediatamente e preserva os tokens de continuation para as páginas seguintes
-  const [songsStepRes, artistsStepRes, albumsStepRes, playlistsStepRes, ytStepRes] = await Promise.allSettled([
-    fetchCategoryStep(q, 'songs', null),
-    fetchCategoryStep(q, 'artists', null),
-    fetchCategoryStep(q, 'albums', null),
-    fetchCategoryStep(q, 'playlists', null),
-    fetchYouTubeInnerTubeStep(q, null),
-  ]);
+  const [songsStepRes, artistsStepRes, albumsStepRes, playlistsStepRes, ytStepRes] =
+    await Promise.allSettled([
+      fetchCategoryStep(q, "songs", null),
+      fetchCategoryStep(q, "artists", null),
+      fetchCategoryStep(q, "albums", null),
+      fetchCategoryStep(q, "playlists", null),
+      fetchYouTubeInnerTubeStep(q, null),
+    ]);
 
-  const songsStep = songsStepRes.status === 'fulfilled' ? songsStepRes.value : { items: [], continuation: null };
-  const artistsStep = artistsStepRes.status === 'fulfilled' ? artistsStepRes.value : { items: [], continuation: null };
-  const albumsStep = albumsStepRes.status === 'fulfilled' ? albumsStepRes.value : { items: [], continuation: null };
-  const playlistsStep = playlistsStepRes.status === 'fulfilled' ? playlistsStepRes.value : { items: [], continuation: null };
-  const ytStep = ytStepRes.status === 'fulfilled' ? ytStepRes.value : { items: [], continuation: null };
+  const songsStep =
+    songsStepRes.status === "fulfilled" ? songsStepRes.value : { items: [], continuation: null };
+  const artistsStep =
+    artistsStepRes.status === "fulfilled"
+      ? artistsStepRes.value
+      : { items: [], continuation: null };
+  const albumsStep =
+    albumsStepRes.status === "fulfilled" ? albumsStepRes.value : { items: [], continuation: null };
+  const playlistsStep =
+    playlistsStepRes.status === "fulfilled"
+      ? playlistsStepRes.value
+      : { items: [], continuation: null };
+  const ytStep =
+    ytStepRes.status === "fulfilled" ? ytStepRes.value : { items: [], continuation: null };
 
   return jsonResponse({
     ok: true,
     query: q,
-    mode: 'initial',
+    mode: "initial",
     internalRequestsCount: 5,
     songs: songsStep.items,
     artists: artistsStep.items,
@@ -654,11 +709,11 @@ export async function handleSearchBundle(query, mode = 'initial') {
     playlists: playlistsStep.items,
     youtube: ytStep.items,
     continuations: {
-      songs: songsStep.continuation || '',
-      artists: artistsStep.continuation || '',
-      albums: albumsStep.continuation || '',
-      playlists: playlistsStep.continuation || '',
-      youtube: ytStep.continuation || '',
+      songs: songsStep.continuation || "",
+      artists: artistsStep.continuation || "",
+      albums: albumsStep.continuation || "",
+      playlists: playlistsStep.continuation || "",
+      youtube: ytStep.continuation || "",
     },
   });
 }
@@ -666,11 +721,11 @@ export async function handleSearchBundle(query, mode = 'initial') {
 // 3. Browse estruturado de Álbum, Playlist ou Artista
 export async function handleBrowse(browseId) {
   if (!browseId) {
-    return jsonResponse({ ok: false, error: 'browseId é obrigatório' }, 400);
+    return jsonResponse({ ok: false, error: "browseId é obrigatório" }, 400);
   }
 
-  const res = await fetch('https://music.youtube.com/youtubei/v1/browse', {
-    method: 'POST',
+  const res = await fetch("https://music.youtube.com/youtubei/v1/browse", {
+    method: "POST",
     headers: YT_HEADERS,
     body: JSON.stringify({
       context: YT_CONTEXT,
@@ -689,10 +744,10 @@ export async function handleBrowse(browseId) {
   if (twoCol) {
     const tab0 = twoCol.tabs?.[0]?.tabRenderer?.content?.sectionListRenderer?.contents?.[0];
     const header = tab0?.musicResponsiveHeaderRenderer;
-    const title = header?.title?.runs?.map((x) => x.text).join('') || 'Sem título';
-    const subtitle = header?.subtitle?.runs?.map((x) => x.text).join('') || '';
+    const title = header?.title?.runs?.map((x) => x.text).join("") || "Sem título";
+    const subtitle = header?.subtitle?.runs?.map((x) => x.text).join("") || "";
     const thumbnail =
-      header?.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails?.slice(-1)?.[0]?.url || '';
+      header?.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails?.slice(-1)?.[0]?.url || "";
 
     const trackShelf =
       twoCol.secondaryContents?.sectionListRenderer?.contents?.[0]?.musicPlaylistShelfRenderer ||
@@ -705,20 +760,19 @@ export async function handleBrowse(browseId) {
       const tTitle =
         item.flexColumns?.[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs
           ?.map((x) => x.text)
-          .join('') || '';
+          .join("") || "";
       const tArtist =
         item.flexColumns?.[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs
           ?.map((x) => x.text)
-          .join('') || '';
+          .join("") || "";
       const tDur =
         item.fixedColumns?.[0]?.musicResponsiveListItemFixedColumnRenderer?.text?.runs
           ?.map((x) => x.text)
-          .join('') || '';
+          .join("") || "";
 
       const tVideoId =
         item.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer
-          ?.playNavigationEndpoint?.watchEndpoint?.videoId ||
-        item.playlistItemData?.videoId;
+          ?.playNavigationEndpoint?.watchEndpoint?.videoId || item.playlistItemData?.videoId;
 
       if (tVideoId && tTitle) {
         tracks.push({
@@ -748,10 +802,10 @@ export async function handleBrowse(browseId) {
   if (singleCol) {
     const header =
       data.header?.musicImmersiveHeaderRenderer || data.header?.musicVisualHeaderRenderer;
-    const artistName = header?.title?.runs?.map((x) => x.text).join('') || 'Artista';
-    const description = header?.description?.runs?.map((x) => x.text).join('') || '';
+    const artistName = header?.title?.runs?.map((x) => x.text).join("") || "Artista";
+    const description = header?.description?.runs?.map((x) => x.text).join("") || "";
     const thumbnail =
-      header?.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails?.slice(-1)?.[0]?.url || '';
+      header?.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails?.slice(-1)?.[0]?.url || "";
 
     const sections = singleCol.tabs?.[0]?.tabRenderer?.content?.sectionListRenderer?.contents || [];
     const parsedSections = [];
@@ -760,22 +814,28 @@ export async function handleBrowse(browseId) {
       const shelf = s.musicShelfRenderer || s.musicCarouselShelfRenderer;
       if (!shelf) continue;
       const sTitle =
-        shelf.title?.runs?.map((x) => x.text).join('') ||
-        shelf.header?.musicCarouselShelfBasicHeaderRenderer?.title?.runs?.map((x) => x.text).join('') ||
-        '';
+        shelf.title?.runs?.map((x) => x.text).join("") ||
+        shelf.header?.musicCarouselShelfBasicHeaderRenderer?.title?.runs
+          ?.map((x) => x.text)
+          .join("") ||
+        "";
 
       const sItems = [];
       for (const it of shelf.contents || []) {
         const itemR = it.musicResponsiveListItemRenderer || it.musicTwoRowItemRenderer;
         if (!itemR) continue;
         const itTitle =
-          itemR.title?.runs?.map((x) => x.text).join('') ||
-          itemR.flexColumns?.[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.map((x) => x.text).join('') ||
-          '';
+          itemR.title?.runs?.map((x) => x.text).join("") ||
+          itemR.flexColumns?.[0]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs
+            ?.map((x) => x.text)
+            .join("") ||
+          "";
         const itSub =
-          itemR.subtitle?.runs?.map((x) => x.text).join('') ||
-          itemR.flexColumns?.[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs?.map((x) => x.text).join('') ||
-          '';
+          itemR.subtitle?.runs?.map((x) => x.text).join("") ||
+          itemR.flexColumns?.[1]?.musicResponsiveListItemFlexColumnRenderer?.text?.runs
+            ?.map((x) => x.text)
+            .join("") ||
+          "";
         const itVideoId =
           itemR.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer
             ?.playNavigationEndpoint?.watchEndpoint?.videoId ||
@@ -812,11 +872,11 @@ export async function handleBrowse(browseId) {
 // 4. Continuidade estruturada: Rádio / Related / Next
 export async function handleNextRadio(videoId) {
   if (!videoId) {
-    return jsonResponse({ ok: false, error: 'videoId é obrigatório' }, 400);
+    return jsonResponse({ ok: false, error: "videoId é obrigatório" }, 400);
   }
 
-  const res = await fetch('https://music.youtube.com/youtubei/v1/next', {
-    method: 'POST',
+  const res = await fetch("https://music.youtube.com/youtubei/v1/next", {
+    method: "POST",
     headers: YT_HEADERS,
     body: JSON.stringify({
       context: YT_CONTEXT,
@@ -832,20 +892,20 @@ export async function handleNextRadio(videoId) {
   const data = await res.json();
   const playlistTracks =
     data.contents?.singleColumnMusicWatchNextResultsRenderer?.tabbedRenderer
-      ?.watchNextTabbedResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.musicQueueRenderer
-      ?.content?.playlistPanelRenderer?.contents || [];
+      ?.watchNextTabbedResultsRenderer?.tabs?.[0]?.tabRenderer?.content?.musicQueueRenderer?.content
+      ?.playlistPanelRenderer?.contents || [];
 
   const tracks = [];
   for (const it of playlistTracks) {
     const r = it.playlistPanelVideoRenderer;
     if (!r || !r.videoId) continue;
-    const title = r.title?.runs?.map((x) => x.text).join('') || '';
-    const byline = r.longBylineText?.runs?.map((x) => x.text).join('') || '';
-    const dur = r.lengthText?.runs?.map((x) => x.text).join('') || '';
+    const title = r.title?.runs?.map((x) => x.text).join("") || "";
+    const byline = r.longBylineText?.runs?.map((x) => x.text).join("") || "";
+    const dur = r.lengthText?.runs?.map((x) => x.text).join("") || "";
     tracks.push({
       videoId: r.videoId,
       title,
-      artist: byline.split('•')[0]?.trim() || '',
+      artist: byline.split("•")[0]?.trim() || "",
       durationStr: dur,
       thumbnail: `https://i.ytimg.com/vi/${r.videoId}/hqdefault.jpg`,
     });
@@ -862,7 +922,7 @@ export async function handleNextRadio(videoId) {
 
 // Handler de requisições HTTP (padrão Fetch / Cloudflare Worker / Node Express / Vite)
 export async function handleRequest(request) {
-  if (request.method === 'OPTIONS') {
+  if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders() });
   }
 
@@ -870,25 +930,28 @@ export async function handleRequest(request) {
   const pathname = url.pathname;
 
   try {
-    if (pathname.endsWith('/bundle')) {
-      let query = url.searchParams.get('q') || url.searchParams.get('query');
-      let mode = url.searchParams.get('mode') || (url.searchParams.get('all') === 'true' ? 'full' : 'initial');
-      if (request.method === 'POST') {
+    if (pathname.endsWith("/bundle")) {
+      let query = url.searchParams.get("q") || url.searchParams.get("query");
+      let mode =
+        url.searchParams.get("mode") ||
+        (url.searchParams.get("all") === "true" ? "full" : "initial");
+      if (request.method === "POST") {
         const body = await request.json().catch(() => ({}));
         query = body.query || body.q || query;
         if (body.mode) mode = body.mode;
-        else if (body.all) mode = 'full';
+        else if (body.all) mode = "full";
       }
       return await handleSearchBundle(query, mode);
     }
 
-    if (pathname.endsWith('/category') || pathname.endsWith('/search')) {
-      let query = url.searchParams.get('q') || url.searchParams.get('query') || '';
-      let type = url.searchParams.get('type') || url.searchParams.get('filter') || '';
-      let continuation = url.searchParams.get('continuation') || url.searchParams.get('ctoken') || '';
-      let stepOnly = url.searchParams.get('step') === 'true';
+    if (pathname.endsWith("/category") || pathname.endsWith("/search")) {
+      let query = url.searchParams.get("q") || url.searchParams.get("query") || "";
+      let type = url.searchParams.get("type") || url.searchParams.get("filter") || "";
+      let continuation =
+        url.searchParams.get("continuation") || url.searchParams.get("ctoken") || "";
+      let stepOnly = url.searchParams.get("step") === "true";
 
-      if (request.method === 'POST') {
+      if (request.method === "POST") {
         const body = await request.json().catch(() => ({}));
         query = body.query || body.q || query;
         type = body.type || body.filter || type;
@@ -898,42 +961,42 @@ export async function handleRequest(request) {
 
       // Se token de continuação foi fornecido ou stepOnly foi solicitado
       if (continuation || stepOnly) {
-        const effectiveType = type && CATEGORY_PARAMS[type] ? type : 'songs';
+        const effectiveType = type && CATEGORY_PARAMS[type] ? type : "songs";
         const step = await fetchCategoryStep(query, effectiveType, continuation || null);
         return jsonResponse({
           ok: true,
           query,
           type: effectiveType,
           items: step.items,
-          continuation: step.continuation || '',
+          continuation: step.continuation || "",
           hasMore: Boolean(step.continuation),
           internalRequestsCount: 1,
         });
       }
 
       // Se nenhum tipo de categoria for especificado, executa o bundle completo
-      if (!type || type === 'all' || type === 'bundle') {
+      if (!type || type === "all" || type === "bundle") {
         return await handleSearchBundle(query);
       }
 
       // Busca na categoria específica percorrendo toda a cadeia de continuação do InnerTube
-      const effectiveType = CATEGORY_PARAMS[type] ? type : 'songs';
+      const effectiveType = CATEGORY_PARAMS[type] ? type : "songs";
       const items = await fetchCategory(query, effectiveType);
       return jsonResponse({
         ok: true,
         query,
         type: effectiveType,
         items,
-        continuation: '',
+        continuation: "",
         hasMore: false,
       });
     }
 
-    if (pathname.endsWith('/youtube')) {
-      let query = url.searchParams.get('q') || url.searchParams.get('query');
-      let continuation = url.searchParams.get('continuation') || url.searchParams.get('ctoken');
-      let stepOnly = url.searchParams.get('step') === 'true';
-      if (request.method === 'POST') {
+    if (pathname.endsWith("/youtube")) {
+      let query = url.searchParams.get("q") || url.searchParams.get("query");
+      let continuation = url.searchParams.get("continuation") || url.searchParams.get("ctoken");
+      let stepOnly = url.searchParams.get("step") === "true";
+      if (request.method === "POST") {
         const body = await request.json().catch(() => ({}));
         query = body.query || body.q || query;
         continuation = body.continuation || body.ctoken || continuation;
@@ -945,7 +1008,7 @@ export async function handleRequest(request) {
           ok: true,
           query,
           items: step.items,
-          continuation: step.continuation || '',
+          continuation: step.continuation || "",
           hasMore: Boolean(step.continuation),
           internalRequestsCount: 1,
         });
@@ -954,18 +1017,18 @@ export async function handleRequest(request) {
       return jsonResponse({ ok: true, query, items, internalRequestsCount: 1 });
     }
 
-    if (pathname.endsWith('/browse')) {
-      let browseId = url.searchParams.get('browseId');
-      if (request.method === 'POST') {
+    if (pathname.endsWith("/browse")) {
+      let browseId = url.searchParams.get("browseId");
+      if (request.method === "POST") {
         const body = await request.json().catch(() => ({}));
         browseId = body.browseId || browseId;
       }
       return await handleBrowse(browseId);
     }
 
-    if (pathname.endsWith('/radio') || pathname.endsWith('/next')) {
-      let videoId = url.searchParams.get('videoId');
-      if (request.method === 'POST') {
+    if (pathname.endsWith("/radio") || pathname.endsWith("/next")) {
+      let videoId = url.searchParams.get("videoId");
+      if (request.method === "POST") {
         const body = await request.json().catch(() => ({}));
         videoId = body.videoId || videoId;
       }

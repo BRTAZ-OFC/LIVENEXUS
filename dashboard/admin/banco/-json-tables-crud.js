@@ -125,7 +125,11 @@ async function readTable(definition) {
   try {
     const parsed = JSON.parse(await readFile(fileFor(definition), "utf8"));
     const expectedArray = definition.shape === "array";
-    if (expectedArray ? !Array.isArray(parsed) : !parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    if (
+      expectedArray
+        ? !Array.isArray(parsed)
+        : !parsed || typeof parsed !== "object" || Array.isArray(parsed)
+    ) {
       throw new Error(`Formato inválido no arquivo ${definition.file}.`);
     }
     return parsed;
@@ -144,7 +148,8 @@ function rowKey(...parts) {
 }
 
 function parseRowKey(value) {
-  if (typeof value !== "string" || !value.trim()) throw new Error("Identificador do registro não fornecido.");
+  if (typeof value !== "string" || !value.trim())
+    throw new Error("Identificador do registro não fornecido.");
   const [kind, ...parts] = value.split("|");
   try {
     return [kind, ...parts.map((part) => decodeURIComponent(part))];
@@ -210,7 +215,8 @@ function rowsFromTable(definition, data, users) {
     data.forEach((record, index) => {
       if (!isRecord(record)) return;
       const normalized = { ...record };
-      if (normalized.user_id === undefined && typeof normalized.userId === "string") normalized.user_id = normalized.userId;
+      if (normalized.user_id === undefined && typeof normalized.userId === "string")
+        normalized.user_id = normalized.userId;
       delete normalized.userId;
       if (typeof normalized.user_id === "string" && !validIds.has(normalized.user_id)) return;
       rows.push({ ...normalized, __rowKey: rowKey("array", recordId(normalized, index)) });
@@ -221,7 +227,8 @@ function rowsFromTable(definition, data, users) {
   if (definition.shape === "map") {
     for (const [key, value] of Object.entries(data)) {
       const record = isRecord(value) ? { ...value } : { value };
-      if (record.user_id === undefined && typeof record.userId === "string") record.user_id = record.userId;
+      if (record.user_id === undefined && typeof record.userId === "string")
+        record.user_id = record.userId;
       delete record.userId;
       if (typeof record.user_id === "string" && !users.has(record.user_id)) continue;
       if (record[definition.keyField] === undefined) record[definition.keyField] = key;
@@ -279,12 +286,17 @@ export async function createJsonTableRecord(tableId, input) {
     const data = await readTable(definition);
     if (definition.shape === "array") {
       const now = new Date().toISOString();
-      const id = String(record.id || (tableId === "templates" ? `template_${randomUUID()}` : randomUUID()));
-      if (data.some((item) => isRecord(item) && String(item.id ?? item.avaliacao_id ?? "") === id)) {
+      const id = String(
+        record.id || (tableId === "templates" ? `template_${randomUUID()}` : randomUUID()),
+      );
+      if (
+        data.some((item) => isRecord(item) && String(item.id ?? item.avaliacao_id ?? "") === id)
+      ) {
         throw new Error("Já existe um registro com esse ID.");
       }
       record = { ...record, id };
-      if (record.created_at === undefined && record.created_date === undefined) record.created_at = now;
+      if (record.created_at === undefined && record.created_date === undefined)
+        record.created_at = now;
       data.push(record);
       await writeJsonAtomically(fileFor(definition), data);
       return { ...record, __rowKey: rowKey("array", id) };
@@ -302,7 +314,8 @@ export async function createJsonTableRecord(tableId, input) {
 
     const ownerId = await assertLocalUser(record.user_id);
     if (definition.shape === "userObject") {
-      if (Object.hasOwn(data, ownerId)) throw new Error("Esse usuário já possui um registro nesta tabela.");
+      if (Object.hasOwn(data, ownerId))
+        throw new Error("Esse usuário já possui um registro nesta tabela.");
       const base = defaultUserValue(tableId, ownerId);
       const stored = { ...base, ...record, user_id: ownerId };
       if (tableId === "rtc_registry" && !stored.rtcId) {
@@ -317,7 +330,8 @@ export async function createJsonTableRecord(tableId, input) {
     const id = String(record.id || randomUUID());
     const now = new Date().toISOString();
     record = { ...record, id, user_id: ownerId };
-    if (record.created_at === undefined && record.created_date === undefined) record.created_at = now;
+    if (record.created_at === undefined && record.created_date === undefined)
+      record.created_at = now;
     const items = Array.isArray(data[ownerId]) ? data[ownerId] : [];
     if (items.some((item) => isRecord(item) && String(item.id) === id)) {
       throw new Error("Já existe um registro com esse ID para o usuário.");
@@ -336,7 +350,8 @@ export async function updateJsonTableRecord(tableId, inputRowKey, inputRecord) {
   return withFileQueue(fileFor(definition), async () => {
     const data = await readTable(definition);
     if (definition.shape === "array") {
-      if (kind !== "array" || parts.length !== 1) throw new Error("Identificador incompatível com a tabela.");
+      if (kind !== "array" || parts.length !== 1)
+        throw new Error("Identificador incompatível com a tabela.");
       const targetId = parts[0];
       const index = data.findIndex((item, i) => isRecord(item) && recordId(item, i) === targetId);
       if (index < 0) throw new Error("Registro não encontrado.");
@@ -351,7 +366,8 @@ export async function updateJsonTableRecord(tableId, inputRowKey, inputRecord) {
     }
 
     if (definition.shape === "map") {
-      if (kind !== "map" || parts.length !== 1) throw new Error("Identificador incompatível com a tabela.");
+      if (kind !== "map" || parts.length !== 1)
+        throw new Error("Identificador incompatível com a tabela.");
       const key = parts[0];
       if (!Object.hasOwn(data, key)) throw new Error("Registro não encontrado.");
       await validateOptionalUserId(record);
@@ -361,11 +377,13 @@ export async function updateJsonTableRecord(tableId, inputRowKey, inputRecord) {
       return { ...data[key], __rowKey: inputRowKey };
     }
 
-    if (kind !== "user" || !parts.length) throw new Error("Identificador incompatível com a tabela.");
+    if (kind !== "user" || !parts.length)
+      throw new Error("Identificador incompatível com a tabela.");
     const ownerId = await assertLocalUser(parts[0]);
 
     if (definition.shape === "userObject") {
-      if (parts.length !== 1 || !Object.hasOwn(data, ownerId)) throw new Error("Registro não encontrado.");
+      if (parts.length !== 1 || !Object.hasOwn(data, ownerId))
+        throw new Error("Registro não encontrado.");
       if (record.user_id !== undefined && String(record.user_id) !== ownerId) {
         throw new Error("Não é permitido transferir o registro para outro usuário.");
       }
@@ -376,9 +394,12 @@ export async function updateJsonTableRecord(tableId, inputRowKey, inputRecord) {
       return { ...record, __rowKey: inputRowKey };
     }
 
-    if (parts.length !== 2 || !Array.isArray(data[ownerId])) throw new Error("Registro não encontrado.");
+    if (parts.length !== 2 || !Array.isArray(data[ownerId]))
+      throw new Error("Registro não encontrado.");
     const targetId = parts[1];
-    const index = data[ownerId].findIndex((item, i) => isRecord(item) && recordId(item, i) === targetId);
+    const index = data[ownerId].findIndex(
+      (item, i) => isRecord(item) && recordId(item, i) === targetId,
+    );
     if (index < 0) throw new Error("Registro não encontrado.");
     const original = data[ownerId][index];
     if (record.user_id !== undefined && String(record.user_id) !== ownerId) {
@@ -397,7 +418,8 @@ export async function deleteJsonTableRecord(tableId, inputRowKey) {
   return withFileQueue(fileFor(definition), async () => {
     const data = await readTable(definition);
     if (definition.shape === "array") {
-      if (kind !== "array" || parts.length !== 1) throw new Error("Identificador incompatível com a tabela.");
+      if (kind !== "array" || parts.length !== 1)
+        throw new Error("Identificador incompatível com a tabela.");
       const targetId = parts[0];
       const next = data.filter((item, i) => !isRecord(item) || recordId(item, i) !== targetId);
       if (next.length === data.length) return false;
@@ -406,7 +428,8 @@ export async function deleteJsonTableRecord(tableId, inputRowKey) {
     }
 
     if (definition.shape === "map") {
-      if (kind !== "map" || parts.length !== 1) throw new Error("Identificador incompatível com a tabela.");
+      if (kind !== "map" || parts.length !== 1)
+        throw new Error("Identificador incompatível com a tabela.");
       const key = parts[0];
       if (!Object.hasOwn(data, key)) return false;
       delete data[key];
@@ -414,7 +437,8 @@ export async function deleteJsonTableRecord(tableId, inputRowKey) {
       return true;
     }
 
-    if (kind !== "user" || !parts.length) throw new Error("Identificador incompatível com a tabela.");
+    if (kind !== "user" || !parts.length)
+      throw new Error("Identificador incompatível com a tabela.");
     const ownerId = await assertLocalUser(parts[0]);
     if (definition.shape === "userObject") {
       if (parts.length !== 1 || !Object.hasOwn(data, ownerId)) return false;
@@ -425,7 +449,9 @@ export async function deleteJsonTableRecord(tableId, inputRowKey) {
 
     if (parts.length !== 2 || !Array.isArray(data[ownerId])) return false;
     const targetId = parts[1];
-    const next = data[ownerId].filter((item, i) => !isRecord(item) || recordId(item, i) !== targetId);
+    const next = data[ownerId].filter(
+      (item, i) => !isRecord(item) || recordId(item, i) !== targetId,
+    );
     if (next.length === data[ownerId].length) return false;
     if (next.length) data[ownerId] = next;
     else delete data[ownerId];
@@ -438,7 +464,8 @@ export function createJsonTableCrud(tableId) {
   definitionFor(tableId);
   return Object.freeze({
     list: () => listJsonTableRecords(tableId),
-    get: async (rowKeyValue) => (await listJsonTableRecords(tableId)).find((row) => row.__rowKey === rowKeyValue) ?? null,
+    get: async (rowKeyValue) =>
+      (await listJsonTableRecords(tableId)).find((row) => row.__rowKey === rowKeyValue) ?? null,
     create: (record) => createJsonTableRecord(tableId, record),
     update: (rowKeyValue, record) => updateJsonTableRecord(tableId, rowKeyValue, record),
     delete: (rowKeyValue) => deleteJsonTableRecord(tableId, rowKeyValue),

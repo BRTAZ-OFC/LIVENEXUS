@@ -48,7 +48,15 @@ type ReviewRow = {
 
 export default function AdminPanel() {
   const [subTab, setSubTab] = useState<
-    "inicial" | "galeria" | "overlay" | "cenarios" | "biblioteca" | "avaliacoes" | "suporte" | "conexoes" | "widgets"
+    | "inicial"
+    | "galeria"
+    | "overlay"
+    | "cenarios"
+    | "biblioteca"
+    | "avaliacoes"
+    | "suporte"
+    | "conexoes"
+    | "widgets"
   >("inicial");
 
   // Real data state
@@ -376,9 +384,7 @@ export default function AdminPanel() {
                         <div className="shrink-0 flex items-center gap-2">
                           <button
                             type="button"
-                            onClick={() =>
-                              setExpandedScenesUserId(isExpanded ? null : u.user_id)
-                            }
+                            onClick={() => setExpandedScenesUserId(isExpanded ? null : u.user_id)}
                             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition border flex items-center gap-1.5 ${
                               isExpanded
                                 ? "bg-violet-600 text-white border-violet-500 shadow-sm"
@@ -443,8 +449,7 @@ export default function AdminPanel() {
                                 id: "brb",
                                 title: "Intervalo / Pausa (BRB)",
                                 badge: "Espera",
-                                badgeColor:
-                                  "bg-amber-500/10 text-amber-300 border-amber-500/20",
+                                badgeColor: "bg-amber-500/10 text-amber-300 border-amber-500/20",
                                 description:
                                   "Cena de pausa com timer regressivo, aviso de retorno em breve e trilha sonora.",
                                 resolution: "1920 × 1080 (60 FPS)",
@@ -460,8 +465,7 @@ export default function AdminPanel() {
                                 id: "ending",
                                 title: "Encerramento da Transmissão",
                                 badge: "Conclusão",
-                                badgeColor:
-                                  "bg-purple-500/10 text-purple-300 border-purple-500/20",
+                                badgeColor: "bg-purple-500/10 text-purple-300 border-purple-500/20",
                                 description:
                                   "Créditos finais, resumo de mensagens recebidas e agradecimentos aos espectadores.",
                                 resolution: "1920 × 1080 (60 FPS)",
@@ -539,7 +543,7 @@ export default function AdminPanel() {
                                               [u.user_id]: scene.id,
                                             }));
                                             setMessage(
-                                              `Cenário "${scene.title}" ativado para ${u.user}.`
+                                              `Cenário "${scene.title}" ativado para ${u.user}.`,
                                             );
                                           }}
                                           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-violet-600 hover:bg-violet-500 text-white transition shadow-sm"
@@ -552,9 +556,7 @@ export default function AdminPanel() {
                                     <button
                                       type="button"
                                       onClick={() =>
-                                        setPreviewingSceneKey(
-                                          isPreviewing ? null : previewKey
-                                        )
+                                        setPreviewingSceneKey(isPreviewing ? null : previewKey)
                                       }
                                       className="px-2 py-1 rounded-md text-[11px] text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 border border-white/10 transition"
                                     >

@@ -399,7 +399,7 @@ export default function TTSPage() {
       queuedAt: Date.now(),
     } satisfies QueueItem;
     setQueue((old) => {
-      let next = [...old, item];
+      const next = [...old, item];
       if (next.length > 200) {
         const discardIndex = next.findIndex((entry) => entry.tier === "normal");
         const fallbackIndex = next.findIndex(

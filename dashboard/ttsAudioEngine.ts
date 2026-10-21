@@ -16,7 +16,7 @@ export type PlaybackHandle = {
   resume: () => void;
 };
 
-const enginePromises = new Map<string, Promise<any>>();
+const enginePromises = new Map<string, Promise<unknown>>();
 let audioContext: AudioContext | null = null;
 
 const PIPER_VOICES: Record<string, { model?: string; config?: string }> = {
@@ -265,7 +265,9 @@ export async function playProcessedSpeech(
       nodes.forEach((node) => {
         try {
           node.disconnect();
-        } catch {}
+        } catch {
+          /* ignora erro de desconexão */
+        }
       });
       source = null;
       if (!paused && !ended) {
@@ -286,10 +288,14 @@ export async function playProcessedSpeech(
       paused = false;
       try {
         source?.stop();
-      } catch {}
+      } catch {
+        /* ignora erro de parada */
+      }
       try {
         modulator?.stop();
-      } catch {}
+      } catch {
+        /* ignora erro de parada */
+      }
       source = null;
       callbacks.onEnd?.();
     },
@@ -299,11 +305,15 @@ export async function playProcessedSpeech(
       paused = true;
       try {
         source.stop();
-      } catch {}
+      } catch {
+        /* ignora erro de pausa */
+      }
       source = null;
       try {
         modulator?.stop();
-      } catch {}
+      } catch {
+        /* ignora erro de pausa */
+      }
     },
     resume() {
       if (!paused || ended) return;

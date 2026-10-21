@@ -40,7 +40,9 @@ function requireAdmin(req: Request, res: Response): Session {
   if (!session?.user_id || session.role !== "admin") {
     res.status(session?.user_id ? 403 : 401).json({
       ok: false,
-      error: session?.user_id ? "Acesso permitido somente para administradores." : "Autenticação necessária.",
+      error: session?.user_id
+        ? "Acesso permitido somente para administradores."
+        : "Autenticação necessária.",
     });
     return null;
   }
@@ -49,8 +51,11 @@ function requireAdmin(req: Request, res: Response): Session {
 
 function sendError(res: Response, error: unknown) {
   const message = error instanceof Error ? error.message : "Falha ao processar a API JSON.";
-  const status = /não encontrado|não permitida/i.test(message) ? 404
-    : /obrigatório|inválido|não existe|não permitido/i.test(message) ? 400 : 500;
+  const status = /não encontrado|não permitida/i.test(message)
+    ? 404
+    : /obrigatório|inválido|não existe|não permitido/i.test(message)
+      ? 400
+      : 500;
   return res.status(status).json({ ok: false, error: message });
 }
 
@@ -63,7 +68,9 @@ export function registerJsonCompatRoutes(app: Express) {
       try {
         if (req.method === "GET") {
           const rows = await listJsonTableRecords(tableId);
-          const visible = ["galeria", "templates"].includes(tableId) ? rows : rows.filter((row) => row.user_id === session.user_id);
+          const visible = ["galeria", "templates"].includes(tableId)
+            ? rows
+            : rows.filter((row) => row.user_id === session.user_id);
           return res.set("Cache-Control", "no-store").json({ ok: true, items: visible });
         }
         if (req.method === "POST") {
@@ -75,18 +82,29 @@ export function registerJsonCompatRoutes(app: Express) {
         if (req.method === "PATCH" || req.method === "PUT") {
           const rowKey = String(req.body?.rowKey ?? "");
           const record = req.body?.record ?? req.body?.item;
-          if (!rowKey || !record) return res.status(400).json({ ok: false, error: "Informe rowKey e record." });
-          const existing = (await listJsonTableRecords(tableId)).find((row) => row.__rowKey === rowKey);
-          if (!existing || (!["galeria", "templates"].includes(tableId) && existing.user_id !== session.user_id)) {
+          if (!rowKey || !record)
+            return res.status(400).json({ ok: false, error: "Informe rowKey e record." });
+          const existing = (await listJsonTableRecords(tableId)).find(
+            (row) => row.__rowKey === rowKey,
+          );
+          if (
+            !existing ||
+            (!["galeria", "templates"].includes(tableId) && existing.user_id !== session.user_id)
+          ) {
             return res.status(404).json({ ok: false, error: "Registro não encontrado." });
           }
-          const updated = await updateJsonTableRecord(tableId, rowKey, { ...record, ...(!["galeria", "templates"].includes(tableId) ? { user_id: session.user_id } : {}) });
+          const updated = await updateJsonTableRecord(tableId, rowKey, {
+            ...record,
+            ...(!["galeria", "templates"].includes(tableId) ? { user_id: session.user_id } : {}),
+          });
           return res.json({ ok: true, item: updated });
         }
         if (req.method === "DELETE") {
           const rowKey = String(req.body?.rowKey ?? req.query?.rowKey ?? "");
           if (!rowKey) return res.status(400).json({ ok: false, error: "Informe rowKey." });
-          const existing = (await listJsonTableRecords(tableId)).find((row) => row.__rowKey === rowKey);
+          const existing = (await listJsonTableRecords(tableId)).find(
+            (row) => row.__rowKey === rowKey,
+          );
           if (!existing || (tableId !== "galeria" && existing.user_id !== session.user_id)) {
             return res.status(404).json({ ok: false, error: "Registro não encontrado." });
           }
@@ -103,7 +121,9 @@ export function registerJsonCompatRoutes(app: Express) {
 
   app.get("/api/admin/database-inspect", (req: Request, res: Response) => {
     if (!requireAdmin(req, res)) return;
-    return res.set("Cache-Control", "no-store").json({ ok: true, tables: getJsonTableDefinitions() });
+    return res
+      .set("Cache-Control", "no-store")
+      .json({ ok: true, tables: getJsonTableDefinitions() });
   });
 
   app.get("/api/admin/database-admin", async (req: Request, res: Response) => {
@@ -111,7 +131,9 @@ export function registerJsonCompatRoutes(app: Express) {
     const tableId = String(req.query["tableId"] ?? req.query["table"] ?? "");
     if (!tableId) return res.status(400).json({ ok: false, error: "Informe tableId." });
     try {
-      return res.set("Cache-Control", "no-store").json({ ok: true, rows: await listJsonTableRecords(tableId) });
+      return res
+        .set("Cache-Control", "no-store")
+        .json({ ok: true, rows: await listJsonTableRecords(tableId) });
     } catch (error) {
       return sendError(res, error);
     }
@@ -133,13 +155,18 @@ export function registerJsonCompatRoutes(app: Express) {
     try {
       const tableId = String(req.body?.tableId ?? req.query["tableId"] ?? "");
       const rowKey = String(req.body?.rowKey ?? req.query["rowKey"] ?? "");
-      if (!tableId || !rowKey) return res.status(400).json({ ok: false, error: "Informe tableId e rowKey." });
+      if (!tableId || !rowKey)
+        return res.status(400).json({ ok: false, error: "Informe tableId e rowKey." });
       if (req.method === "DELETE") {
         const deleted = await deleteJsonTableRecord(tableId, rowKey);
         return res.json({ ok: true, deleted });
       }
       if (req.method === "PATCH" || req.method === "PUT") {
-        const row = await updateJsonTableRecord(tableId, rowKey, req.body?.record ?? req.body?.data);
+        const row = await updateJsonTableRecord(
+          tableId,
+          rowKey,
+          req.body?.record ?? req.body?.data,
+        );
         return res.json({ ok: true, row });
       }
       return res.status(405).json({ ok: false, error: "Método não permitido." });

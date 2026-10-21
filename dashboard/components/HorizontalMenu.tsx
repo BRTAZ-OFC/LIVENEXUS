@@ -48,7 +48,7 @@ export default function HorizontalMenu({
       current.canGoLeft === next.canGoLeft &&
       current.canGoRight === next.canGoRight
         ? current
-        : next
+        : next,
     );
   }, []);
 

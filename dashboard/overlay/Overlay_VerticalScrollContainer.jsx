@@ -1,11 +1,11 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from "react";
 
 export default function VerticalScrollContainer({
   children,
-  className = '',
-  boxClassName = '',
-  contentClassName = '',
-  scrollAmount = 80
+  className = "",
+  boxClassName = "",
+  contentClassName = "",
+  scrollAmount = 80,
 }) {
   const containerRef = useRef(null);
   const [canScrollUp, setCanScrollUp] = useState(false);
@@ -25,7 +25,7 @@ export default function VerticalScrollContainer({
     if (!el) return;
 
     updateScrollState();
-    el.addEventListener('scroll', updateScrollState, { passive: true });
+    el.addEventListener("scroll", updateScrollState, { passive: true });
 
     const resizeObserver = new ResizeObserver(() => {
       requestAnimationFrame(() => {
@@ -35,7 +35,7 @@ export default function VerticalScrollContainer({
     resizeObserver.observe(el);
 
     return () => {
-      el.removeEventListener('scroll', updateScrollState);
+      el.removeEventListener("scroll", updateScrollState);
       resizeObserver.disconnect();
     };
   }, [updateScrollState]);
@@ -44,7 +44,7 @@ export default function VerticalScrollContainer({
     const el = containerRef.current;
     if (!el) return;
     const amount = scrollAmount || Math.max(60, Math.floor(el.clientHeight * 0.7));
-    el.scrollBy({ top: direction * amount, behavior: 'smooth' });
+    el.scrollBy({ top: direction * amount, behavior: "smooth" });
     setTimeout(updateScrollState, 250);
   };
 
@@ -93,4 +93,3 @@ export default function VerticalScrollContainer({
     </div>
   );
 }
-

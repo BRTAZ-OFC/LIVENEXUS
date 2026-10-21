@@ -20,9 +20,7 @@ export default function OverlaySection({ users }: { users?: OverlayUser[] }) {
             Usuários cadastrados e suas funções na plataforma:
           </p>
           {users.length === 0 ? (
-            <p className="py-4 text-xs text-slate-400">
-              Nenhum usuário cadastrado encontrado.
-            </p>
+            <p className="py-4 text-xs text-slate-400">Nenhum usuário cadastrado encontrado.</p>
           ) : (
             <div className="divide-y divide-white/5">
               {users.map((user) => (
@@ -30,7 +28,8 @@ export default function OverlaySection({ users }: { users?: OverlayUser[] }) {
                   <div className="min-w-0">
                     <p className="text-xs font-semibold text-white truncate">{user.user}</p>
                     <p className="text-[10px] text-slate-400">
-                      Papel: <span className="text-violet-300 font-semibold">{user.role || "user"}</span>
+                      Papel:{" "}
+                      <span className="text-violet-300 font-semibold">{user.role || "user"}</span>
                     </p>
                   </div>
                   <span className="px-2 py-1 rounded text-[10px] font-semibold bg-violet-500/10 text-violet-300 border border-violet-500/20 shrink-0">
@@ -41,15 +40,13 @@ export default function OverlaySection({ users }: { users?: OverlayUser[] }) {
             </div>
           )}
         </div>
-  
-  
       )}
 
       <div className="rounded-xl border border-dashed border-white/15 bg-slate-950/30 p-5">
         <h3 className="text-xs font-semibold text-white">Contêiner de overlays</h3>
         <p className="mt-1 text-[11px] leading-relaxed text-slate-400">
-          Esta área está preparada para receber os componentes e as configurações de overlay.
-          Os elementos visuais específicos serão adicionados aqui.
+          Esta área está preparada para receber os componentes e as configurações de overlay. Os
+          elementos visuais específicos serão adicionados aqui.
         </p>
       </div>
     </div>

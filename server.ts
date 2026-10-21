@@ -42,10 +42,11 @@ import {
 } from "./dashboard/login/session.js";
 
 /* Configure SESSION_SECRET na hospedagem para preservar as sessões entre reinicializações. */
-const sessionSecret = process.env["SESSION_SECRET"];
-if (!sessionSecret || sessionSecret.length < 32) {
-  process.env["SESSION_SECRET"] = randomBytes(32).toString("hex");
+const sessionSecret = process.env.SESSION_SECRET || process.env["SESSION_SECRET"];
+if (!sessionSecret) {
+  console.warn("AVISO: SESSION_SECRET não configurado, usando segredo de desenvolvimento fraco.");
 }
+const finalSecret = sessionSecret || "dev-fallback-secret-at-least-32-chars-long-!!!";
 
 const rootDir = dirname(fileURLToPath(import.meta.url));
 const distDir = resolve(rootDir, "dist");
@@ -57,8 +58,7 @@ const NO_CACHE = {
 
 const app = express();
 const isApiOnly = process.argv.includes("--api-only");
-const isDevServer =
-  !isApiOnly && (process.argv.includes("--dev") || process.env["NODE_ENV"] === "development");
+const isDevServer = !isApiOnly && process.env["NODE_ENV"] !== "production";
 
 /* Define routes first */
 app.disable("x-powered-by");
@@ -103,7 +103,8 @@ const PUBLIC_API_ENDPOINTS = new Set([
 
 app.use(/^\/api(?:\/.*)?$/, async (req: Request, res: Response, next: NextFunction) => {
   const requestPath = new URL(req.originalUrl, "http://localhost").pathname;
-  if (PUBLIC_API_ENDPOINTS.has(`${req.method} ${requestPath}`)) return next();
+  const method = req.method === "HEAD" ? "GET" : req.method;
+  if (PUBLIC_API_ENDPOINTS.has(`${method} ${requestPath}`)) return next();
 
   const session = readSession(req) as SessionData | null;
   if (!session?.user_id) {
@@ -447,11 +448,7 @@ app.delete("/api/database/plataformas", async (req: Request, res: Response) => {
 });
 
 /* Conexões de plataformas: o user_id vem da sessão e é validado no JSON de usuários. */
-async function getAuthenticatedJsonUser(
-  req: Request,
-  res: Response,
-  allowAdminTarget = false,
-) {
+async function getAuthenticatedJsonUser(req: Request, res: Response, allowAdminTarget = false) {
   const session = readSession(req) as SessionData | null;
   if (!session?.user_id) {
     res.status(401).set(NO_CACHE).json({ ok: false, error: "Autenticação necessária." });
@@ -471,9 +468,7 @@ async function getAuthenticatedJsonUser(
           : null;
 
   const targetUserId =
-    allowAdminTarget && session.role === "admin" && candidate
-      ? candidate
-      : session.user_id;
+    allowAdminTarget && session.role === "admin" && candidate ? candidate : session.user_id;
 
   const user = await getUserById(targetUserId);
   if (!user) {
@@ -704,10 +699,13 @@ app.get("/api/overlay/canvas", async (req: Request, res: Response) => {
       });
     return res.set(NO_CACHE).json({ ok: true, overlays });
   } catch (error) {
-    return res.status(500).set(NO_CACHE).json({
-      ok: false,
-      message: errorMessage(error, "Não foi possível carregar o canvas de Overlay."),
-    });
+    return res
+      .status(500)
+      .set(NO_CACHE)
+      .json({
+        ok: false,
+        message: errorMessage(error, "Não foi possível carregar o canvas de Overlay."),
+      });
   }
 });
 
@@ -731,13 +729,16 @@ app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
 
   try {
     const rows = await listJsonTableRecords("overlays");
-    const ownedRows = rows.filter((row: Record<string, unknown>) => String(row["user_id"] ?? "") === session.user_id);
+    const ownedRows = rows.filter(
+      (row: Record<string, unknown>) => String(row["user_id"] ?? "") === session.user_id,
+    );
     const requestedId = String(input.id ?? "");
     const createNew = req.body?.createNew === true;
     const existing = createNew
       ? undefined
-      : ownedRows.find((row: Record<string, unknown>) => requestedId && String(row["id"] ?? "") === requestedId)
-        || ownedRows[0];
+      : ownedRows.find(
+          (row: Record<string, unknown>) => requestedId && String(row["id"] ?? "") === requestedId,
+        ) || ownedRows[0];
 
     const settings = { ...input } as Record<string, unknown>;
     delete settings["id"];
@@ -761,10 +762,13 @@ app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
 
     return res.set(NO_CACHE).json({ ok: true, overlay: saved });
   } catch (error) {
-    return res.status(500).set(NO_CACHE).json({
-      ok: false,
-      message: errorMessage(error, "Não foi possível salvar o canvas de Overlay."),
-    });
+    return res
+      .status(500)
+      .set(NO_CACHE)
+      .json({
+        ok: false,
+        message: errorMessage(error, "Não foi possível salvar o canvas de Overlay."),
+      });
   }
 });
 
@@ -773,16 +777,21 @@ app.get("/api/database/json-tables", async (req: Request, res: Response) => {
   if (!requireAdmin(req, res)) return;
   try {
     const definitions = getJsonTableDefinitions();
-    const tables = await Promise.all(definitions.map(async (definition) => ({
-      ...definition,
-      count: (await listJsonTableRecords(definition.id)).length,
-    })));
+    const tables = await Promise.all(
+      definitions.map(async (definition) => ({
+        ...definition,
+        count: (await listJsonTableRecords(definition.id)).length,
+      })),
+    );
     return res.set(NO_CACHE).json({ ok: true, tables });
   } catch (error) {
-    return res.status(500).set(NO_CACHE).json({
-      ok: false,
-      message: errorMessage(error, "Não foi possível listar as tabelas JSON."),
-    });
+    return res
+      .status(500)
+      .set(NO_CACHE)
+      .json({
+        ok: false,
+        message: errorMessage(error, "Não foi possível listar as tabelas JSON."),
+      });
   }
 });
 
@@ -794,7 +803,10 @@ app.get("/api/database/json-tables/:tableId", async (req: Request, res: Response
     return res.set(NO_CACHE).json({ ok: true, tableId, rows });
   } catch (error) {
     const message = errorMessage(error, "Não foi possível abrir a tabela JSON.");
-    return res.status(/não permitida/i.test(message) ? 404 : 500).set(NO_CACHE).json({ ok: false, message });
+    return res
+      .status(/não permitida/i.test(message) ? 404 : 500)
+      .set(NO_CACHE)
+      .json({ ok: false, message });
   }
 });
 
@@ -806,7 +818,11 @@ app.post("/api/database/json-tables/:tableId", async (req: Request, res: Respons
     return res.status(201).set(NO_CACHE).json({ ok: true, row });
   } catch (error) {
     const message = errorMessage(error, "Não foi possível criar o registro JSON.");
-    const status = /não permitida/i.test(message) ? 404 : /não existe em usuario.json|obrigatório|já existe|inválido|informe o user_id/i.test(message) ? 400 : 500;
+    const status = /não permitida/i.test(message)
+      ? 404
+      : /não existe em usuario.json|obrigatório|já existe|inválido|informe o user_id/i.test(message)
+        ? 400
+        : 500;
     return res.status(status).set(NO_CACHE).json({ ok: false, message });
   }
 });
@@ -820,7 +836,11 @@ app.patch("/api/database/json-tables/:tableId", async (req: Request, res: Respon
     return res.set(NO_CACHE).json({ ok: true, row });
   } catch (error) {
     const message = errorMessage(error, "Não foi possível atualizar o registro JSON.");
-    const status = /não permitida|não encontrado|incompatível/i.test(message) ? 404 : /não existe em usuario.json|obrigatório|inválido|não é permitido/i.test(message) ? 400 : 500;
+    const status = /não permitida|não encontrado|incompatível/i.test(message)
+      ? 404
+      : /não existe em usuario.json|obrigatório|inválido|não é permitido/i.test(message)
+        ? 400
+        : 500;
     return res.status(status).set(NO_CACHE).json({ ok: false, message });
   }
 });
@@ -831,11 +851,16 @@ app.delete("/api/database/json-tables/:tableId", async (req: Request, res: Respo
     const tableId = String(req.params["tableId"] ?? "");
     const rowKey = String(req.body?.rowKey ?? "");
     const deleted = await deleteJsonTableRecord(tableId, rowKey);
-    if (!deleted) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Registro não encontrado." });
+    if (!deleted)
+      return res.status(404).set(NO_CACHE).json({ ok: false, message: "Registro não encontrado." });
     return res.set(NO_CACHE).json({ ok: true });
   } catch (error) {
     const message = errorMessage(error, "Não foi possível excluir o registro JSON.");
-    const status = /não permitida|não encontrado|incompatível/i.test(message) ? 404 : /não existe em usuario.json|obrigatório|inválido/i.test(message) ? 400 : 500;
+    const status = /não permitida|não encontrado|incompatível/i.test(message)
+      ? 404
+      : /não existe em usuario.json|obrigatório|inválido/i.test(message)
+        ? 400
+        : 500;
     return res.status(status).set(NO_CACHE).json({ ok: false, message });
   }
 });
@@ -877,7 +902,7 @@ app.get("/api/admin/lab/youtube-test1/bootstrap", async (req: Request, res: Resp
 /* API de música do YouTube portada do BACKUP01, sem dependência de D1/Cloudflare. */
 app.all(/^\/api\/ytmusic(?:\/.*)?$/, async (req: Request, res: Response) => {
   try {
-    const { handleRequest } = await import("./api/ytmusic.js");
+    const { handleRequest } = await import("./dashboard/api/ytmusic.js");
     const protocol = String(req.headers["x-forwarded-proto"] ?? "http").split(",")[0];
     const host = req.get("host") || "localhost";
     const url = new URL(req.originalUrl, `${protocol}://${host}`);
@@ -898,10 +923,13 @@ app.all(/^\/api\/ytmusic(?:\/.*)?$/, async (req: Request, res: Response) => {
     res.send(Buffer.from(await webResponse.arrayBuffer()));
   } catch (error) {
     console.error("[API YouTube Music]", error);
-    res.status(500).set(NO_CACHE).json({
-      ok: false,
-      error: errorMessage(error, "Falha na API de música do YouTube."),
-    });
+    res
+      .status(500)
+      .set(NO_CACHE)
+      .json({
+        ok: false,
+        error: errorMessage(error, "Falha na API de música do YouTube."),
+      });
   }
 });
 
@@ -925,8 +953,8 @@ app.all(/^\/api\/(?:kick|twitch)(?:\/.*)?$/, async (req: Request, res: Response)
     }
     const webRequest = new Request(target, { method: req.method, headers, body });
     const api = isKick
-      ? (await import("./api/channel-meta.js")).default
-      : (await import("./api/twitch-meta.js")).default;
+      ? (await import("./dashboard/api/channel-meta.js")).default
+      : (await import("./dashboard/api/twitch-meta.js")).default;
     const env = {
       TWITCH_CLIENT_ID: process.env["TWITCH_CLIENT_ID"],
       TWITCH_CLIENT_SECRET: process.env["TWITCH_CLIENT_SECRET"],
@@ -937,10 +965,13 @@ app.all(/^\/api\/(?:kick|twitch)(?:\/.*)?$/, async (req: Request, res: Response)
     res.send(Buffer.from(await webResponse.arrayBuffer()));
   } catch (error) {
     console.error("[API metadados]", error);
-    res.status(500).set(NO_CACHE).json({
-      ok: false,
-      error: errorMessage(error, "Falha na API de metadados."),
-    });
+    res
+      .status(500)
+      .set(NO_CACHE)
+      .json({
+        ok: false,
+        error: errorMessage(error, "Falha na API de metadados."),
+      });
   }
 });
 
@@ -996,13 +1027,46 @@ app.use(/^\/dashboard\/?$/, (req: Request, res: Response, next: NextFunction) =>
 app.use(/^\/admin\/banco\/?$/, (req: Request, res: Response, next: NextFunction) =>
   requirePageSession(req, res, next, "admin"),
 );
+// Middleware de proteção de rotas
+function requireSession(req: Request, res: Response, next: NextFunction) {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) {
+    return res.redirect("/login");
+  }
+  next();
+}
+
+function requireAdminPage(req: Request, res: Response, next: NextFunction) {
+  const session = readSession(req) as SessionData | null;
+  if (session?.role !== "admin") {
+    return res.redirect("/dashboard");
+  }
+  next();
+}
+
 /* Arquivos JSON internos nunca devem ser servidos diretamente pelo Vite de desenvolvimento. */
-app.use(/^\/dashboard\/admin\/banco\/json(?:\/.*)?$/, (req: Request, res: Response, next: NextFunction) =>
-  requirePageSession(req, res, next, "admin"),
+app.use(
+  /^\/dashboard\/admin\/banco\/json(?:\/.*)?$/,
+  (req: Request, res: Response, next: NextFunction) => {
+    const session = readSession(req) as SessionData | null;
+    if (session?.role !== "admin") return sendAdminDenied(res);
+    next();
+  },
 );
 
 if (!isDevServer && !isApiOnly) {
   app.use(express.static(distDir));
+  
+  // Proteger rotas do dashboard
+  app.get("/dashboard", requireSession, (_req: Request, res: Response) => {
+    res.sendFile(resolve(distDir, "index.html"));
+  });
+  
+  // Proteger rotas administrativas
+  app.get("/dashboard/admin/*", requireSession, requireAdminPage, (_req: Request, res: Response) => {
+    res.sendFile(resolve(distDir, "index.html"));
+  });
+  
   app.get(/.*/, (_req: Request, res: Response) => {
     res.sendFile(resolve(distDir, "index.html"));
   });
@@ -1015,15 +1079,17 @@ app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
   }
 });
 
-const port = isApiOnly ? 3001 : Number(process.env["PORT"] || 3000);
+const port = isApiOnly ? 3001 : 3000;
 const httpServer = createHttpServer(app);
 
 if (isDevServer) {
   const { createServer: createViteServer } = await import("vite");
   const vite = await createViteServer({
+    root: rootDir,
+    configFile: resolve(rootDir, "vite.config.ts"),
     server: {
       middlewareMode: true,
-      hmr: { server: httpServer },
+      hmr: false,
     },
     appType: "spa",
   });

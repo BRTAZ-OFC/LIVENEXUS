@@ -333,14 +333,22 @@ export default function PlatformBioConnections() {
                           Copiar
                         </button>
                       </div>
-                      <p className="mt-2 text-[10px] text-slate-400">O código expira em 30 minutos.</p>
+                      <p className="mt-2 text-[10px] text-slate-400">
+                        O código expira em 30 minutos.
+                      </p>
                     </div>
                   )}
                   <div className="tts-platform-status">
                     <span>Status</span>
                     <p
                       className={
-                        item.status === "error" ? "error" : online ? "online" : active ? "pending" : ""
+                        item.status === "error"
+                          ? "error"
+                          : online
+                            ? "online"
+                            : active
+                              ? "pending"
+                              : ""
                       }
                     >
                       Aguardando verificação · {item.detail}

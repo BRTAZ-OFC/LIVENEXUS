@@ -9,9 +9,9 @@ let reloadTimeoutId = null;
 
 // Canal Broadcast global para sincronização entre múltiplas abas/janelas/OBS
 let rtcBroadcastChannel = null;
-if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+if (typeof window !== "undefined" && "BroadcastChannel" in window) {
   try {
-    rtcBroadcastChannel = new BroadcastChannel('livenexus_rtc_reload');
+    rtcBroadcastChannel = new BroadcastChannel("livenexus_rtc_reload");
     rtcBroadcastChannel.onmessage = (event) => {
       const data = event.data;
       if (data && data.reason) {
@@ -19,14 +19,14 @@ if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       }
     };
   } catch (err) {
-    console.warn('[ReloadRTC] Falha ao inicializar BroadcastChannel:', err);
+    console.warn("[ReloadRTC] Falha ao inicializar BroadcastChannel:", err);
   }
 }
 
 // Sincronização via localStorage (fallback de comunicação inter-janelas)
-if (typeof window !== 'undefined') {
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'livenexus_rtc_reload_trigger' && e.newValue) {
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (e) => {
+    if (e.key === "livenexus_rtc_reload_trigger" && e.newValue) {
       try {
         const parsed = JSON.parse(e.newValue);
         if (parsed && parsed.reason) {
@@ -48,18 +48,18 @@ function handleIncomingReload(reason, newValues, broadcast = true) {
   }
 
   // Se solicitado, transmite a outras abas
-  if (broadcast && typeof window !== 'undefined') {
+  if (broadcast && typeof window !== "undefined") {
     try {
       if (rtcBroadcastChannel) {
         rtcBroadcastChannel.postMessage({
           reason,
           newValues: latestScenarioValues,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
       }
       window.localStorage.setItem(
-        'livenexus_rtc_reload_trigger',
-        JSON.stringify({ reason, newValues: latestScenarioValues, timestamp: Date.now() })
+        "livenexus_rtc_reload_trigger",
+        JSON.stringify({ reason, newValues: latestScenarioValues, timestamp: Date.now() }),
       );
     } catch {
       // ignore
@@ -67,28 +67,34 @@ function handleIncomingReload(reason, newValues, broadcast = true) {
   }
 
   // Notifica componentes e listeners da janela atual
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     window.dispatchEvent(
-      new CustomEvent('livenexus:reload-rtc-publisher', {
-        detail: { reason, newValues: latestScenarioValues, timestamp: Date.now() }
-      })
+      new CustomEvent("livenexus:reload-rtc-publisher", {
+        detail: { reason, newValues: latestScenarioValues, timestamp: Date.now() },
+      }),
     );
   }
 
   // 1. Envio imediato dos novos valores se o canal estiver aberto no Publisher ativo
   if (activePublisherInstance) {
     try {
-      if (latestScenarioValues && typeof activePublisherInstance.setLatestScenarioData === 'function') {
+      if (
+        latestScenarioValues &&
+        typeof activePublisherInstance.setLatestScenarioData === "function"
+      ) {
         activePublisherInstance.setLatestScenarioData(latestScenarioValues);
       }
-      if (latestScenarioValues && typeof activePublisherInstance.sendScenarioUpdate === 'function') {
+      if (
+        latestScenarioValues &&
+        typeof activePublisherInstance.sendScenarioUpdate === "function"
+      ) {
         activePublisherInstance.sendScenarioUpdate(latestScenarioValues);
       }
-      if (typeof activeSnapshotCallback === 'function') {
+      if (typeof activeSnapshotCallback === "function") {
         activeSnapshotCallback(latestScenarioValues);
       }
     } catch (sendErr) {
-      console.warn('[ReloadRTC] Aviso ao enviar snapshot imediato:', sendErr);
+      console.warn("[ReloadRTC] Aviso ao enviar snapshot imediato:", sendErr);
     }
   }
 
@@ -99,16 +105,19 @@ function handleIncomingReload(reason, newValues, broadcast = true) {
 
   reloadTimeoutId = setTimeout(() => {
     try {
-      if (typeof activeReloadCallback === 'function') {
+      if (typeof activeReloadCallback === "function") {
         activeReloadCallback(latestScenarioValues);
-      } else if (activePublisherInstance && typeof activePublisherInstance.start === 'function') {
-        if (latestScenarioValues && typeof activePublisherInstance.setLatestScenarioData === 'function') {
+      } else if (activePublisherInstance && typeof activePublisherInstance.start === "function") {
+        if (
+          latestScenarioValues &&
+          typeof activePublisherInstance.setLatestScenarioData === "function"
+        ) {
           activePublisherInstance.setLatestScenarioData(latestScenarioValues);
         }
         activePublisherInstance.start();
       }
     } catch (reconnectErr) {
-      console.warn('[ReloadRTC] Erro no reconnect do RTC:', reconnectErr);
+      console.warn("[ReloadRTC] Erro no reconnect do RTC:", reconnectErr);
     }
   }, 200);
 }
@@ -126,7 +135,7 @@ export function registerActivePublisher(publisher, { onSnapshot = null, onReload
   activeReloadCallback = onReload;
 
   // Se já houver valores recentes armazenados, injeta imediatamente na nova instância
-  if (latestScenarioValues && publisher && typeof publisher.setLatestScenarioData === 'function') {
+  if (latestScenarioValues && publisher && typeof publisher.setLatestScenarioData === "function") {
     publisher.setLatestScenarioData(latestScenarioValues);
   }
 }
@@ -162,17 +171,17 @@ export function setLatestScenarioValues(values) {
  * - Transmite instantaneamente os novos valores
  * - Executa a reconexão completa (reconnect) do WebRTC mantendo a constância
  * - Sincroniza em tempo real entre todas as abas e instâncias do OBS Studio
- * 
+ *
  * @param {string} [reason='shortcut'] Motivo do disparo
  * @param {Object} [newValues=null] Novos valores de cenário, subcenário ou mortes a serem transmitidos
  * @returns {boolean} Sucesso do acionamento
  */
-export function triggerReloadRTC(reason = 'shortcut', newValues = null) {
+export function triggerReloadRTC(reason = "shortcut", newValues = null) {
   try {
     handleIncomingReload(reason, newValues, true);
     return true;
   } catch (err) {
-    console.warn('[ReloadRTC] Erro ao disparar triggerReloadRTC:', err);
+    console.warn("[ReloadRTC] Erro ao disparar triggerReloadRTC:", err);
     return false;
   }
 }
@@ -182,5 +191,5 @@ export default {
   unregisterActivePublisher,
   triggerReloadRTC,
   getLatestScenarioValues,
-  setLatestScenarioValues
+  setLatestScenarioValues,
 };

@@ -139,7 +139,9 @@ function persistFlaggedUsers() {
       STORAGE_KEY + ":flagged-users",
       JSON.stringify(Array.from(flaggedUsers.entries())),
     );
-  } catch {}
+  } catch {
+    /* ignora erro de persistência */
+  }
 }
 
 function emitConfig() {
@@ -268,7 +270,7 @@ function removePlatformEmotes(text: string, platform: ChatPlatform, emotes: unkn
 const URL_RE = /\bhttps?:\/\/\S+|www\.\S+/gi;
 const URL_TEST = /\bhttps?:\/\/\S+|www\.\S+/i;
 const MENTION_RE = /@[a-zA-Z0-9_.-]+/g;
-const EMOJI_RE = /[\u{1F000}-\u{1FAFF}\u2600-\u27BF\u2190-\u21FF\u2B00-\u2BFF\uFE0F]/gu;
+const EMOJI_RE = /(?:[\u{1F000}-\u{1FAFF}\u2600-\u27BF\u2190-\u21FF\u2B00-\u2BFF]|\uFE0F)/gu;
 export type TtsFilterDecision = {
   message: MultiChatMessage | null;
   allowed: boolean;

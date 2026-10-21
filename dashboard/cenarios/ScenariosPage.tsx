@@ -45,13 +45,14 @@ function isObject(value: unknown): value is JsonObject {
 }
 
 function getScenarioConfig(row: ScenarioRecord): ScenarioConfig {
-  const source: JsonObject = isObject(row.settings) && Object.keys(row.settings).length
-    ? row.settings
-    : isObject(row.config) && Object.keys(row.config).length
-      ? row.config
-      : isObject(row.data) && Object.keys(row.data).length
-        ? row.data
-        : row as unknown as JsonObject;
+  const source: JsonObject =
+    isObject(row.settings) && Object.keys(row.settings).length
+      ? row.settings
+      : isObject(row.config) && Object.keys(row.config).length
+        ? row.config
+        : isObject(row.data) && Object.keys(row.data).length
+          ? row.data
+          : (row as unknown as JsonObject);
   const background: JsonObject = isObject(source["background"]) ? source["background"] : {};
 
   return {
@@ -60,7 +61,9 @@ function getScenarioConfig(row: ScenarioRecord): ScenarioConfig {
       width: 1920,
       height: 1080,
     },
-    instances: Array.isArray(source["instances"]) ? source["instances"] as ScenarioInstance[] : [],
+    instances: Array.isArray(source["instances"])
+      ? (source["instances"] as ScenarioInstance[])
+      : [],
     background: {
       type: String(background["type"] ?? "transparent"),
       color: typeof background["color"] === "string" ? background["color"] : undefined,
@@ -73,10 +76,16 @@ function getScenarioConfig(row: ScenarioRecord): ScenarioConfig {
 
 function getPreviewBackground(background: ScenarioConfig["background"]): CSSProperties {
   if (background.type === "solid") {
-    return { backgroundColor: background.color || "#07111f", opacity: Math.max(0, Math.min(100, Number(background.opacity ?? 100))) / 100 };
+    return {
+      backgroundColor: background.color || "#07111f",
+      opacity: Math.max(0, Math.min(100, Number(background.opacity ?? 100))) / 100,
+    };
   }
   if (background.type === "gradient") {
-    return { backgroundImage: background.gradient || "linear-gradient(135deg, #0e7490, #312e81)", opacity: Math.max(0, Math.min(100, Number(background.opacity ?? 100))) / 100 };
+    return {
+      backgroundImage: background.gradient || "linear-gradient(135deg, #0e7490, #312e81)",
+      opacity: Math.max(0, Math.min(100, Number(background.opacity ?? 100))) / 100,
+    };
   }
   if (background.type === "image" && background.image) {
     return {
@@ -88,7 +97,8 @@ function getPreviewBackground(background: ScenarioConfig["background"]): CSSProp
   }
   return {
     backgroundColor: "#07111f",
-    backgroundImage: "linear-gradient(45deg, rgba(34,211,238,.09) 25%, transparent 25%), linear-gradient(-45deg, rgba(139,92,246,.09) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(34,211,238,.09) 75%), linear-gradient(-45deg, transparent 75%, rgba(139,92,246,.09) 75%)",
+    backgroundImage:
+      "linear-gradient(45deg, rgba(34,211,238,.09) 25%, transparent 25%), linear-gradient(-45deg, rgba(139,92,246,.09) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(34,211,238,.09) 75%), linear-gradient(-45deg, transparent 75%, rgba(139,92,246,.09) 75%)",
     backgroundSize: "18px 18px",
     backgroundPosition: "0 0, 0 9px, 9px -9px, -9px 0",
   };
@@ -113,17 +123,35 @@ function ScenarioThumbnail({ row }: { row: ScenarioRecord }) {
       <div className="absolute inset-0" style={getPreviewBackground(config.background)} />
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-950/10 via-transparent to-violet-950/30" />
       {visibleInstances.map((instance, index) => {
-        const x = Math.max(0, Math.min(96, (Number(instance.x) || 0) / config.visualizerSize.width * 100));
-        const y = Math.max(0, Math.min(94, (Number(instance.y) || 0) / config.visualizerSize.height * 100));
-        const width = Math.max(6, Math.min(100 - x, (Number(instance.width) || 180) / config.visualizerSize.width * 100));
-        const height = Math.max(5, Math.min(100 - y, (Number(instance.height) || 60) / config.visualizerSize.height * 100));
+        const x = Math.max(
+          0,
+          Math.min(96, ((Number(instance.x) || 0) / config.visualizerSize.width) * 100),
+        );
+        const y = Math.max(
+          0,
+          Math.min(94, ((Number(instance.y) || 0) / config.visualizerSize.height) * 100),
+        );
+        const width = Math.max(
+          6,
+          Math.min(100 - x, ((Number(instance.width) || 180) / config.visualizerSize.width) * 100),
+        );
+        const height = Math.max(
+          5,
+          Math.min(100 - y, ((Number(instance.height) || 60) / config.visualizerSize.height) * 100),
+        );
         const label = String(instance.name || instance.widgetId || `Widget ${index + 1}`);
 
         return (
           <div
             key={String(instance.id || `${instance.widgetId || "widget"}-${index}`)}
             className={`absolute flex min-w-0 items-center overflow-hidden rounded border px-1.5 py-0.5 shadow-lg ${swatches[index % swatches.length]}`}
-            style={{ left: `${x}%`, top: `${y}%`, width: `${width}%`, height: `${height}%`, fontSize: "clamp(5px, 0.65vw, 10px)" }}
+            style={{
+              left: `${x}%`,
+              top: `${y}%`,
+              width: `${width}%`,
+              height: `${height}%`,
+              fontSize: "clamp(5px, 0.65vw, 10px)",
+            }}
             title={label}
           >
             <span className="block w-full truncate font-semibold">{label}</span>
@@ -135,7 +163,9 @@ function ScenarioThumbnail({ row }: { row: ScenarioRecord }) {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-cyan-300/25 bg-slate-950/60 shadow-[0_0_24px_rgba(34,211,238,0.09)]">
             <MonitorPlay className="h-4 w-4" />
           </div>
-          <span className="text-[10px] font-semibold uppercase tracking-[0.22em]">Cenário vazio</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.22em]">
+            Cenário vazio
+          </span>
         </div>
       )}
       <div className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded border border-white/10 bg-slate-950/80 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-slate-300 backdrop-blur">
@@ -168,20 +198,27 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
           headers: { Accept: "application/json" },
           cache: "no-store",
         });
-        const payload = await response.json() as { ok?: boolean; items?: ScenarioRecord[]; error?: string };
+        const payload = (await response.json()) as {
+          ok?: boolean;
+          items?: ScenarioRecord[];
+          error?: string;
+        };
         if (!response.ok || !payload.ok || !Array.isArray(payload.items)) {
           throw new Error(payload.error || "Não foi possível carregar os cenários.");
         }
         if (!cancelled) setScenarios(payload.items);
       } catch (cause) {
-        if (!cancelled) setError(cause instanceof Error ? cause.message : "Erro ao carregar os cenários.");
+        if (!cancelled)
+          setError(cause instanceof Error ? cause.message : "Erro ao carregar os cenários.");
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
     void loadScenarios();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   function openCreateDialog() {
@@ -213,7 +250,11 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
           },
         }),
       });
-      const payload = await response.json() as { ok?: boolean; item?: ScenarioRecord; error?: string };
+      const payload = (await response.json()) as {
+        ok?: boolean;
+        item?: ScenarioRecord;
+        error?: string;
+      };
       if (!response.ok || !payload.ok || !payload.item) {
         throw new Error(payload.error || "Não foi possível criar o cenário.");
       }
@@ -233,10 +274,15 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
     <section className="w-full min-w-0 px-4 py-6 sm:px-6">
       <header className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-cyan-300/10 pb-5">
         <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300">LiveNexus / Studio</p>
-          <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Cenários</h1>
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-300">
+            LiveNexus / Studio
+          </p>
+          <h1 className="mt-2 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+            Cenários
+          </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-            Crie e organize as cenas da sua transmissão. Selecione uma miniatura para abrir seu canvas no Overlay.
+            Crie e organize as cenas da sua transmissão. Selecione uma miniatura para abrir seu
+            canvas no Overlay.
           </p>
         </div>
         <button
@@ -251,7 +297,10 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
       </header>
 
       {error && !showCreateDialog && (
-        <div role="alert" className="mb-5 rounded-lg border border-rose-400/25 bg-rose-950/20 px-4 py-3 text-xs text-rose-200">
+        <div
+          role="alert"
+          className="mb-5 rounded-lg border border-rose-400/25 bg-rose-950/20 px-4 py-3 text-xs text-rose-200"
+        >
           {error}
         </div>
       )}
@@ -277,8 +326,12 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
                 <ScenarioThumbnail row={scenario} />
                 <span className="flex items-start justify-between gap-3 p-4">
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-bold text-slate-100">{config.name || `Cenário ${index + 1}`}</span>
-                    <span className="mt-1 block text-[11px] text-slate-500">Canvas de transmissão</span>
+                    <span className="block truncate text-sm font-bold text-slate-100">
+                      {config.name || `Cenário ${index + 1}`}
+                    </span>
+                    <span className="mt-1 block text-[11px] text-slate-500">
+                      Canvas de transmissão
+                    </span>
                   </span>
                   <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-slate-500 transition group-hover:text-cyan-200" />
                 </span>
@@ -293,7 +346,8 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
           </div>
           <h2 className="mt-4 text-base font-bold text-white">Nenhum cenário criado</h2>
           <p className="mt-2 max-w-sm text-xs leading-5 text-slate-400">
-            Use o botão no canto superior direito para criar seu primeiro cenário. As miniaturas aparecerão aqui.
+            Use o botão no canto superior direito para criar seu primeiro cenário. As miniaturas
+            aparecerão aqui.
           </p>
         </div>
       )}
@@ -309,8 +363,12 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
           >
             <div className="mb-5 flex items-center justify-between gap-3">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">Novo item</p>
-                <h2 id="create-scenario-title" className="mt-1 text-lg font-bold text-white">Criar novo cenário</h2>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">
+                  Novo item
+                </p>
+                <h2 id="create-scenario-title" className="mt-1 text-lg font-bold text-white">
+                  Criar novo cenário
+                </h2>
               </div>
               <button
                 type="button"
@@ -321,7 +379,12 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <label htmlFor="scenario-name" className="mb-2 block text-xs font-semibold text-slate-300">Nome do cenário</label>
+            <label
+              htmlFor="scenario-name"
+              className="mb-2 block text-xs font-semibold text-slate-300"
+            >
+              Nome do cenário
+            </label>
             <input
               id="scenario-name"
               autoFocus
@@ -333,7 +396,9 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
               className="w-full rounded-lg border border-cyan-300/20 bg-slate-950 px-3 py-2.5 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-300"
             />
             {error && (
-              <p role="alert" className="mt-3 text-xs text-rose-300">{error}</p>
+              <p role="alert" className="mt-3 text-xs text-rose-300">
+                {error}
+              </p>
             )}
             <div className="mt-6 flex justify-end gap-2">
               <button
@@ -348,7 +413,11 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
                 disabled={!scenarioName.trim() || saving}
                 className="inline-flex items-center gap-2 rounded-lg border border-cyan-300/30 bg-cyan-400/10 px-4 py-2 text-xs font-bold text-cyan-100 hover:bg-cyan-300/15 disabled:opacity-50"
               >
-                {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                {saving ? (
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
                 {saving ? "Criando..." : "Criar cenário"}
               </button>
             </div>

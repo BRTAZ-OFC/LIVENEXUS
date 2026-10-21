@@ -54,99 +54,98 @@ function DashboardOverview() {
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
   return (
+    <section className="dash-overview">
+      <div className="dash-overview-heading">
+        <div>
+          <p className="dash-text-xs-font-bold-1eh0cdm">CENTRAL DE TRANSMISSÃO</p>
+          <h1 className="dash-mt-3-text-3xl-1fv0i93">Dashboard</h1>
+        </div>
+        <span className="dash-preview-tag">
+          {connectedPlatforms.length
+            ? `${connectedPlatforms.length} plataforma(s) conectada(s)`
+            : "Aguardando conexões"}
+        </span>
+      </div>
 
-          <section className="dash-overview">
-            <div className="dash-overview-heading">
-              <div>
-                <p className="dash-text-xs-font-bold-1eh0cdm">CENTRAL DE TRANSMISSÃO</p>
-                <h1 className="dash-mt-3-text-3xl-1fv0i93">Dashboard</h1>
-              </div>
-              <span className="dash-preview-tag">
-                {connectedPlatforms.length
-                  ? `${connectedPlatforms.length} plataforma(s) conectada(s)`
-                  : "Aguardando conexões"}
-              </span>
-            </div>
+      <div className="dash-live-stats">
+        <article className="dash-stat-card">
+          <div className="dash-stat-label">
+            <Radio /> Quantidade de espectadores por plataforma
+          </div>
+          <div className="dash-platform-counts">
+            <span>
+              <i className="dash-platform-dot twitch" /> Twitch{" "}
+              <b>{(chatState.statuses.Twitch.viewers ?? 0).toLocaleString("pt-BR")}</b>
+            </span>
+            <span>
+              <i className="dash-platform-dot youtube" /> YouTube{" "}
+              <b>{(chatState.statuses.YouTube.viewers ?? 0).toLocaleString("pt-BR")}</b>
+            </span>
+            <span>
+              <i className="dash-platform-dot kick" /> KICK{" "}
+              <b>{(chatState.statuses.Kick.viewers ?? 0).toLocaleString("pt-BR")}</b>
+            </span>
+          </div>
+        </article>
+        <article className="dash-stat-card">
+          <div className="dash-stat-label">
+            <Eye /> Total de espectadores
+          </div>
+          <strong className="dash-stat-number">{totalViewers.toLocaleString("pt-BR")}</strong>
+          <span className="dash-stat-caption">Soma das plataformas conectadas</span>
+        </article>
+        <article className="dash-stat-card">
+          <div className="dash-stat-label">
+            <Clock3 /> Status da transmissão
+          </div>
+          <strong className="dash-stat-number">
+            {connectedPlatforms.length ? "Ativo" : "Offline"}
+          </strong>
+          <span className="dash-stat-caption">
+            {connectedPlatforms.length
+              ? "Conectores recebendo status"
+              : "Conecte um canal no chat ao vivo"}
+          </span>
+        </article>
+        <article className="dash-stat-card">
+          <div className="dash-stat-label">
+            <MessageSquare /> Mensagens recebidas
+          </div>
+          <strong className="dash-stat-number">{chatState.messages.length}</strong>
+          <span className="dash-stat-caption">Mensagens recentes no multichat</span>
+        </article>
+      </div>
 
-            <div className="dash-live-stats">
-              <article className="dash-stat-card">
-                <div className="dash-stat-label">
-                  <Radio /> Quantidade de espectadores por plataforma
-                </div>
-                <div className="dash-platform-counts">
-                  <span>
-                    <i className="dash-platform-dot twitch" /> Twitch{" "}
-                    <b>{(chatState.statuses.Twitch.viewers ?? 0).toLocaleString("pt-BR")}</b>
-                  </span>
-                  <span>
-                    <i className="dash-platform-dot youtube" /> YouTube{" "}
-                    <b>{(chatState.statuses.YouTube.viewers ?? 0).toLocaleString("pt-BR")}</b>
-                  </span>
-                  <span>
-                    <i className="dash-platform-dot kick" /> KICK{" "}
-                    <b>{(chatState.statuses.Kick.viewers ?? 0).toLocaleString("pt-BR")}</b>
-                  </span>
-                </div>
-              </article>
-              <article className="dash-stat-card">
-                <div className="dash-stat-label">
-                  <Eye /> Total de espectadores
-                </div>
-                <strong className="dash-stat-number">{totalViewers.toLocaleString("pt-BR")}</strong>
-                <span className="dash-stat-caption">Soma das plataformas conectadas</span>
-              </article>
-              <article className="dash-stat-card">
-                <div className="dash-stat-label">
-                  <Clock3 /> Status da transmissão
-                </div>
-                <strong className="dash-stat-number">
-                  {connectedPlatforms.length ? "Ativo" : "Offline"}
-                </strong>
-                <span className="dash-stat-caption">
-                  {connectedPlatforms.length
-                    ? "Conectores recebendo status"
-                    : "Conecte um canal no chat ao vivo"}
-                </span>
-              </article>
-              <article className="dash-stat-card">
-                <div className="dash-stat-label">
-                  <MessageSquare /> Mensagens recebidas
-                </div>
-                <strong className="dash-stat-number">{chatState.messages.length}</strong>
-                <span className="dash-stat-caption">Mensagens recentes no multichat</span>
-              </article>
+      <div className="dash-live-workspace">
+        <MultiChatPanel />
+        <section className="dash-speakers-panel">
+          <header className="dash-panel-header">
+            <div>
+              <h2>Top 10 falantes</h2>
+              <p>Mais ativos no chat</p>
             </div>
-
-            <div className="dash-live-workspace">
-              <MultiChatPanel />
-              <section className="dash-speakers-panel">
-                <header className="dash-panel-header">
-                  <div>
-                    <h2>Top 10 falantes</h2>
-                    <p>Mais ativos no chat</p>
-                  </div>
-                  <UserRound className="dash-panel-heading-icon" />
-                </header>
-                <ol className="dash-speakers-list" aria-label="Top 10 falantes">
-                  {Array.from({ length: 10 }, (_, index) => {
-                    const speaker = speakerCounts[index];
-                    return (
-                      <li key={index} className={speaker ? "" : "is-empty"}>
-                        <span className="dash-speaker-rank">{index + 1}</span>
-                        <span className="dash-speaker-avatar">
-                          {speaker ? speaker.author.slice(0, 2).toUpperCase() : "—"}
-                        </span>
-                        <span className="dash-speaker-placeholder">
-                          {speaker?.author ?? "Aguardando usuário"}
-                        </span>
-                        <b>{speaker?.count ?? 0}</b>
-                      </li>
-                    );
-                  })}
-                </ol>
-              </section>
-            </div>
-          </section>
+            <UserRound className="dash-panel-heading-icon" />
+          </header>
+          <ol className="dash-speakers-list" aria-label="Top 10 falantes">
+            {Array.from({ length: 10 }, (_, index) => {
+              const speaker = speakerCounts[index];
+              return (
+                <li key={index} className={speaker ? "" : "is-empty"}>
+                  <span className="dash-speaker-rank">{index + 1}</span>
+                  <span className="dash-speaker-avatar">
+                    {speaker ? speaker.author.slice(0, 2).toUpperCase() : "—"}
+                  </span>
+                  <span className="dash-speaker-placeholder">
+                    {speaker?.author ?? "Aguardando usuário"}
+                  </span>
+                  <b>{speaker?.count ?? 0}</b>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      </div>
+    </section>
   );
 }
 
@@ -187,7 +186,8 @@ function DashboardPage() {
 
   // BLOCO 5 — Atualiza a seção selecionada e persiste a escolha.
   function handleSelectSection(
-    section: "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios",
+    section:
+      "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios",
   ) {
     setActiveSection(section);
     setActiveScenarioId(null);
@@ -218,13 +218,18 @@ function DashboardPage() {
 
     async function verifySession() {
       try {
+        const token = sessionStorage.getItem("livenexus_token");
+        const headers: Record<string, string> = { Accept: "application/json" };
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
         const response = await fetch("/api/auth/me", {
           method: "GET",
           credentials: "same-origin",
-          headers: { Accept: "application/json" },
+          headers,
           cache: "no-store",
         });
-        const result = await response.json() as {
+        const result = (await response.json()) as {
           ok?: boolean;
           user?: { user_id?: string; user?: string; role?: string };
         };
