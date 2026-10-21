@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { triggerReloadRTC } from '@dashboard/conexao/rtc/ReloadRTC';
+import { triggerReloadRTC } from './ReloadRTC';
 
 const zones = typeof Intl.supportedValuesOf === 'function'
   ? Intl.supportedValuesOf('timeZone')
