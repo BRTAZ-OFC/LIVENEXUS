@@ -523,7 +523,7 @@ export default function Overlay_Editor({
                             aria-pressed={activePreset}
                             onClick={() => onUpdateSelectedConfig({
                               structuralPreset: preset.id,
-                              ...(preset.layout ? { layout: preset.layout } : {}),
+                              ...("layout" in preset && preset.layout ? { layout: preset.layout } : {}),
                             })}
                             className={"flex aspect-square min-w-0 flex-col items-center justify-center gap-2 rounded-lg border p-2 text-center transition disabled:cursor-not-allowed disabled:opacity-40 " + (activePreset ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-900/80 text-slate-300 hover:border-violet-400/60 hover:bg-violet-500/10")}
                           >
