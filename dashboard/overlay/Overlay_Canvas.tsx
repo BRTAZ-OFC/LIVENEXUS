@@ -181,6 +181,7 @@ export default function OverlayCanvas() {
     instances: [],
     background: EMPTY_BACKGROUND,
   });
+  const [widgetResizeChoice, setWidgetResizeChoice] = useState<{ instanceId: string; width: number; height: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -484,8 +485,26 @@ export default function OverlayCanvas() {
       background: current.background || EMPTY_BACKGROUND,
     }));
     setSelectedInstanceId(nextInstance.id || null);
+    setWidgetResizeChoice({ instanceId: nextInstance.id || "", width, height });
     setError("");
     setNotice("");
+  }
+
+  function applyWidgetCanvasScale(scaleFactor: number) {
+    if (!widgetResizeChoice) return;
+    const targetWidth = Math.max(1, Math.round(widgetResizeChoice.width * scaleFactor));
+    const targetHeight = Math.max(1, Math.round(widgetResizeChoice.height * scaleFactor));
+    const padding = 32;
+    setConfig((current) => ({
+      ...current,
+      visualizerSize: { width: targetWidth + padding, height: targetHeight + padding },
+      instances: (current.instances || []).map((item) =>
+        (item.id || "") === widgetResizeChoice.instanceId
+          ? { ...item, x: 16, y: 16, width: targetWidth, height: targetHeight }
+          : item
+      ),
+    }));
+    setWidgetResizeChoice(null);
   }
 
   function applyTextStyleToSelectedText(patch: { fontSize?: number; color?: string; fontFamily?: string }) {
@@ -951,6 +970,19 @@ export default function OverlayCanvas() {
           />
         </div>
       </div>
+      {widgetResizeChoice && (
+        <div className="fixed inset-0 z-[11000] flex items-center justify-center bg-black/75 p-4" role="dialog" aria-modal="true" aria-label="Ajustar tamanho da widget e do canvas">
+          <div className="w-full max-w-md rounded-lg border border-white/15 bg-slate-950 p-4 shadow-2xl">
+            <h3 className="text-sm font-semibold text-white">Ajustar widget e canvas</h3>
+            <p className="mt-1 text-xs text-slate-400">Escolha como deseja dimensionar a widget selecionada. O redimensionamento manual do canvas continuará disponível.</p>
+            <div className="mt-4 grid grid-cols-1 gap-2">
+              <button type="button" onClick={() => setWidgetResizeChoice(null)} className="rounded border border-white/15 px-3 py-2 text-left text-xs text-white hover:bg-white/10">Manter tamanho atual</button>
+              <button type="button" onClick={() => applyWidgetCanvasScale(0.75)} className="rounded border border-white/15 px-3 py-2 text-left text-xs text-white hover:bg-white/10">Diminuir widget e ajustar canvas</button>
+              <button type="button" onClick={() => applyWidgetCanvasScale(1.25)} className="rounded border border-white/15 px-3 py-2 text-left text-xs text-white hover:bg-white/10">Aumentar widget e ajustar canvas</button>
+            </div>
+          </div>
+        </div>
+      )}
       <Overlay_Editor
         catalog={catalog}
         onAddFragment={addWidgetComponent}
