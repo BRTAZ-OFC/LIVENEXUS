@@ -9,6 +9,7 @@ type WidgetDefinition = {
   id: string;
   name: string;
   component: ComponentType<{ config?: Record<string, unknown> }>;
+  defaultConfig?: Record<string, unknown>;
   implemented?: boolean;
 };
 
@@ -81,7 +82,7 @@ export default function Overlay_Editor({
   };
 
   const availableWidgets = catalog.filter((widget) => widget.implemented !== false);
-  const selectedWidget = availableWidgets.find((widget) => widget.id === (selectedInstanceWidgetId || selectedWidgetId));
+  const selectedWidget = availableWidgets.find((widget) => widget.id === (selectedWidgetId || selectedInstanceWidgetId));
   const fragments = selectedWidget && isWidgetFragmentable(selectedWidget.id) ? getWidgetInternalElements(selectedWidget.id) : [];
   const hasSelectedInstance = Boolean(selectedWidget && selectedInstanceWidgetId === selectedWidget.id && selectedInstanceConfig);
   const editableConfig = selectedWidget
@@ -90,6 +91,10 @@ export default function Overlay_Editor({
   const editableEntries = Object.entries(editableConfig).filter(([, value]) =>
     value === null || ["string", "number", "boolean"].includes(typeof value) || Array.isArray(value) || (typeof value === "object" && value !== null)
   );
+
+  useEffect(() => {
+    if (selectedInstanceWidgetId) setSelectedWidgetId(selectedInstanceWidgetId);
+  }, [selectedInstanceWidgetId]);
 
   useEffect(() => {
     if (!selectedFontCategory) return;
@@ -144,7 +149,7 @@ export default function Overlay_Editor({
             {activeMenu === "INICIO" && (
               <div className="grid h-full min-h-0 grid-cols-[minmax(150px,0.9fr)_minmax(160px,1fr)_minmax(220px,1.35fr)] gap-2">
                 <section aria-label="Widgets fragmentáveis" className="flex min-h-0 min-w-0 flex-col border-r border-white/10 pr-2">
-                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Widgets</p>
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Widgets (38)</p>
                   <div className="grid min-h-0 grid-cols-3 grid-rows-5 content-start gap-1 overflow-y-auto pr-1">
                     {availableWidgets.map((widget) => (
                       <button
@@ -256,7 +261,7 @@ export default function Overlay_Editor({
                             ) : isColor ? (
                               <div className="flex items-center gap-2">
                                 <input type="color" value={value as string} disabled={!hasSelectedInstance} onChange={(event) => onUpdateSelectedConfig({ [key]: event.target.value })} className="h-7 w-10 rounded border border-white/10 bg-slate-900 p-1" />
-                                <input type="text" value={value as string} onChange={(event) => onUpdateSelectedConfig({ [key]: event.target.value })} className="h-7 min-w-0 flex-1 rounded border border-white/10 bg-slate-900 px-2 text-xs text-white outline-none focus:border-violet-400" />
+                                <input type="text" value={value as string} disabled={!hasSelectedInstance} onChange={(event) => onUpdateSelectedConfig({ [key]: event.target.value })} className="h-7 min-w-0 flex-1 rounded border border-white/10 bg-slate-900 px-2 text-xs text-white outline-none focus:border-violet-400" />
                               </div>
                             ) : (
                               <input type="text" value={String(value ?? "")} disabled={!hasSelectedInstance} onChange={(event) => onUpdateSelectedConfig({ [key]: event.target.value })} className="h-7 w-full rounded border border-white/10 bg-slate-900 px-2 text-xs text-white outline-none focus:border-violet-400" />
