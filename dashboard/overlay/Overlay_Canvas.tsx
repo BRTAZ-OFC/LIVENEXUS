@@ -624,6 +624,27 @@ export default function OverlayCanvas() {
     [config.background],
   );
 
+  const selectedCanvasInstance = (config.instances || []).find(
+    (item, index) => (item.id || `${item.widgetId}-${index}`) === selectedInstanceId,
+  );
+
+  const selectedElementBackgroundColor = selectedCanvasInstance
+    ? String(selectedCanvasInstance.widgetId === SHAPE_WIDGET_ID
+      ? selectedCanvasInstance.config?.fillColor || selectedCanvasInstance.config?.color || "#8b5cf6"
+      : selectedCanvasInstance.config?.backgroundColor || "#020617")
+    : String(config.background?.type === "solid" ? config.background.color || "#020617" : "#020617");
+
+  function updateSelectedBackgroundColor(color: string) {
+    if (!selectedInstanceId || !selectedCanvasInstance) {
+      updateBackground({ type: "solid", color, opacity: 100, gradient: undefined, image: undefined });
+      return;
+    }
+    const nextConfig = selectedCanvasInstance.widgetId === SHAPE_WIDGET_ID
+      ? { ...(selectedCanvasInstance.config || {}), fillColor: color, color, fillOpacity: 100, fillEnabled: true, opacity: 100 }
+      : { ...(selectedCanvasInstance.config || {}), backgroundColor: color };
+    updateInstance(selectedInstanceId, { config: nextConfig });
+  }
+
   return (
     <section className="relative flex w-full min-w-0 flex-col items-center gap-4 px-2 pb-40 pt-4">
       <button type="button" onClick={() => void saveOverlay()} disabled={saving || loading} title="Salvar overlay" aria-label="Salvar overlay" className="fixed right-4 top-20 z-[100] inline-flex h-9 w-9 items-center justify-center rounded-lg bg-violet-600 text-white shadow-lg hover:bg-violet-500 disabled:opacity-50"><Save size={16} /></button>
@@ -879,7 +900,7 @@ export default function OverlayCanvas() {
                       widgetPointer.current = null;
                     }}
                   >
-                    <div className="h-full w-full overflow-hidden">
+                    <div className="h-full w-full overflow-hidden" style={instance.widgetId !== SHAPE_WIDGET_ID && widgetConfig["backgroundColor"] ? { backgroundColor: String(widgetConfig["backgroundColor"]) } : undefined}>
                       <style>{'[data-overlay-instance="' + instanceId + '"] :is(p,span,h1,h2,h3,h4,h5,h6,label,li,a,strong,em,small) { font-family: "' + String(widgetConfig["fontFamily"] || "Inter").replace(/"/g, "") + '", sans-serif !important; font-size: ' + Math.max(1, Number(widgetConfig["fontSize"]) || 16) + 'px !important; color: ' + String(widgetConfig["color"] || widgetConfig["textColor"] || "#ffffff") + ' !important; }'}</style>
                       {instance.widgetId === SHAPE_WIDGET_ID ? (
                         <div className="h-full w-full" style={{ opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100 }}><OverlayShape shape={String(widgetConfig["shape"] || instance.elementKey || "rectangle")} color={String(widgetConfig["fillColor"] || widgetConfig["color"] || "#8b5cf6")} strokeColor={String(widgetConfig["strokeColor"] || "#ddd6fe")} strokeWidth={Math.max(0, Number(widgetConfig["strokeWidth"] ?? 2))} fillEnabled={widgetConfig["fillEnabled"] !== false}/></div>
@@ -1056,8 +1077,8 @@ export default function OverlayCanvas() {
         onAddShape={addShapeInstance}
         gridSettings={gridSettings}
         onUpdateGridSettings={updateGridSettings}
-        globalBackgroundColor={String(config.background?.type === "solid" ? config.background.color || "#020617" : "#020617")}
-        onUpdateGlobalBackgroundColor={(color) => updateBackground({ type: "solid", color, opacity: 100, gradient: undefined, image: undefined })}
+        backgroundColor={selectedElementBackgroundColor}
+        onUpdateBackgroundColor={updateSelectedBackgroundColor}
         globalStyleConfig={{ borderEnabled: Boolean(config.globalStyleConfig?.borderEnabled), borderWidth: Math.max(1, Math.min(100, Number(config.globalStyleConfig?.borderWidth) || 1)), borderColor: String(config.globalStyleConfig?.borderColor || "#dce6ff"), borderRadius: Math.max(1, Math.min(100, Number(config.globalStyleConfig?.borderRadius) || 16)), texture: String(config.globalStyleConfig?.texture || "none"), colorEffectEnabled: Boolean(config.globalStyleConfig?.colorEffectEnabled), colorEffect: String(config.globalStyleConfig?.colorEffect || "glass") }}
         onUpdateGlobalStyleConfig={(patch) => setConfig((current) => ({ ...current, globalStyleConfig: { borderEnabled: false, borderWidth: 1, borderColor: "#dce6ff", borderRadius: 16, texture: "none", colorEffectEnabled: false, colorEffect: "glass", ...(current.globalStyleConfig || {}), ...patch } }))}
         layers={(config.instances || []).map((instance, index) => ({
