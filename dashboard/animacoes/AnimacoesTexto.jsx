@@ -137,11 +137,6 @@ export default function AnimacoesTexto({
           { opacity: 0, transform: "scale(0.65)" },
         ], { duration: duracaoSegura, delay: indice * atrasoSeguro, iterations: 1, fill: "both", easing: "ease-in" })));
       }, tempoEntrada));
-      if (infinita) timers.push(setTimeout(() => {
-        if (cancelled) return;
-        animations.forEach((animation) => animation.cancel());
-        runCycle();
-      }, vaiEVem ? tempoEntrada + tempoSaida : tempoEntrada));
     };
 
     runCycle();
@@ -150,7 +145,7 @@ export default function AnimacoesTexto({
       timers.forEach(clearTimeout);
       animations.forEach((animation) => animation.cancel());
     };
-  }, [caracteres, tipoValido, duracaoSegura, atrasoSeguro, infinita, vaiEVem, versao]);
+  }, [caracteres, tipoValido, duracaoSegura, atrasoSeguro, vaiEVem, versao]);
 
   useEffect(() => {
     if (tipoValido !== "casanique") {
@@ -189,12 +184,14 @@ export default function AnimacoesTexto({
 
   useEffect(() => {
     if (!repetir || caracteres.length === 0) return undefined;
+    const duracaoCiclo = Math.max(0, caracteres.length - 1) * atrasoSeguro + duracaoSegura;
+    const duracaoSaida = vaiEVem ? duracaoCiclo : 0;
     const timer = setTimeout(() => {
       setEmbaralhados({});
       setVersao((atual) => atual + 1);
-    }, caracteres.length * atrasoSeguro + duracaoSegura);
+    }, duracaoCiclo + duracaoSaida);
     return () => clearTimeout(timer);
-  }, [repetir, caracteres.length, atrasoSeguro, duracaoSegura, versao]);
+  }, [repetir, caracteres.length, atrasoSeguro, duracaoSegura, vaiEVem, versao]);
 
   return (
     <span
