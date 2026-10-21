@@ -429,15 +429,17 @@ export default function BibliotecaSearch() {
       </section>}
       {!detailLoading && Array.isArray(detailData?.sections) && detailData.sections.map((section: any, sectionIndex: number) => <section key={section.title || sectionIndex} className="space-y-2">
         <h3 className="text-sm font-bold text-white">{section.title || "Conteúdo"}</h3>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="space-y-2">
           {(section.items || []).map((entry: any, entryIndex: number) => {
             const isTrack = Boolean(entry.videoId);
-            return <article key={entry.videoId || entry.browseId || entryIndex} className="min-w-0 rounded-xl border border-white/10 bg-black/20 p-2">
-              <button type="button" onClick={() => isTrack ? playDetailTrack(entry, section.items) : openSectionItem(entry, section.title)} className="block w-full text-left">
-                {entry.thumbnail ? <img src={entry.thumbnail} alt="" className="mb-2 aspect-square w-full rounded-lg object-cover" /> : <div className="mb-2 flex aspect-square items-center justify-center rounded-lg bg-white/5"><Music2 className="h-6 w-6 text-slate-500" /></div>}
+            return <article key={entry.videoId || entry.browseId || entryIndex} className="flex min-w-0 items-center gap-3 rounded-lg border border-white/10 bg-black/20 px-3 py-2">
+              <button type="button" onClick={() => isTrack ? playDetailTrack(entry, section.items) : openSectionItem(entry, section.title)} aria-label={`Abrir ${entry.title || entry.name || "item"}`} className="h-12 w-12 shrink-0 overflow-hidden rounded-md border border-white/10 bg-white/5">
+                {entry.thumbnail ? <img src={entry.thumbnail} alt="" className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center"><Music2 className="h-5 w-5 text-slate-500" /></span>}
+              </button>
+              <button type="button" onClick={() => isTrack ? playDetailTrack(entry, section.items) : openSectionItem(entry, section.title)} className="min-w-0 flex-1 text-left">
                 <p className="truncate text-xs font-semibold text-white">{entry.title || entry.name || "Item"}</p><p className="truncate text-[11px] text-slate-400">{entry.subtitle || section.title}</p>
               </button>
-              {isTrack && <button type="button" onClick={() => playDetailTrack(entry, section.items)} className="mt-2 inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-cyan-200 hover:bg-white/10"><Play className="h-3 w-3" />Reproduzir</button>}
+              {isTrack && <button type="button" onClick={() => playDetailTrack(entry, section.items)} className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1 text-[11px] text-cyan-200 hover:bg-white/10"><Play className="h-3 w-3" />Reproduzir</button>}
             </article>;
           })}
         </div>
