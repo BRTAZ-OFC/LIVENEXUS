@@ -740,13 +740,15 @@ app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
     const ownedRows = rows.filter(
       (row: Record<string, unknown>) => String(row["user_id"] ?? "") === session.user_id,
     );
-    const requestedId = String(input.id ?? "");
+    const requestedId = String(input.id ?? "").trim();
+    const name = String(input.name ?? "").trim();
     const createNew = req.body?.createNew === true;
-    const existing = createNew
-      ? undefined
-      : ownedRows.find(
-          (row: Record<string, unknown>) => requestedId && String(row["id"] ?? "") === requestedId,
-        ) || ownedRows[0];
+    if (!name || !requestedId) return res.status(400).set(NO_CACHE).json({ ok: false, message: "Nome e ID textual da overlay são obrigatórios." });
+    if (createNew && ownedRows.some((row: Record<string, unknown>) => String(row["id"] ?? "") === requestedId)) {
+      return res.status(409).set(NO_CACHE).json({ ok: false, message: "Já existe uma overlay com esse ID. Escolha outro nome." });
+    }
+    const existing = createNew ? undefined : ownedRows.find((row: Record<string, unknown>) => String(row["id"] ?? "") === requestedId);
+    if (!createNew && !existing) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Overlay não encontrada. Se deseja criar outra, use Nova." });
 
     const settings = { ...input } as Record<string, unknown>;
     delete settings["id"];
@@ -755,9 +757,9 @@ app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
 
     const record = {
       ...(existing || {}),
-      id: String(existing?.["id"] ?? input.id ?? ""),
+      id: String(existing?.["id"] ?? requestedId),
       user_id: session.user_id,
-      name: String(input.name ?? existing?.["name"] ?? "Overlay"),
+      name,
       settings,
       updated_at: new Date().toISOString(),
     };
@@ -781,6 +783,24 @@ app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
 });
 
 /* CRUD administrativo genérico das tabelas JSON que não possuem CRUD específico. */
+/* Exclui somente a overlay pertencente ao usuário autenticado. */
+app.delete("/api/overlay/canvas", async (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) return res.status(401).set(NO_CACHE).json({ ok: false, message: "Faça login para excluir a overlay." });
+  const id = String(req.body?.id ?? "").trim();
+  if (!id) return res.status(400).set(NO_CACHE).json({ ok: false, message: "ID da overlay não fornecido." });
+  try {
+    const rows = await listJsonTableRecords("overlays");
+    const existing = rows.find((row: Record<string, unknown>) => String(row["id"] ?? "") === id && String(row["user_id"] ?? "") === session.user_id);
+    if (!existing) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Overlay não encontrada." });
+    const deleted = await deleteJsonTableRecord("overlays", String(existing["__rowKey"]));
+    if (!deleted) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Overlay não encontrada." });
+    return res.set(NO_CACHE).json({ ok: true, message: "Overlay excluída." });
+  } catch (error) {
+    return res.status(500).set(NO_CACHE).json({ ok: false, message: errorMessage(error, "Não foi possível excluir a overlay.") });
+  }
+});
+
 app.get("/api/database/json-tables", async (req: Request, res: Response) => {
   if (!requireAdmin(req, res)) return;
   try {
