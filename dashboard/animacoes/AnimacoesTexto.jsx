@@ -148,7 +148,7 @@ export default function AnimacoesTexto({
 
     const elements = caracteres.map((caractere, indice) => ({
       caractere, indice, element: letterRefs.current[indice],
-    })).filter(({ caractere, element }) => element && !/\\s/.test(caractere));
+    })).filter(({ caractere, element }) => element && !/\s/.test(caractere));
     const tempoEntrada = Math.max(0, caracteres.length - 1) * atrasoSeguro + duracaoSegura;
 
     elements.forEach(({ element, indice }) => {
@@ -245,7 +245,7 @@ export default function AnimacoesTexto({
             backfaceVisibility: tipoValido === "rolar" ? "hidden" : undefined,
           }}
         >
-          {tipoValido === "casanique" && !/\\s/.test(caractere)
+          {tipoValido === "casanique" && !/\s/.test(caractere)
             ? (embaralhados[indice] ?? caractere)
             : caractere === " "
               ? "\\u00a0"
