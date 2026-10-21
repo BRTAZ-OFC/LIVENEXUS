@@ -467,8 +467,8 @@ export default function OverlayCanvas() {
       elementKey,
       isFullWidget: false,
       name: `${definition.name} — ${label}`,
-      x: Math.max(0, Math.min(size.width - width, 24 + (index % 5) * 28)),
-      y: Math.max(0, Math.min(size.height - height, 24 + (index % 5) * 28)),
+      x: 16,
+      y: 16,
       width,
       height,
       zIndex: index + 1,
@@ -486,7 +486,6 @@ export default function OverlayCanvas() {
       background: current.background || EMPTY_BACKGROUND,
     }));
     setSelectedInstanceId(nextInstance.id || null);
-    setWidgetResizeChoice({ instanceId: nextInstance.id || "", width, height });
     setError("");
     setNotice("");
   }
