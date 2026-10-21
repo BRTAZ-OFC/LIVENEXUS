@@ -631,8 +631,13 @@ export default function OverlayCanvas() {
   const selectedElementBackgroundColor = selectedCanvasInstance
     ? String(selectedCanvasInstance.widgetId === SHAPE_WIDGET_ID
       ? selectedCanvasInstance.config?.fillColor || selectedCanvasInstance.config?.color || "#8b5cf6"
-      : selectedCanvasInstance.config?.backgroundColor || "#020617")
+      : selectedCanvasInstance.config?.backgroundColor && selectedCanvasInstance.config.backgroundColor !== "transparent" ? selectedCanvasInstance.config.backgroundColor : "#020617")
     : String(config.background?.type === "solid" ? config.background.color || "#020617" : "#020617");
+  const selectedBackgroundMode: "transparent" | "solid" = selectedCanvasInstance
+    ? selectedCanvasInstance.widgetId === SHAPE_WIDGET_ID
+      ? selectedCanvasInstance.config?.fillEnabled === false || Number(selectedCanvasInstance.config?.fillOpacity ?? 100) === 0 ? "transparent" : "solid"
+      : !selectedCanvasInstance.config?.backgroundColor || selectedCanvasInstance.config.backgroundColor === "transparent" ? "transparent" : "solid"
+    : config.background?.type === "solid" ? "solid" : "transparent";
 
   function updateSelectedBackgroundColor(color: string) {
     if (!selectedInstanceId || !selectedCanvasInstance) {
@@ -643,6 +648,19 @@ export default function OverlayCanvas() {
       ? { ...(selectedCanvasInstance.config || {}), fillColor: color, color, fillOpacity: 100, fillEnabled: true, opacity: 100 }
       : { ...(selectedCanvasInstance.config || {}), backgroundColor: color };
     updateInstance(selectedInstanceId, { config: nextConfig });
+  }
+
+  function updateSelectedBackgroundMode(mode: "transparent" | "solid") {
+    if (!selectedInstanceId || !selectedCanvasInstance) {
+      if (mode === "transparent") updateBackground({ type: "transparent", opacity: 100, gradient: undefined, image: undefined });
+      else updateBackground({ type: "solid", color: selectedElementBackgroundColor || "#020617", opacity: 100, gradient: undefined, image: undefined });
+      return;
+    }
+    if (selectedCanvasInstance.widgetId === SHAPE_WIDGET_ID) {
+      updateInstance(selectedInstanceId, { config: { ...(selectedCanvasInstance.config || {}), fillEnabled: mode === "solid", fillOpacity: mode === "solid" ? 100 : 0 } });
+      return;
+    }
+    updateInstance(selectedInstanceId, { config: { ...(selectedCanvasInstance.config || {}), backgroundColor: mode === "solid" ? selectedElementBackgroundColor : "transparent" } });
   }
 
   return (
@@ -1078,7 +1096,9 @@ export default function OverlayCanvas() {
         gridSettings={gridSettings}
         onUpdateGridSettings={updateGridSettings}
         backgroundColor={selectedElementBackgroundColor}
+        backgroundMode={selectedBackgroundMode}
         onUpdateBackgroundColor={updateSelectedBackgroundColor}
+        onUpdateBackgroundMode={updateSelectedBackgroundMode}
         globalStyleConfig={{ borderEnabled: Boolean(config.globalStyleConfig?.borderEnabled), borderWidth: Math.max(1, Math.min(100, Number(config.globalStyleConfig?.borderWidth) || 1)), borderColor: String(config.globalStyleConfig?.borderColor || "#dce6ff"), borderRadius: Math.max(1, Math.min(100, Number(config.globalStyleConfig?.borderRadius) || 16)), texture: String(config.globalStyleConfig?.texture || "none"), colorEffectEnabled: Boolean(config.globalStyleConfig?.colorEffectEnabled), colorEffect: String(config.globalStyleConfig?.colorEffect || "glass") }}
         onUpdateGlobalStyleConfig={(patch) => setConfig((current) => ({ ...current, globalStyleConfig: { borderEnabled: false, borderWidth: 1, borderColor: "#dce6ff", borderRadius: 16, texture: "none", colorEffectEnabled: false, colorEffect: "glass", ...(current.globalStyleConfig || {}), ...patch } }))}
         layers={(config.instances || []).map((instance, index) => ({
