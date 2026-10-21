@@ -856,7 +856,7 @@ export default function OverlayCanvas() {
                             color: String(widgetConfig["color"] || "#ffffff"), fontSize: Math.max(1, Number(widgetConfig["fontSize"]) || 32),
                             fontFamily: `"${String(widgetConfig["fontFamily"] || "Inter")}", sans-serif`, lineHeight: 1.2,
                           }}
-                        >{editingTextId === instanceId || !["cascata", "casanique", "rolar", "encarrilha"].includes(String(widgetConfig["animationType"] || ""))
+                        >{editingTextId === instanceId || !["cascata", "casanique", "rolar", "encarrilha", "slide-in-cima", "slide-in-baixo", "slide-in-esquerda", "slide-in-direita", "reveal", "flip-in", "bounce-in", "blur-in", "light-speed-in"].includes(String(widgetConfig["animationType"] || ""))
                           ? String(widgetConfig["text"] || "Texto")
                           : <AnimacoesTexto
                               key={String(widgetConfig["animationType"]) + "-" + String(widgetConfig["text"] || "") + "-" + String(widgetConfig["animationDelayMs"] ?? 1000) + "-" + String(widgetConfig["animationDurationMs"] ?? 650) + "-" + String(Boolean(widgetConfig["animationInfinite"])) + "-" + String(Boolean(widgetConfig["animationAlternate"]))}
