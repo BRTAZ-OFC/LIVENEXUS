@@ -695,8 +695,14 @@ export default function OverlayCanvas() {
                     style={instanceStyle}
                     onPointerDown={(event) => {
                       setSelectedInstanceId(instanceId);
+                      const target = event.target as HTMLElement;
+                      // Preserve native focus and pointer events on the editable text itself.
+                      if (target.closest("[data-overlay-text]")) {
+                        if (event.detail >= 2) setEditingTextId(instanceId);
+                        return;
+                      }
                       if (
-                        (event.target as HTMLElement).closest(
+                        target.closest(
                           "button,input,textarea,select,a,[data-no-widget-drag]",
                         )
                       )
@@ -785,8 +791,9 @@ export default function OverlayCanvas() {
                           suppressContentEditableWarning
                           spellCheck={false}
                           onDoubleClick={(event) => {
-                            event.preventDefault(); event.stopPropagation();
-                            setEditingTextId(instanceId); setSelectedInstanceId(instanceId);
+                            event.stopPropagation();
+                            setSelectedInstanceId(instanceId);
+                            setEditingTextId(instanceId);
                             const editable = event.currentTarget;
                             requestAnimationFrame(() => {
                               editable.focus();
