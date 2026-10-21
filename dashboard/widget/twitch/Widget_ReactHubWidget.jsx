@@ -28,6 +28,7 @@ export default function ReactHubWidget({ config = {} }) {
   const [queue, setQueue] = useState(() => getStoredReactQueue());
   const [activeVideo, setActiveVideo] = useState(() => getStoredActiveReactVideo());
   const [previewVideo, setPreviewVideo] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
 
   const containerRef = useRef(null);
 
@@ -225,14 +226,25 @@ export default function ReactHubWidget({ config = {} }) {
         </div>
       </div>
       {previewVideo && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 p-3" role="dialog" aria-modal="true" aria-label={"Reproduzir vídeo enviado por " + (previewVideo.author || "usuário")} onClick={() => setPreviewVideo(null)}>
-          <div className="relative w-full max-w-4xl rounded-lg border border-white/20 bg-slate-950 p-3 shadow-2xl" onClick={(event) => event.stopPropagation()}>
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <div className="min-w-0"><p className="text-xs font-semibold text-white">Vídeo do YouTube</p><p className="truncate text-[11px] text-slate-400">Enviado por: {previewVideo.author || "Não identificado"}</p></div>
-              <button type="button" data-no-widget-drag onClick={() => setPreviewVideo(null)} aria-label="Fechar vídeo" className="rounded border border-white/20 p-1.5 text-white hover:bg-white/10"><X size={16} /></button>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/85 p-3" role="dialog" aria-modal="true" aria-label="Fila de vídeos para reagir" onClick={() => setPreviewVideo(null)}>
+          <div className="relative flex max-h-[90vh] w-full max-w-6xl flex-col rounded-lg border border-white/20 bg-slate-950 p-3 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="mb-2 flex items-center justify-between gap-3 shrink-0">
+              <div className="min-w-0"><p className="text-xs font-semibold text-white">React Hub — vídeos da fila</p><p className="truncate text-[11px] text-slate-400">Selecionado: {previewVideo.author || "Não identificado"}</p></div>
+              <button type="button" data-no-widget-drag onClick={() => setPreviewVideo(null)} aria-label="Fechar popup" className="rounded border border-white/20 p-1.5 text-white hover:bg-white/10"><X size={16} /></button>
             </div>
-            <div className="aspect-video w-full overflow-hidden rounded bg-black">
-              <iframe className="h-full w-full" src={getYouTubeEmbedUrl(previewVideo.url)} title={"Vídeo enviado por " + (previewVideo.author || "usuário")} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />
+            <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-hidden md:grid-cols-2">
+              <div className="flex min-h-[220px] flex-col overflow-hidden rounded bg-black">
+                {getYouTubeEmbedUrl(previewUrl) ? <iframe className="h-full min-h-[220px] w-full flex-1" src={getYouTubeEmbedUrl(previewUrl)} title={"Vídeo enviado por " + (previewVideo.author || "usuário")} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /> : <div className="flex min-h-[220px] items-center justify-center p-4 text-sm text-slate-400">Selecione um link válido do YouTube na coluna ao lado.</div>}
+              </div>
+              <div className="min-h-0 overflow-y-auto rounded border border-white/10">
+                <div className="sticky top-0 border-b border-white/10 bg-slate-900 px-3 py-2 text-xs font-bold text-slate-200">Fila de vídeos</div>
+                <div className="space-y-1 p-2">
+                  {queue.map((item, index) => <button key={item.id || index} type="button" data-no-widget-drag onClick={() => { setPreviewVideo(item); setPreviewUrl(item.url || ""); }} className={"block w-full rounded px-2 py-2 text-left text-xs break-words hover:bg-white/10 " + (previewUrl === item.url ? "bg-blue-950/70 text-cyan-200" : "text-slate-300")}>
+                    <span className="font-semibold">{index + 1} - {item.author || "Usuário"} enviou = </span><span className="text-cyan-300 underline">{item.url || item.title || "Link indisponível"}</span>
+                  </button>)}
+                  {queue.length === 0 && <p className="p-2 text-xs text-slate-500">A fila está vazia.</p>}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -256,68 +268,15 @@ export default function ReactHubWidget({ config = {} }) {
             </p>
           </div>
         ) : (
-          queue.map((item) => {
+          queue.map((item, index) => {
             const isPlaying = activeVideo && activeVideo.id === item.id;
             const isWatched = item.status === "watched";
-
             return (
-              <div
-                key={item.id}
-                className={`p-2 rounded-lg border transition-all text-left flex flex-col gap-1 shrink-0 w-full min-w-0 overflow-hidden ${
-                  isPlaying
-                    ? "bg-blue-950/80 border-blue-500/80 shadow-md shadow-blue-950/50 ring-1 ring-blue-500/40"
-                    : isWatched
-                      ? "bg-slate-900/40 border-white/5 opacity-60"
-                      : "bg-slate-900/80 border-slate-700/60"
-                }`}
-              >
-                {/* Top line: Author & Platform badge */}
-                <div className="flex items-center justify-between gap-1 w-full min-w-0">
-                  <div className="flex items-center gap-1.5 min-w-0 overflow-hidden">
-                    <span
-                      style={{ backgroundColor: item.parsed?.badgeColor || "#ef4444" }}
-                      className="px-1.5 py-0.2 rounded text-[9px] font-bold text-white uppercase shrink-0"
-                    >
-                      {item.parsed?.platform || "YouTube"}
-                    </span>
-                    <span className="text-xs font-semibold text-slate-200 truncate whitespace-nowrap">
-                      {item.author}
-                    </span>
-                    {item.source === "chat" && (
-                      <span className="text-[9px] px-1 bg-purple-900/60 text-purple-300 rounded font-mono shrink-0">
-                        chat
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Status indicator */}
-                  <div className="shrink-0">
-                    {isPlaying && (
-                      <span className="flex items-center gap-1 text-[10px] font-extrabold text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/30 animate-pulse">
-                        <Radio className="w-2.5 h-2.5" /> NO AR
-                      </span>
-                    )}
-                    {isWatched && !isPlaying && (
-                      <span className="text-[10px] text-slate-500 flex items-center gap-0.5">
-                        <CheckCircle2 className="w-2.5 h-2.5" /> Assistido
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Middle line: URL / Title - GUARANTEED SINGLE LINE WITH ELLIPSIS (...) */}
-                <div className="flex min-w-0 items-center gap-2">
-                  <a href={item.url} target="_blank" rel="noreferrer" title={item.url} className="min-w-0 flex-1 truncate text-[11px] text-cyan-300 underline decoration-cyan-700 underline-offset-2" onClick={(event) => event.stopPropagation()}>
-                    {item.url || item.title || "Link do YouTube"}
-                  </a>
-                  {getYouTubeEmbedUrl(item.url) && (
-                    <button type="button" data-no-widget-drag onClick={() => setPreviewVideo(item)} className="inline-flex shrink-0 items-center gap-1 rounded border border-cyan-400/40 bg-cyan-500/10 px-2 py-1 text-[10px] font-semibold text-cyan-200 hover:bg-cyan-500/20" title="Abrir vídeo em popup">
-                      <Play size={11} /> Reagir
-                    </button>
-                  )}
-                </div>
-                <p className="truncate text-[10px] text-slate-400">Enviado por: {item.author || "Não identificado"}</p>
-              </div>
+              <button key={item.id} type="button" data-no-widget-drag onClick={() => { setPreviewVideo(item); setPreviewUrl(item.url || ""); }} title="Abrir fila de vídeos" className={"p-2 rounded-lg border transition-all text-left flex items-center gap-1.5 shrink-0 w-full min-w-0 overflow-hidden " + (isPlaying ? "bg-blue-950/80 border-blue-500/80 shadow-md shadow-blue-950/50 ring-1 ring-blue-500/40" : isWatched ? "bg-slate-900/40 border-white/5 opacity-60" : "bg-slate-900/80 border-slate-700/60")}>
+                <span className="shrink-0 text-xs font-semibold text-slate-200">{index + 1} - {item.author || "Usuário"} enviou =</span>
+                <span className="min-w-0 flex-1 truncate text-[11px] text-cyan-300 underline decoration-cyan-700 underline-offset-2">{item.url || item.title || "Link do YouTube"}</span>
+                {isPlaying && <Radio className="h-3 w-3 shrink-0 text-rose-400" />}{isWatched && !isPlaying && <CheckCircle2 className="h-3 w-3 shrink-0 text-slate-500" />}
+              </button>
             );
           })
         )}
