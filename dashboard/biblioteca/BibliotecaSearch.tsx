@@ -5,6 +5,7 @@ import type { CatalogItem } from "./catalogSources";
 import { playTrack, playTracks, type MusicTrack } from "./musicPlayerEngine";
 
 type Category = "songs" | "albums" | "artists" | "playlists";
+type SearchCategory = Category | "mixes";
 type View = "categories" | "history" | "personal";
 type PersonalLibrary = { songs: CatalogItem[]; albums: CatalogItem[]; artists: CatalogItem[]; playlists: CatalogItem[]; user_id?: string };
 type HistoryItem = { query: string; date: number };
@@ -75,7 +76,7 @@ export default function BibliotecaSearch() {
   const [view, setView] = useState<View>("categories");
   const [query, setQuery] = useState("");
   const [searched, setSearched] = useState("");
-  const [category, setCategory] = useState<Category>("songs");
+  const [category, setCategory] = useState<SearchCategory>("songs");
   const [results, setResults] = useState<CatalogItem[]>([]);
   const [continuations, setContinuations] = useState<Record<string, string>>({});
   const [loadingMore, setLoadingMore] = useState(false);
@@ -319,7 +320,7 @@ export default function BibliotecaSearch() {
   async function loadMore() {
     const tokenKeys = category === "songs"
       ? ["songs", "youtube"].filter((key) => Boolean(continuations[key]))
-      : [category].filter((key) => Boolean(continuations[key]));
+      : [category === "mixes" ? "playlists" : category].filter((key) => Boolean(continuations[key]));
     if (!tokenKeys.length || loadingMore || !searched) return;
     const version = requestVersionRef.current;
     setLoadingMore(true);
@@ -357,8 +358,12 @@ export default function BibliotecaSearch() {
   }
   const canLoadMore = category === "songs"
     ? Boolean(continuations.songs || continuations.youtube)
-    : Boolean(continuations[category]);
-  const visibleResults = useMemo(() => results.filter((item) => itemCategory(item) === category), [results, category]);
+    : Boolean(continuations[category === "mixes" ? "playlists" : category]);
+  const visibleResults = useMemo(() => results.filter((item) => {
+    if (category === "mixes") return item.type === "mix" || Boolean(item.playlistId?.startsWith("RD"));
+    if (category === "playlists") return itemCategory(item) === "playlists" && item.type !== "mix" && !item.playlistId?.startsWith("RD");
+    return itemCategory(item) === category;
+  }), [results, category]);
   const removeItem = (item: CatalogItem) => void mutateLibrary((current) => {
     const kind = itemCategory(item); const id = itemId(item);
     return { ...current, [kind]: current[kind].filter((saved) => itemId(saved) !== id) };
@@ -456,7 +461,7 @@ export default function BibliotecaSearch() {
         <button type="submit" disabled={loading || !query.trim()} className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-cyan-300 px-5 text-sm font-bold text-slate-950 disabled:opacity-50">{loading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}Pesquisar</button>
       </form>
       <div className="flex gap-2 overflow-x-auto pb-1" aria-label="Categorias de resultados">
-        {CATEGORIES.map((entry) => <button key={entry.key} type="button" onClick={() => setCategory(entry.key)} aria-pressed={category === entry.key} className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold ${category === entry.key ? "border-cyan-300/40 bg-cyan-300/10 text-cyan-200" : "border-white/10 text-slate-400 hover:text-white"}`}>{entry.label}</button>)}
+        {[...CATEGORIES, { key: "mixes" as const, label: "Mixes", icon: ListMusic }].map((entry) => <button key={entry.key} type="button" onClick={() => setCategory(entry.key)} aria-pressed={category === entry.key} className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold ${category === entry.key ? "border-cyan-300/40 bg-cyan-300/10 text-cyan-200" : "border-white/10 text-slate-400 hover:text-white"}`}>{entry.label}</button>)}
       </div>
       {searched ? <section className="space-y-4">
         <div className="flex items-center justify-between"><h2 className="text-sm font-bold text-white">Resultados: {searched}</h2><button type="button" onClick={() => { setSearched(""); setResults([]); }} className="text-xs text-slate-400 hover:text-white">Limpar busca</button></div>
