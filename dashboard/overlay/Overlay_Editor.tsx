@@ -1,5 +1,5 @@
 import { useState, type CSSProperties, type ComponentType } from "react";
-import { ChevronDown, ChevronUp, Plus, Type } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import HorizontalMenu from "../components/HorizontalMenu";
 import { FONT_CATEGORIES } from "../fontes/Font_Catalog";
 import { loadGoogleFont } from "../fontes/Font_Loader";
