@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getCurrentTrack } from './Library_youtubePlayer';
 import { playerEvents } from './Library_playerEvents';
+import { subscribeMusicPlayer } from '../biblioteca/musicPlayerEngine';
 
 const shells = [
   'rounded-xl bg-slate-950/90 text-white p-4',
@@ -76,6 +77,8 @@ function useExistingTrack() {
   const [track, setTrack] = useState(() => getCurrentTrack());
   useEffect(() => {
     const refresh = () => setTrack(getCurrentTrack());
+    // O player atual publica o estado pelo motor global, não pelo playerEvents legado.
+    const unsubscribePlayer = subscribeMusicPlayer(state => setTrack(state.track || null));
     const off = ['track_changed', 'track_started', 'track_resumed', 'track_paused', 'track_finished', 'queue_empty'].map(event => playerEvents.on(event, refresh));
     let channel;
     const fromState = data => { if (data?.type === 'music_state') setTrack(data.track || null); };
@@ -90,7 +93,7 @@ function useExistingTrack() {
       }
     };
     window.addEventListener('storage', onStorage);
-    return () => { off.forEach(unsubscribe => unsubscribe()); channel?.close(); window.removeEventListener('storage', onStorage); };
+    return () => { unsubscribePlayer(); off.forEach(unsubscribe => unsubscribe()); channel?.close(); window.removeEventListener('storage', onStorage); };
   }, []);
   return track;
 }
