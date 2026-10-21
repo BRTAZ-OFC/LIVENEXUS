@@ -27,7 +27,7 @@ export default function GlobalMusicPlayer() {
         : <Music2 className="hidden h-5 w-5 shrink-0 text-cyan-300 sm:block" />}
       <div className="min-w-0 max-w-48 flex-1">
                 <div className="w-full min-w-0 overflow-hidden text-xs font-semibold text-white" title={track?.title || "Nenhuma música"}>
-          <div className="flex w-max" style={{ animation: "global-player-title-marquee 12s linear infinite" }}>
+          <div className="ln-marquee-motion flex w-max" style={{ animation: "global-player-title-marquee 12s linear infinite" }}>
             <span className="shrink-0 pr-8">{track?.title || "Nenhuma música"}</span>
             <span className="shrink-0 pr-8" aria-hidden="true">{track?.title || "Nenhuma música"}</span>
           </div>
