@@ -52,7 +52,8 @@ function parseLink(raw: string, titleInput: string): CatalogItem {
   if (!["youtube.com", "m.youtube.com", "music.youtube.com", "youtu.be"].includes(host)) throw new Error("Use um link de youtube.com, youtu.be ou music.youtube.com.");
   const video = host === "youtu.be" ? url.pathname.split("/").filter(Boolean)[0] : url.searchParams.get("v");
   const playlist = url.searchParams.get("list") || "";
-  const browse = url.pathname.match(/\/browse\/([A-Za-z0-9_-]+)/)?.[1] || "";
+  const browse = url.pathname.match(/\/(?:browse|channel)\/([A-Za-z0-9_-]+)/)?.[1] || "";
+  const handle = url.pathname.match(/^\/@([A-Za-z0-9._-]+)/)?.[1] || "";
   const videoId = video && /^[A-Za-z0-9_-]{11}$/.test(video) ? video : "";
   const playlistId = /^[A-Za-z0-9_-]{10,}$/.test(playlist) ? playlist : "";
   const browseId = /^[A-Za-z0-9_-]{5,}$/.test(browse) ? browse : "";
