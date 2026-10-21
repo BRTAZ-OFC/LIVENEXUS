@@ -63,11 +63,3 @@
   from { opacity: 0; transform: translateX(-0.35em); }
   to { opacity: 1; transform: translateX(0); }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .animacao-texto__letra {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-}
