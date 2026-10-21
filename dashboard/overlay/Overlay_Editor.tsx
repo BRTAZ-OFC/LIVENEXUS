@@ -549,10 +549,10 @@ export default function Overlay_Editor({
                     Duração de cada letra (ms)
                     <input
                       type="number" min="50" step="50"
-                      disabled={!selectedInstanceWidgetId || !selectedInstanceConfig}
+                      disabled={selectedInstanceWidgetId !== "__livenexus_text__" || !selectedInstanceConfig}
                       value={Number(selectedInstanceConfig?.animationDurationMs ?? 650)}
                       onChange={(event) => onUpdateSelectedConfig({ animationDurationMs: Math.max(50, Number(event.target.value) || 650) })}
-                      className="h-7 w-full rounded border border-white/10 bg-slate-950 px-2 text-xs text-white disabled:opacity-40"
+                      className="h-5 w-full min-w-0 rounded border border-white/10 bg-slate-950 px-1 text-[10px] text-white disabled:opacity-40"
                     />
                   </label>
                   <label className="flex min-w-0 items-start gap-1 text-[9px] leading-3 text-slate-300">
