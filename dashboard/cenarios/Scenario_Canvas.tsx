@@ -197,7 +197,8 @@ export default function ScenarioCanvas({
       if (
         !selectedId ||
         !scenario ||
-        target?.closest("input,textarea,select,button,a,[contenteditable='true'],[role='textbox']")
+        !viewportRef.current?.contains(target) ||
+        target?.closest("input,textarea,select,a,[contenteditable='true'],[role='textbox']")
       ) {
         return;
       }
@@ -597,6 +598,13 @@ export default function ScenarioCanvas({
         </div>
         <div
           ref={viewportRef}
+          tabIndex={-1}
+          onPointerDownCapture={(event) => {
+            const target = event.target as HTMLElement;
+            if (!target.closest("input,textarea,select,button,a,[contenteditable='true'],[role='textbox']")) {
+              viewportRef.current?.focus({ preventScroll: true });
+            }
+          }}
           className="relative aspect-video w-full overflow-hidden border border-cyan-300/20 bg-[#030712] shadow-[0_12px_48px_rgba(0,0,0,0.35)]"
           aria-label="Canvas do cenário 1920 por 1080"
         >
