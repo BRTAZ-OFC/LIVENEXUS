@@ -575,7 +575,7 @@ export default function Overlay_Editor({
                   </label>
                   <label className="flex min-w-0 items-start gap-1 text-[9px] leading-3 text-slate-300">
                     <input className="mt-px h-3 w-3 shrink-0" type="checkbox" disabled={!selectedInstanceWidgetId || !selectedInstanceConfig} checked={Boolean(selectedInstanceConfig?.animationAlternate)} onChange={(event) => onUpdateSelectedConfig({ animationAlternate: event.target.checked })} />
-                    Vai e volta (ex.: sobe e desce)
+                    Entrada e Saida
                   </label>
                   {selectedInstanceWidgetId === "__livenexus_text__" && (
                     <p className="text-[9px] leading-3 text-slate-400">
