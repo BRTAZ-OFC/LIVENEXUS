@@ -3,7 +3,8 @@
   white-space: pre-wrap;
 }
 
-.animacao-texto__letra {
+.animacao-texto__letra,
+.animacao-texto__conteudo {
   display: inline-block;
   transform-origin: center;
   will-change: transform, opacity;
