@@ -118,7 +118,7 @@ export default function AnimacoesTexto({
 
     const elements = caracteres.map((caractere, indice) => ({
       caractere, indice, element: letterRefs.current[indice],
-    })).filter(({ caractere, element }) => element && !/\\s/.test(caractere));
+    })).filter(({ caractere, element }) => element && !/\s/.test(caractere));
     const tempoEntrada = Math.max(0, caracteres.length - 1) * atrasoSeguro + duracaoSegura;
 
     const runCycle = () => {
