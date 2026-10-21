@@ -147,7 +147,7 @@ export default function BibliotecaSearch() {
         (item: SearchItem) => belongsToCategory(item, category),
       );
       setItems((current) => {
-        const merged = new Map(current.map((item) => [itemKey(item), item]));
+        const merged = new Map<string, SearchItem>(current.map((item) => [itemKey(item), item] as const));
         nextItems.forEach((item: SearchItem) => {
           const key = itemKey(item);
           if (!merged.has(key)) merged.set(key, item);
