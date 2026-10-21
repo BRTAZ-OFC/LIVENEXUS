@@ -4,11 +4,13 @@ import {
   platformIsOnline,
   platformMessages,
   visibleChatText,
+  selectedPlatforms,
 } from "../Overlay_platformData";
 
 export default function TwitchChatBox({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = platformIsOnline(connections, config);
+  const isMultichat = selectedPlatforms(config).length > 1;
   const listContainerRef = useRef(null);
 
   const chatMessages = useMemo(() => {
@@ -128,7 +130,7 @@ export default function TwitchChatBox({ config = {} }) {
                 <span className={`text-xs ${getRoleStyle(msg.roles || [])}`}>{msg.author}</span>
               </span>
               <span
-                className={`text-xs break-all text-slate-200 min-w-0 line-clamp-3`}
+                className={`text-xs break-all text-slate-200 min-w-0 ${isMultichat ? "line-clamp-3" : ""}`}
               >
                 <span className="mr-1 text-slate-400">[{msg.platform}]</span>
                 {visibleChatText(msg)}
