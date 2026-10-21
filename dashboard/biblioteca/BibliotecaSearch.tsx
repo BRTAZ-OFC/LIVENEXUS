@@ -162,14 +162,15 @@ export default function BibliotecaSearch() {
             return { tokenKey, items, continuation: pageData.continuation || "" };
           }));
           const before = collected.length;
+          const previousTokens = { ...tokens };
           for (const page of pages) {
             tokens[page.tokenKey] = page.continuation;
             collected.push(...page.items.filter((item) => itemCategory(item) === entry.key));
           }
           const deduped = unique(collected);
           collected.splice(0, collected.length, ...deduped.slice(0, 400));
-          if (collected.length === before && pages.every((page) => !page.continuation)) break;
           if (pages.every((page) => !page.continuation)) break;
+          if (collected.length === before && pages.every((page) => page.continuation === previousTokens[page.tokenKey])) break;
         }
       } catch { /* cada carrossel pode carregar independentemente */ }
       return unique(collected).slice(0, 400);
