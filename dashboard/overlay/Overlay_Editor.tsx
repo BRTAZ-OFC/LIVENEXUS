@@ -513,7 +513,7 @@ export default function Overlay_Editor({
                                 { id: "04", label: "Neon" },
                                 { id: "05", label: "Minimal" },
                               ]
-                      ).map((preset) => {
+                      as Array<{ id: string; label: string; layout?: string }>).map((preset) => {
                         const activePreset = String(editableConfig.structuralPreset ?? (selectedWidget.id === "manual-now-playing" ? "01" : "01")) === preset.id;
                         return (
                           <button
