@@ -72,6 +72,7 @@ export default function BibliotecaPage() {
   const [carouselData, setCarouselData] = useState<Record<Category, MusicItem[]>>(initialCategories);
   const [carouselLoading, setCarouselLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const [currentTrack, setCurrentTrack] = useState<MusicItem | null>(null);
   const [activeSource, setActiveSource] = useState<"music" | "youtube">("music");
   const [results, setResults] = useState<Record<Category, MusicItem[]>>(initialCategories);
   const [continuations, setContinuations] = useState<Partial<Record<Category, string>>>({});
@@ -126,8 +127,8 @@ export default function BibliotecaPage() {
     saveHistory({ ...item, source });
     const videoId = item.videoId;
     if (videoId) {
+      setCurrentTrack({ ...item, source });
       window.dispatchEvent(new CustomEvent("livenexus:play-track", { detail: { ...item, source } }));
-      window.open(`https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`, "_blank", "noopener,noreferrer");
     } else if (item.browseId) {
       window.open(`https://music.youtube.com/browse/${encodeURIComponent(item.browseId)}`, "_blank", "noopener,noreferrer");
     } else if (item.playlistId) {
@@ -276,6 +277,25 @@ export default function BibliotecaPage() {
           <Radio size={17} /> Gêneros
         </button>
       </form>
+
+      {currentTrack?.videoId && (
+        <section className="lnx-library-player" aria-label="Reprodutor da biblioteca">
+          <div className="lnx-library-player-info">
+            <strong>Tocando agora</strong>
+            <span>{itemTitle(currentTrack)}{currentTrack.artist ? ` — ${currentTrack.artist}` : ""}</span>
+            <button type="button" onClick={() => setCurrentTrack(null)} aria-label="Fechar reprodutor"><X size={16} /></button>
+          </div>
+          <div className="lnx-library-player-frame">
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${encodeURIComponent(currentTrack.videoId)}?autoplay=1&rel=0`}
+              title={itemTitle(currentTrack)}
+              allow="autoplay; encrypted-media; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          </div>
+        </section>
+      )}
 
       {showGenres && (
         <div className="lnx-library-genres">
