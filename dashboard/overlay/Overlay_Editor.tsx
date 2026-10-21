@@ -903,7 +903,7 @@ export default function Overlay_Editor({
                 <p className="text-[9px] leading-tight text-slate-500">Cada camada representa um elemento. As setas alteram a ordem e a coluna; o cadeado impede movimentação no canvas.</p>
               </div>
             )}
-            {!["INICIO", "FUNDO", "TEXTO", "ANIMACAO", "ALINHAMENTO", "FORMAS", "CAMADAS"].includes(activeMenu) && (
+            {!["INICIO", "WIDGETS", "FUNDO", "TEXTO", "ANIMACAO", "ALINHAMENTO", "FORMAS", "CAMADAS"].includes(activeMenu) && (
               <div className="flex h-full items-center justify-center text-xs text-slate-500">
                 Este menu ficará vazio nesta etapa.
               </div>
