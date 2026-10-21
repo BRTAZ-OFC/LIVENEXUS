@@ -1,12 +1,12 @@
 import React from 'react';
 import { useStreaming } from '../runtime';
 import { Users, Gamepad2 } from 'lucide-react';
-import { TextMarquee } from '@dashboard/overlays/Overlay_textMarquee';
+import { TextMarquee } from '../Overlay_textMarquee';
 import { platformIsOnline, platformMeta, platformViewers } from '../Overlay_platformData';
 
 /**
  * @param {Object} props
- * @param {import('@dashboard/types/WidgetConfig').WidgetConfig} props.config
+ * @param {import('../types/WidgetConfig').WidgetConfig} props.config
  */
 export default function TwitchStatusLabel({ config = {} }) {
   const { connections, streamMeta } = useStreaming();
