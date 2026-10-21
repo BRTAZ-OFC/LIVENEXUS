@@ -19,6 +19,7 @@ type OverlayEditorProps = {
   onAddFragment: (definition: WidgetDefinition, elementKey: string, label: string) => void;
   onAddText: (text: string, fontSize: number, color: string, fontFamily: string) => void;
   onFontChange: (fontFamily: string) => void;
+  onTextStyleChange: (patch: { fontSize?: number; color?: string; fontFamily?: string }) => void;
 };
 
 const MENUS = ["INICIO", "TEXTO", "ANIMACAO", "IMAGEMS", "ALINHAMENTO", "FORMAS", "EMOJES", "CAMADAS"] as const;
@@ -34,6 +35,7 @@ export default function Overlay_Editor({
   onAddFragment,
   onAddText,
   onFontChange,
+  onTextStyleChange,
 }: OverlayEditorProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuName>("INICIO");
@@ -64,6 +66,7 @@ export default function Overlay_Editor({
     setSelectedFont(font);
     if (font !== "monospace") loadGoogleFont(font);
     onFontChange(font);
+    onTextStyleChange({ fontFamily: font });
   }
 
   return (
@@ -153,7 +156,11 @@ export default function Overlay_Editor({
                       min={1}
                       max={300}
                       value={fontSize}
-                      onChange={(event) => setFontSize(Math.max(1, Math.min(300, Number(event.target.value) || 1)))}
+                      onChange={(event) => {
+                        const nextSize = Math.max(1, Math.min(300, Number(event.target.value) || 1));
+                        setFontSize(nextSize);
+                        onTextStyleChange({ fontSize: nextSize });
+                      }}
                       className="h-7 w-20 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
                     />
                   </label>
@@ -162,7 +169,11 @@ export default function Overlay_Editor({
                     <input
                       type="color"
                       value={textColor}
-                      onChange={(event) => setTextColor(event.target.value)}
+                      onChange={(event) => {
+                        const nextColor = event.target.value;
+                        setTextColor(nextColor);
+                        onTextStyleChange({ color: nextColor });
+                      }}
                       aria-label="Cor do texto"
                       className="h-7 w-20 cursor-pointer rounded-md border border-white/10 bg-slate-900 p-1"
                     />
