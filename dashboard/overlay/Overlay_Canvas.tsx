@@ -158,6 +158,7 @@ export default function OverlayCanvas() {
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
+  const textDraftsRef = useRef<Record<string, string>>({});
   const [gridSettings, setGridSettings] = useState<CanvasGridSettings>({
     showGrid: false,
     snapToGrid: false,
@@ -818,6 +819,7 @@ export default function OverlayCanvas() {
                           onDoubleClick={(event) => {
                             event.stopPropagation();
                             setSelectedInstanceId(instanceId);
+                            textDraftsRef.current[instanceId] = String(widgetConfig["text"] || "Texto");
                             setEditingTextId(instanceId);
                             const editable = event.currentTarget;
                             requestAnimationFrame(() => {
@@ -831,12 +833,12 @@ export default function OverlayCanvas() {
                           }}
                           onInput={(event) => {
                             if (editingTextId !== instanceId) return;
-                            const text = event.currentTarget.textContent || "";
-                            updateInstance(instanceId, { name: text.slice(0, 80) || "Texto", config: { ...widgetConfig, text } });
+                            textDraftsRef.current[instanceId] = event.currentTarget.textContent || "";
                           }}
                           onBlur={(event) => {
                             if (editingTextId !== instanceId) return;
-                            const text = event.currentTarget.textContent || "";
+                            const text = textDraftsRef.current[instanceId] ?? event.currentTarget.textContent ?? "";
+                            delete textDraftsRef.current[instanceId];
                             updateInstance(instanceId, { name: text.slice(0, 80) || "Texto", config: { ...widgetConfig, text } });
                             setEditingTextId(null);
                           }}
