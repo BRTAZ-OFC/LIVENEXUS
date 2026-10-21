@@ -85,6 +85,22 @@ const TEXT_WIDGET_ID = "__livenexus_text__";
 const SHAPE_WIDGET_ID = "__livenexus_shape__";
 const EMPTY_BACKGROUND: CanvasBackground = { type: "transparent", opacity: 100 };
 
+function transparentWidgetConfig(config: JsonObject = {}): JsonObject {
+  return {
+    ...config,
+    backgroundColor: "transparent",
+    backgroundTransparent: true,
+    isTransparent: true,
+    bgMode: "transparent",
+    effBgActiveType: "bg-transparent",
+    effBgType: "transparent",
+    effBgColor: undefined,
+    effGradientActiveType: undefined,
+    effGlassActiveType: undefined,
+    effAnimBgActiveType: undefined,
+  };
+}
+
 const COLOR_EFFECT_FILTERS: Record<string, string> = {"glass":"saturate(1.25) contrast(1.04) brightness(1.04)","chrome":"saturate(0.35) contrast(1.35) brightness(1.08)","mirror":"saturate(1.4) contrast(1.2)","crystal":"saturate(1.3) brightness(1.12) contrast(0.92)","hologram":"hue-rotate(38deg) saturate(1.8) contrast(1.08)","neon":"saturate(2.2) contrast(1.25) brightness(1.08)","iridescent":"hue-rotate(75deg) saturate(1.55)","metal":"grayscale(0.65) contrast(1.35) brightness(1.12)","liquid":"saturate(1.65) contrast(1.08)","frost":"saturate(0.65) brightness(1.1) contrast(0.9)","gold":"sepia(0.8) saturate(1.8) contrast(1.12)","silver":"grayscale(0.85) contrast(1.2) brightness(1.12)","copper":"sepia(0.65) saturate(1.35) hue-rotate(-12deg)","ruby":"hue-rotate(315deg) saturate(1.8) contrast(1.12)","sapphire":"hue-rotate(190deg) saturate(1.7) contrast(1.1)","emerald":"hue-rotate(95deg) saturate(1.65) contrast(1.08)","amethyst":"hue-rotate(250deg) saturate(1.55)","duotone":"grayscale(0.8) sepia(0.35) hue-rotate(180deg) saturate(1.5)","thermal":"hue-rotate(155deg) saturate(2) contrast(1.15)","vintage":"sepia(0.55) saturate(0.8) contrast(0.95)","dream":"hue-rotate(22deg) saturate(1.35) brightness(1.12)"};
 const COLOR_EFFECT_OVERLAYS: Record<string, string> = {
   glass: "linear-gradient(135deg, rgba(220,245,255,.48), rgba(125,190,220,.28), rgba(255,255,255,.42))",
@@ -164,7 +180,12 @@ function getCanvasConfig(row: OverlayRow): CanvasConfig {
     visualizerSize: isObject(source["visualizerSize"])
       ? (source["visualizerSize"] as CanvasConfig["visualizerSize"])
       : DEFAULT_SIZE,
-    instances: Array.isArray(source["instances"]) ? (source["instances"] as CanvasInstance[]) : [],
+    instances: Array.isArray(source["instances"])
+      ? (source["instances"] as CanvasInstance[]).map((instance) => ({
+          ...instance,
+          config: transparentWidgetConfig(isObject(instance.config) ? instance.config : {}),
+        }))
+      : [],
     background: isObject(source["background"])
       ? (source["background"] as CanvasBackground)
       : EMPTY_BACKGROUND,
@@ -224,6 +245,11 @@ export default function OverlayCanvas() {
   const [scale, setScale] = useState(1);
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
+
+  useEffect(() => {
+    setEditorOpen(Boolean(selectedInstanceId));
+  }, [selectedInstanceId]);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const textDraftsRef = useRef<Record<string, string>>({});
   const [gridSettings, setGridSettings] = useState<CanvasGridSettings>({
@@ -509,7 +535,7 @@ export default function OverlayCanvas() {
       height,
       zIndex: index + 1,
       visible: true,
-      config: { ...(definition.defaultConfig || {}) },
+      config: transparentWidgetConfig({ ...(definition.defaultConfig || {}) }),
     };
     // Cada submenu selecionado representa uma overlay independente neste editor provisório.
     // Não acrescentar a nova widget à overlay que estava aberta.
@@ -544,7 +570,7 @@ export default function OverlayCanvas() {
       height,
       zIndex: index + 1,
       visible: true,
-      config: { ...(definition.defaultConfig || {}) },
+      config: transparentWidgetConfig({ ...(definition.defaultConfig || {}) }),
     };
     // Elementos escolhidos por submenu também recebem canvas/overlay próprios.
     setActiveOverlayId(null);
@@ -801,6 +827,13 @@ export default function OverlayCanvas() {
         >
           <div
             className="absolute left-0 top-0 overflow-hidden"
+            onPointerDown={(event) => {
+              const target = event.target as HTMLElement;
+              if (!target.closest("[data-overlay-instance]")) {
+                setSelectedInstanceId(null);
+                setEditorOpen(false);
+              }
+            }}
             style={{
               width: size.width,
               height: size.height,
@@ -1163,7 +1196,17 @@ export default function OverlayCanvas() {
           />
         </div>
       </div>
-      <Overlay_Editor
+      {!editorOpen && (
+        <button
+          type="button"
+          onClick={() => setEditorOpen(true)}
+          className="fixed right-28 top-20 z-[100] rounded-lg border border-violet-400/40 bg-slate-950 px-3 py-2 text-xs font-semibold text-violet-100 shadow-lg hover:bg-violet-500/15"
+          title="Visualizar editor de overlay"
+        >
+          Visualizar editor
+        </button>
+      )}
+      {editorOpen && <Overlay_Editor
         catalog={catalog}
         onAddFragment={addWidgetComponent}
         onAddText={addTextInstance}
@@ -1223,7 +1266,7 @@ export default function OverlayCanvas() {
           if (!selected) return;
           updateInstance(selectedInstanceId, { config: { ...(selected.config || {}), ...patch } });
         }}
-      />
+      />}
     </section>
   );
 }
