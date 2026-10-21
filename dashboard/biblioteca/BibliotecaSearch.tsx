@@ -180,40 +180,47 @@ export default function BibliotecaSearch() {
   }
 
   async function loadMore() {
-    const tokenKey = category === "mixes" ? "playlists" : category;
-    const token = continuations[tokenKey];
-    if (!token || loadingMore || !submittedQuery) return;
+    const tokenKeys = category === "songs"
+      ? ["songs", "youtube"].filter((key) => Boolean(continuations[key]))
+      : [category === "mixes" ? "playlists" : category].filter((key) => Boolean(continuations[key]));
+    if (!tokenKeys.length || loadingMore || !submittedQuery) return;
 
     const version = requestVersion.current;
     setLoadingMore(true);
     setError("");
     try {
-      const endpoint = tokenKey === "youtube" ? "youtube" : "search";
-      const params = new URLSearchParams({
-        q: submittedQuery,
-        continuation: token,
-        step: "true",
-      });
-      if (endpoint === "search") params.set("type", tokenKey);
-      const response = await fetch(`/api/ytmusic/${endpoint}?${params.toString()}`, {
-        headers: { Accept: "application/json" },
-        credentials: "same-origin",
-        cache: "no-store",
-      });
-      const data = await response.json();
+      const pages = await Promise.all(tokenKeys.map(async (tokenKey) => {
+        const endpoint = tokenKey === "youtube" ? "youtube" : "search";
+        const params = new URLSearchParams({
+          q: submittedQuery,
+          continuation: continuations[tokenKey],
+          step: "true",
+        });
+        if (endpoint === "search") params.set("type", tokenKey);
+        const response = await fetch(`/api/ytmusic/${endpoint}?${params.toString()}`, {
+          headers: { Accept: "application/json" },
+          credentials: "same-origin",
+          cache: "no-store",
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data.error || "Não foi possível carregar mais resultados.");
+        const incoming = (Array.isArray(data.items) ? data.items : []).map((item: any) => {
+          if (tokenKey === "playlists") {
+            const id = String(item.playlistId || "");
+            return { ...item, type: id.startsWith("RD") ? "mix" : id.startsWith("PL") ? "community_playlist" : "playlist", source: item.source || "YouTube Music" };
+          }
+          if (tokenKey === "youtube") return { ...item, source: "YouTube" };
+          return { ...item, type: tokenKey === "songs" ? "song" : tokenKey.slice(0, -1), source: "YouTube Music" };
+        });
+        return { tokenKey, items: incoming, continuation: data.continuation || "" };
+      }));
       if (version !== requestVersion.current) return;
-      if (!response.ok || !data.ok) throw new Error(data.error || "Não foi possível carregar mais resultados.");
-
-      const incoming = (Array.isArray(data.items) ? data.items : []).map((item: any) => {
-        if (tokenKey === "playlists") {
-          const id = String(item.playlistId || "");
-          return { ...item, type: id.startsWith("RD") ? "mix" : id.startsWith("PL") ? "community_playlist" : "playlist", source: item.source || "YouTube Music" };
-        }
-        if (tokenKey === "youtube") return { ...item, source: "YouTube" };
-        return { ...item, type: tokenKey === "songs" ? "song" : tokenKey.slice(0, -1), source: "YouTube Music" };
+      setItems((current) => uniqueItems([...current, ...pages.flatMap((page) => page.items)]));
+      setContinuations((current) => {
+        const next = { ...current };
+        for (const page of pages) next[page.tokenKey] = page.continuation;
+        return next;
       });
-      setItems((current) => uniqueItems([...current, ...incoming]));
-      setContinuations((current) => ({ ...current, [tokenKey]: data.continuation || "" }));
     } catch (err) {
       if (version === requestVersion.current) {
         setError(err instanceof Error ? err.message : "Falha ao carregar mais resultados.");
@@ -235,7 +242,9 @@ export default function BibliotecaSearch() {
   }
 
   const ResultIcon = categoryIcon(category);
-  const canLoadMore = Boolean(continuations[category === "mixes" ? "playlists" : category]);
+  const canLoadMore = category === "songs"
+    ? Boolean(continuations.songs || continuations.youtube)
+    : Boolean(continuations[category === "mixes" ? "playlists" : category]);
 
   return (
     <section className="w-full min-w-0 px-4 py-6 sm:px-8">
