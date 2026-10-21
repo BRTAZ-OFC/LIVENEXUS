@@ -86,6 +86,29 @@ const SHAPE_WIDGET_ID = "__livenexus_shape__";
 const EMPTY_BACKGROUND: CanvasBackground = { type: "transparent", opacity: 100 };
 
 const COLOR_EFFECT_FILTERS: Record<string, string> = {"glass":"saturate(1.25) contrast(1.04) brightness(1.04)","chrome":"saturate(0.35) contrast(1.35) brightness(1.08)","mirror":"saturate(1.4) contrast(1.2)","crystal":"saturate(1.3) brightness(1.12) contrast(0.92)","hologram":"hue-rotate(38deg) saturate(1.8) contrast(1.08)","neon":"saturate(2.2) contrast(1.25) brightness(1.08)","iridescent":"hue-rotate(75deg) saturate(1.55)","metal":"grayscale(0.65) contrast(1.35) brightness(1.12)","liquid":"saturate(1.65) contrast(1.08)","frost":"saturate(0.65) brightness(1.1) contrast(0.9)","gold":"sepia(0.8) saturate(1.8) contrast(1.12)","silver":"grayscale(0.85) contrast(1.2) brightness(1.12)","copper":"sepia(0.65) saturate(1.35) hue-rotate(-12deg)","ruby":"hue-rotate(315deg) saturate(1.8) contrast(1.12)","sapphire":"hue-rotate(190deg) saturate(1.7) contrast(1.1)","emerald":"hue-rotate(95deg) saturate(1.65) contrast(1.08)","amethyst":"hue-rotate(250deg) saturate(1.55)","duotone":"grayscale(0.8) sepia(0.35) hue-rotate(180deg) saturate(1.5)","thermal":"hue-rotate(155deg) saturate(2) contrast(1.15)","vintage":"sepia(0.55) saturate(0.8) contrast(0.95)","dream":"hue-rotate(22deg) saturate(1.35) brightness(1.12)"};
+const COLOR_EFFECT_OVERLAYS: Record<string, string> = {
+  glass: "linear-gradient(135deg, rgba(220,245,255,.48), rgba(125,190,220,.28), rgba(255,255,255,.42))",
+  chrome: "linear-gradient(135deg, rgba(245,248,255,.92), rgba(105,120,145,.78), rgba(235,240,250,.92))",
+  mirror: "linear-gradient(135deg, rgba(240,248,255,.78), rgba(70,100,130,.68), rgba(220,235,255,.86))",
+  crystal: "linear-gradient(135deg, rgba(190,245,255,.62), rgba(125,190,255,.45), rgba(245,255,255,.72))",
+  hologram: "linear-gradient(120deg, rgba(255,80,220,.68), rgba(65,225,255,.62), rgba(180,100,255,.7))",
+  neon: "linear-gradient(135deg, rgba(255,0,220,.72), rgba(0,255,235,.62), rgba(100,0,255,.68))",
+  iridescent: "linear-gradient(120deg, rgba(255,120,210,.68), rgba(100,220,255,.62), rgba(190,255,140,.62), rgba(210,150,255,.68))",
+  metal: "linear-gradient(135deg, rgba(235,238,242,.88), rgba(85,95,110,.78), rgba(210,215,225,.9))",
+  liquid: "linear-gradient(135deg, rgba(50,210,230,.56), rgba(35,110,230,.54), rgba(100,245,220,.6))",
+  frost: "linear-gradient(135deg, rgba(225,240,255,.78), rgba(195,215,235,.68), rgba(250,252,255,.82))",
+  gold: "linear-gradient(135deg, rgba(255,210,65,.92), rgba(190,125,15,.84), rgba(255,235,135,.92))",
+  silver: "linear-gradient(135deg, rgba(245,248,255,.92), rgba(145,155,170,.86), rgba(225,232,242,.92))",
+  copper: "linear-gradient(135deg, rgba(235,135,75,.9), rgba(145,65,35,.82), rgba(255,185,125,.9))",
+  ruby: "linear-gradient(135deg, rgba(255,45,85,.9), rgba(145,0,35,.82), rgba(255,105,125,.9))",
+  sapphire: "linear-gradient(135deg, rgba(45,115,255,.9), rgba(5,35,145,.84), rgba(105,185,255,.9))",
+  emerald: "linear-gradient(135deg, rgba(30,210,125,.9), rgba(0,95,55,.84), rgba(105,255,175,.9))",
+  amethyst: "linear-gradient(135deg, rgba(175,85,255,.9), rgba(75,25,145,.84), rgba(220,155,255,.9))",
+  duotone: "linear-gradient(135deg, rgba(30,215,220,.86), rgba(60,45,160,.86))",
+  thermal: "linear-gradient(135deg, rgba(255,35,35,.92), rgba(255,190,0,.86), rgba(30,90,255,.9))",
+  vintage: "linear-gradient(135deg, rgba(190,135,75,.78), rgba(115,75,45,.7), rgba(240,205,145,.8))",
+  dream: "linear-gradient(135deg, rgba(255,165,215,.62), rgba(160,155,255,.58), rgba(145,230,255,.62))",
+};
 function getGlobalTextureStyle(texture: string): CSSProperties {
   const textures: Record<string, CSSProperties> = {
     glass: { backgroundImage: "linear-gradient(135deg, rgba(255,255,255,.34), rgba(255,255,255,.03) 45%, rgba(160,220,255,.16))", backdropFilter: "blur(1px)", mixBlendMode: "screen" },
@@ -754,6 +777,7 @@ export default function OverlayCanvas() {
             }}
           >
             <div className="absolute inset-0" style={{ ...canvasBackground, filter: config.globalStyleConfig?.colorEffectEnabled ? (COLOR_EFFECT_FILTERS[String(config.globalStyleConfig.colorEffect || "glass")] || "none") : undefined, borderRadius: config.globalStyleConfig?.borderRadius ? `${Math.max(1, Math.min(100, Number(config.globalStyleConfig.borderRadius) || 16))}px` : undefined }} />
+            {config.globalStyleConfig?.colorEffectEnabled && config.background?.type === "solid" && <div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ backgroundImage: COLOR_EFFECT_OVERLAYS[String(config.globalStyleConfig.colorEffect || "glass")] || COLOR_EFFECT_OVERLAYS.glass, borderRadius: config.globalStyleConfig?.borderRadius ? `${Math.max(1, Math.min(100, Number(config.globalStyleConfig.borderRadius) || 16))}px` : undefined }} />}
             {config.globalStyleConfig?.texture && config.globalStyleConfig.texture !== "none" && <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-30" style={{ ...getGlobalTextureStyle(String(config.globalStyleConfig.texture)), borderRadius: config.globalStyleConfig?.borderRadius ? `${Math.max(1, Math.min(100, Number(config.globalStyleConfig.borderRadius) || 16))}px` : undefined }} />}
             {gridSettings.showGrid && (
               <div
