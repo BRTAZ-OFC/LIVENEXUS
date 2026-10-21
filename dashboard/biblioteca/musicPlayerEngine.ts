@@ -77,7 +77,7 @@ function playQueueIndex(index: number) {
 export function subscribeMusicPlayer(listener: (next: PlayerState) => void) {
   listeners.add(listener);
   listener(snapshot());
-  return () => listeners.delete(listener);
+  return () => { listeners.delete(listener); };
 }
 export function getMusicPlayerState() { return snapshot(); }
 export function connectMusicPlayerFrame(nextFrame: HTMLIFrameElement | null) {
@@ -111,7 +111,9 @@ export function connectMusicPlayerFrame(nextFrame: HTMLIFrameElement | null) {
     }
     });
   }
-  try { frame.contentWindow?.postMessage(JSON.stringify({ event: "listening", channel: "widget" }), "https://www.youtube-nocookie.com"); } catch {}
+  window.setTimeout(() => {
+    try { frame?.contentWindow?.postMessage(JSON.stringify({ event: "listening", channel: "widget" }), "https://www.youtube-nocookie.com"); } catch {}
+  }, 300);
 }
 export function playTrack(track: MusicTrack) {
   if (!track?.videoId) return;
