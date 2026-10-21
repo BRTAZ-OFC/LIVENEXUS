@@ -840,13 +840,29 @@ export async function handleBrowse(browseId) {
           itemR.overlay?.musicItemThumbnailOverlayRenderer?.content?.musicPlayButtonRenderer
             ?.playNavigationEndpoint?.watchEndpoint?.videoId ||
           itemR.navigationEndpoint?.watchEndpoint?.videoId;
-        const itBrowseId = itemR.navigationEndpoint?.browseEndpoint?.browseId;
+        const itBrowseId = itemR.navigationEndpoint?.browseEndpoint?.browseId ||
+          itemR.title?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.browseId || null;
+        const itPlaylistId = itemR.navigationEndpoint?.watchEndpoint?.playlistId ||
+          itemR.navigationEndpoint?.watchPlaylistEndpoint?.playlistId ||
+          (String(itBrowseId || "").startsWith("VL") ? String(itBrowseId).slice(2) : null);
+        const itThumbnail =
+          itemR.thumbnail?.musicThumbnailRenderer?.thumbnail?.thumbnails?.slice(-1)?.[0]?.url ||
+          itemR.thumbnailRenderer?.musicThumbnailRenderer?.thumbnail?.thumbnails?.slice(-1)?.[0]?.url ||
+          (itVideoId ? `https://i.ytimg.com/vi/${itVideoId}/hqdefault.jpg` : "");
+        const lowerSectionTitle = String(sTitle).toLowerCase();
+        const itType = itVideoId ? "song" :
+          /álbum|album|lançamento|release/.test(lowerSectionTitle) ? "album" :
+          /playlist|lista/.test(lowerSectionTitle) ? "playlist" :
+          String(itBrowseId || "").startsWith("UC") ? "artist" : "";
 
         sItems.push({
           title: itTitle,
           subtitle: itSub,
           videoId: itVideoId || null,
           browseId: itBrowseId || null,
+          playlistId: itPlaylistId || null,
+          thumbnail: itThumbnail,
+          type: itType,
         });
       }
 
