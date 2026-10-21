@@ -792,7 +792,7 @@ app.delete("/api/overlay/canvas", async (req: Request, res: Response) => {
   if (!id) return res.status(400).set(NO_CACHE).json({ ok: false, message: "ID da overlay não fornecido." });
   try {
     const rows = await listJsonTableRecords("overlays");
-    const existing = rows.find((row: Record<string, unknown>) => String(row["id"] ?? "") === id && String(row["user_id"] ?? "") === session.user_id);
+    const existing = rows.find((row: Record<string, unknown>) => String(row["id"] ?? row["overlay_id"] ?? "") === id && String(row["user_id"] ?? "") === session.user_id);
     if (!existing) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Overlay não encontrada." });
     const deleted = await deleteJsonTableRecord("overlays", String(existing["__rowKey"]));
     if (!deleted) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Overlay não encontrada." });
