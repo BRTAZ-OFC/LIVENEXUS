@@ -102,7 +102,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     id: "react-hub-widget",
     name: "React Hub",
     implemented: true,
-    category: "twitch",
+    category: "manual",
     component: ReactHubWidget,
     defaultWidth: 420,
     defaultHeight: 640,
