@@ -67,7 +67,7 @@ function parseLink(raw: string, titleInput: string): CatalogItem {
   else if (browseId.startsWith("MP")) { type = "album"; category = "albums"; }
   else throw new Error("Não identifiquei uma música, álbum, artista ou playlist nesse link.");
   const id = videoId || playlistId || browseId || (handle ? `@${handle}` : "");
-  const title = titleInput.trim() || `${category === "songs" ? "Música" : category === "albums" ? "Álbum" : category === "artists" ? "Artista" : "Playlist"} ${id}`;
+  const title = titleInput.trim() || (category === "artists" && handle ? `@${handle}` : `${category === "songs" ? "Música" : category === "albums" ? "Álbum" : category === "artists" ? "Artista" : "Playlist"} ${id}`);
   return { id, type, title, name: category === "artists" ? title : undefined, ...(videoId ? { videoId, thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` } : {}), ...(playlistId ? { playlistId } : {}), ...(browseId ? { browseId } : {}), url: url.toString(), source: host === "music.youtube.com" ? "YouTube Music" : "YouTube" } as CatalogItem;
 }
 
@@ -94,6 +94,7 @@ export default function BibliotecaSearch() {
   const libraryRef = useRef<PersonalLibrary>(EMPTY);
   const rowKeyRef = useRef("");
   const writes = useRef<Promise<void>>(Promise.resolve());
+  const pendingAddsRef = useRef<Set<string>>(new Set());
 
   const setSnapshot = useCallback((value: PersonalLibrary, rowKey?: string) => {
     const normalized = normalizeLibrary(value);
@@ -193,11 +194,12 @@ export default function BibliotecaSearch() {
   const addItem = useCallback((item: CatalogItem) => {
     const kind = itemCategory(item);
     const id = itemId(item);
-    if (!id || isSaved(item)) return;
+    if (!id || isSaved(item) || pendingAddsRef.current.has(id)) return;
+    pendingAddsRef.current.add(id);
     void mutateLibrary((current) => ({
       ...current,
       [kind]: [...current[kind], { ...item, id: item.id || id, type: kind === "songs" ? "song" : kind === "albums" ? "album" : kind === "artists" ? "artist" : "playlist" }],
-    }));
+    })).finally(() => pendingAddsRef.current.delete(id));
   }, [isSaved, mutateLibrary]);
 
   const openItem = useCallback(async (item: CatalogItem) => {
@@ -316,7 +318,7 @@ export default function BibliotecaSearch() {
     {detailItem && <section className="mb-8 space-y-5 rounded-2xl border border-white/10 bg-[#0d1120] p-4 sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <button type="button" onClick={() => { setDetailItem(null); setDetailData(null); setError(""); }} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white"><ArrowLeft className="h-4 w-4" />Voltar ao catálogo</button>
-        <button type="button" disabled={isSaved(detailItem)} onClick={() => addItem(detailItem)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-cyan-200 disabled:opacity-50"><Plus className="h-3.5 w-3.5" />{isSaved(detailItem) ? "Na biblioteca" : "Adicionar à biblioteca"}</button>
+        <button type="button" disabled={libraryBusy || isSaved(detailItem)} onClick={() => addItem(detailItem)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-cyan-200 disabled:opacity-50"><Plus className="h-3.5 w-3.5" />{isSaved(detailItem) ? "Na biblioteca" : "Adicionar à biblioteca"}</button>
       </div>
       <div className="flex flex-col gap-4 sm:flex-row">
         {detailItem.thumbnail ? <img src={detailItem.thumbnail} alt="" className={`h-36 w-36 shrink-0 rounded-xl object-cover ${itemCategory(detailItem) === "artists" ? "rounded-full" : ""}`} /> : <div className="flex h-36 w-36 shrink-0 items-center justify-center rounded-xl bg-white/5"><Music2 className="h-10 w-10 text-cyan-200" /></div>}
