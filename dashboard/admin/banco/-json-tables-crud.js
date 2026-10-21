@@ -159,7 +159,7 @@ function parseRowKey(value) {
 }
 
 function recordId(record, index) {
-  return String(record?.id ?? record?.avaliacao_id ?? record?.user_id ?? `indice-${index}`);
+  return String(record?.id ?? record?.overlay_id ?? record?.avaliacao_id ?? record?.user_id ?? `indice-${index}`);
 }
 
 function normalizeRecord(record, forcedUserId) {
