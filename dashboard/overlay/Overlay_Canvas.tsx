@@ -488,6 +488,23 @@ export default function OverlayCanvas() {
     setNotice("");
   }
 
+  function applyFontToSelectedText(fontFamily: string) {
+    if (fontFamily !== "monospace") loadGoogleFont(fontFamily);
+    if (!selectedInstanceId) return;
+    const selected = (config.instances || []).find((item, index) =>
+      (item.id || `${item.widgetId}-${index}`) === selectedInstanceId,
+    );
+    if (!selected || selected.widgetId !== TEXT_WIDGET_ID) return;
+    setConfig((current) => ({
+      ...current,
+      instances: (current.instances || []).map((item, index) =>
+        (item.id || `${item.widgetId}-${index}`) === selectedInstanceId
+          ? { ...item, config: { ...(item.config || {}), fontFamily } }
+          : item,
+      ),
+    }));
+  }
+
   function addTextInstance(text: string, fontSize: number, color: string, fontFamily: string) {
     const existing = config.instances || [];
     const width = Math.min(size.width, Math.max(180, Math.ceil(text.length * fontSize * 0.62) + 24));
@@ -929,7 +946,7 @@ export default function OverlayCanvas() {
           />
         </div>
       </div>
-      <Overlay_Editor catalog={catalog} onAddFragment={addWidgetComponent} onAddText={addTextInstance} />
+      <Overlay_Editor catalog={catalog} onAddFragment={addWidgetComponent} onAddText={addTextInstance} onFontChange={applyFontToSelectedText} />
     </section>
   );
 }
