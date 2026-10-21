@@ -712,6 +712,7 @@ export default function OverlayCanvas() {
                 return (
                   <div
                     key={instanceId}
+                    data-overlay-instance={instanceId}
                     style={instanceStyle}
                     onPointerDown={(event) => {
                       setSelectedInstanceId(instanceId);
@@ -803,6 +804,7 @@ export default function OverlayCanvas() {
                     }}
                   >
                     <div className="h-full w-full overflow-hidden">
+                      <style>{'[data-overlay-instance="' + instanceId + '"] :is(p,span,h1,h2,h3,h4,h5,h6,label,li,a,strong,em,small) { font-family: "' + String(widgetConfig["fontFamily"] || "Inter").replace(/"/g, "") + '", sans-serif !important; font-size: ' + Math.max(1, Number(widgetConfig["fontSize"]) || 16) + 'px !important; color: ' + String(widgetConfig["color"] || widgetConfig["textColor"] || "#ffffff") + ' !important; }'}</style>
                       {instance.widgetId === TEXT_WIDGET_ID ? (
                         <div
                           data-overlay-text
