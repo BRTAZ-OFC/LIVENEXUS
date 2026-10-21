@@ -379,12 +379,17 @@ export default function BibliotecaSearch() {
       const Icon = entry.icon; const items = library[entry.key];
       return <section key={entry.key} className="space-y-3">
         <header className="flex items-center gap-2 text-white"><Icon className="h-4 w-4 text-cyan-300" /><h2 className="text-sm font-bold">{entry.label}</h2><span className="text-xs text-slate-500">{items.length}</span></header>
-        {items.length ? <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {items.map((item) => <article key={itemId(item)} className="min-w-0 rounded-xl border border-white/10 bg-[#0d1120] p-3">
-            <button type="button" onClick={() => void openItem(item)} className="block w-full text-left">{item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className={`mb-2 aspect-square w-full rounded-lg object-cover ${entry.key === "artists" ? "rounded-full" : ""}`} /> : <div className="mb-2 flex aspect-square items-center justify-center rounded-lg bg-white/5 text-slate-500"><Icon className="h-7 w-7" /></div>}<p className="truncate text-xs font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p></button>
-            <p className="mt-1 truncate text-[11px] text-slate-400">{item.artist || item.author || item.source || itemUrl(item)}</p>
-            {itemUrl(item) && <a className="mt-2 block truncate text-[11px] text-cyan-300 hover:underline" href={itemUrl(item)} target="_blank" rel="noreferrer">Abrir link</a>}
-            <button type="button" disabled={libraryBusy} onClick={() => removeItem(item)} className="mt-2 inline-flex items-center gap-1 rounded-lg border border-rose-400/20 px-2 py-1.5 text-[11px] text-rose-200 hover:bg-rose-400/10 disabled:opacity-50"><Trash2 className="h-3 w-3" />Remover</button>
+        {items.length ? <div className="space-y-2">
+          {items.map((item) => <article key={itemId(item)} className="flex min-w-0 items-center gap-3 rounded-lg border border-white/10 bg-[#0d1120] px-3 py-2">
+            <button type="button" onClick={() => void openItem(item)} aria-label={`Abrir ${item.title || item.name || "item"}`} className="h-12 w-12 shrink-0 overflow-hidden rounded-md border border-white/10 bg-white/5">
+              {item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className={`h-full w-full object-cover ${entry.key === "artists" ? "rounded-full" : ""}`} /> : <span className="flex h-full w-full items-center justify-center text-slate-500"><Icon className="h-5 w-5" /></span>}
+            </button>
+            <button type="button" onClick={() => void openItem(item)} className="min-w-0 flex-1 text-left">
+              <p className="truncate text-xs font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p>
+              <p className="truncate text-[11px] text-slate-400">{item.artist || item.author || item.source || itemUrl(item)}</p>
+            </button>
+            {itemUrl(item) && <a className="hidden shrink-0 text-[11px] text-cyan-300 hover:underline sm:block" href={itemUrl(item)} target="_blank" rel="noreferrer">Abrir link</a>}
+            <button type="button" disabled={libraryBusy} onClick={() => removeItem(item)} className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-rose-400/20 px-2 py-1.5 text-[11px] text-rose-200 hover:bg-rose-400/10 disabled:opacity-50"><Trash2 className="h-3 w-3" />Remover</button>
           </article>)}
         </div> : <p className="text-xs text-slate-500">Nenhum item salvo em {entry.label.toLowerCase()}.</p>}
       </section>;
