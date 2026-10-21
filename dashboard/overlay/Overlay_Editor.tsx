@@ -579,7 +579,10 @@ export default function Overlay_Editor({
                   </label>
                   {selectedInstanceWidgetId === "__livenexus_text__" && (
                     <p className="text-[9px] leading-3 text-slate-400">
-                      Duração estimada: {Math.max(0, Array.from(String(selectedInstanceConfig?.text || "")).length - 1) * Math.max(0, Number(selectedInstanceConfig?.animationDelayMs ?? 1000)) + Math.max(50, Number(selectedInstanceConfig?.animationDurationMs ?? 650))} ms
+                      Duração estimada: {(["slide-in-cima", "slide-in-baixo", "slide-in-esquerda", "slide-in-direita", "reveal", "flip-in", "bounce-in", "blur-in", "light-speed-in"].includes(String(selectedInstanceConfig?.animationType || ""))
+                        ? Math.max(50, Number(selectedInstanceConfig?.animationDurationMs ?? 650))
+                        : Math.max(0, Array.from(String(selectedInstanceConfig?.text || "")).length - 1) * Math.max(0, Number(selectedInstanceConfig?.animationDelayMs ?? 1000)) + Math.max(50, Number(selectedInstanceConfig?.animationDurationMs ?? 650))
+                      ) * (Boolean(selectedInstanceConfig?.animationAlternate) ? 2 : 1)} ms
                     </p>
                   )}
                   {selectedInstanceWidgetId && selectedInstanceWidgetId !== "__livenexus_text__" && <p className="text-[9px] leading-3 text-slate-500">As animações atuais são para elementos de texto. Efeitos para outros elementos serão adicionados depois.</p>}
