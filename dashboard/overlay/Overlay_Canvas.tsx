@@ -247,6 +247,57 @@ export default function OverlayCanvas() {
     return () => observer.disconnect();
   }, [size.width, size.height]);
 
+  useEffect(() => {
+    function handleCanvasKeyDown(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      if (
+        !selectedInstanceId ||
+        target?.closest("input,textarea,select,button,a,[contenteditable='true'],[role='textbox']")
+      ) {
+        return;
+      }
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+
+      if (event.key === "Delete" || event.key === "Backspace") {
+        event.preventDefault();
+        deleteInstance(selectedInstanceId);
+        return;
+      }
+
+      const step = event.shiftKey ? 10 : 1;
+      const selected = (config.instances || []).find(
+        (item, index) => (item.id || `${item.widgetId}-${index}`) === selectedInstanceId,
+      );
+      if (!selected) return;
+
+      let dx = 0;
+      let dy = 0;
+      if (event.key === "ArrowLeft") dx = -step;
+      else if (event.key === "ArrowRight") dx = step;
+      else if (event.key === "ArrowUp") dy = -step;
+      else if (event.key === "ArrowDown") dy = step;
+      else return;
+
+      event.preventDefault();
+      setConfig((current) => ({
+        ...current,
+        instances: (current.instances || []).map((item, index) => {
+          if ((item.id || `${item.widgetId}-${index}`) !== selectedInstanceId) return item;
+          const width = Math.max(1, Number(item.width) || 280);
+          const height = Math.max(1, Number(item.height) || 120);
+          return {
+            ...item,
+            x: Math.max(0, Math.min(size.width - width, (Number(item.x) || 0) + dx)),
+            y: Math.max(0, Math.min(size.height - height, (Number(item.y) || 0) + dy)),
+          };
+        }),
+      }));
+    }
+
+    window.addEventListener("keydown", handleCanvasKeyDown);
+    return () => window.removeEventListener("keydown", handleCanvasKeyDown);
+  }, [config.instances, selectedInstanceId, size.width, size.height]);
+
   function addWidget(definition: WidgetDefinition) {
     const existing = config.instances || [];
     const index = existing.length;
@@ -353,6 +404,9 @@ export default function OverlayCanvas() {
             ))}
         </HorizontalMenu>
       </div>
+      <p className="w-full text-[10px] text-violet-200/80">
+        Atalhos: Delete remove · setas movem 1 px · Shift + setas movem 10 px
+      </p>
       <div className="relative flex w-full min-w-0 justify-center overflow-hidden">
         <div
           ref={frameRef}
