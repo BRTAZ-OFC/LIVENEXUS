@@ -25,6 +25,7 @@ import {
   MessageSquare,
   Eye,
   LayoutGrid,
+  Library,
   Volume2,
   Terminal,
 } from "lucide-react";
@@ -161,7 +162,7 @@ function DashboardPage() {
     typeof window !== "undefined" ? sessionStorage.getItem("livenexus_editor_scenario_id") : null,
   );
   const [activeSection, setActiveSection] = useState<
-    "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios"
+    "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios" | "biblioteca"
   >(() => {
     if (typeof window !== "undefined") {
       const admin = sessionStorage.getItem("livenexus_role") === "admin";
@@ -174,6 +175,7 @@ function DashboardPage() {
       if (candidate === "connections") return "connections";
       if (candidate === "overlay") return "overlay";
       if (candidate === "scenarios") return "scenarios";
+      if (candidate === "biblioteca") return "biblioteca";
       if (
         admin &&
         (candidate === "database" ||
@@ -205,7 +207,8 @@ function DashboardPage() {
         section === "voice" ||
         section === "connections" ||
         section === "overlay" ||
-        section === "scenarios"
+        section === "scenarios" ||
+        section === "biblioteca"
       ) {
         url.searchParams.set("tab", section);
       } else {
@@ -352,6 +355,16 @@ function DashboardPage() {
             <LayoutGrid className="dash-h-2-5-w-2-5-16znhny" />
             {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Cenário</span>}
           </button>
+          <button
+            type="button"
+            onClick={() => handleSelectSection("biblioteca")}
+            title="Biblioteca"
+            aria-label="Biblioteca"
+            className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "biblioteca" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
+          >
+            <Library className="dash-h-2-5-w-2-5-16znhny" />
+            {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Biblioteca</span>}
+          </button>
           {isAdmin && (
             <>
               <button
@@ -444,7 +457,11 @@ function DashboardPage() {
             <MemoOverlayCanvas />
           </div>
         )}
-        {activeSection === "overview" ? (
+        {activeSection === "biblioteca" ? (
+          <section className="dash-w-full-px-6-5ebeye">
+            <h1 className="text-2xl font-semibold text-white">Biblioteca</h1>
+          </section>
+        ) : activeSection === "overview" ? (
           <DashboardOverview />
         ) : activeSection === "admin-panel" && isAdmin ? (
           <section className="dash-w-full-px-6-5ebeye">
