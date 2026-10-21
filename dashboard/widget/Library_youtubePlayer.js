@@ -1,11 +1,9 @@
-// O LIVENEXUS ainda não possui o player de música do BACKUP01.
-// Interface mínima usada pela widget Tocando Agora.
-let currentTrack = null;
+import { getMusicPlayerState, playTrack as playGlobalTrack } from "../biblioteca/musicPlayerEngine";
 
 export function getCurrentTrack() {
-  return currentTrack;
+  return getMusicPlayerState().track;
 }
 
 export function setCurrentTrack(track) {
-  currentTrack = track || null;
+  if (track?.videoId) playGlobalTrack(track);
 }
