@@ -1286,7 +1286,8 @@ export default function WidgetElementRenderer({
           >
             <TextMarquee
               text={streamTitle}
-              className="font-bold w-full"
+              forceMarquee
+              className="font-bold w-full min-w-0"
               style={{ fontFamily: config.fontFamily, color: config.textColor }}
             />
           </div>
