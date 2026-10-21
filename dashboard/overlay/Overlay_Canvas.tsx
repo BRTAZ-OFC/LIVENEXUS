@@ -183,6 +183,11 @@ function backgroundStyle(background: CanvasBackground): CSSProperties {
     style.backgroundSize = "cover";
     style.backgroundPosition = "center";
     style.backgroundRepeat = "no-repeat";
+  } else if (background.type === "transparent") {
+    // Transparente precisa remover o fundo de verdade; o padrão quadriculado escuro
+    // fazia o canvas parecer sólido ao alternar os botões.
+    style.backgroundColor = "transparent";
+    style.backgroundImage = "none";
   } else {
     style.backgroundImage = [
       "linear-gradient(45deg, rgba(255,255,255,.04) 25%, transparent 25%)",
