@@ -1064,7 +1064,7 @@ export default function OverlayCanvas() {
         })).sort((a, b) => b.zIndex - a.zIndex)}
         onSelectLayer={(id) => setSelectedInstanceId(id)}
         onMoveLayer={(id, delta) => setConfig((current) => {
-          const normalized = (current.instances || []).map((item, index) => ({ ...item, id: item.id || `${item.widgetId}-${index}` }));
+          const normalized = (current.instances || []).map((item, index) => ({ ...item, id: item.id || `${item.widgetId}-${index}` })).sort((a, b) => (Number(b.zIndex) || 0) - (Number(a.zIndex) || 0));
           const from = normalized.findIndex((item) => item.id === id);
           const to = from + delta;
           if (from < 0 || to < 0 || to >= normalized.length) return current;
