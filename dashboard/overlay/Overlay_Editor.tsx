@@ -54,6 +54,48 @@ function CommandEditor({ commands, disabled, onChange }: { commands: unknown[]; 
   </div>;
 }
 
+
+function StringListEditor({ title, items, disabled, onChange, placeholder }: { title: string; items: string[]; disabled: boolean; onChange: (items: string[]) => void; placeholder: string }) {
+  const [draft, setDraft] = useState("");
+  return <div className="rounded border border-white/10 bg-slate-900 p-2">
+    <p className="mb-1 text-[11px] font-semibold text-slate-200">{title}</p>
+    {items.map((item, index) => <div key={index} className="mb-1 flex gap-1">
+      <input aria-label={title} value={item} disabled={disabled} onChange={(event) => onChange(items.map((current, i) => i === index ? event.target.value : current))} className="h-7 min-w-0 flex-1 rounded border border-white/10 bg-slate-950 px-2 text-xs text-white disabled:opacity-50" />
+      <button type="button" disabled={disabled} onClick={() => onChange(items.filter((_, i) => i !== index))} className="rounded border border-red-400/30 px-2 text-xs text-red-200 disabled:opacity-40">×</button>
+    </div>)}
+    <div className="flex gap-1">
+      <input aria-label="Novo item" placeholder={placeholder} value={draft} disabled={disabled} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && draft.trim()) { event.preventDefault(); onChange([...items, draft.trim()]); setDraft(""); } }} className="h-7 min-w-0 flex-1 rounded border border-white/10 bg-slate-950 px-2 text-xs text-white disabled:opacity-50" />
+      <button type="button" disabled={disabled || !draft.trim()} onClick={() => { onChange([...items, draft.trim()]); setDraft(""); }} className="rounded border border-violet-400/50 px-2 text-xs text-white disabled:opacity-40">Adicionar</button>
+    </div>
+  </div>;
+}
+
+function ScheduleEditor({ schedule, disabled, onChange }: { schedule: Array<{ day?: string; hour?: string; label?: string }>; disabled: boolean; onChange: (schedule: Array<{ day: string; hour: string; label: string }>) => void }) {
+  const normalized = schedule.map((item) => ({ day: String(item?.day || ""), hour: String(item?.hour || ""), label: String(item?.label || "") }));
+  return <div className="rounded border border-white/10 bg-slate-900 p-2">
+    <p className="mb-1 text-[11px] font-semibold text-slate-200">Agenda de Streams</p>
+    {normalized.map((item, index) => <div key={index} className="mb-2 grid grid-cols-1 gap-1 rounded border border-white/5 p-1.5">
+      <input aria-label="Dia da stream" placeholder="Dia (ex.: Segunda)" value={item.day} disabled={disabled} onChange={(event) => onChange(normalized.map((v, i) => i === index ? { ...v, day: event.target.value } : v))} className="h-7 rounded border border-white/10 bg-slate-950 px-2 text-xs text-white" />
+      <div className="flex gap-1"><input aria-label="Horário da stream" placeholder="Horário (ex.: 19:00)" value={item.hour} disabled={disabled} onChange={(event) => onChange(normalized.map((v, i) => i === index ? { ...v, hour: event.target.value } : v))} className="h-7 min-w-0 flex-1 rounded border border-white/10 bg-slate-950 px-2 text-xs text-white" /><button type="button" disabled={disabled} onClick={() => onChange(normalized.filter((_, i) => i !== index))} className="rounded border border-red-400/30 px-2 text-xs text-red-200">Remover</button></div>
+      <input aria-label="Nome da stream" placeholder="Título / conteúdo" value={item.label} disabled={disabled} onChange={(event) => onChange(normalized.map((v, i) => i === index ? { ...v, label: event.target.value } : v))} className="h-7 rounded border border-white/10 bg-slate-950 px-2 text-xs text-white" />
+    </div>)}
+    <button type="button" disabled={disabled} onClick={() => onChange([...normalized, { day: "", hour: "", label: "" }])} className={buttonClass}>Adicionar horário</button>
+  </div>;
+}
+
+function PollOptionsEditor({ options, disabled, onChange }: { options: Array<{ text?: string; label?: string }>; disabled: boolean; onChange: (options: Array<{ text: string; label: string }>) => void }) {
+  const normalized = options.map((option, i) => ({ text: String(option?.text || ""), label: String(option?.label || String(i + 1)) }));
+  return <div className="rounded border border-white/10 bg-slate-900 p-2">
+    <p className="mb-1 text-[11px] font-semibold text-slate-200">Opções de voto (!voto número)</p>
+    {normalized.map((option, index) => <div key={index} className="mb-1 grid grid-cols-[minmax(0,1fr)_3rem_auto] gap-1">
+      <input aria-label="Texto da opção" placeholder="Opção" value={option.text} disabled={disabled} onChange={(event) => onChange(normalized.map((v, i) => i === index ? { ...v, text: event.target.value } : v))} className="h-7 min-w-0 rounded border border-white/10 bg-slate-950 px-2 text-xs text-white" />
+      <input aria-label="Número da opção" placeholder="#" value={option.label} disabled={disabled} onChange={(event) => onChange(normalized.map((v, i) => i === index ? { ...v, label: event.target.value } : v))} className="h-7 min-w-0 rounded border border-white/10 bg-slate-950 px-1 text-xs text-white" />
+      <button type="button" disabled={disabled} onClick={() => onChange(normalized.filter((_, i) => i !== index))} className="rounded border border-red-400/30 px-2 text-xs text-red-200">×</button>
+    </div>)}
+    <button type="button" disabled={disabled} onClick={() => onChange([...normalized, { text: "", label: String(normalized.length + 1) }])} className={buttonClass}>Adicionar opção</button>
+  </div>;
+}
+
 export default function Overlay_Editor({
   className = "",
   height = 220,
@@ -202,6 +244,25 @@ export default function Overlay_Editor({
                           </div>
                         </div>
                       )}
+
+                      {selectedWidget.id === "twitch-rules" && <StringListEditor title="Regras do Canal" items={Array.isArray(editableConfig.rules) ? editableConfig.rules.map(String) : typeof editableConfig.rules === "string" ? editableConfig.rules.split("\\n").filter(Boolean) : []} disabled={!hasSelectedInstance} placeholder="Digite uma regra" onChange={(rules) => onUpdateSelectedConfig({ rules })} />}
+                      {selectedWidget.id === "twitch-schedule" && <ScheduleEditor schedule={Array.isArray(editableConfig.schedule) ? editableConfig.schedule as Array<{ day?: string; hour?: string; label?: string }> : []} disabled={!hasSelectedInstance} onChange={(schedule) => onUpdateSelectedConfig({ schedule })} />}
+                      {selectedWidget.id === "twitch-schedule-ticker" && <StringListEditor title="Mensagens do letreiro" items={Array.isArray(editableConfig.news) ? editableConfig.news.map(String) : typeof editableConfig.newsText === "string" && editableConfig.newsText ? [editableConfig.newsText] : typeof editableConfig.text === "string" && editableConfig.text ? [editableConfig.text] : []} disabled={!hasSelectedInstance} placeholder="Digite um aviso" onChange={(news) => onUpdateSelectedConfig({ news, newsText: news.join(" ★ "), text: news.join(" ★ ") })} />}
+                      {["twitch-sub-goal", "twitch-bits-goal", "twitch-raid-goal"].includes(selectedWidget.id) && <div className="rounded border border-white/10 bg-slate-900 p-2">
+                        <p className="mb-1 text-[11px] font-semibold text-slate-200">{selectedWidget.name}</p>
+                        <label className="mb-1 flex flex-col gap-1 text-[10px] text-slate-300">Valor inicial<input type="number" min={0} value={Number(editableConfig.startValue ?? 0)} disabled={!hasSelectedInstance} onChange={(event) => onUpdateSelectedConfig({ startValue: Math.max(0, Number(event.target.value) || 0) })} className="h-7 rounded border border-white/10 bg-slate-950 px-2 text-xs text-white" /></label>
+                        <label className="flex flex-col gap-1 text-[10px] text-slate-300">Meta / alvo<input type="number" min={1} value={Number(editableConfig.targetValue ?? (selectedWidget.id === "twitch-bits-goal" ? 2500 : selectedWidget.id === "twitch-raid-goal" ? 5 : 50))} disabled={!hasSelectedInstance} onChange={(event) => onUpdateSelectedConfig({ targetValue: Math.max(1, Number(event.target.value) || 1) })} className="h-7 rounded border border-white/10 bg-slate-950 px-2 text-xs text-white" /></label>
+                      </div>}
+                      {selectedWidget.id === "twitch-poll" && <div className="flex flex-col gap-1.5">
+                        <label className="flex flex-col gap-1 text-[10px] text-slate-300">Pergunta da enquete<input value={String(editableConfig.question ?? "")} disabled={!hasSelectedInstance} onChange={(event) => onUpdateSelectedConfig({ question: event.target.value })} className="h-7 rounded border border-white/10 bg-slate-950 px-2 text-xs text-white" /></label>
+                        <PollOptionsEditor options={Array.isArray(editableConfig.options) ? editableConfig.options as Array<{ text?: string; label?: string }> : []} disabled={!hasSelectedInstance} onChange={(options) => onUpdateSelectedConfig({ options })} />
+                        <button type="button" disabled={!hasSelectedInstance} onClick={() => onUpdateSelectedConfig({ resetVotes: Date.now() })} className={buttonClass}>Zerar votos</button>
+                      </div>}
+                      {selectedWidget.id === "twitch-raffle" && <div className="rounded border border-white/10 bg-slate-900 p-2">
+                        <p className="mb-1 text-[11px] font-semibold text-slate-200">Sorteio de Chat</p>
+                        <p className="mb-2 text-[10px] text-slate-400">Os participantes entram pelo chat usando !entrar. O sorteio usa os participantes conectados; não é uma lista manual.</p>
+                        <div className="flex flex-wrap gap-1"><button type="button" disabled={!hasSelectedInstance} onClick={() => onUpdateSelectedConfig({ drawTrigger: Date.now() })} className={buttonClass}>Sortear vencedor</button><button type="button" disabled={!hasSelectedInstance} onClick={() => onUpdateSelectedConfig({ resetTrigger: Date.now() })} className={buttonClass}>Limpar sorteio</button></div>
+                      </div>}
                       {selectedWidget.id === "twitch-commands-list" && (
                         <div className="rounded border border-white/10 bg-slate-900 p-2">
                           <p className="mb-1 text-[11px] text-slate-200">Adicionar comando</p>
@@ -234,6 +295,10 @@ export default function Overlay_Editor({
                       )}
                       {editableEntries.length ? editableEntries.filter(([key]) => !(
                         selectedWidget.id === "manual-death-counter" && key === "deathCount" ||
+                        ["twitch-rules", "twitch-schedule", "twitch-schedule-ticker"].includes(selectedWidget.id) && ["rules", "schedule", "news", "newsText", "text"].includes(key) ||
+                        ["twitch-sub-goal", "twitch-bits-goal", "twitch-raid-goal"].includes(selectedWidget.id) && ["startValue", "targetValue"].includes(key) ||
+                        selectedWidget.id === "twitch-poll" && ["question", "options", "resetVotes"].includes(key) ||
+                        selectedWidget.id === "twitch-raffle" && ["drawTrigger", "resetTrigger"].includes(key) ||
                         selectedWidget.id === "twitch-commands-list" && key === "commands" ||
                         selectedWidget.id === "manual-pix-widget" && ["title", "pixKey", "pixName", "pixCity", "pixAmount"].includes(key) ||
                         selectedWidget.id === "manual-timer" && ["durationSeconds", "remainingSeconds", "timerRunning", "timerEndAt"].includes(key) ||
@@ -268,7 +333,7 @@ export default function Overlay_Editor({
                             )}
                           </label>
                         );
-                      }) : editableEntries.length === 0 && !["manual-death-counter", "twitch-commands-list", "manual-pix-widget", "manual-timer", "manual-clock"].includes(selectedWidget.id) ? <p className="text-[11px] text-slate-500">Esta widget não declara campos manuais adicionais. Os dados exibidos são recebidos do runtime da plataforma.</p> : null}
+                      }) : editableEntries.length === 0 && !["manual-death-counter", "twitch-commands-list", "manual-pix-widget", "manual-timer", "manual-clock", "twitch-rules", "twitch-schedule", "twitch-schedule-ticker", "twitch-sub-goal", "twitch-bits-goal", "twitch-raid-goal", "twitch-poll", "twitch-raffle"].includes(selectedWidget.id) ? <p className="text-[11px] text-slate-500">Esta widget não declara campos manuais adicionais. Os dados exibidos são recebidos do runtime da plataforma.</p> : null}
                     </div>
                   ) : (
                     <p className="text-[11px] text-slate-500">Selecione uma widget ou um elemento no canvas para carregar seus campos de configuração.</p>
