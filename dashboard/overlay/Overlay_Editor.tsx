@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ComponentType } from "react";
+import { useEffect, useState, type CSSProperties, type ComponentType } from "react";
 import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import HorizontalMenu from "../components/HorizontalMenu";
 import { FONT_CATEGORIES } from "../fontes/Font_Catalog";
@@ -51,9 +51,16 @@ export default function Overlay_Editor({
   const selectedWidget = fragmentableWidgets.find((widget) => widget.id === selectedWidgetId);
   const fragments = selectedWidget ? getWidgetInternalElements(selectedWidget.id) : [];
 
+  useEffect(() => {
+    if (!selectedFontCategory) return;
+    FONT_CATEGORIES[selectedFontCategory].forEach((font) => {
+      if (font !== "monospace") loadGoogleFont(font);
+    });
+  }, [selectedFontCategory]);
+
   function chooseFont(font: string) {
     setSelectedFont(font);
-    loadGoogleFont(font);
+    if (font !== "monospace") loadGoogleFont(font);
   }
 
   return (
@@ -177,7 +184,11 @@ export default function Overlay_Editor({
                   {selectedFontCategory && (
                     <div className="min-h-0 min-w-0 border-t border-white/10 pt-1">
                       <p className="mb-0.5 text-[10px] leading-3 text-slate-400">Famílias de fontes</p>
-                      <div className="flex min-w-0 flex-wrap content-start gap-1 overflow-y-auto overflow-x-hidden">
+                      <div
+                        aria-label="Prévia das famílias de fontes"
+                        className="grid min-w-0 grid-cols-8 grid-rows-4 content-start gap-1 overflow-x-hidden overflow-y-auto"
+                        style={{ gridAutoRows: "22px", maxHeight: "94px" }}
+                      >
                         {FONT_CATEGORIES[selectedFontCategory].map((font) => (
                           <button
                             key={font}
@@ -185,8 +196,9 @@ export default function Overlay_Editor({
                             onClick={() => chooseFont(font)}
                             aria-pressed={selectedFont === font}
                             title={font}
-                            style={{ fontFamily: `"${font}", sans-serif` }}
-                            className={`h-5 max-w-full shrink rounded border px-1.5 py-0 text-[10px] leading-4 transition ${selectedFont === font ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-800/80 text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"}`}
+                            aria-label={font}
+                            style={{ fontFamily: font === "monospace" ? "monospace" : `"${font}", sans-serif` }}
+                            className={`h-[22px] min-w-0 overflow-hidden rounded border px-0.5 text-[10px] leading-4 transition ${selectedFont === font ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-800/80 text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"}`}
                           >
                             <span className="block overflow-hidden text-ellipsis whitespace-nowrap">{font}</span>
                           </button>
