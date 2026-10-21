@@ -5,7 +5,7 @@ import { Sparkles, Trophy, Heart, Flame, Users, Award } from 'lucide-react';
 // 1. TwitchLatestSub (Último Inscrito)
 /**
  * @param {Object} props
- * @param {import('@dashboard/types/WidgetConfig').WidgetConfig} props.config
+ * @param {import('../types/WidgetConfig').WidgetConfig} props.config
  */
 export function TwitchLatestSub({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
