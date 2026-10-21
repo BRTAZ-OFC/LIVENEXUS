@@ -249,7 +249,14 @@ export default function OverlayCanvas() {
     if (!editingTextId) return;
     const element = Array.from(document.querySelectorAll<HTMLElement>("[data-overlay-text]"))
       .find((node) => node.dataset.overlayTextId === editingTextId);
-    element?.focus();
+    if (element) {
+      element.focus();
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+    }
   }, [editingTextId]);
 
   const size = useMemo(
@@ -780,6 +787,15 @@ export default function OverlayCanvas() {
                           onDoubleClick={(event) => {
                             event.preventDefault(); event.stopPropagation();
                             setEditingTextId(instanceId); setSelectedInstanceId(instanceId);
+                            const editable = event.currentTarget;
+                            requestAnimationFrame(() => {
+                              editable.focus();
+                              const selection = window.getSelection();
+                              const range = document.createRange();
+                              range.selectNodeContents(editable);
+                              selection?.removeAllRanges();
+                              selection?.addRange(range);
+                            });
                           }}
                           onBlur={(event) => {
                             if (editingTextId !== instanceId) return;
