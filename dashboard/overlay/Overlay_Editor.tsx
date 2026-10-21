@@ -527,7 +527,7 @@ export default function Overlay_Editor({
                             })}
                             className={"flex aspect-square min-w-0 flex-col items-center justify-center gap-1 rounded-lg border p-1 text-center transition disabled:cursor-not-allowed disabled:opacity-40 " + (activePreset ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-900/80 text-slate-300 hover:border-violet-400/60 hover:bg-violet-500/10")}
                           >
-                            <span className="flex h-10 w-10 items-center justify-center rounded border border-current/30 bg-slate-950/70 text-xs font-bold">{preset.id}</span>
+                            <span className="flex h-7 w-7 items-center justify-center rounded border border-current/30 bg-slate-950/70 text-[10px] font-bold">{preset.id}</span>
                             <span className="text-[10px] leading-tight">{preset.label}</span>
                           </button>
                         );
@@ -548,7 +548,7 @@ export default function Overlay_Editor({
                     <Timer size={15} className="text-violet-300" />
                     <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Tempo de visualização</p>
                   </div>
-                  <div className="col-span-2 grid grid-cols-2 grid-rows-2 gap-1">
+                  <div className="col-span-2 grid grid-cols-3 grid-rows-1 gap-1">
                     {[
                       { id: "always", label: "Sem tempo", description: "Sempre visível", icon: <Timer size={16} /> },
                       { id: "interval", label: "De tempo em tempo", description: "Exibição periódica", icon: <span className="text-base font-bold">↻</span> },
