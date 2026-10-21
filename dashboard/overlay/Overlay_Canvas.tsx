@@ -11,6 +11,7 @@ import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
 import HorizontalMenu from "../components/HorizontalMenu";
 import Overlay_Editor from "./Overlay_Editor";
+import { loadAllGoogleFonts } from "../fontes/Font_Loader";
 
 type JsonObject = Record<string, unknown>;
 type CanvasInstance = {
@@ -147,6 +148,10 @@ function backgroundStyle(background: CanvasBackground): CSSProperties {
  * Mantém apenas o canvas, com seleção, arraste e redimensionamento direto das widgets.
  */
 export default function OverlayCanvas() {
+  useEffect(() => {
+    loadAllGoogleFonts();
+  }, []);
+
   const frameRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
