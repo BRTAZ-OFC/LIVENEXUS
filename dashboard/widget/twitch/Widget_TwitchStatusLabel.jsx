@@ -43,9 +43,10 @@ export default function TwitchStatusLabel({ config = {} }) {
         </div>
 
         {/* Stream Title */}
-        <TextMarquee 
-          text={streamTitle} 
-          className="text-xs font-semibold text-white max-w-full"
+        <TextMarquee
+          text={streamTitle}
+          forceMarquee
+          className="text-xs font-semibold text-white w-full min-w-0"
         />
 
         {/* Viewers & Game */}
