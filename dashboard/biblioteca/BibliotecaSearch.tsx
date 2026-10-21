@@ -236,7 +236,11 @@ export default function BibliotecaSearch() {
 
   const playDetailTrack = (track: any, list?: any[]) => {
     const normalized = { ...track, videoId: track.videoId, title: track.title || track.name || "Música", artist: track.artist || track.subtitle || detailItem?.artist || detailItem?.name || "", thumbnail: track.thumbnail || detailItem?.thumbnail };
-    if (list?.length) playTracks(list.map((entry) => ({ ...entry, title: entry.title || entry.name || "Música" })) as MusicTrack[], list.findIndex((entry) => entry.videoId === track.videoId));
+    if (list?.length) {
+      const playable = list.filter((entry) => entry?.videoId).map((entry) => ({ ...entry, title: entry.title || entry.name || "Música" })) as MusicTrack[];
+      const startIndex = playable.findIndex((entry) => entry.videoId === track.videoId);
+      playTracks(playable, startIndex >= 0 ? startIndex : 0);
+    }
     else playTrack(normalized as MusicTrack);
   };
 
