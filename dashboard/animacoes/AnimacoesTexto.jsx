@@ -96,7 +96,7 @@ export default function AnimacoesTexto({
           }}
         >
           {tipoValido === "casanique" && !/\s/.test(caractere)
-            ? (embaralhados[indice] ?? embaralharCaractere())
+            ? (embaralhados[indice] ?? caractere)
             : caractere === " "
               ? "\u00a0"
               : caractere}
