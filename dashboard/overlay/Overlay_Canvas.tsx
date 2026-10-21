@@ -329,7 +329,7 @@ export default function OverlayCanvas() {
   }
 
   function makeOverlayId(name: string) {
-    return name.trim().normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase()
+    return name.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
       .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   }
 
