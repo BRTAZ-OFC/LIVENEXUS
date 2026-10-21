@@ -359,9 +359,12 @@ export default function OverlayCanvas() {
       const saved = payload.overlay as OverlayRow;
       const savedId = String(saved.id ?? activeOverlayId ?? generatedId);
       setActiveOverlayId(savedId);
-      setOverlays((current) => current.some((row) => String(row.id ?? "") === savedId)
-        ? current.map((row) => String(row.id ?? "") === savedId ? saved : row)
-        : [...current, saved]);
+      setOverlays((current) => {
+        const withoutPreviousId = current.filter((row) => String(row.id ?? "") !== activeOverlayId);
+        return withoutPreviousId.some((row) => String(row.id ?? "") === savedId)
+          ? withoutPreviousId.map((row) => String(row.id ?? "") === savedId ? saved : row)
+          : [...withoutPreviousId, saved];
+      });
       setConfig(getCanvasConfig(saved));
       setNotice("Overlay salva no JSON.");
     } catch (cause) {
