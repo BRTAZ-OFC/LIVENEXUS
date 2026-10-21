@@ -499,6 +499,23 @@ export default function OverlayCanvas() {
       <button type="button" onClick={() => void saveOverlay()} disabled={saving || loading} title="Salvar overlay" aria-label="Salvar overlay" className="fixed right-4 top-20 z-[100] inline-flex h-9 w-9 items-center justify-center rounded-lg bg-violet-600 text-white shadow-lg hover:bg-violet-500 disabled:opacity-50"><Save size={16} /></button>
       <button type="button" onClick={() => void deleteOverlay()} disabled={saving || !activeOverlayId} title="Excluir overlay" aria-label="Excluir overlay" className="fixed right-16 top-20 z-[100] inline-flex h-9 w-9 items-center justify-center rounded-lg border border-rose-400/30 bg-slate-950 text-rose-200 shadow-lg hover:bg-rose-500/10 disabled:opacity-40"><Trash2 size={16} /></button>
       {error && <p role="alert" className="w-full text-xs text-rose-200">{error}</p>}
+      <div className="mt-4 w-full min-w-0">
+        <HorizontalMenu ariaLabel="Widgets de Overlay" className="w-full">
+          {catalog
+            .filter((widget) => widget.implemented !== false)
+            .map((widget) => (
+              <button
+                key={widget.id}
+                type="button"
+                onClick={() => addWidget(widget)}
+                title={`Adicionar ${widget.name} ao canvas`}
+                className="shrink-0 rounded-md border border-white/10 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"
+              >
+                {widget.name}
+              </button>
+            ))}
+        </HorizontalMenu>
+      </div>
       {overlays.length > 0 && (
         <div className="w-full min-w-0">
           <p className="mb-1 text-[10px] text-violet-200/80">Overlays salvas</p>
@@ -522,23 +539,6 @@ export default function OverlayCanvas() {
           </HorizontalMenu>
         </div>
       )}
-      <div className="mt-4 w-full min-w-0">
-        <HorizontalMenu ariaLabel="Widgets de Overlay" className="w-full">
-          {catalog
-            .filter((widget) => widget.implemented !== false)
-            .map((widget) => (
-              <button
-                key={widget.id}
-                type="button"
-                onClick={() => addWidget(widget)}
-                title={`Adicionar ${widget.name} ao canvas`}
-                className="shrink-0 rounded-md border border-white/10 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"
-              >
-                {widget.name}
-              </button>
-            ))}
-        </HorizontalMenu>
-      </div>
       <p className="w-full text-[10px] text-violet-200/80">
         Atalhos: Delete remove · setas movem 1 px · Shift + setas movem 10 px
       </p>
