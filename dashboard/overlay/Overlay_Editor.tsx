@@ -30,6 +30,23 @@ type OverlayEditorProps = {
 const MENUS = ["INICIO", "TEXTO", "ANIMACAO", "IMAGEMS", "ALINHAMENTO", "FORMAS", "EMOJES", "CAMADAS"] as const;
 type MenuName = (typeof MENUS)[number];
 
+
+function getReactHubEmbedUrl(value: string) {
+  try {
+    const url = new URL(String(value || ""));
+    let videoId = "";
+    if (url.hostname === "youtu.be") videoId = url.pathname.split("/").filter(Boolean)[0] || "";
+    else if (url.hostname.includes("youtube.com") || url.hostname.includes("youtube-nocookie.com")) {
+      videoId = url.searchParams.get("v") || "";
+      const parts = url.pathname.split("/").filter(Boolean);
+      if (!videoId && parts.length > 1 && ["embed", "shorts", "live"].includes(parts[0])) videoId = parts[1];
+    }
+    return /^[a-zA-Z0-9_-]{11}$/.test(videoId) ? "https://www.youtube.com/embed/" + videoId + "?autoplay=1&rel=0" : "";
+  } catch { return ""; }
+}
+
+type ReactHubQueueItem = { id?: string; author?: string; url?: string; title?: string; status?: string };
+
 const buttonClass = "shrink-0 rounded-md border border-white/10 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white";
 const activeButtonClass = "shrink-0 rounded-md border border-violet-400 bg-violet-500/20 px-3 py-1.5 text-xs text-white";
 
@@ -117,11 +134,36 @@ export default function Overlay_Editor({
   const [textValue, setTextValue] = useState("Novo texto");
   const [fontSize, setFontSize] = useState(32);
   const [textColor, setTextColor] = useState("#ffffff");
+  const [reactHubQueue, setReactHubQueue] = useState<ReactHubQueueItem[]>([]);
+  const [reactHubPopupOpen, setReactHubPopupOpen] = useState(false);
+  const [reactHubSelected, setReactHubSelected] = useState<ReactHubQueueItem | null>(null);
   const panelHeight = `min(${Math.max(190, height)}px, 34vh)`;
   const style: CSSProperties = {
     height: isCollapsed ? "0px" : panelHeight,
     transition: "height 220ms ease",
   };
+
+  useEffect(() => {
+    const readQueue = () => {
+      try {
+        const raw = window.localStorage.getItem("scenario_react_queue");
+        const parsed = raw ? JSON.parse(raw) : [];
+        setReactHubQueue(Array.isArray(parsed) ? parsed : []);
+      } catch { setReactHubQueue([]); }
+    };
+    readQueue();
+    const onStorage = (event: StorageEvent) => { if (event.key === "scenario_react_queue") readQueue(); };
+    let channel: BroadcastChannel | null = null;
+    try {
+      if ("BroadcastChannel" in window) {
+        channel = new BroadcastChannel("scenario_react_bus");
+        channel.onmessage = (event) => { if (event.data?.type === "QUEUE_UPDATED") readQueue(); };
+      }
+    } catch { /* BroadcastChannel opcional */ }
+    window.addEventListener("storage", onStorage);
+    const interval = window.setInterval(readQueue, 1000);
+    return () => { window.removeEventListener("storage", onStorage); window.clearInterval(interval); channel?.close(); };
+  }, []);
 
   const availableWidgets = catalog.filter((widget) => widget.implemented !== false);
   const fragmentableWidgets = availableWidgets.filter((widget) => isWidgetFragmentable(widget.id));
@@ -235,6 +277,21 @@ export default function Overlay_Editor({
                   {selectedWidget ? (
                     <div className="flex min-h-0 flex-col gap-1.5 overflow-y-auto pr-1">
                       {!hasSelectedInstance && <p className="rounded border border-amber-400/30 bg-amber-400/5 p-1.5 text-[10px] text-amber-200">Configuração padrão da widget. Selecione uma instância dela no canvas para aplicar e salvar as alterações.</p>}
+                      {selectedWidget.id === "react-hub-widget" && (
+                        <div className="flex min-h-0 flex-col gap-2 rounded border border-white/10 bg-slate-900 p-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[11px] font-semibold text-slate-200">Fila de vídeos ({reactHubQueue.length})</p>
+                            <button type="button" onClick={() => { setReactHubSelected(reactHubQueue[0] || null); setReactHubPopupOpen(true); }} className={buttonClass}>Abrir popup</button>
+                          </div>
+                          <div className="max-h-48 min-h-8 space-y-1 overflow-y-auto">
+                            {reactHubQueue.length ? reactHubQueue.map((item, index) => (
+                              <button key={item.id || index} type="button" onClick={() => { setReactHubSelected(item); setReactHubPopupOpen(true); }} className="block w-full rounded border border-white/5 bg-slate-950 px-2 py-1.5 text-left text-[10px] text-slate-200 hover:border-violet-400/50">
+                                <span className="font-semibold">{index + 1} - {item.author || "Usuário"} enviou = </span><span className="break-all text-cyan-300 underline">{item.url || item.title || "Link indisponível"}</span>
+                              </button>
+                            )) : <p className="text-[10px] text-slate-500">Nenhum vídeo na fila. A fila é sincronizada com o React Hub.</p>}
+                          </div>
+                        </div>
+                      )}
                       {selectedWidget.id === "manual-death-counter" && (
                         <div className="flex items-center justify-between gap-2 rounded border border-white/10 bg-slate-900 p-2">
                           <span className="text-xs text-slate-200">Mortes</span>
@@ -435,6 +492,26 @@ export default function Overlay_Editor({
           </div>
         </div>
       )}
+    {reactHubPopupOpen && (
+      <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 p-3" role="dialog" aria-modal="true" aria-label="Fila de vídeos do React Hub" onClick={() => setReactHubPopupOpen(false)}>
+        <div className="flex max-h-[90vh] w-full max-w-6xl flex-col rounded-lg border border-white/20 bg-slate-950 p-3 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <div><p className="text-xs font-semibold text-white">React Hub — fila de vídeos</p><p className="text-[10px] text-slate-400">Clique em um link na coluna direita para carregar o vídeo.</p></div>
+            <button type="button" onClick={() => setReactHubPopupOpen(false)} className="rounded border border-white/20 px-3 py-1 text-xs text-white">Fechar</button>
+          </div>
+          <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-hidden md:grid-cols-2">
+            <div className="flex min-h-[220px] items-center justify-center overflow-hidden rounded bg-black">
+              {reactHubSelected && getReactHubEmbedUrl(reactHubSelected.url || "") ? <iframe className="h-full min-h-[220px] w-full" src={getReactHubEmbedUrl(reactHubSelected.url || "")} title={"Vídeo de " + (reactHubSelected.author || "usuário")} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /> : <p className="p-4 text-xs text-slate-400">Selecione um link válido do YouTube na coluna ao lado.</p>}
+            </div>
+            <div className="min-h-0 overflow-y-auto rounded border border-white/10">
+              <p className="sticky top-0 border-b border-white/10 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-200">Fila de vídeos</p>
+              {reactHubQueue.map((item, index) => <button key={item.id || index} type="button" onClick={() => setReactHubSelected(item)} className={"block w-full border-b border-white/5 px-3 py-2 text-left text-xs hover:bg-white/10 " + (reactHubSelected?.url === item.url ? "bg-blue-950/70" : "")}><span className="font-semibold text-slate-200">{index + 1} - {item.author || "Usuário"} enviou = </span><span className="break-all text-cyan-300 underline">{item.url || item.title || "Link indisponível"}</span></button>)}
+              {!reactHubQueue.length && <p className="p-3 text-xs text-slate-500">A fila está vazia.</p>}
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
     </section>
   );
 }
