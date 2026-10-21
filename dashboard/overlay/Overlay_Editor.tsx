@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from "react";
+import { useState, type CSSProperties, type ComponentType } from "react";
 import { ChevronDown, ChevronUp, Plus, Type } from "lucide-react";
 import HorizontalMenu from "../components/HorizontalMenu";
 import { FONT_CATEGORIES } from "../fontes/Font_Catalog";
@@ -8,7 +8,7 @@ import { getWidgetInternalElements, isWidgetFragmentable } from "./Overlay_widge
 type WidgetDefinition = {
   id: string;
   name: string;
-  component: React.ComponentType<{ config?: Record<string, unknown> }>;
+  component: ComponentType<{ config?: Record<string, unknown> }>;
   implemented?: boolean;
 };
 
