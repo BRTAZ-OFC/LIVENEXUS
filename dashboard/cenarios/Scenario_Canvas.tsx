@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { ArrowLeft, Check, LoaderCircle, Save, Trash2 } from "lucide-react";
 import HorizontalMenu from "../components/HorizontalMenu";
 import OverlayWidgetElementRenderer from "../overlay/Overlay_WidgetElementRenderer";
@@ -72,7 +72,7 @@ function sourceFor(row: ScenarioRecord): JsonObject {
   if (isObject(row.settings) && Object.keys(row.settings).length) return row.settings;
   if (isObject(row.config) && Object.keys(row.config).length) return row.config;
   if (isObject(row.data) && Object.keys(row.data).length) return row.data;
-  return row as JsonObject;
+  return row as unknown as JsonObject;
 }
 
 function normalizeScenario(row: ScenarioRecord): ScenarioConfig {
@@ -112,9 +112,6 @@ function backgroundStyle(background: CanvasBackground): CSSProperties {
   };
 }
 
-function messageFrom(payload: unknown, fallback: string) {
-  return isObject(payload) && typeof payload.message === "string" ? payload.message : fallback;
-}
 
 export default function ScenarioCanvas({
   scenarioId,
