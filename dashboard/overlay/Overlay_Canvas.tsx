@@ -954,6 +954,14 @@ export default function OverlayCanvas() {
         onTextStyleChange={applyTextStyleToSelectedText}
         selectedInstanceWidgetId={config.instances?.find((item, index) => (item.id || `${item.widgetId}-${index}`) === selectedInstanceId)?.widgetId ?? null}
         selectedInstanceConfig={config.instances?.find((item, index) => (item.id || `${item.widgetId}-${index}`) === selectedInstanceId)?.config ?? null}
+        onSelectWidget={(widgetId) => {
+          const existing = (config.instances || []).find((item) => item.widgetId === widgetId && item.isFullWidget !== false);
+          if (existing?.id) setSelectedInstanceId(existing.id);
+          else {
+            const definition = catalog.find((widget) => widget.id === widgetId);
+            if (definition) addWidget(definition);
+          }
+        }}
         onUpdateSelectedConfig={(patch) => {
           if (!selectedInstanceId) return;
           const selected = (config.instances || []).find((item, index) => (item.id || `${item.widgetId}-${index}`) === selectedInstanceId);
