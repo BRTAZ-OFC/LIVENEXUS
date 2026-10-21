@@ -680,29 +680,43 @@ export default function OverlayCanvas() {
 
   function updateSelectedBackgroundMode(mode: "transparent" | "solid") {
     if (mode === "transparent") {
-      // O modo transparente é global: remove o fundo do canvas, das formas e de todas as widgets.
-      updateBackground({ type: "transparent", opacity: 100, gradient: undefined, image: undefined });
+      // Transparência global: mantém as cores configuradas para que possam ser restauradas ao voltar para Sólido.
       setConfig((current) => ({
         ...current,
-        background: { ...(current.background || {}), type: "transparent", opacity: 100, gradient: undefined, image: undefined },
+        background: { ...(current.background || EMPTY_BACKGROUND), type: "transparent", opacity: 100, gradient: undefined, image: undefined },
         instances: (current.instances || []).map((instance) => ({
           ...instance,
           config: instance.widgetId === SHAPE_WIDGET_ID
             ? { ...(instance.config || {}), fillEnabled: false, fillOpacity: 0 }
-            : { ...(instance.config || {}), backgroundTransparent: true, backgroundOpacity: 0 },
+            : { ...(instance.config || {}), backgroundTransparent: true },
         })),
       }));
       return;
     }
-    if (!selectedInstanceId || !selectedCanvasInstance) {
-      updateBackground({ type: "solid", color: selectedElementBackgroundColor || "#020617", opacity: 100, gradient: undefined, image: undefined });
-      return;
-    }
-    if (selectedCanvasInstance.widgetId === SHAPE_WIDGET_ID) {
-      updateInstance(selectedInstanceId, { config: { ...(selectedCanvasInstance.config || {}), fillEnabled: true, fillOpacity: 100 } });
-      return;
-    }
-    updateInstance(selectedInstanceId, { config: { ...(selectedCanvasInstance.config || {}), backgroundColor: selectedElementBackgroundColor, backgroundTransparent: false, backgroundOpacity: 100 } });
+
+    // Sólido também é global: reativa os fundos de todos os elementos e widgets.
+    setConfig((current) => ({
+      ...current,
+      background: {
+        ...(current.background || EMPTY_BACKGROUND),
+        type: "solid",
+        color: current.background?.color || "#020617",
+        opacity: 100,
+        gradient: undefined,
+        image: undefined,
+      },
+      instances: (current.instances || []).map((instance) => ({
+        ...instance,
+        config: instance.widgetId === SHAPE_WIDGET_ID
+          ? { ...(instance.config || {}), fillEnabled: true, fillOpacity: 100 }
+          : {
+              ...(instance.config || {}),
+              backgroundColor: String(instance.config?.backgroundColor || "#020617"),
+              backgroundTransparent: false,
+              backgroundOpacity: 100,
+            },
+      })),
+    }));
   }
 
   function updateSelectedBackgroundOpacity(opacity: number) {
