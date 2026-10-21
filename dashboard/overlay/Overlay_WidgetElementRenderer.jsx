@@ -364,12 +364,9 @@ export default function WidgetElementRenderer({
       contentCSS += `opacity: ${config.effOpacity / 100} !important; `;
     }
 
-    const isTransparent =
-      config.effBgActiveType === "bg-transparent" ||
-      config.backgroundColor === "transparent" ||
-      config.isTransparent === true ||
-      config.bgMode === "transparent" ||
-      config.effBgType === "transparent";
+    // Todas as widgets do overlay são renderizadas sem fundos sólidos, gradientes ou imagens.
+    // Mantém visíveis textos, ícones, linhas, bordas e o conteúdo real dos elementos.
+    const isTransparent = true;
 
     // 1. FUNDOS BÁSICOS - container effect
     if (isTransparent) {
