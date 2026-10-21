@@ -511,7 +511,7 @@ export default function Overlay_Editor({
                       ...Array.from({ length: 21 }, (_, index) => ({ id: `em-breve-${index + 5}`, label: "" })),
                     ].map((animation) => {
                       const active = String(selectedInstanceConfig?.animationType || "nenhuma") === animation.id;
-                      const disabled = !animation.label || !selectedInstanceWidgetId || !selectedInstanceConfig;
+                      const disabled = !animation.label || selectedInstanceWidgetId !== "__livenexus_text__" || !selectedInstanceConfig;
                       return (
                         <button
                           key={animation.id}
@@ -539,7 +539,7 @@ export default function Overlay_Editor({
                     Intervalo entre letras (ms)
                     <input
                       type="number" min="0" step="100"
-                      disabled={!selectedInstanceWidgetId || !selectedInstanceConfig}
+                      disabled={selectedInstanceWidgetId !== "__livenexus_text__" || !selectedInstanceConfig}
                       value={Number(selectedInstanceConfig?.animationDelayMs ?? 1000)}
                       onChange={(event) => onUpdateSelectedConfig({ animationDelayMs: Math.max(0, Number(event.target.value) || 0) })}
                       className="h-7 w-full rounded border border-white/10 bg-slate-950 px-2 text-xs text-white disabled:opacity-40"
@@ -563,7 +563,13 @@ export default function Overlay_Editor({
                     <input type="checkbox" disabled={!selectedInstanceWidgetId || !selectedInstanceConfig} checked={Boolean(selectedInstanceConfig?.animationAlternate)} onChange={(event) => onUpdateSelectedConfig({ animationAlternate: event.target.checked })} />
                     Vai e volta (ex.: sobe e desce)
                   </label>
-                  {!selectedInstanceWidgetId && <p className="text-[10px] text-slate-500">Selecione um elemento no canvas.</p>}
+                  {selectedInstanceWidgetId === "__livenexus_text__" && (
+                    <p className="text-[10px] text-slate-400">
+                      Duração estimada: {Math.max(0, Array.from(String(selectedInstanceConfig?.text || "")).length - 1) * Math.max(0, Number(selectedInstanceConfig?.animationDelayMs ?? 1000)) + Math.max(50, Number(selectedInstanceConfig?.animationDurationMs ?? 650))} ms
+                    </p>
+                  )}
+                  {selectedInstanceWidgetId && selectedInstanceWidgetId !== "__livenexus_text__" && <p className="text-[10px] text-slate-500">As animações atuais são para elementos de texto. Efeitos para outros elementos serão adicionados depois.</p>}
+                  {!selectedInstanceWidgetId && <p className="text-[10px] text-slate-500">Selecione um elemento de texto no canvas.</p>}
                 </section>
               </div>
             )}
