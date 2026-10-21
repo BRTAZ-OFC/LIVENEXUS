@@ -509,11 +509,11 @@ export default function Overlay_Editor({
           </div>
           <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-hidden md:grid-cols-2">
             <div className="flex min-h-[220px] items-center justify-center overflow-hidden rounded bg-black">
-              {reactHubSelected && getReactHubEmbedUrl(getReactHubQueueUrl(reactHubSelected)) ? <iframe className="h-full min-h-[220px] w-full" src={getReactHubEmbedUrl(reactHubSelected.url || "")} title={"Vídeo de " + (reactHubSelected.author || "usuário")} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /> : <p className="p-4 text-xs text-slate-400">Selecione um link válido do YouTube na coluna ao lado.</p>}
+              {reactHubSelected && getReactHubEmbedUrl(getReactHubQueueUrl(reactHubSelected)) ? <iframe className="h-full min-h-[220px] w-full" src={getReactHubEmbedUrl(getReactHubQueueUrl(reactHubSelected))} title={"Vídeo de " + (reactHubSelected.author || "usuário")} allow="autoplay; encrypted-media; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /> : <p className="p-4 text-xs text-slate-400">Selecione um link válido do YouTube na coluna ao lado.</p>}
             </div>
             <div className="min-h-0 overflow-y-auto rounded border border-white/10">
               <p className="sticky top-0 border-b border-white/10 bg-slate-900 px-3 py-2 text-xs font-semibold text-slate-200">Fila de vídeos</p>
-              {reactHubQueue.map((item, index) => <button key={item.id || item.url || index} type="button" onClick={() => setReactHubSelected(item)} title={item.url || ""} className={"block w-full border-b border-white/5 px-3 py-2 text-left text-xs hover:bg-white/10 " + (getReactHubQueueUrl(reactHubSelected || {}) === getReactHubQueueUrl(item) ? "bg-blue-950/70" : "")}><span className="break-all text-cyan-300 underline">{item.url || ""}</span></button>)}
+              {reactHubQueue.map((item, index) => <button key={item.id || getReactHubQueueUrl(item) || index} type="button" onClick={() => setReactHubSelected(item)} title={getReactHubQueueUrl(item)} className={"block w-full border-b border-white/5 px-3 py-2 text-left text-xs hover:bg-white/10 " + (getReactHubQueueUrl(reactHubSelected || {}) === getReactHubQueueUrl(item) ? "bg-blue-950/70" : "")}><span className="break-all text-cyan-300 underline">{getReactHubQueueUrl(item)}</span></button>)}
               {!reactHubQueue.length && <p className="p-3 text-xs text-slate-500">A fila está vazia.</p>}
             </div>
           </div>
