@@ -488,8 +488,8 @@ export default function OverlayCanvas() {
     setNotice("");
   }
 
-  function applyFontToSelectedText(fontFamily: string) {
-    if (fontFamily !== "monospace") loadGoogleFont(fontFamily);
+  function applyTextStyleToSelectedText(patch: { fontSize?: number; color?: string; fontFamily?: string }) {
+    if (patch.fontFamily && patch.fontFamily !== "monospace") loadGoogleFont(patch.fontFamily);
     if (!selectedInstanceId) return;
     const selected = (config.instances || []).find((item, index) =>
       (item.id || `${item.widgetId}-${index}`) === selectedInstanceId,
@@ -499,7 +499,7 @@ export default function OverlayCanvas() {
       ...current,
       instances: (current.instances || []).map((item, index) =>
         (item.id || `${item.widgetId}-${index}`) === selectedInstanceId
-          ? { ...item, config: { ...(item.config || {}), fontFamily } }
+          ? { ...item, config: { ...(item.config || {}), ...patch } }
           : item,
       ),
     }));
@@ -946,7 +946,7 @@ export default function OverlayCanvas() {
           />
         </div>
       </div>
-      <Overlay_Editor catalog={catalog} onAddFragment={addWidgetComponent} onAddText={addTextInstance} onFontChange={applyFontToSelectedText} />
+      <Overlay_Editor catalog={catalog} onAddFragment={addWidgetComponent} onAddText={addTextInstance} onFontChange={(fontFamily) => applyTextStyleToSelectedText({ fontFamily })} onTextStyleChange={applyTextStyleToSelectedText} />
     </section>
   );
 }
