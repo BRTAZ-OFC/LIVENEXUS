@@ -11,7 +11,9 @@
 
 /* 1. Cascata: cada letra cai individualmente. */
 .animacao-texto--cascata .animacao-texto__letra {
-  animation: animacao-cascata 650ms cubic-bezier(0.22, 0.75, 0.35, 1) both;
+  animation: animacao-cascata var(--animacao-duracao, 650ms) cubic-bezier(0.22, 0.75, 0.35, 1) both;
+  animation-iteration-count: var(--animacao-iteracoes, 1);
+  animation-direction: var(--animacao-direcao, normal);
   animation-delay: var(--animacao-atraso, 0ms);
 }
 
@@ -22,7 +24,9 @@
 
 /* 2. Caça-níquel: caracteres embaralham e estabilizam em sequência. */
 .animacao-texto--casanique .animacao-texto__letra {
-  animation: animacao-casanique 350ms ease-out both;
+  animation: animacao-casanique var(--animacao-duracao, 650ms) ease-out both;
+  animation-iteration-count: var(--animacao-iteracoes, 1);
+  animation-direction: var(--animacao-direcao, normal);
   animation-delay: var(--animacao-atraso, 0ms);
 }
 
@@ -34,7 +38,9 @@
 
 /* 3. Rolar: flip vertical individual por letra. */
 .animacao-texto--rolar .animacao-texto__letra {
-  animation: animacao-rolar 700ms ease-in-out both;
+  animation: animacao-rolar var(--animacao-duracao, 650ms) ease-in-out both;
+  animation-iteration-count: var(--animacao-iteracoes, 1);
+  animation-direction: var(--animacao-direcao, normal);
   animation-delay: var(--animacao-atraso, 0ms);
   backface-visibility: hidden;
 }
@@ -47,7 +53,9 @@
 
 /* 4. Encarrilha: revela cada letra da esquerda para a direita. */
 .animacao-texto--encarrilha .animacao-texto__letra {
-  animation: animacao-encarrilha 350ms steps(1, end) both;
+  animation: animacao-encarrilha var(--animacao-duracao, 650ms) steps(1, end) both;
+  animation-iteration-count: var(--animacao-iteracoes, 1);
+  animation-direction: var(--animacao-direcao, normal);
   animation-delay: var(--animacao-atraso, 0ms);
 }
 
