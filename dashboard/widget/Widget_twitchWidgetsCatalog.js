@@ -73,7 +73,7 @@ export const TWITCH_WIDGETS_CATALOG = [
     defaultWidth: 480,
     defaultHeight: 70,
     defaultConfig: {
-      backgroundColor: 'rgba(0, 0, 0, 0.65)',
+      backgroundColor: 'transparent',
       borderRadius: '0px',
       showBorder: false,
       fontFamily: 'Inter, sans-serif'
