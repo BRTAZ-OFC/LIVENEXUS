@@ -508,7 +508,7 @@ export default function Overlay_Editor({
       )}
     {reactHubPopupOpen && (
       <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/85 p-3" role="dialog" aria-modal="true" aria-label="Fila de vídeos do React Hub" onClick={() => setReactHubPopupOpen(false)}>
-        <div className="flex max-h-[90vh] w-full max-w-6xl flex-col rounded-lg border border-white/20 bg-slate-950 p-3 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+        <div className="flex h-[400px] w-[600px] max-h-[90vh] max-w-[95vw] flex-col rounded-lg border border-white/20 bg-slate-950 p-3 shadow-2xl" onClick={(event) => event.stopPropagation()}>
           <div className="mb-2 flex items-center justify-between gap-3">
             <div><p className="text-xs font-semibold text-white">React Hub — fila de vídeos</p><p className="text-[10px] text-slate-400">Clique em um link na coluna direita para carregar o vídeo.</p></div>
             <button type="button" onClick={() => setReactHubPopupOpen(false)} className="rounded border border-white/20 px-3 py-1 text-xs text-white">Fechar</button>
