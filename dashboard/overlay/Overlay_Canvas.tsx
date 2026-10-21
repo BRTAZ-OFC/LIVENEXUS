@@ -763,8 +763,38 @@ export default function OverlayCanvas() {
 
   return (
     <section className="relative flex w-full min-w-0 flex-col items-center gap-4 px-2 pb-40 pt-4">
-      <button type="button" onClick={() => void saveOverlay()} disabled={saving || loading} title="Salvar overlay" aria-label="Salvar overlay" className="fixed right-4 top-20 z-[100] inline-flex h-9 w-9 items-center justify-center rounded-lg bg-violet-600 text-white shadow-lg hover:bg-violet-500 disabled:opacity-50"><Save size={16} /></button>
-      <button type="button" onClick={() => void deleteOverlay()} disabled={saving || !activeOverlayId} title="Excluir overlay" aria-label="Excluir overlay" className="fixed right-16 top-20 z-[100] inline-flex h-9 w-9 items-center justify-center rounded-lg border border-rose-400/30 bg-slate-950 text-rose-200 shadow-lg hover:bg-rose-500/10 disabled:opacity-40"><Trash2 size={16} /></button>
+      <div className="fixed right-4 top-20 z-[100] flex flex-col items-stretch gap-2">
+        {!editorOpen && (
+          <button
+            type="button"
+            onClick={() => setEditorOpen(true)}
+            className="inline-flex min-h-9 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-violet-400/40 bg-slate-950 px-3 py-2 text-xs font-semibold text-violet-100 shadow-lg hover:bg-violet-500/15"
+            title="Visualizar editor de overlay"
+          >
+            Visualizar editor
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => void deleteOverlay()}
+          disabled={saving || !activeOverlayId}
+          title="Excluir overlay"
+          aria-label="Excluir overlay"
+          className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-rose-400/30 bg-slate-950 px-3 text-xs font-semibold text-rose-200 shadow-lg hover:bg-rose-500/10 disabled:opacity-40"
+        >
+          <Trash2 size={16} /> Deletar
+        </button>
+        <button
+          type="button"
+          onClick={() => void saveOverlay()}
+          disabled={saving || loading}
+          title="Salvar overlay"
+          aria-label="Salvar overlay"
+          className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-violet-600 px-3 text-xs font-semibold text-white shadow-lg hover:bg-violet-500 disabled:opacity-50"
+        >
+          <Save size={16} /> Salvar
+        </button>
+      </div>
       {error && <p role="alert" className="w-full text-xs text-rose-200">{error}</p>}
       <div className="mt-4 w-full min-w-0">
         <HorizontalMenu ariaLabel="Widgets de Overlay" className="w-full">
@@ -1196,16 +1226,6 @@ export default function OverlayCanvas() {
           />
         </div>
       </div>
-      {!editorOpen && (
-        <button
-          type="button"
-          onClick={() => setEditorOpen(true)}
-          className="fixed right-28 top-20 z-[100] rounded-lg border border-violet-400/40 bg-slate-950 px-3 py-2 text-xs font-semibold text-violet-100 shadow-lg hover:bg-violet-500/15"
-          title="Visualizar editor de overlay"
-        >
-          Visualizar editor
-        </button>
-      )}
       {editorOpen && <Overlay_Editor
         catalog={catalog}
         onAddFragment={addWidgetComponent}
