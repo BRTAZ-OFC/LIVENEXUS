@@ -25,6 +25,9 @@ export default function AnimacoesTexto({
   className = "",
   style = {},
   repetir = false,
+  duracao = 650,
+  infinita = false,
+  vaiEVem = false,
 }) {
   const caracteres = useMemo(() => Array.from(String(texto ?? "")), [texto]);
   const [versao, setVersao] = useState(0);
@@ -93,6 +96,9 @@ export default function AnimacoesTexto({
           key={`${versao}-${indice}`}
           style={{
             "--animacao-atraso": `${indice * atraso}ms`,
+            "--animacao-duracao": `${Math.max(50, Number(duracao) || 650)}ms`,
+            "--animacao-iteracoes": infinita ? "infinite" : "1",
+            "--animacao-direcao": vaiEVem ? "alternate" : "normal",
           }}
         >
           {tipoValido === "casanique" && !/\s/.test(caractere)
