@@ -120,7 +120,6 @@ export default function AnimacoesTexto({
       caractere, indice, element: letterRefs.current[indice],
     })).filter(({ caractere, element }) => element && !/\\s/.test(caractere));
     const tempoEntrada = Math.max(0, caracteres.length - 1) * atrasoSeguro + duracaoSegura;
-    const tempoSaida = tempoEntrada;
 
     const runCycle = () => {
       if (cancelled) return;
