@@ -124,6 +124,7 @@ export default function Overlay_Editor({
   };
 
   const availableWidgets = catalog.filter((widget) => widget.implemented !== false);
+  const fragmentableWidgets = availableWidgets.filter((widget) => isWidgetFragmentable(widget.id));
   const selectedWidget = availableWidgets.find((widget) => widget.id === (selectedWidgetId || selectedInstanceWidgetId));
   const fragments = selectedWidget && isWidgetFragmentable(selectedWidget.id) ? getWidgetInternalElements(selectedWidget.id) : [];
   const hasSelectedInstance = Boolean(selectedWidget && selectedInstanceWidgetId === selectedWidget.id && selectedInstanceConfig);
@@ -191,9 +192,9 @@ export default function Overlay_Editor({
             {activeMenu === "INICIO" && (
               <div className="grid h-full min-h-0 grid-cols-[minmax(150px,0.9fr)_minmax(160px,1fr)_minmax(220px,1.35fr)] gap-2">
                 <section aria-label="Widgets fragmentáveis" className="flex min-h-0 min-w-0 flex-col border-r border-white/10 pr-2">
-                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Widgets (38)</p>
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">Widgets fragmentáveis ({fragmentableWidgets.length})</p>
                   <div className="grid min-h-0 grid-cols-3 grid-rows-5 content-start gap-1 overflow-y-auto pr-1">
-                    {availableWidgets.map((widget) => (
+                    {fragmentableWidgets.map((widget) => (
                       <button
                         key={widget.id}
                         type="button"
@@ -293,7 +294,7 @@ export default function Overlay_Editor({
                       {selectedWidget.id === "manual-clock" && (
                         <label className="flex flex-col gap-1 text-[10px] text-slate-300"><span>Fuso horário (IANA; vazio = local)</span><input type="text" value={String(editableConfig.timeZone ?? "")} disabled={!hasSelectedInstance} placeholder="America/Sao_Paulo" onChange={(event) => onUpdateSelectedConfig({ timeZone: event.target.value })} className="h-7 rounded border border-white/10 bg-slate-900 px-2 text-xs text-white disabled:opacity-50" /></label>
                       )}
-                      {editableEntries.length ? editableEntries.filter(([key]) => !(
+                      {editableEntries.length ? editableEntries.filter(([key]) => !(/^(fontFamily|fontSize|color|textColor|textColour|fontWeight|fontStyle|textDecoration|lineHeight|letterSpacing|textAlign)$/i.test(key) ||
                         selectedWidget.id === "manual-death-counter" && key === "deathCount" ||
                         ["twitch-rules", "twitch-schedule", "twitch-schedule-ticker"].includes(selectedWidget.id) && ["rules", "schedule", "news", "newsText", "text"].includes(key) ||
                         ["twitch-sub-goal", "twitch-bits-goal", "twitch-raid-goal"].includes(selectedWidget.id) && ["startValue", "targetValue"].includes(key) ||
