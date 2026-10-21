@@ -108,28 +108,46 @@ export default function AnimacoesTexto({
   const duracaoSegura = Math.max(50, Number(duracao) || 650);
   const atrasoSeguro = Math.max(0, Number(atraso) || 0);
 
-  // Usa Web Animations API para que cada efeito tenha seus próprios keyframes,
-  // sem depender de regras CSS externas ou de shorthand que possa sobrescrevê-las.
+  // No modo vai e vem, conclui a entrada de todas as letras antes de recolhê-las
+  // em sequência, da primeira até a última.
   useEffect(() => {
     const animations = [];
+    const timers = [];
+    let cancelled = false;
     if (tipoValido === "casanique") return undefined;
 
-    caracteres.forEach((caractere, indice) => {
-      const element = letterRefs.current[indice];
-      if (!element || /\s/.test(caractere)) return;
-      const animation = element.animate(KEYFRAMES[tipoValido], {
-        duration: duracaoSegura,
-        delay: indice * atrasoSeguro,
-        iterations: infinita ? Infinity : vaiEVem ? 2 : 1,
-        direction: vaiEVem ? "alternate" : "normal",
-        fill: "both",
-        easing: EASING[tipoValido],
-      });
-      if (tipoValido === "rolar") element.style.backfaceVisibility = "hidden";
-      animations.push(animation);
-    });
+    const elements = caracteres.map((caractere, indice) => ({
+      caractere, indice, element: letterRefs.current[indice],
+    })).filter(({ caractere, element }) => element && !/\\s/.test(caractere));
+    const tempoEntrada = Math.max(0, caracteres.length - 1) * atrasoSeguro + duracaoSegura;
+    const tempoSaida = tempoEntrada;
 
+    const runCycle = () => {
+      if (cancelled) return;
+      elements.forEach(({ element, indice }) => {
+        animations.push(element.animate(KEYFRAMES[tipoValido], {
+          duration: duracaoSegura, delay: indice * atrasoSeguro, iterations: 1, fill: "both", easing: EASING[tipoValido],
+        }));
+        if (tipoValido === "rolar") element.style.backfaceVisibility = "hidden";
+      });
+      if (vaiEVem) timers.push(setTimeout(() => {
+        if (cancelled) return;
+        elements.forEach(({ element, indice }) => animations.push(element.animate([
+          { opacity: 1, transform: "scale(1)" },
+          { opacity: 0, transform: "scale(0.65)" },
+        ], { duration: duracaoSegura, delay: indice * atrasoSeguro, iterations: 1, fill: "both", easing: "ease-in" })));
+      }, tempoEntrada));
+      if (infinita) timers.push(setTimeout(() => {
+        if (cancelled) return;
+        animations.forEach((animation) => animation.cancel());
+        runCycle();
+      }, vaiEVem ? tempoEntrada + tempoSaida : tempoEntrada));
+    };
+
+    runCycle();
     return () => {
+      cancelled = true;
+      timers.forEach(clearTimeout);
       animations.forEach((animation) => animation.cancel());
     };
   }, [caracteres, tipoValido, duracaoSegura, atrasoSeguro, infinita, vaiEVem, versao]);
