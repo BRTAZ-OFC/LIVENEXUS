@@ -411,7 +411,6 @@ export default function BibliotecaSearch() {
     {detailItem && <section className="mb-8 space-y-5 rounded-2xl border border-white/10 bg-[#0d1120] p-4 sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <button type="button" onClick={() => { setDetailItem(null); setDetailData(null); setError(""); }} className="inline-flex items-center gap-2 text-xs font-semibold text-slate-300 hover:text-white"><ArrowLeft className="h-4 w-4" />Voltar ao catálogo</button>
-        <button type="button" disabled={libraryBusy || isSaved(detailItem)} onClick={() => addItem(detailItem)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-semibold text-cyan-200 disabled:opacity-50"><Plus className="h-3.5 w-3.5" />{isSaved(detailItem) ? "Na biblioteca" : "Adicionar à biblioteca"}</button>
       </div>
       <div className="flex flex-col gap-4 sm:flex-row">
         {detailItem.thumbnail ? <img src={detailItem.thumbnail} alt="" className={`h-20 w-20 shrink-0 rounded-lg object-cover ${itemCategory(detailItem) === "artists" ? "rounded-full" : ""}`} /> : <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-white/5"><Music2 className="h-10 w-10 text-cyan-200" /></div>}
@@ -466,13 +465,14 @@ export default function BibliotecaSearch() {
         <div className="space-y-2">{visibleResults.map((item) => {
           const Icon = CATEGORIES.find((entry) => entry.key === itemCategory(item))?.icon || Music2;
           return <article key={itemId(item)} className="flex min-w-0 items-center gap-3 rounded-lg border border-white/10 bg-[#0d1120] px-3 py-2">
-            <button type="button" onClick={() => void openItem(item)} aria-label={`Abrir detalhes: ${item.title || item.name || "item"}`} className="h-14 w-14 shrink-0 overflow-hidden rounded-md border border-white/10 bg-white/5">
+            <button type="button" onClick={() => void openItem(item)} aria-label={`Abrir detalhes: ${item.title || item.name || "item"}`} className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/5">
               {item.thumbnail ? <img src={item.thumbnail} alt="" loading="lazy" referrerPolicy="no-referrer" className={`h-full w-full object-cover ${itemCategory(item) === "artists" ? "rounded-full" : ""}`} /> : <span className="flex h-full w-full items-center justify-center text-slate-500"><Icon className="h-5 w-5" /></span>}
             </button>
             <button type="button" onClick={() => void openItem(item)} className="min-w-0 flex-1 text-left">
               <p className="truncate text-sm font-semibold text-white" title={item.title || item.name}>{item.title || item.name || "Sem título"}</p>
               <p className="truncate text-xs text-slate-400">{item.artist || item.author || item.source || ""}</p>
             </button>
+            <button type="button" disabled={libraryBusy || isSaved(item)} onClick={() => addItem(item)} aria-label={isSaved(item) ? "Já está na biblioteca" : "Adicionar à biblioteca"} title={isSaved(item) ? "Na biblioteca" : "Adicionar à biblioteca"} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 text-cyan-200 hover:bg-cyan-300/10 disabled:opacity-50"><Plus className="h-4 w-4" /></button>
           </article>;
         })}</div>
         {canLoadMore && <div className="flex justify-center pt-3"><button type="button" disabled={loadingMore || loading} onClick={() => void loadMore()} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-4 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10 disabled:opacity-50">{loadingMore ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}{loadingMore ? "Carregando..." : "Carregar mais resultados"}</button></div>}
