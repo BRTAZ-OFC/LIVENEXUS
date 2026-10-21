@@ -100,15 +100,25 @@ export function registerJsonCompatRoutes(app: Express) {
           return res.json({ ok: true, item: updated });
         }
         if (req.method === "DELETE") {
-          const rowKey = String(req.body?.rowKey ?? req.query?.rowKey ?? "");
-          if (!rowKey) return res.status(400).json({ ok: false, error: "Informe rowKey." });
-          const existing = (await listJsonTableRecords(tableId)).find(
-            (row) => row.__rowKey === rowKey,
-          );
+          let rowKey = String(req.body?.rowKey ?? req.query?.rowKey ?? "");
+          const requestedId = String(req.body?.id ?? req.query?.id ?? "").trim();
+          const rows = await listJsonTableRecords(tableId);
+          // O CRUD de overlays também pode enviar o ID textual diretamente, sem a chave interna __rowKey.
+          if (!rowKey && tableId === "overlays" && requestedId) {
+            const byId = rows.find(
+              (row) =>
+                String(row.id ?? row.overlay_id ?? "") === requestedId &&
+                String(row.user_id ?? "") === session.user_id,
+            );
+            rowKey = String(byId?.__rowKey ?? "");
+          }
+          if (!rowKey) return res.status(400).json({ ok: false, error: "Informe rowKey ou o ID da overlay." });
+          const existing = rows.find((row) => row.__rowKey === rowKey);
           if (!existing || (tableId !== "galeria" && existing.user_id !== session.user_id)) {
             return res.status(404).json({ ok: false, error: "Registro não encontrado." });
           }
           const deleted = await deleteJsonTableRecord(tableId, rowKey);
+          if (!deleted) return res.status(404).json({ ok: false, error: "Registro não encontrado." });
           return res.json({ ok: true, deleted });
         }
         res.set("Allow", "GET, POST, PATCH, PUT, DELETE");
