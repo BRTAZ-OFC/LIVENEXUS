@@ -78,9 +78,10 @@ export function subscribeMusicPlayer(listener: (next: PlayerState) => void) {
 export function getMusicPlayerState() { return snapshot(); }
 export function connectMusicPlayerFrame(nextFrame: HTMLIFrameElement | null) {
   frame = nextFrame;
-  if (!frame || messageHandlerReady || typeof window === "undefined") return;
-  messageHandlerReady = true;
-  window.addEventListener("message", (event) => {
+  if (!frame || typeof window === "undefined") return;
+  if (!messageHandlerReady) {
+    messageHandlerReady = true;
+    window.addEventListener("message", (event) => {
     if (!frame || event.source !== frame.contentWindow || typeof event.data !== "string") return;
     let message: any;
     try { message = JSON.parse(event.data); } catch { return; }
@@ -104,7 +105,8 @@ export function connectMusicPlayerFrame(nextFrame: HTMLIFrameElement | null) {
       if (state.index >= 0 && state.index + 1 < state.queue.length) { playQueueIndex(state.index + 1); return; }
       emit();
     }
-  });
+    });
+  }
   try { frame.contentWindow?.postMessage(JSON.stringify({ event: "listening", channel: "widget" }), "https://www.youtube-nocookie.com"); } catch {}
 }
 export function playTrack(track: MusicTrack) {
