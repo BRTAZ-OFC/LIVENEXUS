@@ -20,7 +20,7 @@ function Frame({ config = {}, children, label, className = '' }) {
       .replace(/\bborder\b/g, '')
       .replace(/\brounded-[^\s]+/g, 'rounded-none');
   }
-  return <div className={`w-full h-full min-w-0 overflow-hidden flex ${style === 2 ? 'items-center justify-between gap-3' : style === 4 ? 'items-center justify-center gap-3' : 'flex-col justify-center gap-2'} ${shellStr} ${className}`} style={{ fontFamily: config.fontFamily || 'Inter, sans-serif' }}>
+  return <div className={`w-full h-full min-w-0 overflow-hidden flex ${style === 2 ? 'items-center justify-between gap-3' : style === 4 ? 'items-center justify-center gap-3' : 'flex-col justify-center gap-2'} ${shellStr} ${className}`} style={{ fontFamily: config.fontFamily || 'Inter, sans-serif', backgroundColor: 'transparent', backgroundImage: 'none', boxShadow: 'none' }}>
     {label && style !== 5 && <span className="text-[10px] font-bold uppercase tracking-[.17em] opacity-70">{label}</span>}
     {children}
   </div>;
@@ -124,9 +124,10 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
         className="w-full h-full flex items-center p-3 select-none relative overflow-hidden"
         style={{
           fontFamily: config.fontFamily || 'Inter, sans-serif',
-          background: '#090d16',
+          background: 'transparent',
+          backgroundImage: 'none',
           borderRadius: '0px',
-          boxShadow: '0 0 15px rgba(239, 68, 68, 0.6)'
+          boxShadow: 'none'
         }}
       >
         <span className="text-red-500 text-lg font-bold mr-3 shrink-0 flex items-center">
@@ -152,9 +153,10 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
         className="w-full h-full flex flex-col justify-between p-4 select-none relative overflow-hidden"
         style={{
           fontFamily: config.fontFamily || 'Inter, sans-serif',
-          background: '#0a0f1d',
+          background: 'transparent',
+          backgroundImage: 'none',
           borderRadius: '0px',
-          boxShadow: '0 0 15px rgba(59, 130, 246, 0.6)'
+          boxShadow: 'none'
         }}
       >
         {/* Cover */}
@@ -201,9 +203,10 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
         className="w-full h-full flex items-center p-3 gap-4 select-none relative overflow-hidden"
         style={{
           fontFamily: config.fontFamily || 'Inter, sans-serif',
-          background: '#0a0f1d',
+          background: 'transparent',
+          backgroundImage: 'none',
           borderRadius: '0px',
-          boxShadow: '0 0 15px rgba(168, 85, 247, 0.6)'
+          boxShadow: 'none'
         }}
       >
         {/* Cover */}
@@ -324,9 +327,10 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
         className="w-full h-full flex items-center p-3 select-none relative overflow-hidden"
         style={{
           fontFamily: config.fontFamily || 'Inter, sans-serif',
-          background: '#090d16',
+          background: 'transparent',
+          backgroundImage: 'none',
           borderRadius: '0px',
-          boxShadow: '0 0 15px rgba(249, 115, 22, 0.6)'
+          boxShadow: 'none'
         }}
       >
         <span className="text-orange-500 text-lg font-bold mr-3 shrink-0 flex items-center">
