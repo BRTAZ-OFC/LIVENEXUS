@@ -232,8 +232,8 @@ export default function OverlayCanvas() {
 
   const size = useMemo(
     () => ({
-      width: Math.max(320, Number(config.visualizerSize?.width) || DEFAULT_SIZE.width),
-      height: Math.max(180, Number(config.visualizerSize?.height) || DEFAULT_SIZE.height),
+      width: Math.max(1, Number(config.visualizerSize?.width) || DEFAULT_SIZE.width),
+      height: Math.max(1, Number(config.visualizerSize?.height) || DEFAULT_SIZE.height),
     }),
     [config.visualizerSize],
   );
@@ -505,13 +505,12 @@ export default function OverlayCanvas() {
       <p className="w-full text-[10px] text-violet-200/80">
         Atalhos: Delete remove · setas movem 1 px · Shift + setas movem 10 px
       </p>
-      <div className="relative mt-2 flex w-full min-w-0 justify-center overflow-hidden">
+      <div className="relative mt-2 flex w-full min-w-0 justify-center overflow-auto">
         <div
           ref={frameRef}
           className="relative mx-auto shrink-0 overflow-hidden bg-transparent"
           style={{
             width: size.width,
-            maxWidth: "100%",
             marginInline: "auto",
             height: size.height,
             boxSizing: "border-box",
@@ -756,7 +755,7 @@ export default function OverlayCanvas() {
           <div
             role="separator"
             aria-label="Redimensionar canvas"
-            title="Arraste para redimensionar (mínimo 40 × 20 px)"
+            title="Arraste para redimensionar; tamanho definido pelo usuário"
             className="absolute bottom-0 right-0 z-[70] h-4 w-4 cursor-se-resize touch-none opacity-60 hover:opacity-100"
             style={{
               background:
@@ -776,19 +775,11 @@ export default function OverlayCanvas() {
             onPointerMove={(event) => {
               const start = resizeStart.current;
               if (!start || !(event.buttons & 1)) return;
-              const parentWidth = frameRef.current?.parentElement?.clientWidth ?? 2400;
               setConfig((current) => ({
                 ...current,
                 visualizerSize: {
-                  width: Math.round(
-                    Math.max(
-                      40,
-                      Math.min(2400, parentWidth, start.width + event.clientX - start.x),
-                    ),
-                  ),
-                  height: Math.round(
-                    Math.max(20, Math.min(1600, start.height + event.clientY - start.y)),
-                  ),
+                  width: Math.max(1, Math.round(start.width + event.clientX - start.x)),
+                  height: Math.max(1, Math.round(start.height + event.clientY - start.y)),
                 },
               }));
             }}
