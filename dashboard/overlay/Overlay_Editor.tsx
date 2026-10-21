@@ -525,10 +525,10 @@ export default function Overlay_Editor({
                               structuralPreset: preset.id,
                               ...("layout" in preset && preset.layout ? { layout: preset.layout } : {}),
                             })}
-                            className={"flex aspect-square min-w-0 flex-col items-center justify-center gap-1 rounded-lg border p-1 text-center transition disabled:cursor-not-allowed disabled:opacity-40 " + (activePreset ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-900/80 text-slate-300 hover:border-violet-400/60 hover:bg-violet-500/10")}
+                            className={"flex aspect-square min-h-0 min-w-0 flex-col items-center justify-center gap-0.5 rounded-md border p-0.5 text-center transition disabled:cursor-not-allowed disabled:opacity-40 " + (activePreset ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-900/80 text-slate-300 hover:border-violet-400/60 hover:bg-violet-500/10")}
                           >
-                            <span className="flex h-7 w-7 items-center justify-center rounded border border-current/30 bg-slate-950/70 text-[10px] font-bold">{preset.id}</span>
-                            <span className="text-[10px] leading-tight">{preset.label}</span>
+                            <span className="flex h-4 w-4 items-center justify-center rounded border border-current/30 bg-slate-950/70 text-[8px] font-bold">{preset.id}</span>
+                            <span className="max-w-full truncate text-[9px] leading-tight">{preset.label}</span>
                           </button>
                         );
                       })}
@@ -560,11 +560,11 @@ export default function Overlay_Editor({
                         disabled={!hasSelectedInstance}
                         aria-pressed={String(editableConfig.widgetDisplayMode ?? "always") === mode.id}
                         onClick={() => onUpdateSelectedConfig({ widgetDisplayMode: mode.id })}
-                        className={"flex min-h-[54px] min-w-0 flex-col items-center justify-center gap-1 rounded-lg border px-1 py-1 text-center transition disabled:cursor-not-allowed disabled:opacity-40 " + (String(editableConfig.widgetDisplayMode ?? "always") === mode.id ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-900/80 text-slate-300 hover:border-violet-400/60 hover:bg-violet-500/10")}
+                        className={"flex min-h-[44px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-md border px-0.5 py-1 text-center transition disabled:cursor-not-allowed disabled:opacity-40 " + (String(editableConfig.widgetDisplayMode ?? "always") === mode.id ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-900/80 text-slate-300 hover:border-violet-400/60 hover:bg-violet-500/10")}
                       >
-                        <span className="flex h-7 items-center justify-center">{mode.icon}</span>
-                        <span className="text-[10px] font-semibold leading-tight">{mode.label}</span>
-                        <span className="text-[9px] leading-tight text-slate-400">{mode.description}</span>
+                        <span className="flex h-4 items-center justify-center">{mode.icon}</span>
+                        <span className="max-w-full text-[9px] font-semibold leading-tight">{mode.label}</span>
+                        
                       </button>
                     ))}
                   </div>
