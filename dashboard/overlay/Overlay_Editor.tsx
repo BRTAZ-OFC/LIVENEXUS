@@ -129,15 +129,13 @@ export default function Overlay_Editor({
             {activeMenu === "TEXTO" && (
               <div className="grid h-full min-h-0 min-w-0 grid-cols-[minmax(180px,0.38fr)_minmax(0,0.62fr)] gap-3">
                 <div className="flex min-w-0 flex-col justify-start gap-1.5 border-r border-white/10 pr-3">
-                  <label className="flex min-w-0 items-center gap-2 text-[11px] text-slate-300">
-                    <span className="w-[66px] shrink-0">Texto</span>
-                    <input
-                      value={textValue}
-                      onChange={(event) => setTextValue(event.target.value)}
-                      placeholder="Digite o texto"
-                      className="h-7 min-w-0 flex-1 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
-                    />
-                  </label>
+                  <button
+                    type="button"
+                    onClick={() => onAddText("Novo texto", fontSize, textColor, selectedFont)}
+                    className="inline-flex h-8 w-full items-center justify-center gap-1 rounded-md bg-violet-600 px-2 text-xs font-medium text-white transition hover:bg-violet-500"
+                  >
+                    <Plus size={14} /> Adicionar caixa de texto
+                  </button>
                   <label className="flex items-center gap-2 text-[11px] text-slate-300">
                     <span className="w-[66px] shrink-0">Tamanho</span>
                     <input
@@ -159,15 +157,6 @@ export default function Overlay_Editor({
                       className="h-7 w-20 cursor-pointer rounded-md border border-white/10 bg-slate-900 p-1"
                     />
                   </label>
-                  <div className="flex justify-end pt-0.5">
-                    <button
-                      type="button"
-                      onClick={() => onAddText(textValue.trim() || "Texto", fontSize, textColor, selectedFont)}
-                      className="inline-flex h-7 items-center gap-1 rounded-md bg-violet-600 px-3 text-xs font-medium text-white transition hover:bg-violet-500"
-                    >
-                      <Plus size={14} /> Adicionar texto
-                    </button>
-                  </div>
                 </div>
 
                 <div className="flex min-h-0 min-w-0 flex-col gap-1 overflow-hidden">
@@ -188,7 +177,7 @@ export default function Overlay_Editor({
                   {selectedFontCategory && (
                     <div className="min-h-0 min-w-0 border-t border-white/10 pt-1">
                       <p className="mb-0.5 text-[10px] leading-3 text-slate-400">Famílias de fontes</p>
-                      <div className="flex min-w-0 flex-wrap gap-1.5 overflow-y-auto">
+                      <div className="grid min-w-0 grid-cols-2 gap-1">
                         {FONT_CATEGORIES[selectedFontCategory].map((font) => (
                           <button
                             key={font}
@@ -197,10 +186,9 @@ export default function Overlay_Editor({
                             aria-pressed={selectedFont === font}
                             title={font}
                             style={{ fontFamily: `"${font}", sans-serif` }}
-                            className={selectedFont === font ? activeButtonClass : buttonClass}
+                            className={`flex h-7 min-w-0 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap rounded-md border px-2 py-1 text-[11px] transition ${selectedFont === font ? "border-violet-400 bg-violet-500/20 text-white" : "border-white/10 bg-slate-800/80 text-slate-200 hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white"}`}
                           >
-                            <span className="mr-1 text-[10px] text-slate-400">{font}</span>
-                            <span style={{ fontFamily: `"${font}", sans-serif` }}>Aa Bb 123</span>
+                            <span className="block min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{font}</span>
                           </button>
                         ))}
                       </div>
