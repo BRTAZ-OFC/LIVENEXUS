@@ -19,6 +19,7 @@ type OverlayEditorProps = {
   catalog: WidgetDefinition[];
   onAddFragment: (definition: WidgetDefinition, elementKey: string, label: string) => void;
   onAddText: (text: string, fontSize: number, color: string, fontFamily: string) => void;
+  onAddShape: (shape: string) => void;
   onFontChange: (fontFamily: string) => void;
   onTextStyleChange: (patch: { fontSize?: number; color?: string; fontFamily?: string }) => void;
   selectedInstanceWidgetId?: string | null;
@@ -54,6 +55,25 @@ function getReactHubQueueUrl(item: ReactHubQueueItem) {
     if (match?.[0]) return match[0].replace(/[),.;!?\]}]+$/, "");
   }
   return "";
+}
+
+
+const SHAPE_OPTIONS: Array<{ id: string; label: string }> = [["rectangle","Retângulo"],["rounded-rectangle","Retângulo arredondado"],["square","Quadrado"],["circle","Círculo"],["ellipse","Elipse"],["triangle","Triângulo"],["right-triangle","Triângulo retângulo"],["diamond","Losango"],["parallelogram","Paralelogramo"],["trapezoid","Trapézio"],["pentagon","Pentágono"],["hexagon","Hexágono"],["heptagon","Heptágono"],["octagon","Octógono"],["decagon","Decágono"],["star","Estrela"],["star-6","Estrela 6 pontas"],["arrow-right","Seta direita"],["arrow-left","Seta esquerda"],["arrow-up","Seta para cima"],["arrow-down","Seta para baixo"],["chevron","Chevron"],["cross","Cruz"],["plus","Mais"],["minus","Menos"],["heart","Coração"],["lightning","Raio"],["speech-bubble","Balão de fala"],["cylinder","Cilindro"],["cloud","Nuvem"],["arch","Arco"],["wave","Onda"],["pie","Setor circular"],["ring","Anel"],["line","Linha"]].map(([id, label]) => ({ id, label }));
+function ShapeIcon({ shape }: { shape: string }) {
+  const pts: Record<string,string> = {triangle:"50,4 96,94 4,94","right-triangle":"5,5 5,95 95,95",diamond:"50,3 97,50 50,97 3,50",parallelogram:"25,5 97,5 75,95 3,95",trapezoid:"25,5 75,5 97,95 3,95",pentagon:"50,3 97,38 79,96 21,96 3,38",hexagon:"25,4 75,4 97,50 75,96 25,96 3,50",heptagon:"50,3 88,20 98,55 76,90 38,98 5,70 12,30",octagon:"30,3 70,3 97,30 97,70 70,97 30,97 3,70 3,30",decagon:"50,2 79,12 96,35 96,65 79,88 50,98 21,88 4,65 4,35 21,12","star-6":"50,3 61,35 95,35 68,55 78,91 50,70 22,91 32,55 5,35 39,35","arrow-right":"3,30 60,30 60,7 97,50 60,93 60,70 3,70","arrow-left":"97,30 40,30 40,7 3,50 40,93 40,70 97,70","arrow-up":"30,97 30,40 7,40 50,3 93,40 70,40 70,97","arrow-down":"30,3 70,3 70,60 93,60 50,97 7,60 30,60",chevron:"5,5 50,35 95,5 95,35 50,65 5,35",cross:"35,3 65,3 65,35 97,35 97,65 65,65 65,97 35,97 35,65 3,65 3,35 35,35",plus:"38,3 62,3 62,38 97,38 97,62 62,62 62,97 38,97 38,62 3,62 3,38 38,38",minus:"5,38 95,38 95,62 5,62"};
+  if (["circle","ellipse","ring"].includes(shape)) return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><ellipse cx="50" cy="50" rx={shape==="ellipse"?48:43} ry={shape==="ellipse"?30:43} fill={shape==="ring"?"none":"currentColor"} stroke="currentColor" strokeWidth={shape==="ring"?9:2}/></svg>;
+  if (["rectangle","square","rounded-rectangle"].includes(shape)) return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><rect x={shape==="square"?8:3} y={shape==="square"?8:20} width={shape==="square"?84:94} height={shape==="square"?84:60} rx={shape==="rounded-rectangle"?14:1} fill="currentColor"/></svg>;
+  if(shape==="star") return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><polygon points="50,3 61,36 96,36 68,57 79,93 50,71 21,93 32,57 4,36 39,36" fill="currentColor"/></svg>;
+  if(shape==="heart") return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><path d="M50 91 C40 78 7 56 7 30 C7 5 38 1 50 24 C63 1 94 5 94 30 C94 56 60 79 50 91Z" fill="currentColor"/></svg>;
+  if(shape==="lightning") return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><polygon points="57,2 18,56 44,56 35,98 83,37 56,37" fill="currentColor"/></svg>;
+  if(shape==="speech-bubble") return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><path d="M8 12 H92 V72 H42 L20 92 V72 H8Z" fill="currentColor"/></svg>;
+  if(shape==="cylinder") return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><path d="M8 20 C8 3 92 3 92 20 V80 C92 98 8 98 8 80Z" fill="currentColor"/><ellipse cx="50" cy="20" rx="42" ry="14" fill="currentColor" stroke="#ddd6fe" strokeWidth="4"/></svg>;
+  if(shape==="cloud") return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><path d="M22 76 C1 76 1 48 21 43 C18 17 48 9 60 31 C82 21 100 40 91 58 C109 77 87 88 72 85 H23Z" fill="currentColor"/></svg>;
+  if(shape==="arch") return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><path d="M10 95 V48 A40 40 0 0 1 90 48 V95 H68 V48 A18 18 0 0 0 32 48 V95Z" fill="currentColor"/></svg>;
+  if(shape==="wave") return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><path d="M4 35 C25 5 35 65 50 35 S75 5 96 35 V65 C75 35 65 95 50 65 S25 35 4 65Z" fill="currentColor"/></svg>;
+  if(shape==="pie") return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><path d="M50 50 L50 5 A45 45 0 0 1 95 50Z" fill="currentColor"/><circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3"/></svg>;
+  if(shape==="line") return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><path d="M8 90 L92 10" fill="none" stroke="currentColor" strokeWidth="10" strokeLinecap="round"/></svg>;
+  return <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true"><polygon points={pts[shape]||pts.hexagon} fill="currentColor"/></svg>;
 }
 
 const buttonClass = "shrink-0 rounded-md border border-white/10 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white";
@@ -128,6 +148,7 @@ export default function Overlay_Editor({
   catalog,
   onAddFragment,
   onAddText,
+  onAddShape,
   onFontChange,
   onTextStyleChange,
   selectedInstanceWidgetId = null,
@@ -590,7 +611,26 @@ export default function Overlay_Editor({
                 </section>
               </div>
             )}
-            {!["INICIO", "TEXTO", "ANIMACAO"].includes(activeMenu) && (
+            {activeMenu === "FORMAS" && (
+              <div className="grid h-full min-h-0 min-w-0 grid-cols-2 gap-3 overflow-hidden">
+                <section className="flex min-h-0 min-w-0 flex-col border-r border-white/10 pr-2">
+                  <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-300">Formas geométricas</p>
+                  <div className="grid min-h-0 min-w-0 flex-1 grid-cols-2 content-start gap-1">
+                    {SHAPE_OPTIONS.map((item) => <button key={item.id} type="button" title={item.label} onClick={() => onAddShape(item.id)} className="flex min-w-0 items-center gap-1 rounded border border-white/10 bg-slate-900/80 px-1.5 py-1 text-left text-[9px] leading-tight text-slate-200 hover:border-violet-400 hover:bg-violet-500/15"><ShapeIcon shape={item.id}/><span className="min-w-0 truncate">{item.label}</span></button>)}
+                  </div>
+                </section>
+                <section className="flex min-w-0 flex-col gap-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">Cor e efeitos de cor</p>
+                  <label className="flex items-center justify-between gap-2 text-[10px] text-slate-300">Preenchimento<input aria-label="Cor de preenchimento da forma" type="color" value={String(selectedInstanceConfig?.fillColor || "#8b5cf6")} disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} onChange={(event) => onUpdateSelectedConfig({ fillColor: event.target.value, color: event.target.value })} className="h-7 w-10 rounded border border-white/10 bg-slate-900 p-0.5 disabled:opacity-40"/></label>
+                  <label className="flex items-center justify-between gap-2 text-[10px] text-slate-300">Contorno<input aria-label="Cor do contorno da forma" type="color" value={String(selectedInstanceConfig?.strokeColor || "#ddd6fe")} disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} onChange={(event) => onUpdateSelectedConfig({ strokeColor: event.target.value })} className="h-7 w-10 rounded border border-white/10 bg-slate-900 p-0.5 disabled:opacity-40"/></label>
+                  <label className="flex items-center justify-between gap-2 text-[10px] text-slate-300">Espessura<input aria-label="Espessura do contorno" type="number" min={0} max={24} value={Number(selectedInstanceConfig?.strokeWidth ?? 2)} disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} onChange={(event) => onUpdateSelectedConfig({ strokeWidth: Math.max(0, Math.min(24, Number(event.target.value) || 0)) })} className="h-7 w-14 rounded border border-white/10 bg-slate-900 px-1 text-xs text-white disabled:opacity-40"/></label>
+                  <label className="flex items-center justify-between gap-2 text-[10px] text-slate-300">Opacidade<input aria-label="Opacidade da forma" type="range" min={0} max={100} value={Number(selectedInstanceConfig?.opacity ?? 100)} disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} onChange={(event) => onUpdateSelectedConfig({ opacity: Number(event.target.value) })} className="w-24 accent-violet-500 disabled:opacity-40"/></label>
+                  <label className="flex items-center gap-2 text-[10px] text-slate-300"><input type="checkbox" checked={selectedInstanceConfig?.fillEnabled !== false} disabled={selectedInstanceWidgetId !== "__livenexus_shape__"} onChange={(event) => onUpdateSelectedConfig({ fillEnabled: event.target.checked })} className="accent-violet-500 disabled:opacity-40"/>Preenchimento ativo</label>
+                  <p className="text-[9px] leading-tight text-slate-500">Selecione uma forma no canvas para editar as cores e os efeitos.</p>
+                </section>
+              </div>
+            )}
+            {!["INICIO", "TEXTO", "ANIMACAO", "FORMAS"].includes(activeMenu) && (
               <div className="flex h-full items-center justify-center text-xs text-slate-500">
                 Este menu ficará vazio nesta etapa.
               </div>
