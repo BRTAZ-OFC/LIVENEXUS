@@ -28,7 +28,7 @@ const activeButtonClass = "shrink-0 rounded-md border border-violet-400 bg-viole
 
 export default function Overlay_Editor({
   className = "",
-  height = 190,
+  height = 220,
   catalog,
   onAddFragment,
   onAddText,
@@ -41,7 +41,7 @@ export default function Overlay_Editor({
   const [textValue, setTextValue] = useState("Novo texto");
   const [fontSize, setFontSize] = useState(32);
   const [textColor, setTextColor] = useState("#ffffff");
-  const panelHeight = `min(${Math.max(120, height)}px, 42vh)`;
+  const panelHeight = `min(${Math.max(190, height)}px, 34vh)`;
   const style: CSSProperties = {
     height: isCollapsed ? "0px" : panelHeight,
     transition: "height 220ms ease",
@@ -76,8 +76,8 @@ export default function Overlay_Editor({
       </button>
 
       {!isCollapsed && (
-        <div className="flex h-full min-h-0 flex-col gap-2 px-3 pb-3 pt-2">
-          <HorizontalMenu ariaLabel="Seções do editor de overlay" trackClassName="overflow-hidden">
+        <div className="flex h-full min-h-0 flex-col gap-1 px-3 pb-2 pt-1.5">
+          <HorizontalMenu ariaLabel="Seções do editor de overlay" trackClassName="overflow-x-auto overflow-y-hidden">
             {MENUS.map((menu) => (
               <button
                 key={menu}
@@ -91,7 +91,7 @@ export default function Overlay_Editor({
             ))}
           </HorizontalMenu>
 
-          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+          <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-1">
             {activeMenu === "INICIO" && (
               <div className="flex flex-col gap-2">
                 <p className="text-[11px] text-slate-400">Fragmentos das widgets</p>
@@ -127,7 +127,7 @@ export default function Overlay_Editor({
             )}
 
             {activeMenu === "TEXTO" && (
-              <div className="flex min-w-0 flex-col gap-1.5">
+              <div className="flex min-w-0 flex-col gap-0.5">
                 <div className="flex min-w-0 items-end gap-2">
                   <label className="flex min-w-[160px] flex-1 flex-col gap-1 text-[10px] text-slate-400">
                     Texto
@@ -135,7 +135,7 @@ export default function Overlay_Editor({
                       value={textValue}
                       onChange={(event) => setTextValue(event.target.value)}
                       placeholder="Digite o texto"
-                      className="h-8 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
+                      className="h-7 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
                     />
                   </label>
                   <label className="flex w-[72px] shrink-0 flex-col gap-1 text-[10px] text-slate-400">
@@ -156,13 +156,13 @@ export default function Overlay_Editor({
                       value={textColor}
                       onChange={(event) => setTextColor(event.target.value)}
                       aria-label="Cor do texto"
-                      className="h-8 w-full cursor-pointer rounded-md border border-white/10 bg-slate-900 p-1"
+                      className="h-7 w-full cursor-pointer rounded-md border border-white/10 bg-slate-900 p-1"
                     />
                   </label>
                   <button
                     type="button"
                     onClick={() => onAddText(textValue.trim() || "Texto", fontSize, textColor, selectedFont)}
-                    className="inline-flex h-8 items-center gap-1 rounded-md bg-violet-600 px-3 text-xs font-medium text-white transition hover:bg-violet-500"
+                    className="inline-flex h-7 items-center gap-1 rounded-md bg-violet-600 px-3 text-xs font-medium text-white transition hover:bg-violet-500"
                   >
                     <Plus size={14} /> Adicionar texto
                   </button>
@@ -184,7 +184,7 @@ export default function Overlay_Editor({
                     ))}
                   </HorizontalMenu>
                   {selectedFontCategory && (
-                    <div className="min-w-0 border-t border-white/10 pt-1">
+                    <div className="min-w-0 border-t border-white/10 pt-0.5">
                       <HorizontalMenu ariaLabel="Famílias de fontes" trackClassName="overflow-hidden">
                         {FONT_CATEGORIES[selectedFontCategory].map((font) => (
                           <button
@@ -204,7 +204,7 @@ export default function Overlay_Editor({
                     </div>
                   )}
                 </div>
-                <p className="text-[10px] leading-3 text-slate-500">Duplo clique no texto do canvas para editar.</p>
+                <p className="hidden">Duplo clique no texto do canvas para editar.</p>
               </div>
             )}
 
