@@ -82,11 +82,32 @@ export default function HorizontalMenu({
 
   function move(direction: "left" | "right") {
     const track = trackRef.current;
-    if (!track) return;
+    const content = contentRef.current;
+    if (!track || !content) return;
 
-    const distance = Math.max(140, Math.floor(track.clientWidth * 0.75));
-    track.scrollBy({
-      left: direction === "left" ? -distance : distance,
+    const items = Array.from(content.children) as HTMLElement[];
+    if (items.length === 0) return;
+
+    const currentScroll = track.scrollLeft;
+    const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+    const itemPositions = items.map(
+      (item) =>
+        item.getBoundingClientRect().left -
+        track.getBoundingClientRect().left +
+        currentScroll,
+    );
+
+    let target = currentScroll;
+    if (direction === "right") {
+      const nextPosition = itemPositions.find((position) => position > currentScroll + 3);
+      if (nextPosition !== undefined) target = nextPosition;
+    } else {
+      const previousPositions = itemPositions.filter((position) => position < currentScroll - 3);
+      if (previousPositions.length > 0) target = previousPositions[previousPositions.length - 1];
+    }
+
+    track.scrollTo({
+      left: Math.max(0, Math.min(maxScroll, target)),
       behavior: "smooth",
     });
   }
