@@ -18,6 +18,7 @@ type OverlayEditorProps = {
   catalog: WidgetDefinition[];
   onAddFragment: (definition: WidgetDefinition, elementKey: string, label: string) => void;
   onAddText: (text: string, fontSize: number, color: string, fontFamily: string) => void;
+  onFontChange: (fontFamily: string) => void;
 };
 
 const MENUS = ["INICIO", "TEXTO", "ANIMACAO", "IMAGEMS", "ALINHAMENTO", "FORMAS", "EMOJES", "CAMADAS"] as const;
@@ -32,6 +33,7 @@ export default function Overlay_Editor({
   catalog,
   onAddFragment,
   onAddText,
+  onFontChange,
 }: OverlayEditorProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeMenu, setActiveMenu] = useState<MenuName>("INICIO");
@@ -61,6 +63,7 @@ export default function Overlay_Editor({
   function chooseFont(font: string) {
     setSelectedFont(font);
     if (font !== "monospace") loadGoogleFont(font);
+    onFontChange(font);
   }
 
   return (
