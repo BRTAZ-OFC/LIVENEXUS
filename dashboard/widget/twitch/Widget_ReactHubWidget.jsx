@@ -6,13 +6,28 @@ import {
   getStoredActiveReactVideo,
   syncVideosFromChatMessages,
 } from "../../cenarios/Scenario_reactVideoService";
-import { MessageSquare, Film, SplitSquareVertical, CheckCircle2, Radio } from "lucide-react";
+import { MessageSquare, Film, SplitSquareVertical, CheckCircle2, Radio, Play, X } from "lucide-react";
+
+function getYouTubeEmbedUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    let videoId = "";
+    if (url.hostname === "youtu.be") videoId = url.pathname.split("/").filter(Boolean)[0] || "";
+    else if (url.hostname.includes("youtube.com") || url.hostname.includes("youtube-nocookie.com")) {
+      videoId = url.searchParams.get("v") || "";
+      const parts = url.pathname.split("/").filter(Boolean);
+      if (!videoId && parts.length > 1 && ["embed", "shorts", "live"].includes(parts[0])) videoId = parts[1];
+    }
+    return /^[a-zA-Z0-9_-]{11}$/.test(videoId) ? "https://www.youtube.com/embed/" + videoId + "?autoplay=1&rel=0" : "";
+  } catch { return ""; }
+}
 
 export default function ReactHubWidget({ config = {} }) {
   const { liveActivity } = useStreaming();
 
   const [queue, setQueue] = useState(() => getStoredReactQueue());
   const [activeVideo, setActiveVideo] = useState(() => getStoredActiveReactVideo());
+  const [previewVideo, setPreviewVideo] = useState(null);
 
   const containerRef = useRef(null);
 
