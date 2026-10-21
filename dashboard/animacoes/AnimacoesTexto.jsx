@@ -248,10 +248,10 @@ export default function AnimacoesTexto({
           {tipoValido === "casanique" && !/\s/.test(caractere)
             ? (embaralhados[indice] ?? caractere)
             : caractere === " "
-              ? "\\u00a0"
+              ? "\u00a0"
               : caractere}
         </span>
-      ))})}
+      ))}
     </span>
   );
 }
