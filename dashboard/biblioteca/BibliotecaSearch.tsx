@@ -61,10 +61,10 @@ function parseLink(raw: string, titleInput: string): CatalogItem {
   if (videoId) { type = "song"; category = "songs"; }
   else if (playlistId.startsWith("OLAK5uy_")) { type = "album"; category = "albums"; }
   else if (playlistId) { type = "playlist"; category = "playlists"; }
-  else if (browseId.startsWith("UC")) { type = "artist"; category = "artists"; }
+  else if (browseId.startsWith("UC") || handle) { type = "artist"; category = "artists"; }
   else if (browseId.startsWith("MP")) { type = "album"; category = "albums"; }
   else throw new Error("Não identifiquei uma música, álbum, artista ou playlist nesse link.");
-  const id = videoId || playlistId || browseId;
+  const id = videoId || playlistId || browseId || (handle ? `@${handle}` : "");
   const title = titleInput.trim() || `${category === "songs" ? "Música" : category === "albums" ? "Álbum" : category === "artists" ? "Artista" : "Playlist"} ${id}`;
   return { id, type, title, name: category === "artists" ? title : undefined, ...(videoId ? { videoId, thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` } : {}), ...(playlistId ? { playlistId } : {}), ...(browseId ? { browseId } : {}), url: url.toString(), source: host === "music.youtube.com" ? "YouTube Music" : "YouTube" } as CatalogItem;
 }
@@ -246,7 +246,7 @@ export default function BibliotecaSearch() {
     <nav className="mb-6 flex gap-2 overflow-x-auto border-b border-white/10 pb-3" aria-label="Navegação da biblioteca">
       {([{ key: "categories", label: "CATEGORIAS", icon: Music2 }, { key: "history", label: "HISTORICO", icon: History }, { key: "library", label: "BIBLIOTECA", icon: Library }, { key: "personal", label: "PESSOAL", icon: UserRound }] as const).map((entry) => {
         const Icon = entry.icon;
-        return <button key={entry.key} type="button" onClick={() => { setView(entry.key); setError(""); setNotice(""); }} aria-pressed={view === entry.key} className={`inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-2 text-xs font-bold tracking-wide transition ${view === entry.key ? "border-cyan-300 text-cyan-200" : "border-transparent text-slate-400 hover:text-white"}`}><Icon className="h-4 w-4" />{entry.label}</button>;
+        return <button key={entry.key} type="button" onClick={() => { setView(entry.key); if (entry.key === "categories") setSearched(""); setError(""); setNotice(""); }} aria-pressed={view === entry.key} className={`inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-2 text-xs font-bold tracking-wide transition ${view === entry.key ? "border-cyan-300 text-cyan-200" : "border-transparent text-slate-400 hover:text-white"}`}><Icon className="h-4 w-4" />{entry.label}</button>;
       })}
     </nav>
     {error && <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border border-red-400/20 bg-red-400/5 p-3 text-sm text-red-200"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /><span>{error}</span><button type="button" onClick={() => setError("")} aria-label="Fechar erro" className="ml-auto"><X className="h-4 w-4" /></button></div>}
