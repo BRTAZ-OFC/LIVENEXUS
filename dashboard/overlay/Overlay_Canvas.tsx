@@ -1056,6 +1056,8 @@ export default function OverlayCanvas() {
         onAddShape={addShapeInstance}
         gridSettings={gridSettings}
         onUpdateGridSettings={updateGridSettings}
+        globalBackgroundColor={String(config.background?.type === "solid" ? config.background.color || "#020617" : "#020617")}
+        onUpdateGlobalBackgroundColor={(color) => updateBackground({ type: "solid", color, opacity: 100, gradient: undefined, image: undefined })}
         globalStyleConfig={{ borderEnabled: Boolean(config.globalStyleConfig?.borderEnabled), borderWidth: Math.max(1, Math.min(100, Number(config.globalStyleConfig?.borderWidth) || 1)), borderColor: String(config.globalStyleConfig?.borderColor || "#dce6ff"), borderRadius: Math.max(1, Math.min(100, Number(config.globalStyleConfig?.borderRadius) || 16)), texture: String(config.globalStyleConfig?.texture || "none"), colorEffectEnabled: Boolean(config.globalStyleConfig?.colorEffectEnabled), colorEffect: String(config.globalStyleConfig?.colorEffect || "glass") }}
         onUpdateGlobalStyleConfig={(patch) => setConfig((current) => ({ ...current, globalStyleConfig: { borderEnabled: false, borderWidth: 1, borderColor: "#dce6ff", borderRadius: 16, texture: "none", colorEffectEnabled: false, colorEffect: "glass", ...(current.globalStyleConfig || {}), ...patch } }))}
         layers={(config.instances || []).map((instance, index) => ({
