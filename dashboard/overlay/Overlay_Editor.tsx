@@ -508,7 +508,16 @@ export default function Overlay_Editor({
                       { id: "casanique", label: "Casanique" },
                       { id: "rolar", label: "Rolar" },
                       { id: "encarrilha", label: "Encarrilha" },
-                      ...Array.from({ length: 21 }, (_, index) => ({ id: `em-breve-${index + 5}`, label: "" })),
+                      { id: "slide-in-cima", label: "Slide In Cima" },
+                      { id: "slide-in-baixo", label: "Slide In Baixo" },
+                      { id: "slide-in-esquerda", label: "Slide In Esquerda" },
+                      { id: "slide-in-direita", label: "Slide In Direita" },
+                      { id: "reveal", label: "Reveal" },
+                      { id: "flip-in", label: "Flip In" },
+                      { id: "bounce-in", label: "Bounce In" },
+                      { id: "blur-in", label: "Blur In" },
+                      { id: "light-speed-in", label: "Light Speed In" },
+                      ...Array.from({ length: 12 }, (_, index) => ({ id: `em-breve-${index + 14}`, label: "" })),
                     ].map((animation) => {
                       const active = String(selectedInstanceConfig?.animationType || "nenhuma") === animation.id;
                       const disabled = !animation.label || selectedInstanceWidgetId !== "__livenexus_text__" || !selectedInstanceConfig;
