@@ -142,39 +142,9 @@ export default function BibliotecaSearch() {
         const data = await response.json();
         if (!response.ok || !data.ok) return collected;
         collected.push(...normalizeBundle(data).filter((item) => itemCategory(item) === entry.key));
-        const tokens: Record<string, string> = { ...(data.continuations || {}) };
-        const keys = entry.key === "songs" ? ["songs", "youtube"] : [entry.key];
-        while (active && collected.length < 400 && keys.some((key) => Boolean(tokens[key]))) {
-          const pages = await Promise.all(keys.filter((key) => Boolean(tokens[key])).map(async (tokenKey) => {
-            const endpoint = tokenKey === "youtube" ? "youtube" : "search";
-            const params = new URLSearchParams({ q: SEEDS[entry.key], continuation: tokens[tokenKey], step: "true" });
-            if (endpoint === "search") params.set("type", tokenKey);
-            const pageResponse = await fetch(`/api/ytmusic/${endpoint}?${params.toString()}`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
-            const pageData = await pageResponse.json();
-            if (!pageResponse.ok || !pageData.ok) return { tokenKey, items: [] as CatalogItem[], continuation: "" };
-            const items = (Array.isArray(pageData.items) ? pageData.items : []).map((item: any) => {
-              if (tokenKey === "youtube") return { ...item, type: item.type || "song", source: "YouTube" };
-              if (tokenKey === "playlists") {
-                const id = String(item.playlistId || "");
-                return { ...item, type: id.startsWith("RD") ? "mix" : id.startsWith("PL") ? "community_playlist" : "playlist", source: item.source || "YouTube Music" };
-              }
-              return { ...item, type: tokenKey === "songs" ? "song" : tokenKey.slice(0, -1), source: "YouTube Music" };
-            });
-            return { tokenKey, items, continuation: pageData.continuation || "" };
-          }));
-          const before = collected.length;
-          const previousTokens = { ...tokens };
-          for (const page of pages) {
-            tokens[page.tokenKey] = page.continuation;
-            collected.push(...page.items.filter((item) => itemCategory(item) === entry.key));
-          }
-          const deduped = unique(collected);
-          collected.splice(0, collected.length, ...deduped.slice(0, 400));
-          if (pages.every((page) => !page.continuation)) break;
-          if (collected.length === before && pages.every((page) => page.continuation === previousTokens[page.tokenKey])) break;
-        }
+        // Carrega somente o lote inicial, igual à primeira leva da pesquisa; não solicita continuations.
       } catch { /* cada carrossel pode carregar independentemente */ }
-      return unique(collected).slice(0, 400);
+      return unique(collected).slice(0, 30);
     };
     (async () => {
       const pairs = await Promise.all(CATEGORIES.map(async (entry) => [entry.key, await loadHomeCategory(entry)] as const));
