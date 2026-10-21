@@ -6,6 +6,7 @@ import {
   type ComponentType,
   type CSSProperties,
 } from "react";
+import { Plus, Save, Trash2 } from "lucide-react";
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
 import HorizontalMenu from "../components/HorizontalMenu";
@@ -70,6 +71,7 @@ type OverlayRow = {
   config?: unknown;
   data?: unknown;
   user_id?: string;
+  updated_at?: string;
 };
 
 const catalog = TWITCH_WIDGETS_CATALOG as unknown as WidgetDefinition[];
@@ -173,7 +175,11 @@ export default function OverlayCanvas() {
     background: EMPTY_BACKGROUND,
   });
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [overlays, setOverlays] = useState<OverlayRow[]>([]);
+  const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -202,16 +208,15 @@ export default function OverlayCanvas() {
           requestedScenario ||
           rows.find((row) => getCanvasConfig(row).instances.length > 0) ||
           rows[0];
+        if (!cancelled) setOverlays(rows);
         if (!cancelled && firstConfigured) {
           setConfig(getCanvasConfig(firstConfigured));
+          setActiveOverlayId(String(firstConfigured.id ?? "") || null);
           if (requestedScenario) sessionStorage.removeItem("livenexus_active_scenario_id");
-        } else if (!cancelled)
-          setConfig({
-            name: "Overlay",
-            visualizerSize: DEFAULT_SIZE,
-            instances: [],
-            background: EMPTY_BACKGROUND,
-          });
+        } else if (!cancelled) {
+          setActiveOverlayId(null);
+          setConfig({ name: "Overlay", visualizerSize: DEFAULT_SIZE, instances: [], background: EMPTY_BACKGROUND });
+        }
       } catch (cause) {
         if (!cancelled)
           setError(cause instanceof Error ? cause.message : "Erro ao carregar o canvas.");
@@ -305,6 +310,89 @@ export default function OverlayCanvas() {
     return () => window.removeEventListener("keydown", handleCanvasKeyDown);
   }, [config.instances, selectedInstanceId, size.width, size.height]);
 
+  function startNewOverlay() {
+    setActiveOverlayId(null);
+    setConfig({ name: "Nova Overlay", visualizerSize: DEFAULT_SIZE, instances: [], background: EMPTY_BACKGROUND });
+    setSelectedInstanceId(null);
+    setError("");
+    setNotice("Nova overlay: informe o nome e clique em Salvar.");
+  }
+
+  function selectOverlay(id: string) {
+    const row = overlays.find((item) => String(item.id ?? "") === id);
+    if (!row) return;
+    setConfig(getCanvasConfig(row));
+    setActiveOverlayId(id);
+    setSelectedInstanceId(null);
+    setError("");
+    setNotice("");
+  }
+
+  function makeOverlayId(name: string) {
+    return name.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  }
+
+  async function saveOverlay() {
+    const name = String(config.name ?? "").trim();
+    const generatedId = makeOverlayId(name);
+    if (!name || !generatedId) {
+      setError("Informe um nome válido para a overlay.");
+      return;
+    }
+    if (!activeOverlayId && overlays.some((row) => String(row.id ?? "") === generatedId)) {
+      setError("Já existe uma overlay com esse nome/ID. Escolha outro nome ou selecione a overlay existente.");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch("/api/overlay/canvas", {
+        method: "PUT", credentials: "include",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        cache: "no-store",
+        body: JSON.stringify({ overlay: { ...config, id: generatedId, name }, currentId: activeOverlayId, createNew: !activeOverlayId }),
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload.ok || !payload.overlay) throw new Error(payload.message || "Não foi possível salvar a overlay.");
+      const saved = payload.overlay as OverlayRow;
+      const savedId = String(saved.id ?? activeOverlayId ?? generatedId);
+      setActiveOverlayId(savedId);
+      setOverlays((current) => {
+        const withoutPreviousId = current.filter((row) => String(row.id ?? "") !== activeOverlayId);
+        return withoutPreviousId.some((row) => String(row.id ?? "") === savedId)
+          ? withoutPreviousId.map((row) => String(row.id ?? "") === savedId ? saved : row)
+          : [...withoutPreviousId, saved];
+      });
+      setConfig(getCanvasConfig(saved));
+      setNotice("Overlay salva no JSON.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Erro ao salvar a overlay.");
+    } finally { setSaving(false); }
+  }
+
+  async function deleteOverlay() {
+    if (!activeOverlayId) { setError("Selecione uma overlay salva para excluir."); return; }
+    if (!window.confirm("Excluir permanentemente a overlay \"" + String(config.name || activeOverlayId) + "\"?")) return;
+    setSaving(true); setError(""); setNotice("");
+    try {
+      const response = await fetch("/api/overlay/canvas", {
+        method: "DELETE", credentials: "include",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        cache: "no-store", body: JSON.stringify({ id: activeOverlayId }),
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload.ok) throw new Error(payload.message || "Não foi possível excluir a overlay.");
+      setOverlays((current) => current.filter((row) => String(row.id ?? "") !== activeOverlayId));
+      setActiveOverlayId(null);
+      setConfig({ name: "Nova Overlay", visualizerSize: DEFAULT_SIZE, instances: [], background: EMPTY_BACKGROUND });
+      setSelectedInstanceId(null); setNotice("Overlay excluída do JSON.");
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Erro ao excluir a overlay.");
+    } finally { setSaving(false); }
+  }
+
   function addWidget(definition: WidgetDefinition) {
     const existing = config.instances || [];
     const index = existing.length;
@@ -393,8 +481,25 @@ export default function OverlayCanvas() {
   );
 
   return (
-    <section className="flex w-full min-w-0 flex-col items-center gap-2 overflow-hidden">
-      <div className="w-full min-w-0">
+    <section className="flex w-full min-w-0 flex-col items-center gap-4 overflow-hidden px-2 pb-6 pt-4">
+      <div className="flex w-full flex-wrap items-end gap-2 rounded-xl border border-violet-300/15 bg-slate-950/70 p-3">
+        <label className="flex min-w-[180px] flex-1 flex-col gap-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+          Overlay salva
+          <select value={activeOverlayId ?? ""} onChange={(event) => selectOverlay(event.target.value)} className="h-9 rounded-lg border border-white/10 bg-slate-900 px-2 text-sm normal-case tracking-normal text-white">
+            <option value="">Nova overlay / não salva</option>
+            {overlays.map((row) => <option key={String(row.id)} value={String(row.id)}>{String(row.name || row.id)} · {String(row.id)}</option>)}
+          </select>
+        </label>
+        <label className="flex min-w-[180px] flex-[2] flex-col gap-1 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+          Nome da overlay (ID baseado no nome)
+          <input value={String(config.name ?? "")} onChange={(event) => setConfig((current) => ({ ...current, name: event.target.value }))} placeholder="Ex.: Minha overlay" className="h-9 rounded-lg border border-white/10 bg-slate-900 px-3 text-sm normal-case tracking-normal text-white outline-none focus:border-violet-400" />
+        </label>
+        <button type="button" onClick={startNewOverlay} disabled={saving} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/10 px-3 text-xs text-slate-200 hover:bg-white/10 disabled:opacity-50"><Plus size={14} /> Nova</button>
+        <button type="button" onClick={() => void saveOverlay()} disabled={saving || loading} className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-violet-600 px-3 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-50"><Save size={14} /> {saving ? "Salvando…" : "Salvar"}</button>
+        <button type="button" onClick={() => void deleteOverlay()} disabled={saving || !activeOverlayId} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-rose-400/30 px-3 text-xs text-rose-200 hover:bg-rose-500/10 disabled:opacity-40"><Trash2 size={14} /> Excluir</button>
+      </div>
+      {(error || notice) && <p role={error ? "alert" : "status"} className={error ? "w-full rounded-lg border border-rose-400/20 bg-rose-950/20 p-2 text-xs text-rose-200" : "w-full rounded-lg border border-emerald-400/20 bg-emerald-950/20 p-2 text-xs text-emerald-200"}>{error || notice}</p>}
+      <div className="mt-4 w-full min-w-0">
         <HorizontalMenu ariaLabel="Widgets de Overlay" className="w-full">
           {catalog
             .filter((widget) => widget.implemented !== false)
@@ -414,13 +519,14 @@ export default function OverlayCanvas() {
       <p className="w-full text-[10px] text-violet-200/80">
         Atalhos: Delete remove · setas movem 1 px · Shift + setas movem 10 px
       </p>
-      <div className="relative flex w-full min-w-0 justify-center overflow-hidden">
+      <div className="relative mt-2 flex w-full min-w-0 justify-center overflow-hidden">
         <div
           ref={frameRef}
           className="relative mx-auto shrink-0 overflow-hidden bg-transparent"
           style={{
             width: size.width,
             maxWidth: "100%",
+            marginInline: "auto",
             height: size.height,
             boxSizing: "border-box",
           }}

@@ -405,10 +405,14 @@ export async function updateJsonTableRecord(tableId, inputRowKey, inputRecord) {
     if (record.user_id !== undefined && String(record.user_id) !== ownerId) {
       throw new Error("Não é permitido transferir o registro para outro usuário.");
     }
-    record = { ...original, ...record, id: original.id ?? targetId, user_id: ownerId };
+    const nextId = tableId === "overlays" ? String(record.id ?? original.id ?? targetId) : String(original.id ?? targetId);
+    if (tableId === "overlays" && data[ownerId].some((item, itemIndex) => itemIndex !== index && isRecord(item) && String(item.id ?? "") === nextId)) {
+      throw new Error("Já existe uma overlay com esse ID para o usuário.");
+    }
+    record = { ...original, ...record, id: nextId, user_id: ownerId };
     data[ownerId][index] = record;
     await writeJsonAtomically(fileFor(definition), data);
-    return { ...record, __rowKey: inputRowKey };
+    return { ...record, __rowKey: rowKey("user", ownerId, nextId) };
   });
 }
 
