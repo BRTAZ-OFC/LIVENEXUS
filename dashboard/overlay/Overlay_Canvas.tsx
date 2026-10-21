@@ -352,7 +352,7 @@ export default function OverlayCanvas() {
         method: "PUT", credentials: "include",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         cache: "no-store",
-        body: JSON.stringify({ overlay: { ...config, id: activeOverlayId || generatedId, name }, createNew: !activeOverlayId }),
+        body: JSON.stringify({ overlay: { ...config, id: generatedId, name }, currentId: activeOverlayId, createNew: !activeOverlayId }),
       });
       const payload = await response.json();
       if (!response.ok || !payload.ok || !payload.overlay) throw new Error(payload.message || "Não foi possível salvar a overlay.");
