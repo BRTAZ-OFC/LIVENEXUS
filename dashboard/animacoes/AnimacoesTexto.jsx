@@ -99,6 +99,20 @@ export default function AnimacoesTexto({
             "--animacao-duracao": `${Math.max(50, Number(duracao) || 650)}ms`,
             "--animacao-iteracoes": infinita ? "infinite" : vaiEVem ? "2" : "1",
             "--animacao-direcao": vaiEVem ? "alternate" : "normal",
+            animationName: `animacao-${tipoValido}`,
+            animationDuration: `${Math.max(50, Number(duracao) || 650)}ms`,
+            animationDelay: `${indice * Math.max(0, Number(atraso) || 0)}ms`,
+            animationIterationCount: infinita ? "infinite" : vaiEVem ? 2 : 1,
+            animationDirection: vaiEVem ? "alternate" : "normal",
+            animationFillMode: "both",
+            animationTimingFunction: tipoValido === "cascata"
+              ? "cubic-bezier(0.22, 0.75, 0.35, 1)"
+              : tipoValido === "casanique"
+                ? "ease-out"
+                : tipoValido === "rolar"
+                  ? "ease-in-out"
+                  : "steps(1, end)",
+            backfaceVisibility: tipoValido === "rolar" ? "hidden" : undefined,
           }}
         >
           {tipoValido === "casanique" && !/\s/.test(caractere)
