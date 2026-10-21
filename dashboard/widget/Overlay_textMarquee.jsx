@@ -1,27 +1,14 @@
-import React from "react";
+import React from 'react';
 
-export function TextMarquee({
-  text = "",
-  isMainChat = false,
-  forceMarquee = false,
-  className = "",
-  style = {},
-}) {
+export function TextMarquee({ text = '', isMainChat = false, forceMarquee = false, className = '', style = {} }) {
   if (isMainChat) {
-    return (
-      <div className={className} style={style}>
-        {text}
-      </div>
-    );
+    return <div className={className} style={style}>{text}</div>;
   }
 
-  const str = String(text || "");
+  const str = String(text || '');
   if (!forceMarquee && str.length <= 35) {
     return (
-      <div
-        className={className}
-        style={{ ...style, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
-      >
+      <div className={className} style={{ ...style, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {str}
       </div>
     );
@@ -29,14 +16,7 @@ export function TextMarquee({
 
   return (
     <div className={`overflow-hidden whitespace-nowrap relative ${className}`} style={style}>
-      <div
-        className="inline-block animate-marquee"
-        style={{
-          display: "inline-block",
-          paddingLeft: "100%",
-          animation: "marquee 12s linear infinite",
-        }}
-      >
+      <div className="inline-block animate-marquee" style={{ display: 'inline-block', paddingLeft: '100%', animation: 'marquee 12s linear infinite' }}>
         {str}
       </div>
       <style>{`
