@@ -1,32 +1,67 @@
 import { useState, type CSSProperties } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, Type } from "lucide-react";
+import HorizontalMenu from "../components/HorizontalMenu";
+import { FONT_CATEGORIES } from "../fontes/Font_Catalog";
+import { loadGoogleFont } from "../fontes/Font_Loader";
+import { getWidgetInternalElements, isWidgetFragmentable } from "./Overlay_widgetElements";
+
+type WidgetDefinition = {
+  id: string;
+  name: string;
+  component: React.ComponentType<{ config?: Record<string, unknown> }>;
+  implemented?: boolean;
+};
 
 type OverlayEditorProps = {
   className?: string;
   height?: number;
+  catalog: WidgetDefinition[];
+  onAddFragment: (definition: WidgetDefinition, elementKey: string, label: string) => void;
+  onAddText: (text: string, fontSize: number, color: string, fontFamily: string) => void;
 };
 
-/**
- * Painel base do editor de overlays.
- * Fica fixo na borda inferior da janela e permanece vazio nesta primeira etapa.
- */
+const MENUS = ["INICIO", "TEXTO", "ANIMACAO", "IMAGEMS", "ALINHAMENTO", "FORMAS", "EMOJES", "CAMADAS"] as const;
+type MenuName = (typeof MENUS)[number];
+
+const buttonClass = "shrink-0 rounded-md border border-white/10 bg-slate-800/80 px-3 py-1.5 text-xs text-slate-200 transition hover:border-violet-400/60 hover:bg-violet-500/20 hover:text-white";
+const activeButtonClass = "shrink-0 rounded-md border border-violet-400 bg-violet-500/20 px-3 py-1.5 text-xs text-white";
+
 export default function Overlay_Editor({
   className = "",
-  height = 140,
+  height = 190,
+  catalog,
+  onAddFragment,
+  onAddText,
 }: OverlayEditorProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const panelHeight = `min(${Math.max(80, height)}px, 35vh)`;
+  const [activeMenu, setActiveMenu] = useState<MenuName>("INICIO");
+  const [selectedWidgetId, setSelectedWidgetId] = useState<string | null>(null);
+  const [selectedFontCategory, setSelectedFontCategory] = useState<keyof typeof FONT_CATEGORIES | null>(null);
+  const [selectedFont, setSelectedFont] = useState("Inter");
+  const [textValue, setTextValue] = useState("Novo texto");
+  const [fontSize, setFontSize] = useState(32);
+  const [textColor, setTextColor] = useState("#ffffff");
+  const panelHeight = `min(${Math.max(120, height)}px, 42vh)`;
   const style: CSSProperties = {
     height: isCollapsed ? "0px" : panelHeight,
     transition: "height 220ms ease",
   };
+
+  const fragmentableWidgets = catalog.filter((widget) => widget.implemented !== false && isWidgetFragmentable(widget.id));
+  const selectedWidget = fragmentableWidgets.find((widget) => widget.id === selectedWidgetId);
+  const fragments = selectedWidget ? getWidgetInternalElements(selectedWidget.id) : [];
+
+  function chooseFont(font: string) {
+    setSelectedFont(font);
+    loadGoogleFont(font);
+  }
 
   return (
     <section
       role="region"
       aria-label="Editor de overlay"
       data-overlay-editor
-      className={`fixed inset-x-0 bottom-0 z-[80] w-full border-t border-white/15 bg-slate-950 ${className}`}
+      className={`fixed inset-x-0 bottom-0 z-[80] w-full overflow-visible border-t border-white/15 bg-slate-950 text-slate-100 shadow-2xl ${className}`}
       style={style}
     >
       <button
@@ -39,6 +74,146 @@ export default function Overlay_Editor({
       >
         {isCollapsed ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </button>
+
+      {!isCollapsed && (
+        <div className="flex h-full min-h-0 flex-col gap-2 px-3 pb-3 pt-2">
+          <HorizontalMenu ariaLabel="Seções do editor de overlay" trackClassName="overflow-hidden">
+            {MENUS.map((menu) => (
+              <button
+                key={menu}
+                type="button"
+                onClick={() => setActiveMenu(menu)}
+                aria-pressed={activeMenu === menu}
+                className={activeMenu === menu ? activeButtonClass : buttonClass}
+              >
+                {menu}
+              </button>
+            ))}
+          </HorizontalMenu>
+
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+            {activeMenu === "INICIO" && (
+              <div className="flex flex-col gap-2">
+                <p className="text-[11px] text-slate-400">Fragmentos das widgets</p>
+                <HorizontalMenu ariaLabel="Widgets fragmentáveis">
+                  {fragmentableWidgets.map((widget) => (
+                    <button
+                      key={widget.id}
+                      type="button"
+                      onClick={() => setSelectedWidgetId(widget.id)}
+                      aria-pressed={selectedWidgetId === widget.id}
+                      className={selectedWidgetId === widget.id ? activeButtonClass : buttonClass}
+                    >
+                      {widget.name}
+                    </button>
+                  ))}
+                </HorizontalMenu>
+                {selectedWidget && (
+                  <div className="flex flex-wrap gap-2">
+                    {fragments.map((fragment) => (
+                      <button
+                        key={fragment.key}
+                        type="button"
+                        onClick={() => onAddFragment(selectedWidget, fragment.key, fragment.label)}
+                        title={`Adicionar ${fragment.label} ao canvas`}
+                        className={buttonClass}
+                      >
+                        {fragment.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeMenu === "TEXTO" && (
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-wrap items-end gap-2">
+                  <label className="flex min-w-[180px] flex-1 flex-col gap-1 text-[11px] text-slate-400">
+                    Texto
+                    <input
+                      value={textValue}
+                      onChange={(event) => setTextValue(event.target.value)}
+                      placeholder="Digite o texto"
+                      className="h-8 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
+                    />
+                  </label>
+                  <label className="flex w-24 flex-col gap-1 text-[11px] text-slate-400">
+                    Tamanho
+                    <input
+                      type="number"
+                      min={1}
+                      max={300}
+                      value={fontSize}
+                      onChange={(event) => setFontSize(Math.max(1, Math.min(300, Number(event.target.value) || 1)))}
+                      className="h-8 rounded-md border border-white/10 bg-slate-900 px-2 text-sm text-white outline-none focus:border-violet-400"
+                    />
+                  </label>
+                  <label className="flex w-20 flex-col gap-1 text-[11px] text-slate-400">
+                    Cor
+                    <input
+                      type="color"
+                      value={textColor}
+                      onChange={(event) => setTextColor(event.target.value)}
+                      aria-label="Cor do texto"
+                      className="h-8 w-full cursor-pointer rounded-md border border-white/10 bg-slate-900 p-1"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => onAddText(textValue.trim() || "Texto", fontSize, textColor, selectedFont)}
+                    className="inline-flex h-8 items-center gap-1 rounded-md bg-violet-600 px-3 text-xs font-medium text-white transition hover:bg-violet-500"
+                  >
+                    <Plus size={14} /> Adicionar texto
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <p className="text-[11px] text-slate-400">Categorias de fontes</p>
+                  <div className="flex flex-wrap gap-2">
+                    {(Object.keys(FONT_CATEGORIES) as Array<keyof typeof FONT_CATEGORIES>).map((category) => (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => setSelectedFontCategory(category)}
+                        aria-pressed={selectedFontCategory === category}
+                        className={selectedFontCategory === category ? activeButtonClass : buttonClass}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                  {selectedFontCategory && (
+                    <div className="flex flex-wrap gap-2 border-t border-white/10 pt-2">
+                      {FONT_CATEGORIES[selectedFontCategory].map((font) => (
+                        <button
+                          key={font}
+                          type="button"
+                          onClick={() => chooseFont(font)}
+                          aria-pressed={selectedFont === font}
+                          title={font}
+                          style={{ fontFamily: `"${font}", sans-serif` }}
+                          className={selectedFont === font ? activeButtonClass : buttonClass}
+                        >
+                          <span className="mr-1 text-[10px] text-slate-400">{font}</span>
+                          <span style={{ fontFamily: `"${font}", sans-serif` }}>Aa Bb 123</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <p className="text-[10px] text-slate-500">O texto adicionado ao canvas pode ser editado com duplo clique dentro da própria caixa.</p>
+              </div>
+            )}
+
+            {!["INICIO", "TEXTO"].includes(activeMenu) && (
+              <div className="flex h-full items-center justify-center text-xs text-slate-500">
+                Este menu ficará vazio nesta etapa.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
