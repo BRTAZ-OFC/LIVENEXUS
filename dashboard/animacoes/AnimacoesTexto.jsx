@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./animacoes.css";
 
 const GLIFOS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*";
@@ -7,17 +7,29 @@ function embaralharCaractere() {
   return GLIFOS[Math.floor(Math.random() * GLIFOS.length)];
 }
 
-/**
- * Anima texto caractere por caractere.
- *
- * tipos:
- * - cascata: cada letra cai de cima para baixo.
- * - casanique: cada letra embaralha como caça-níquel e termina no caractere correto.
- * - rolar: cada letra faz um flip vertical.
- * - encarrilha: cada letra aparece da esquerda para a direita.
- *
- * O atraso entre o início de cada letra é de 1 segundo por padrão.
- */
+const KEYFRAMES = {
+  cascata: [
+    { opacity: 0, transform: "translate3d(0, -1.5em, 0) scale(0.92)" },
+    { opacity: 1, transform: "translate3d(0, 0.12em, 0) scale(1.02)", offset: 0.72 },
+    { opacity: 1, transform: "translate3d(0, 0, 0) scale(1)" },
+  ],
+  rolar: [
+    { opacity: 0, transform: "perspective(500px) rotateX(-180deg)" },
+    { opacity: 1, transform: "perspective(500px) rotateX(18deg)", offset: 0.55 },
+    { opacity: 1, transform: "perspective(500px) rotateX(0deg)" },
+  ],
+  encarrilha: [
+    { opacity: 0, transform: "translateX(-0.35em)" },
+    { opacity: 1, transform: "translateX(0)" },
+  ],
+};
+
+const EASING = {
+  cascata: "cubic-bezier(0.22, 0.75, 0.35, 1)",
+  rolar: "ease-in-out",
+  encarrilha: "steps(1, end)",
+};
+
 export default function AnimacoesTexto({
   texto = "",
   tipo = "cascata",
@@ -30,11 +42,44 @@ export default function AnimacoesTexto({
   vaiEVem = false,
 }) {
   const caracteres = useMemo(() => Array.from(String(texto ?? "")), [texto]);
+  const letterRefs = useRef([]);
   const [versao, setVersao] = useState(0);
   const [embaralhados, setEmbaralhados] = useState({});
 
+  const tipoValido = ["cascata", "casanique", "rolar", "encarrilha"].includes(tipo)
+    ? tipo
+    : "cascata";
+  const duracaoSegura = Math.max(50, Number(duracao) || 650);
+  const atrasoSeguro = Math.max(0, Number(atraso) || 0);
+
+  // Usa Web Animations API para que cada efeito tenha seus próprios keyframes,
+  // sem depender de regras CSS externas ou de shorthand que possa sobrescrevê-las.
   useEffect(() => {
-    if (tipo !== "casanique") {
+    const animations = [];
+    if (tipoValido === "casanique") return undefined;
+
+    caracteres.forEach((caractere, indice) => {
+      const element = letterRefs.current[indice];
+      if (!element || /\s/.test(caractere)) return;
+      const animation = element.animate(KEYFRAMES[tipoValido], {
+        duration: duracaoSegura,
+        delay: indice * atrasoSeguro,
+        iterations: infinita ? Infinity : vaiEVem ? 2 : 1,
+        direction: vaiEVem ? "alternate" : "normal",
+        fill: "both",
+        easing: EASING[tipoValido],
+      });
+      if (tipoValido === "rolar") element.style.backfaceVisibility = "hidden";
+      animations.push(animation);
+    });
+
+    return () => {
+      animations.forEach((animation) => animation.cancel());
+    };
+  }, [caracteres, tipoValido, duracaoSegura, atrasoSeguro, infinita, vaiEVem, versao]);
+
+  useEffect(() => {
+    if (tipoValido !== "casanique") {
       setEmbaralhados({});
       return undefined;
     }
@@ -45,9 +90,8 @@ export default function AnimacoesTexto({
 
     caracteres.forEach((caractere, indice) => {
       if (/\s/.test(caractere)) return;
-
-      const comecaEm = indice * atraso;
-      const terminaEm = comecaEm + Math.min(800, Math.max(250, atraso - 100));
+      const comecaEm = indice * atrasoSeguro;
+      const terminaEm = comecaEm + Math.min(800, Math.max(250, atrasoSeguro - 100));
 
       timers.push(setTimeout(() => {
         const intervalo = setInterval(() => {
@@ -67,21 +111,16 @@ export default function AnimacoesTexto({
       timers.forEach(clearTimeout);
       intervalos.forEach(clearInterval);
     };
-  }, [texto, tipo, atraso, versao, caracteres]);
+  }, [texto, tipoValido, atrasoSeguro, versao, caracteres]);
 
   useEffect(() => {
     if (!repetir || caracteres.length === 0) return undefined;
-    const duracao = caracteres.length * atraso + 1000;
     const timer = setTimeout(() => {
       setEmbaralhados({});
       setVersao((atual) => atual + 1);
-    }, duracao);
+    }, caracteres.length * atrasoSeguro + duracaoSegura);
     return () => clearTimeout(timer);
-  }, [repetir, caracteres.length, atraso, versao]);
-
-  const tipoValido = ["cascata", "casanique", "rolar", "encarrilha"].includes(tipo)
-    ? tipo
-    : "cascata";
+  }, [repetir, caracteres.length, atrasoSeguro, duracaoSegura, versao]);
 
   return (
     <span
@@ -94,24 +133,10 @@ export default function AnimacoesTexto({
           aria-hidden="true"
           className="animacao-texto__letra"
           key={`${versao}-${indice}`}
+          ref={(element) => { letterRefs.current[indice] = element; }}
           style={{
-            "--animacao-atraso": `${indice * atraso}ms`,
-            "--animacao-duracao": `${Math.max(50, Number(duracao) || 650)}ms`,
-            "--animacao-iteracoes": infinita ? "infinite" : vaiEVem ? "2" : "1",
-            "--animacao-direcao": vaiEVem ? "alternate" : "normal",
-            animationName: `animacao-${tipoValido}`,
-            animationDuration: `${Math.max(50, Number(duracao) || 650)}ms`,
-            animationDelay: `${indice * Math.max(0, Number(atraso) || 0)}ms`,
-            animationIterationCount: infinita ? "infinite" : vaiEVem ? 2 : 1,
-            animationDirection: vaiEVem ? "alternate" : "normal",
-            animationFillMode: "both",
-            animationTimingFunction: tipoValido === "cascata"
-              ? "cubic-bezier(0.22, 0.75, 0.35, 1)"
-              : tipoValido === "casanique"
-                ? "ease-out"
-                : tipoValido === "rolar"
-                  ? "ease-in-out"
-                  : "steps(1, end)",
+            display: "inline-block",
+            transformOrigin: "center",
             backfaceVisibility: tipoValido === "rolar" ? "hidden" : undefined,
           }}
         >
