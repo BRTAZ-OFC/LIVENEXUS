@@ -71,6 +71,7 @@ interface SessionData {
   role?: string;
 }
 
+// sendAdminDenied: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function sendAdminDenied(res: Response) {
   return res.status(403).json({
     ok: false,
@@ -78,6 +79,7 @@ function sendAdminDenied(res: Response) {
   });
 }
 
+// requireAdmin: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function requireAdmin(req: Request, res: Response): SessionData | null {
   const session = readSession(req) as SessionData | null;
   if (session?.role !== "admin") {
@@ -87,6 +89,7 @@ function requireAdmin(req: Request, res: Response): SessionData | null {
   return session;
 }
 
+// errorMessage: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
 }
@@ -512,6 +515,7 @@ app.delete("/api/database/plataformas", async (req: Request, res: Response) => {
 });
 
 /* Conexões de plataformas: o user_id vem da sessão e é validado no JSON de usuários. */
+// getAuthenticatedJsonUser: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function getAuthenticatedJsonUser(req: Request, res: Response, allowAdminTarget = false) {
   const session = readSession(req) as SessionData | null;
   if (!session?.user_id) {
@@ -1081,6 +1085,7 @@ app.all(/^\/api(?:\/.*)?$/, (req: Request, res: Response) => {
 });
 
 /* Proteção no servidor: a verificação acontece antes do fallback do SPA e do Vite. */
+// requirePageSession: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function requirePageSession(
   req: Request,
   res: Response,
@@ -1119,6 +1124,7 @@ app.use(/^\/admin\/banco\/?$/, (req: Request, res: Response, next: NextFunction)
   requirePageSession(req, res, next, "admin"),
 );
 // Middleware de proteção de rotas
+// requireSession: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function requireSession(req: Request, res: Response, next: NextFunction) {
   const session = readSession(req) as SessionData | null;
   if (!session?.user_id) {
@@ -1127,6 +1133,7 @@ function requireSession(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+// requireAdminPage: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function requireAdminPage(req: Request, res: Response, next: NextFunction) {
   const session = readSession(req) as SessionData | null;
   if (session?.role !== "admin") {
