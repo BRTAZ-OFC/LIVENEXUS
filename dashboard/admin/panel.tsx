@@ -48,6 +48,7 @@ type ReviewRow = {
   data_atualizacao?: string;
 };
 
+// AdminPanel: executa a etapa descrita pelo nome da função.
 export default function AdminPanel() {
   const [subTab, setSubTab] = useState<
     | "inicial"
@@ -149,6 +150,8 @@ export default function AdminPanel() {
     { id: "widgets", label: "Widgets", icon: Tv },
   ] as const;
 
+  {/* Estrutura visual: div. */}
+
   return (
     <div className="w-full px-6 py-4 space-y-6">
       <div>
@@ -185,6 +188,7 @@ export default function AdminPanel() {
         {subtabsList.map((tab) => {
           const Icon = tab.icon;
           const active = subTab === tab.id;
+          {/* Estrutura visual: button. */}
           return (
             <button
               key={tab.id}
@@ -276,6 +280,7 @@ export default function AdminPanel() {
             <div className="space-y-3">
               {users.map((u) => {
                 const isEditing = editingUserId === u.user_id;
+                {/* Estrutura visual: div. */}
                 return (
                   <div
                     key={u.user_id}
@@ -356,6 +361,8 @@ export default function AdminPanel() {
                 {users.map((u) => {
                   const isExpanded = expandedScenesUserId === u.user_id;
                   const activeScene = userActiveScenes[u.user_id] || "gameplay";
+
+                  {/* Estrutura visual: div. */}
 
                   return (
                     <div
@@ -486,6 +493,8 @@ export default function AdminPanel() {
                               const isActive = activeScene === scene.id;
                               const previewKey = `${u.user_id}_${scene.id}`;
                               const isPreviewing = previewingSceneKey === previewKey;
+
+                              {/* Estrutura visual: div. */}
 
                               return (
                                 <div
@@ -679,6 +688,7 @@ export default function AdminPanel() {
   );
 }
 
+// ErrorLogsEmbedded: executa a etapa descrita pelo nome da função.
 function ErrorLogsEmbedded() {
   const [errors, setErrors] = useState<unknown[]>(
     typeof window !== "undefined" ? window.__LIVENEXUS_ERRORS__ || [] : [],
@@ -690,6 +700,8 @@ function ErrorLogsEmbedded() {
     }
     setErrors([]);
   };
+
+  {/* Estrutura visual: div. */}
 
   return (
     <div className="space-y-6">
