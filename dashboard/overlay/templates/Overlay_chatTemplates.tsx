@@ -15,6 +15,8 @@ export const CHAT_TEMPLATES = [
     render: ({ messages = [], isOnline = false, config = {} }) => {
       const displayMsgs = messages.slice(0, 5);
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div
           className="w-full h-full p-3 rounded-none bg-slate-950/80 backdrop-blur-md flex flex-col justify-between overflow-hidden shadow-xl select-none"
@@ -82,6 +84,8 @@ export const CHAT_TEMPLATES = [
     render: ({ messages = [], isOnline = false, config = {} }) => {
       const displayMsgs = messages.slice(0, 4);
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div
           className="w-full h-full p-3 rounded-2xl bg-black/70 border border-cyan-500/30 flex flex-col justify-between overflow-hidden shadow-xl select-none"
@@ -107,6 +111,7 @@ export const CHAT_TEMPLATES = [
             ) : (
               displayMsgs.map((msg, i) => {
                 const author = msg.author || msg.username || msg.user || "U";
+                {/* Estrutura visual retornada: div. */}
                 return (
                   <div key={i} className="flex items-start gap-2 text-left">
                     <div className="h-6 w-6 rounded-full bg-cyan-600/30 border border-cyan-400/40 text-[10px] font-bold text-cyan-200 flex items-center justify-center shrink-0 uppercase">
@@ -144,6 +149,8 @@ export const CHAT_TEMPLATES = [
     badge: "Terminal / Cyber",
     render: ({ messages = [], isOnline = false }) => {
       const displayMsgs = messages.slice(0, 5);
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 rounded-xl bg-black border border-emerald-500/40 font-mono flex flex-col justify-between overflow-hidden shadow-2xl select-none">
@@ -199,6 +206,8 @@ export const CHAT_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const displayMsgs = messages.slice(0, 4);
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full px-4 rounded-xl bg-slate-950/90 border border-purple-500/40 flex items-center justify-between shadow-xl select-none overflow-hidden">
           <div className="flex items-center gap-2 pr-3 border-r border-white/10 shrink-0">
@@ -246,6 +255,8 @@ export const CHAT_TEMPLATES = [
     badge: "Stream Clean",
     render: ({ messages = [], isOnline = false }) => {
       const displayMsgs = messages.slice(0, 5);
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-2.5 flex flex-col justify-end overflow-hidden select-none text-left">
@@ -297,6 +308,8 @@ export const CHAT_TEMPLATES = [
     badge: "Cyber HUD",
     render: ({ messages = [], isOnline = false }) => {
       const displayMsgs = messages.slice(0, 4);
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div
@@ -353,6 +366,8 @@ export const CHAT_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const displayMsgs = messages.slice(0, 4);
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full rounded-xl bg-slate-900 border border-slate-700 flex flex-col overflow-hidden shadow-2xl select-none text-left">
           <div className="bg-gradient-to-r from-purple-700 to-indigo-700 px-3 py-1.5 flex items-center justify-between text-white shrink-0">
@@ -402,6 +417,8 @@ export const CHAT_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const displayMsgs = messages.slice(0, 5);
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-xl bg-slate-950/60 border border-white/10 flex flex-col justify-between overflow-hidden shadow-lg select-none text-left">
           <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 mb-2 shrink-0">
@@ -450,6 +467,8 @@ export const CHAT_TEMPLATES = [
     badge: "Neon Glow",
     render: ({ messages = [], isOnline = false }) => {
       const displayMsgs = messages.slice(0, 4);
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3.5 rounded-2xl bg-black/85 border border-purple-500/50 shadow-[0_0_25px_rgba(168,85,247,0.18)] flex flex-col justify-between overflow-hidden select-none text-left">
@@ -501,6 +520,8 @@ export const CHAT_TEMPLATES = [
     badge: "Floating Pills",
     render: ({ messages = [], isOnline = false }) => {
       const displayMsgs = messages.slice(0, 4);
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-2 flex flex-col justify-end space-y-2 overflow-hidden select-none text-left">
