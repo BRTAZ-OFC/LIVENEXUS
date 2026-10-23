@@ -10,6 +10,7 @@ import {
 import { Activity, Flame, Smile, TrendingUp } from "lucide-react";
 
 // 1. TwitchChatSpeed (Velocímetro de Chat)
+// TwitchChatSpeed: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function TwitchChatSpeed({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = platformIsOnline(connections, config);
@@ -36,6 +37,8 @@ export function TwitchChatSpeed({ config = {} }) {
 
     return () => clearInterval(interval);
   }, [liveActivity, isOnline, config.platform, config.platforms]);
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div
@@ -67,6 +70,7 @@ export function TwitchChatSpeed({ config = {} }) {
 }
 
 // 2. TwitchHypeMeter (Medidor de Hype)
+// TwitchHypeMeter: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function TwitchHypeMeter({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = connections?.Twitch?.status === "connected";
@@ -89,6 +93,8 @@ export function TwitchHypeMeter({ config = {} }) {
     const computedHype = Math.min(eventCount * 25 + recentItems.length * 3, 100);
     setHypeLevel(Math.round(computedHype));
   }, [liveActivity, isOnline]);
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div
@@ -124,6 +130,7 @@ export function TwitchHypeMeter({ config = {} }) {
 }
 
 // 3. TwitchChatVibe (Termômetro de Vibe)
+// TwitchChatVibe: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function TwitchChatVibe({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = platformIsOnline(connections, config);
@@ -190,6 +197,8 @@ export function TwitchChatVibe({ config = {} }) {
     return { score: clamped, label };
   }, [liveActivity, isOnline, config.platform, config.platforms]);
 
+  {/* Estrutura visual retornada: div. */}
+
   return (
     <div
       className="w-full h-full p-4 flex flex-col justify-center text-left"
@@ -218,6 +227,7 @@ export function TwitchChatVibe({ config = {} }) {
 }
 
 // 4. TwitchViewersChart (Gráfico de Espectadores)
+// TwitchViewersChart: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function TwitchViewersChart({ config = {} }) {
   const { connections } = useStreaming();
   const isOnline = platformIsOnline(connections, config);
@@ -253,6 +263,8 @@ export function TwitchViewersChart({ config = {} }) {
     return () => clearInterval(interval);
   }, [currentViewers, isOnline, audienceSource]);
 
+  {/* Estrutura visual retornada: div. */}
+
   return (
     <div
       className="w-full h-full p-4 flex flex-col justify-center text-left"
@@ -286,6 +298,7 @@ export function TwitchViewersChart({ config = {} }) {
           history.map((val, idx) => {
             const maxVal = Math.max(...history, 1);
             const heightPct = Math.max(Math.round((val / maxVal) * 100), 10);
+            {/* Estrutura visual retornada: div. */}
             return (
               <div
                 key={idx}
