@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como os vídeos dos cenários são carregados e organizados. */
 // Service to manage community submitted videos for the REACT subscenario
 // Handles parsing of various video sources (YouTube, Twitch Clips, TikTok, Direct MP4/WebM, Streamable, etc.)
 // Manages real-time synchronization between the Dashboard/Editor and the Live OBS Overlay (LiveScenarioViewer)
