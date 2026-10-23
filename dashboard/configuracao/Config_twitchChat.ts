@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica as opções usadas para configurar o chat da Twitch. */
 // Chat ao vivo da Twitch via IRC anônimo sobre WSS + contagem de espectadores
 // via Worker twitch-meta (Twitch Helix oficial). 100% client-side, sem backend.
 // connectTwitch(channel, onMessage, onStatus, onMeta) -> { disconnect }
