@@ -18,6 +18,7 @@ const shells = [
   "rounded-md bg-slate-950 border border-slate-800 text-slate-200 p-4",
 ];
 
+// Frame: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function Frame({ config = {}, children, label, className = "" }) {
   const style = Math.max(0, Math.min(12, Number(config.structuralPreset) || 0));
   const showBorder = config.showBorder === true;
@@ -28,6 +29,7 @@ function Frame({ config = {}, children, label, className = "" }) {
       .replace(/\bborder\b/g, "")
       .replace(/\brounded-[^\s]+/g, "rounded-none");
   }
+  {/* Estrutura visual retornada: div. */}
   return (
     <div
       className={`w-full h-full min-w-0 overflow-hidden flex ${style === 2 ? "items-center justify-between gap-3" : style === 4 ? "items-center justify-center gap-3" : "flex-col justify-center gap-2"} ${shellStr} ${className}`}
@@ -46,8 +48,10 @@ function Frame({ config = {}, children, label, className = "" }) {
   );
 }
 
+// DeathCounter: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function DeathCounter({ config = {}, elementKey }) {
   const count = Math.max(0, Number(config.deathCount) || 0);
+  {/* Estrutura visual retornada: Frame. */}
   return (
     <Frame config={config} label={elementKey === "count" ? null : "Mortes"}>
       <strong className="text-4xl leading-none tabular-nums">{count}</strong>
@@ -55,6 +59,7 @@ export function DeathCounter({ config = {}, elementKey }) {
   );
 }
 
+// ClockWidget: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function ClockWidget({ config = {}, elementKey }) {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -83,6 +88,7 @@ export function ClockWidget({ config = {}, elementKey }) {
     }).format(now);
     date = "";
   }
+  {/* Estrutura visual retornada: Frame. */}
   return (
     <Frame config={config} label={elementKey ? null : "Relógio"}>
       {elementKey !== "date" && (
@@ -96,11 +102,13 @@ export function ClockWidget({ config = {}, elementKey }) {
   );
 }
 
+// formatDuration: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function formatDuration(seconds) {
   const n = Math.max(0, Math.ceil(seconds));
   return `${String(Math.floor(n / 3600)).padStart(2, "0")}:${String(Math.floor((n % 3600) / 60)).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
 }
 
+// TimerWidget: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function TimerWidget({ config = {}, elementKey }) {
   const [now, setNow] = useState(() => Date.now());
   const initial = Math.max(0, Number(config.durationSeconds ?? 300));
@@ -113,6 +121,7 @@ export function TimerWidget({ config = {}, elementKey }) {
     const id = setInterval(() => setNow(Date.now()), 250);
     return () => clearInterval(id);
   }, [config.timerRunning]);
+  {/* Estrutura visual retornada: Frame. */}
   return (
     <Frame config={config} label={elementKey === "timer" ? null : "Temporizador"}>
       <strong className="text-3xl leading-none tabular-nums">{formatDuration(remaining)}</strong>
@@ -120,6 +129,7 @@ export function TimerWidget({ config = {}, elementKey }) {
   );
 }
 
+// useExistingTrack: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function useExistingTrack() {
   const [track, setTrack] = useState(() => getCurrentTrack());
   useEffect(() => {
@@ -165,6 +175,7 @@ function useExistingTrack() {
   return track;
 }
 
+// NowPlayingWidget: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function NowPlayingWidget({ config = {}, elementKey }) {
   const track = useExistingTrack();
   const title = track?.title || "Nada tocando";
@@ -189,8 +200,10 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
 
   // Lógica de Fragmentação (para templates customizados)
   if (elementKey === "cover")
+    {/* Estrutura visual retornada: img. */}
     return <img src={image} alt="Capa" className="h-full w-full object-cover rounded" />;
   if (elementKey === "title")
+    {/* Estrutura visual retornada: div. */}
     return (
       <div className="w-full overflow-hidden">
         {marqueeAnimation}
@@ -203,11 +216,13 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
       </div>
     );
   if (elementKey === "artist")
+    {/* Estrutura visual retornada: span. */}
     return <span className="text-sm font-medium text-slate-400 truncate">{artist}</span>;
 
   // 1. PADRÃO (FAIXA SUPERIOR)
   if (layout === "default") {
     const textRepeated = `${title} • `.repeat(15);
+    {/* Estrutura visual retornada: div. */}
     return (
       <div
         className="w-full h-full flex items-center p-3 select-none relative overflow-hidden"
@@ -240,6 +255,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
   // 2. QUADRADO
   if (layout === "square") {
     const textRepeated = `${title} • `.repeat(10);
+    {/* Estrutura visual retornada: div. */}
     return (
       <div
         className="w-full h-full flex flex-col justify-between p-4 select-none relative overflow-hidden"
@@ -296,6 +312,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
   // 3. LATERAL
   if (layout === "horizontal") {
     const textRepeated = `${title} • `.repeat(10);
+    {/* Estrutura visual retornada: div. */}
     return (
       <div
         className="w-full h-full flex items-center p-3 gap-4 select-none relative overflow-hidden"
@@ -363,6 +380,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
   // 4. VINIL
   if (layout === "vinil") {
     const textRepeated = `${title} • ${artist} • `.repeat(4);
+    {/* Estrutura visual retornada: div. */}
     return (
       <div
         className="w-full h-full flex flex-col items-center justify-center p-3 select-none relative overflow-hidden"
@@ -456,6 +474,7 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
   // 5. FAIXA (SÓ MARQUEE)
   if (layout === "marquee") {
     const textRepeated = `${title} • `.repeat(15);
+    {/* Estrutura visual retornada: div. */}
     return (
       <div
         className="w-full h-full flex items-center p-3 select-none relative overflow-hidden"
