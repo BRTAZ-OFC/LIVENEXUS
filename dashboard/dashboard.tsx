@@ -10,6 +10,7 @@ import ScenarioCanvas from "./cenarios/Scenario_Canvas";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import BibliotecaSearch from "./biblioteca/BibliotecaSearch";
 import GlobalMusicPlayer from "./biblioteca/GlobalMusicPlayer";
+import MinhaConta from "./perfil/MinhaConta";
 import { RtcAutoPublisherBridge } from "./conexao/rtc/RtcAutoPublisherBridge";
 import { memo, useEffect, useState } from "react";
 import {
@@ -518,28 +519,7 @@ function DashboardPage() {
           </div>
         )}
         {activeSection === "perfil" ? (
-          <section className="dash-w-full-px-6-5ebeye" style={{ paddingTop: 28, paddingBottom: 40, color: "#e2e8f0" }}>
-            <div style={{ maxWidth: 960, margin: "0 auto" }}>
-              <p style={{ color: "#a78bfa", fontSize: 12, fontWeight: 700, letterSpacing: 2 }}>CONTA DO USUÁRIO</p>
-              <h1 style={{ fontSize: 30, fontWeight: 750, margin: "8px 0" }}>Meu perfil</h1>
-              <p style={{ color: "#94a3b8", marginBottom: 24 }}>Gerencie seu espaço e acesse as funções disponíveis da sua conta.</p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
-                <article style={{ border: "1px solid #334155", borderRadius: 14, background: "#0f172a", padding: 22 }}>
-                  <CircleUserRound size={28} color="#a78bfa" />
-                  <h2 style={{ fontSize: 18, fontWeight: 700, margin: "14px 0 8px" }}>Dados da conta</h2>
-                  <p style={{ color: "#94a3b8", fontSize: 14, marginBottom: 14 }}>Sua sessão está autenticada e protegida.</p>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, borderTop: "1px solid #334155", paddingTop: 12 }}><span style={{ color: "#94a3b8" }}>Identificador</span><strong style={{ overflowWrap: "anywhere" }}>{sessionStorage.getItem("livenexus_user_id") || "—"}</strong></div>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginTop: 10 }}><span style={{ color: "#94a3b8" }}>Tipo de conta</span><strong>{isAdmin ? "Administrador" : "Usuário"}</strong></div>
-                </article>
-                <article style={{ border: "1px solid #334155", borderRadius: 14, background: "#0f172a", padding: 22 }}>
-                  <Settings size={28} color="#67e8f9" />
-                  <h2 style={{ fontSize: 18, fontWeight: 700, margin: "14px 0 8px" }}>Gerenciar espaço</h2>
-                  <p style={{ color: "#94a3b8", fontSize: 14, marginBottom: 14 }}>Acesse as ferramentas da sua conta.</p>
-                  {[{label:"Conexões de plataformas",section:"connections",desc:"Gerenciar conexões"},{label:"Cenários",section:"scenarios",desc:"Editar cenários"},{label:"Overlays",section:"overlay",desc:"Editar overlays"},{label:"Biblioteca",section:"biblioteca",desc:"Pesquisar e organizar músicas"},{label:"Voz e TTS",section:"voice",desc:"Configurar voz"}].map((item) => <button key={item.section} type="button" onClick={() => handleSelectSection(item.section as "connections" | "scenarios" | "overlay" | "biblioteca" | "voice")} style={{ width: "100%", textAlign: "left", padding: "12px 0", borderTop: "1px solid #334155", display: "flex", justifyContent: "space-between", gap: 12, color: "#e2e8f0", cursor: "pointer" }}><span><strong style={{ display: "block" }}>{item.label}</strong><small style={{ color: "#94a3b8" }}>{item.desc}</small></span><ChevronRight size={18} /></button>)}
-                </article>
-              </div>
-            </div>
-          </section>
+          <MinhaConta />
         ) : activeSection === "biblioteca" ? (
           <BibliotecaSearch />
         ) : activeSection === "overview" ? (
