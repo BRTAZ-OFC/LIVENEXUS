@@ -1,8 +1,11 @@
 import React from "react";
 import { selectedPlatforms, STREAM_PLATFORMS } from "../widget/Overlay_platformData";
 
+// PlatformControls: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function PlatformControls({ instance, onUpdateInstance }) {
   const enabled = selectedPlatforms(instance.config);
+
+  {/* Estrutura visual retornada: fieldset. */}
 
   return (
     <fieldset className="space-y-2 rounded-lg border border-white/10 p-3">
