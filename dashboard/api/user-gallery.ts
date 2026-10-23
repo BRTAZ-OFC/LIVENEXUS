@@ -135,7 +135,7 @@ export function registerUserGalleryRoutes(app: Express) {
 
   app.post(
     "/api/galeria-usuarios/:albumId/imagens",
-    express.raw({ type: ["image/png", "image/gif"], limit: "5mb" }),
+    express.raw({ type: ["image/png", "image/gif"], limit: "6mb" }),
     async (req: Request, res: Response) => {
       const userId = sessionUser(req, res);
       if (!userId) return;
@@ -150,6 +150,11 @@ export function registerUserGalleryRoutes(app: Express) {
         return res.status(415).set(NO_CACHE).json({ ok: false, message: "Este formato nao e permitido neste ambiente." });
       if (!Buffer.isBuffer(req.body) || req.body.length === 0)
         return res.status(400).set(NO_CACHE).json({ ok: false, message: "Arquivo de imagem vazio ou inválido." });
+      const isPng = type === "image/png" && req.body.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+      const signature = req.body.subarray(0, 6).toString("ascii");
+      const isGif = type === "image/gif" && (signature === "GIF87a" || signature === "GIF89a");
+      if (!isPng && !isGif)
+        return res.status(415).set(NO_CACHE).json({ ok: false, message: "Este formato nao e permitido neste ambiente." });
       if (req.body.length > MAX_IMAGE_SIZE)
         return res.status(413).set(NO_CACHE).json({ ok: false, message: "Este tamanho de arquivo ultrapassa o limite permitido de 5 MB por imagem." });
       try {
