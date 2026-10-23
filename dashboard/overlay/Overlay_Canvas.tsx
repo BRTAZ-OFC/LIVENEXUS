@@ -95,6 +95,7 @@ const TEXT_WIDGET_ID = "__livenexus_text__";
 const SHAPE_WIDGET_ID = "__livenexus_shape__";
 const EMPTY_BACKGROUND: CanvasBackground = { type: "transparent", opacity: 100 };
 
+// transparentWidgetConfig: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function transparentWidgetConfig(config: JsonObject = {}): JsonObject {
   return {
     ...config,
@@ -169,6 +170,7 @@ const COLOR_EFFECT_OVERLAYS: Record<string, string> = {
   dream:
     "linear-gradient(135deg, rgba(255,165,215,.62), rgba(160,155,255,.58), rgba(145,230,255,.62))",
 };
+// getGlobalTextureStyle: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function getGlobalTextureStyle(texture: string): CSSProperties {
   const textures: Record<string, CSSProperties> = {
     glass: {
@@ -216,6 +218,7 @@ function getGlobalTextureStyle(texture: string): CSSProperties {
   return textures[texture] || {};
 }
 
+// OverlayShape: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function OverlayShape({
   shape,
   color,
@@ -262,6 +265,7 @@ function OverlayShape({
     minus: "5,38 95,38 95,62 5,62",
   };
   if (["circle", "ellipse", "ring"].includes(shape))
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <ellipse
@@ -278,6 +282,7 @@ function OverlayShape({
       </svg>
     );
   if (["rectangle", "square", "rounded-rectangle"].includes(shape))
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <rect
@@ -291,12 +296,14 @@ function OverlayShape({
       </svg>
     );
   if (shape === "star")
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <polygon points="50,3 61,36 96,36 68,57 79,93 50,71 21,93 32,57 4,36 39,36" {...common} />
       </svg>
     );
   if (shape === "heart")
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <path
@@ -306,18 +313,21 @@ function OverlayShape({
       </svg>
     );
   if (shape === "lightning")
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <polygon points="57,2 18,56 44,56 35,98 83,37 56,37" {...common} />
       </svg>
     );
   if (shape === "speech-bubble")
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <path d="M8 12 H92 V72 H42 L20 92 V72 H8Z" {...common} />
       </svg>
     );
   if (shape === "cylinder")
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <path d="M8 20 C8 3 92 3 92 20 V80 C92 98 8 98 8 80Z" {...common} />
@@ -333,6 +343,7 @@ function OverlayShape({
       </svg>
     );
   if (shape === "cloud")
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <path
@@ -342,12 +353,14 @@ function OverlayShape({
       </svg>
     );
   if (shape === "arch")
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <path d="M10 95 V48 A40 40 0 0 1 90 48 V95 H68 V48 A18 18 0 0 0 32 48 V95Z" {...common} />
       </svg>
     );
   if (shape === "wave")
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <path
@@ -357,6 +370,7 @@ function OverlayShape({
       </svg>
     );
   if (shape === "pie")
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <path d="M50 50 L50 5 A45 45 0 0 1 95 50Z" {...common} />
@@ -364,6 +378,7 @@ function OverlayShape({
       </svg>
     );
   if (shape === "line")
+    {/* Estrutura visual retornada: svg. */}
     return (
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
         <path
@@ -375,6 +390,7 @@ function OverlayShape({
         />
       </svg>
     );
+  {/* Estrutura visual retornada: svg. */}
   return (
     <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
       <polygon points={points[shape] || points.hexagon} {...common} />
@@ -382,10 +398,12 @@ function OverlayShape({
   );
 }
 
+// isObject: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function isObject(value: unknown): value is JsonObject {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
+// sourceFor: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function sourceFor(row: OverlayRow): JsonObject {
   if (isObject(row.settings) && Object.keys(row.settings).length) return row.settings;
   if (isObject(row.config) && Object.keys(row.config).length) return row.config;
@@ -547,6 +565,7 @@ function alignSelectedInstances<
   });
 }
 
+// getCanvasConfig: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function getCanvasConfig(row: OverlayRow): CanvasConfig {
   const source = sourceFor(row);
   return {
@@ -569,6 +588,7 @@ function getCanvasConfig(row: OverlayRow): CanvasConfig {
   };
 }
 
+// backgroundStyle: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function backgroundStyle(background: CanvasBackground): CSSProperties {
   const style: CSSProperties = {};
   if (background.type === "solid") {
@@ -614,6 +634,7 @@ function backgroundStyle(background: CanvasBackground): CSSProperties {
  * Somente o canvas de Overlay do BACKUP01, adaptado ao catálogo e ao multichat do LIVENEXUS.
  * Mantém apenas o canvas, com seleção, arraste e redimensionamento direto das widgets.
  */
+// OverlayCanvas: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function OverlayCanvas() {
   useEffect(() => {}, []);
 
@@ -1430,6 +1451,8 @@ export default function OverlayCanvas() {
     });
   }
 
+  {/* Estrutura visual retornada: section. */}
+
   return (
     <section className="relative flex w-full min-w-0 flex-col items-center gap-4 px-2 pb-40 pt-[10px]">
       <div className="flex w-full items-center justify-between gap-3 border-b border-white/10 pb-3">
@@ -1554,6 +1577,7 @@ export default function OverlayCanvas() {
               const overlayName = String(
                 overlay.name ?? getCanvasConfig(overlay).name ?? overlayId,
               );
+              {/* Estrutura visual retornada: button. */}
               return (
                 <button
                   key={overlayId}
@@ -1881,6 +1905,7 @@ export default function OverlayCanvas() {
                   fontSize: `${Math.max(1, Number(widgetConfig["fontSize"]) || 16)}px`,
                   color: String(widgetConfig["color"] || widgetConfig["textColor"] || "#ffffff"),
                 };
+                {/* Estrutura visual retornada: div. */}
                 return (
                   <div
                     key={instanceId}
