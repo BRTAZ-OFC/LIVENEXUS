@@ -22,9 +22,12 @@ type CanvasInstance = {
   config?: JsonObject;
 };
 
+// TEXT_WIDGET_ID: valor ou configuração reutilizada neste módulo.
 const TEXT_WIDGET_ID = "__livenexus_text__";
+// SHAPE_WIDGET_ID: valor ou configuração reutilizada neste módulo.
 const SHAPE_WIDGET_ID = "__livenexus_shape__";
 
+// OverlayReceiver: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function OverlayReceiver() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
