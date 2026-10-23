@@ -82,6 +82,7 @@ const EVENT_NAMES: Record<string, string> = {
   youtube_poll: "Enquete do YouTube",
 };
 
+// formatEventName: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function formatEventName(eventType: string) {
   return (
     EVENT_NAMES[eventType.toLowerCase()] ??
@@ -112,6 +113,7 @@ const TTL: Record<QueueItem["tier"], number> = {
   normal: 30000,
 };
 
+// TTSPage: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function TTSPage() {
   const [settings, setSettings] = useState<TtsSettings>(DEFAULTS);
   const [engineReady, setEngineReady] = useState(false);
@@ -464,6 +466,8 @@ export default function TTSPage() {
     setShowFilters(panel === "filters");
   }
 
+  {/* Estrutura visual retornada: section. */}
+
   return (
     <section className="tts-page">
       <header className="tts-page-heading">
@@ -696,6 +700,7 @@ export default function TTSPage() {
   );
 }
 
+// RangeControl: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function RangeControl({
   label,
   value,
@@ -716,6 +721,7 @@ function RangeControl({
   onChange: (value: number) => void;
 }) {
   const shown = display ?? (Number.isInteger(value) ? value : value.toFixed(2));
+  {/* Estrutura visual retornada: label. */}
   return (
     <label className="tts-range">
       <span>{label}</span>
