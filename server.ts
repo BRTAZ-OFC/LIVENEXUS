@@ -36,6 +36,7 @@ import {
 } from "./dashboard/admin/banco/-json-tables-crud.js";
 import { registerJsonCompatRoutes } from "./dashboard/api/json-compat.ts";
 import { registerRtcSignalingRoutes } from "./dashboard/api/rtc-signaling.ts";
+import { registerUserGalleryRoutes } from "./dashboard/api/user-gallery.ts";
 import {
   createSessionToken,
   createSessionCookie,
@@ -113,6 +114,7 @@ const PUBLIC_API_ENDPOINTS = new Set([
 ]);
 
 registerRtcSignalingRoutes(app);
+registerUserGalleryRoutes(app);
 
 app.get("/api/overlay/canvas", async (req: Request, res: Response) => {
   const session = readSession(req) as SessionData | null;
