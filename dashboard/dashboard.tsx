@@ -481,7 +481,6 @@ function DashboardPage() {
               </span>
             </a>
             <GlobalMusicPlayer />
-            <button type="button" onClick={() => handleSelectSection("perfil")} className="dash-inline-flex-items-center-11vpqzb" title="Minha conta" aria-label="Minha conta"><CircleUserRound className="dash-h-4-w-4-3ulyf2" /> Minha conta</button>
             <button
               type="button"
               onClick={async () => {
