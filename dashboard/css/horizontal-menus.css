@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica os estilos dos menus horizontais. */
 /* Menus horizontais globais: sem barra nem rolagem manual. Somente os botões externos movem a faixa. */
 .lnx-horizontal-menu {
   min-width: 0;
