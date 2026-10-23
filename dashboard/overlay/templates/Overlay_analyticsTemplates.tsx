@@ -15,6 +15,8 @@ export const CHAT_SPEED_TEMPLATES = [
       const spd = isOnline ? speed : 0;
       const pct = Math.min(100, Math.round((spd / 120) * 100));
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-none bg-slate-950/90 flex flex-col items-center justify-center select-none aspect-square text-center shadow-xl">
           <Activity className="h-5 w-5 text-purple-400 mb-0.5 animate-pulse" />
@@ -39,6 +41,8 @@ export const CHAT_SPEED_TEMPLATES = [
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
       const pct = Math.min(100, Math.round((spd / 120) * 100));
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-slate-950/90 border border-white/10 flex flex-col justify-between select-none text-left shadow-lg">
@@ -70,6 +74,8 @@ export const CHAT_SPEED_TEMPLATES = [
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/85 border border-purple-500/40 flex flex-col justify-between select-none text-left shadow-xl">
           <span className="text-[9px] font-mono text-purple-300 font-bold uppercase">
@@ -97,6 +103,8 @@ export const CHAT_SPEED_TEMPLATES = [
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
       const zone = !isOnline ? "OFFLINE" : spd > 60 ? "ALTO" : spd > 25 ? "MÉDIO" : "TRANQUILO";
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-black/80 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -126,6 +134,8 @@ export const CHAT_SPEED_TEMPLATES = [
       const spd = isOnline ? speed : 0;
       const pct = Math.min(100, Math.round((spd / 120) * 100));
       const activeLeds = Math.round((pct / 100) * 8);
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div
@@ -163,6 +173,8 @@ export const CHAT_SPEED_TEMPLATES = [
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full px-3 rounded-full bg-slate-900/90 border border-cyan-500/40 flex items-center justify-between select-none shadow-md text-left">
           <Activity className="h-3.5 w-3.5 text-cyan-400 shrink-0" />
@@ -182,6 +194,8 @@ export const CHAT_SPEED_TEMPLATES = [
     badge: "Telemetry Card",
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-slate-950/90 border border-slate-700 flex flex-col justify-between select-none text-left shadow-lg">
@@ -211,6 +225,8 @@ export const CHAT_SPEED_TEMPLATES = [
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-black/85 border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.18)] flex flex-col justify-between select-none text-left">
           <span className="text-[8.5px] font-mono text-purple-300 font-bold uppercase">
@@ -233,6 +249,8 @@ export const CHAT_SPEED_TEMPLATES = [
     badge: "Lower Speed",
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full px-3.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -258,6 +276,8 @@ export const CHAT_SPEED_TEMPLATES = [
     badge: "Combat Badge",
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-2.5 rounded-lg bg-slate-900 border-l-4 border-cyan-400 border-t border-b border-r border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -291,6 +311,8 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-none bg-slate-950/90 flex flex-col items-center justify-between select-none shadow-xl">
           <div className="flex items-center gap-1 text-orange-400">
@@ -319,6 +341,8 @@ export const HYPE_METER_TEMPLATES = [
     badge: "Fire Bar",
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 rounded-xl bg-slate-950/90 border border-amber-500/40 flex flex-col justify-between select-none text-left shadow-xl">
@@ -357,6 +381,8 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full rounded-full bg-slate-950/90 border border-orange-500/40 p-2 flex flex-col items-center justify-center relative select-none shadow-xl aspect-square">
           <Flame className="h-6 w-6 text-orange-400 mb-1" />
@@ -377,6 +403,8 @@ export const HYPE_METER_TEMPLATES = [
     badge: "Big Hype",
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/85 border border-orange-500/40 flex flex-col justify-between select-none text-left shadow-xl">
@@ -405,6 +433,8 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full px-3.5 rounded-full bg-slate-900/90 border border-orange-500/40 flex items-center justify-between select-none shadow-md">
           <div className="flex items-center gap-1.5">
@@ -427,6 +457,8 @@ export const HYPE_METER_TEMPLATES = [
     badge: "Cyber Hype",
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div
@@ -463,6 +495,8 @@ export const HYPE_METER_TEMPLATES = [
       const hp = isOnline ? hype : 0;
       const activeLevels = Math.round((hp / 100) * 5);
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-slate-950/90 border border-white/10 flex flex-col justify-between select-none text-left shadow-lg">
           <div className="flex justify-between items-center text-[9px] font-mono">
@@ -493,6 +527,8 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-black/85 border border-orange-500/40 shadow-[0_0_20px_rgba(249,115,22,0.2)] flex items-center justify-between select-none text-left">
           <div>
@@ -518,6 +554,8 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full px-3.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
           <div className="flex items-center gap-2">
@@ -540,6 +578,8 @@ export const HYPE_METER_TEMPLATES = [
     badge: "Esports Hype",
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-2.5 rounded-lg bg-slate-900 border-l-4 border-orange-500 border-t border-b border-r border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -568,6 +608,8 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full rounded-none bg-slate-950/90 p-3 flex flex-col items-center justify-between select-none text-center shadow-xl">
           <span className="text-[9px] font-mono text-emerald-300 font-bold uppercase">
@@ -592,6 +634,8 @@ export const CHAT_VIBE_TEMPLATES = [
     badge: "Positive Bar",
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-slate-950/90 border border-emerald-500/40 flex flex-col justify-between select-none text-left shadow-lg">
@@ -626,6 +670,8 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/85 border border-emerald-500/40 flex flex-col justify-between select-none text-left shadow-xl">
           <span className="text-[9px] font-mono text-emerald-300 font-bold uppercase">
@@ -653,6 +699,8 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full px-3.5 rounded-full bg-slate-900/90 border border-emerald-500/40 flex items-center justify-between select-none shadow-md">
           <div className="flex items-center gap-1.5">
@@ -675,6 +723,8 @@ export const CHAT_VIBE_TEMPLATES = [
     badge: "Cyber Vibe",
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div
@@ -717,6 +767,8 @@ export const CHAT_VIBE_TEMPLATES = [
             ? "ESTÁVEL"
             : "TENSO";
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-lg">
           <div>
@@ -744,6 +796,8 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-2 rounded-full bg-slate-950/90 border border-emerald-500/40 flex flex-col items-center justify-center select-none text-center shadow-xl aspect-square">
           <Smile className="h-5 w-5 text-emerald-400 mb-1" />
@@ -764,6 +818,8 @@ export const CHAT_VIBE_TEMPLATES = [
     badge: "Glass Emerald",
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-black/85 border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.2)] flex items-center justify-between select-none text-left">
@@ -790,6 +846,8 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full px-3.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
           <div className="flex items-center gap-2">
@@ -814,6 +872,8 @@ export const CHAT_VIBE_TEMPLATES = [
     badge: "Esports Vibe",
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-2.5 rounded-lg bg-slate-900 border-l-4 border-emerald-400 border-t border-b border-r border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -841,6 +901,8 @@ export const VIEWERS_CHART_TEMPLATES = [
     badge: "Neon Chart",
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 rounded-none bg-slate-950/90 shadow-xl flex flex-col justify-between select-none text-left">
@@ -879,6 +941,8 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-xl bg-black/80 border border-white/10 flex flex-col justify-between select-none text-left shadow-lg">
           <div className="flex justify-between items-center text-[10px] font-mono text-slate-300">
@@ -906,6 +970,8 @@ export const VIEWERS_CHART_TEMPLATES = [
     badge: "Peak HUD",
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/90 border border-purple-500/40 flex flex-col justify-between select-none text-left shadow-xl">
@@ -940,6 +1006,8 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-xl bg-black/80 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
           <div>
@@ -962,6 +1030,8 @@ export const VIEWERS_CHART_TEMPLATES = [
     badge: "Trader View",
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 bg-slate-950/95 border border-emerald-500/40 flex flex-col justify-between font-mono select-none text-left shadow-2xl">
@@ -991,6 +1061,8 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/90 border border-purple-500/30 flex items-center justify-between select-none text-left shadow-xl">
           <div>
@@ -1017,6 +1089,8 @@ export const VIEWERS_CHART_TEMPLATES = [
     badge: "Oscilloscope",
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-black border border-cyan-400/60 shadow-[0_0_20px_rgba(6,182,212,0.2)] flex flex-col justify-between select-none text-left">
@@ -1046,6 +1120,8 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-xl bg-slate-950/90 border border-white/10 flex flex-col justify-between select-none text-left shadow-lg">
           <span className="text-[9px] font-mono text-slate-400 uppercase">ESPECTADORES</span>
@@ -1068,6 +1144,8 @@ export const VIEWERS_CHART_TEMPLATES = [
     badge: "Vertical Stats",
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/90 border border-purple-500/30 flex flex-col justify-between select-none text-center shadow-xl">
@@ -1093,6 +1171,8 @@ export const VIEWERS_CHART_TEMPLATES = [
     badge: "Mini Strip Chart",
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full px-4 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
