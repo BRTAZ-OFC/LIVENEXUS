@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como a conexão recebe e prepara o áudio e o vídeo recebidos. */
 // Consumer RTC Automático do LiveNexus
 // Reproduz a fórmula funcional comprovada no laboratório de referência
 // Canal oficial: "livenexus-rtc-live"
