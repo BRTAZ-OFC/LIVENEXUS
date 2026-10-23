@@ -114,6 +114,7 @@ const MENUS = [
 ] as const;
 type MenuName = (typeof MENUS)[number];
 
+// getReactHubEmbedUrl: executa a etapa descrita pelo nome da função.
 function getReactHubEmbedUrl(value: string) {
   try {
     const url = new URL(String(value || ""));
@@ -144,6 +145,7 @@ type ReactHubQueueItem = {
   status?: string;
 };
 
+// getReactHubQueueUrl: executa a etapa descrita pelo nome da função.
 function getReactHubQueueUrl(item: ReactHubQueueItem) {
   for (const value of [item.url, item.title]) {
     const raw = String(value || "").trim();
@@ -190,6 +192,7 @@ const SHAPE_OPTIONS: Array<{ id: string; label: string }> = [
   ["ring", "Anel"],
   ["line", "Linha"],
 ].map(([id, label]) => ({ id, label }));
+// ShapeIcon: executa a etapa descrita pelo nome da função.
 function ShapeIcon({ shape }: { shape: string }) {
   const pts: Record<string, string> = {
     triangle: "50,4 96,94 4,94",
@@ -213,6 +216,7 @@ function ShapeIcon({ shape }: { shape: string }) {
     minus: "5,38 95,38 95,62 5,62",
   };
   if (["circle", "ellipse", "ring"].includes(shape))
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-3 w-3 shrink-0" aria-hidden="true">
         <ellipse
@@ -227,6 +231,7 @@ function ShapeIcon({ shape }: { shape: string }) {
       </svg>
     );
   if (["rectangle", "square", "rounded-rectangle"].includes(shape))
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
         <rect
@@ -240,6 +245,7 @@ function ShapeIcon({ shape }: { shape: string }) {
       </svg>
     );
   if (shape === "star")
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
         <polygon
@@ -249,6 +255,7 @@ function ShapeIcon({ shape }: { shape: string }) {
       </svg>
     );
   if (shape === "heart")
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
         <path
@@ -258,18 +265,21 @@ function ShapeIcon({ shape }: { shape: string }) {
       </svg>
     );
   if (shape === "lightning")
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
         <polygon points="57,2 18,56 44,56 35,98 83,37 56,37" fill="currentColor" />
       </svg>
     );
   if (shape === "speech-bubble")
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
         <path d="M8 12 H92 V72 H42 L20 92 V72 H8Z" fill="currentColor" />
       </svg>
     );
   if (shape === "cylinder")
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
         <path d="M8 20 C8 3 92 3 92 20 V80 C92 98 8 98 8 80Z" fill="currentColor" />
@@ -285,6 +295,7 @@ function ShapeIcon({ shape }: { shape: string }) {
       </svg>
     );
   if (shape === "cloud")
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
         <path
@@ -294,6 +305,7 @@ function ShapeIcon({ shape }: { shape: string }) {
       </svg>
     );
   if (shape === "arch")
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
         <path
@@ -303,6 +315,7 @@ function ShapeIcon({ shape }: { shape: string }) {
       </svg>
     );
   if (shape === "wave")
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
         <path
@@ -312,6 +325,7 @@ function ShapeIcon({ shape }: { shape: string }) {
       </svg>
     );
   if (shape === "pie")
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
         <path d="M50 50 L50 5 A45 45 0 0 1 95 50Z" fill="currentColor" />
@@ -319,6 +333,7 @@ function ShapeIcon({ shape }: { shape: string }) {
       </svg>
     );
   if (shape === "line")
+    {/* Estrutura visual: svg. */}
     return (
       <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
         <path
@@ -330,6 +345,7 @@ function ShapeIcon({ shape }: { shape: string }) {
         />
       </svg>
     );
+  {/* Estrutura visual: svg. */}
   return (
     <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
       <polygon points={pts[shape] || pts.hexagon} fill="currentColor" />
@@ -445,6 +461,7 @@ const TIMER_PRESETS_12 = [
   { id: "12", label: "Dark" },
 ];
 
+// getWidgetPresetsList: executa a etapa descrita pelo nome da função.
 function getWidgetPresetsList(
   widgetId?: string | null,
 ): Array<{ id: string; label: string; layout?: string }> {
@@ -473,6 +490,7 @@ function getWidgetPresetsList(
   return DEFAULT_PRESETS_12;
 }
 
+// CommandEditor: executa a etapa descrita pelo nome da função.
 function CommandEditor({
   commands,
   disabled,
@@ -499,6 +517,7 @@ function CommandEditor({
         .filter((item) => item.name.trim()),
     );
   }
+  {/* Estrutura visual: div. */}
   return (
     <div className="flex flex-col gap-1.5">
       {normalized.map((command, index) => (
@@ -564,6 +583,7 @@ function CommandEditor({
   );
 }
 
+// StringListEditor: executa a etapa descrita pelo nome da função.
 function StringListEditor({
   title,
   items,
@@ -578,6 +598,7 @@ function StringListEditor({
   placeholder: string;
 }) {
   const [draft, setDraft] = useState("");
+  {/* Estrutura visual: div. */}
   return (
     <div className="rounded border border-white/10 bg-slate-900 p-2">
       <p className="mb-1 text-[11px] font-semibold text-slate-200">{title}</p>
@@ -634,6 +655,7 @@ function StringListEditor({
   );
 }
 
+// ScheduleEditor: executa a etapa descrita pelo nome da função.
 function ScheduleEditor({
   schedule,
   disabled,
@@ -648,6 +670,7 @@ function ScheduleEditor({
     hour: String(item?.hour || ""),
     label: String(item?.label || ""),
   }));
+  {/* Estrutura visual: div. */}
   return (
     <div className="rounded border border-white/10 bg-slate-900 p-2">
       <p className="mb-1 text-[11px] font-semibold text-slate-200">Agenda de Streams</p>
@@ -716,6 +739,7 @@ function ScheduleEditor({
   );
 }
 
+// PollOptionsEditor: executa a etapa descrita pelo nome da função.
 function PollOptionsEditor({
   options,
   disabled,
@@ -729,6 +753,7 @@ function PollOptionsEditor({
     text: String(option?.text || ""),
     label: String(option?.label || String(i + 1)),
   }));
+  {/* Estrutura visual: div. */}
   return (
     <div className="rounded border border-white/10 bg-slate-900 p-2">
       <p className="mb-1 text-[11px] font-semibold text-slate-200">Opções de voto (!voto número)</p>
@@ -782,6 +807,7 @@ function PollOptionsEditor({
   );
 }
 
+// Overlay_Editor: executa a etapa descrita pelo nome da função.
 export default function Overlay_Editor({
   className = "",
   height = 220,
@@ -919,6 +945,8 @@ export default function Overlay_Editor({
     onFontChange(font);
     onTextStyleChange({ fontFamily: font });
   }
+
+  {/* Estrutura visual: section. */}
 
   return (
     <section
@@ -1518,6 +1546,7 @@ export default function Overlay_Editor({
                                 typeof value === "string" &&
                                 /(?:color|colour)$/i.test(key) &&
                                 /^#[0-9a-f]{6}$/i.test(value);
+                              {/* Estrutura visual: label. */}
                               return (
                                 <label
                                   key={key}
@@ -1667,6 +1696,7 @@ export default function Overlay_Editor({
                           editableConfig.structuralPreset ??
                             (selectedWidget?.id === "manual-now-playing" ? "01" : "01"),
                         ) === preset.id;
+                      {/* Estrutura visual: button. */}
                       return (
                         <button
                           key={preset.id}
@@ -1743,6 +1773,8 @@ export default function Overlay_Editor({
                     ),
                   );
 
+                  {/* Estrutura visual: section. */}
+
                   return (
                     <section
                       aria-label="Tempo de visualização da widget"
@@ -1790,6 +1822,7 @@ export default function Overlay_Editor({
                           },
                         ].map((mode) => {
                           const isActive = currentDisplayMode === mode.id;
+                          {/* Estrutura visual: button. */}
                           return (
                             <button
                               key={mode.id}
@@ -2204,6 +2237,7 @@ export default function Overlay_Editor({
                         !animation.label ||
                         selectedInstanceWidgetId !== "__livenexus_text__" ||
                         !selectedInstanceConfig;
+                      {/* Estrutura visual: button. */}
                       return (
                         <button
                           key={animation.id}
@@ -2834,6 +2868,7 @@ export default function Overlay_Editor({
                         .filter((_, index) => index % 3 === column)
                         .map((layer) => {
                           const index = layers.findIndex((item) => item.id === layer.id);
+                          {/* Estrutura visual: div. */}
                           return (
                             <div
                               key={layer.id}
