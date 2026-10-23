@@ -7,6 +7,7 @@ const STORAGE_QUEUE_KEY = "scenario_react_queue";
 const STORAGE_ACTIVE_KEY = "scenario_react_active_video";
 const BROADCAST_CHANNEL_NAME = "scenario_react_bus";
 
+// parseVideoUrl: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function parseVideoUrl(inputUrl) {
   if (!inputUrl || typeof inputUrl !== "string") return null;
   const url = inputUrl.trim();
@@ -32,6 +33,7 @@ export function parseVideoUrl(inputUrl) {
 }
 
 // Broadcast message helper
+// broadcastReactEvent: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function broadcastReactEvent(type, payload) {
   if (typeof window === "undefined") return;
   try {
@@ -46,6 +48,7 @@ function broadcastReactEvent(type, payload) {
 }
 
 // Storage helpers
+// getStoredReactQueue: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getStoredReactQueue() {
   if (typeof window === "undefined") return [];
   try {
@@ -58,6 +61,7 @@ export function getStoredReactQueue() {
   }
 }
 
+// saveStoredReactQueue: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function saveStoredReactQueue(queue) {
   if (typeof window === "undefined") return;
   try {
@@ -68,6 +72,7 @@ export function saveStoredReactQueue(queue) {
   }
 }
 
+// getStoredActiveReactVideo: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getStoredActiveReactVideo() {
   if (typeof window === "undefined") return null;
   try {
@@ -79,6 +84,7 @@ export function getStoredActiveReactVideo() {
   }
 }
 
+// saveStoredActiveReactVideo: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function saveStoredActiveReactVideo(video) {
   if (typeof window === "undefined") return;
   try {
@@ -94,6 +100,7 @@ export function saveStoredActiveReactVideo(video) {
 }
 
 // Add user-submitted link to the community queue
+// addVideoToReactQueue: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function addVideoToReactQueue({ url, author, title, source = "manual" }) {
   if (!url) return { success: false, error: "URL do vídeo é obrigatória" };
 
@@ -129,6 +136,7 @@ export function addVideoToReactQueue({ url, author, title, source = "manual" }) 
 }
 
 // Select and start playing a video in the REACT main area
+// playReactVideo: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function playReactVideo(videoIdOrItem) {
   const currentQueue = getStoredReactQueue();
   let targetItem = null;
@@ -158,6 +166,7 @@ export function playReactVideo(videoIdOrItem) {
 }
 
 // Stop current active video playback
+// stopReactVideo: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function stopReactVideo() {
   const currentActive = getStoredActiveReactVideo();
   if (currentActive) {
@@ -171,6 +180,7 @@ export function stopReactVideo() {
 }
 
 // Delete item from queue
+// removeReactVideo: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function removeReactVideo(id) {
   const currentQueue = getStoredReactQueue();
   const updatedQueue = currentQueue.filter((item) => item.id !== id);
@@ -183,6 +193,7 @@ export function removeReactVideo(id) {
 }
 
 // Clear all watched items
+// clearWatchedReactVideos: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function clearWatchedReactVideos() {
   const currentQueue = getStoredReactQueue();
   const updatedQueue = currentQueue.filter((item) => item.status !== "watched");
@@ -190,6 +201,7 @@ export function clearWatchedReactVideos() {
 }
 
 // Check chat items from liveActivity to automatically capture submitted video links
+// syncVideosFromChatMessages: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function syncVideosFromChatMessages(chatItems = []) {
   if (!chatItems || !Array.isArray(chatItems)) return;
 
