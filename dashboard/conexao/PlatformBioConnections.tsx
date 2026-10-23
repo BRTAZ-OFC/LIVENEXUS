@@ -21,6 +21,7 @@ const EMPTY: Record<ChatPlatform, VerificationState> = {
 
 type AuthUser = { user_id: string; user: string; role?: string };
 
+// PlatformBioConnections: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function PlatformBioConnections() {
   const state = useMultiChatStatusSnapshot();
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
@@ -224,6 +225,8 @@ export default function PlatformBioConnections() {
     setNotice(`Conectando ao canal ${platform} verificado.`);
   }
 
+  {/* Estrutura visual retornada: section. */}
+
   return (
     <section className="tts-card tts-platform-connections">
       <div className="tts-card-title flex flex-wrap items-center justify-between gap-3">
@@ -282,6 +285,7 @@ export default function PlatformBioConnections() {
               : platform === "Kick"
                 ? "Slug do canal (ex.: xqc)"
                 : "@canal ou URL do canal";
+          {/* Estrutura visual retornada: article. */}
           return (
             <article key={platform} className="tts-platform-card">
               <div className="tts-platform-card-heading">
