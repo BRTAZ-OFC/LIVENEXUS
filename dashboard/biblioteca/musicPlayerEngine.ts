@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica as ações que controlam a reprodução e o estado da música. */
 export type MusicTrack = {
   videoId: string;
   title: string;
