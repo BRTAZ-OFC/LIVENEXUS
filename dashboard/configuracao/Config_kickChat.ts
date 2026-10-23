@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica as opções usadas para configurar o chat da Kick. */
 // Conexão ao chat do Kick: Pusher DIRETO no navegador + resolução de chatroomId via
 // API v2 do Kick (CORS permissivo, frontend puro). Viewer count via poll da mesma API.
 // Sem Worker; client-side direto.
