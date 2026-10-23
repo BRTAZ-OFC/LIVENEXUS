@@ -8,6 +8,7 @@ import { platformIsOnline, platformMeta, platformViewers } from "../Overlay_plat
  * @param {Object} props
  * @param {import('../types/WidgetConfig').WidgetConfig} props.config
  */
+// TwitchStatusLabel: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function TwitchStatusLabel({ config = {} }) {
   const { connections, streamMeta } = useStreaming();
 
@@ -27,6 +28,8 @@ export default function TwitchStatusLabel({ config = {} }) {
     color: config.textColor || "#ffffff",
     fontFamily: config.fontFamily || "Inter, sans-serif",
   };
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div
