@@ -11,6 +11,7 @@ const CONNECTIONS_FILE = resolve(
   "conect-plataform.json",
 );
 
+// validateUserId: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function validateUserId(userId) {
   if (typeof userId !== "string" || !userId.trim()) {
     throw new Error("Usuário não identificado.");
@@ -18,6 +19,7 @@ function validateUserId(userId) {
   return userId.trim();
 }
 
+// readDatabase: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function readDatabase() {
   try {
     const parsed = JSON.parse(await readFile(CONNECTIONS_FILE, "utf8"));
@@ -33,6 +35,7 @@ async function readDatabase() {
   }
 }
 
+// consolidatedRecord: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function consolidatedRecord(records, userId) {
   if (!Array.isArray(records) || records.length === 0) return null;
   const source = records.find((record) => record && typeof record === "object") || null;
@@ -70,6 +73,7 @@ function consolidatedRecord(records, userId) {
   };
 }
 
+// upsertRecord: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function upsertRecord(existing, userId, data = {}) {
   const record = existing || {
     id: randomUUID(),
@@ -268,6 +272,7 @@ export const PlataformasJohnson = {
   },
 };
 
+// listAllPlataformas: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function listAllPlataformas() {
   const db = await readDatabase();
   const list = [];
