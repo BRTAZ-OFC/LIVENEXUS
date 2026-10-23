@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica o recurso usado pela tela para publicar mídia RTC. */
 // Hook para inicialização e ciclo de vida do Publisher RTC Automático
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useStreaming } from "@/dashboard/widget/runtime";
