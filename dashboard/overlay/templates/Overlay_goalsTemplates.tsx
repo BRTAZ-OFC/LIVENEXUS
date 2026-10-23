@@ -1,6 +1,7 @@
 import React from "react";
 import { Award, Trophy, Sparkles, Flame } from "lucide-react";
 
+// createGoalTemplates: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function createGoalTemplates({
   title,
   icon: Icon,
@@ -55,6 +56,8 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full p-3 rounded-none bg-slate-950/90 shadow-xl flex flex-col justify-between select-none text-left`}
@@ -98,6 +101,8 @@ function createGoalTemplates({
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
         const strokeDash = 2 * Math.PI * 40;
         const strokeOffset = strokeDash - (strokeDash * pct) / 100;
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
@@ -160,6 +165,8 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full p-2.5 rounded-2xl bg-slate-950/90 border ${c.border} flex flex-col items-center justify-between select-none shadow-xl`}
@@ -195,6 +202,8 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full p-3 rounded-2xl bg-slate-950/85 border ${c.border} flex flex-col justify-between select-none text-left shadow-xl`}
@@ -229,6 +238,8 @@ function createGoalTemplates({
         const cur = isOnline ? current : 0;
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
@@ -268,6 +279,8 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full px-3.5 rounded-full bg-slate-900/90 border ${c.border} flex items-center justify-between shadow-md select-none text-left`}
@@ -296,6 +309,8 @@ function createGoalTemplates({
         const cur = isOnline ? current : 0;
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
@@ -337,6 +352,8 @@ function createGoalTemplates({
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
         const activeBlocks = Math.round((pct / 100) * 10);
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full p-3 rounded-xl bg-slate-950/90 border ${c.border} flex flex-col justify-between select-none text-left shadow-lg`}
@@ -376,6 +393,8 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div className="w-full h-full flex bg-gradient-to-r from-red-600 via-rose-700 to-slate-950 p-3 rounded-xl shadow-2xl select-none text-left border-l-4 border-amber-400 items-center justify-between">
             <div className="truncate flex-1 pr-3">
@@ -407,6 +426,8 @@ function createGoalTemplates({
         const cur = isOnline ? current : 0;
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
