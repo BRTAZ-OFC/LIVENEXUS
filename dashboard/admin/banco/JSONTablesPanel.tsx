@@ -11,6 +11,7 @@ type Props = {
   refreshKey?: number;
 };
 
+// authHeaders: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function authHeaders(json = false): Record<string, string> {
   const headers: Record<string, string> = {};
   if (json) headers["Content-Type"] = "application/json";
@@ -19,6 +20,7 @@ function authHeaders(json = false): Record<string, string> {
   return headers;
 }
 
+// fieldTitle: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function fieldTitle(key: string) {
   const labels: Record<string, string> = {
     user_id: "ID do usuário",
@@ -45,12 +47,14 @@ function fieldTitle(key: string) {
   );
 }
 
+// cellValue: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function cellValue(value: unknown) {
   if (value === null || value === undefined || value === "") return "—";
   const text = typeof value === "object" ? JSON.stringify(value) : String(value);
   return text.length > 10 ? `${text.slice(0, 10)}…` : text;
 }
 
+// emptyRecord: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function emptyRecord(tableId: string, userId: string) {
   if (tableId === "biblioteca")
     return { user_id: userId, songs: [], albums: [], artists: [], playlists: [] };
@@ -91,6 +95,7 @@ function emptyRecord(tableId: string, userId: string) {
   return {};
 }
 
+// JSONTablesPanel: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function JSONTablesPanel({ tableId, title, refreshKey = 0 }: Props) {
   const [rows, setRows] = useState<JsonRow[]>([]);
   const [users, setUsers] = useState<JsonUser[]>([]);
@@ -257,6 +262,8 @@ export default function JSONTablesPanel({ tableId, title, refreshKey = 0 }: Prop
     }
   }
 
+  {/* Estrutura visual retornada: div. */}
+
   return (
     <div className="space-y-4 min-w-0">
       <header className="flex flex-wrap items-center justify-between gap-3">
@@ -344,6 +351,7 @@ export default function JSONTablesPanel({ tableId, title, refreshKey = 0 }: Prop
                 {(columns.length ? columns : ["Registro"]).map((column) => {
                   const value = column === "Registro" ? row.__rowKey : row[column];
                   const text = cellValue(value);
+                  {/* Estrutura visual retornada: td. */}
                   return (
                     <td
                       key={column}
