@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica as cores e medidas compartilhadas pelos estilos. */
 /* BLOCO 1 — Variantes Tailwind e tokens de tema compartilhados pela aplicação. */
 
 @custom-variant dark (&:is(.dark *));
