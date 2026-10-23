@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica as opções para mostrar informações da transmissão da Twitch. */
 // twitchStreamInfo — metadata da live Twitch via GQL anônima (FRONTEND, sem Worker).
 // Reutiliza o mesmo Client-ID público do web client da Twitch já usado em
 // twitchFollowers.js (CORS * confirmado). Sem backend, sem OAuth, sem Helix.
