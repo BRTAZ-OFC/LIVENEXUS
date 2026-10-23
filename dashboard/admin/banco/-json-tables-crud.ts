@@ -354,7 +354,7 @@ export async function createJsonTableRecord(tableId, input) {
     const id = String(record.id || randomUUID());
     const now = new Date().toISOString();
     record = { ...record, id, user_id: ownerId };
-    if (record.created_at === undefined && record.created_date === undefined)
+    if (tableId !== "galeria_usuarios" && record.created_at === undefined && record.created_date === undefined)
       record.created_at = now;
     const items = Array.isArray(data[ownerId]) ? data[ownerId] : [];
     if (items.some((item) => isRecord(item) && String(item.id) === id)) {
