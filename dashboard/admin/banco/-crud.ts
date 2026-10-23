@@ -14,6 +14,7 @@ import { withFileQueue, writeJsonAtomically } from "./-json-storage.js";
 const USERS_FILE = resolve(dirname(fileURLToPath(import.meta.url)), "json", "usuario.json");
 
 // BLOCO 2 — Lê usuario.json e valida que o conteúdo é uma lista.
+// readUsers: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function readUsers() {
   try {
     const parsed = JSON.parse(await readFile(USERS_FILE, "utf8"));
@@ -26,11 +27,13 @@ async function readUsers() {
 }
 
 // BLOCO 3 — Cria a pasta, quando necessário, e persiste a lista no JSON.
+// writeUsers: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function writeUsers(users) {
   await writeJsonAtomically(USERS_FILE, users);
 }
 
 // BLOCO 4 — Armazena senha como hash scrypt com salt, nunca em texto puro.
+// hashPassword: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function hashPassword(password) {
   const salt = randomBytes(16).toString("hex");
   const hash = scryptSync(password, salt, 64).toString("hex");
@@ -38,6 +41,7 @@ function hashPassword(password) {
 }
 
 // BLOCO 5 — Compara a senha enviada ao hash salvo sem comparação insegura de strings.
+// verifyPassword: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function verifyPassword(password, storedHash) {
   if (typeof password !== "string" || typeof storedHash !== "string") return false;
   const parts = storedHash.split(":");
@@ -52,11 +56,13 @@ export function verifyPassword(password, storedHash) {
 }
 
 // BLOCO 6 — Lista registros removendo password antes de devolver os dados.
+// listUsers: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function listUsers() {
   return (await readUsers()).map(({ password, ...user }) => user);
 }
 
 // BLOCO 7 — Busca um usuário por ID sem revelar sua senha.
+// getUserById: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function getUserById(user_id) {
   const user = (await readUsers()).find((item) => item.user_id === user_id);
   if (!user) return null;
@@ -65,6 +71,7 @@ export async function getUserById(user_id) {
 }
 
 // BLOCO 8 — Confere se o nome já existe ignorando espaços externos e maiúsculas.
+// usernameExists: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function usernameExists(user) {
   if (typeof user !== "string") return false;
   const normalized = user.trim().toLowerCase();
@@ -73,6 +80,7 @@ export async function usernameExists(user) {
 }
 
 // BLOCO 9 — Valida campos, evita nomes duplicados e grava um usuário novo.
+// createUser: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function createUser({ user, password, imagen = null, role = "user" }) {
   if (typeof user !== "string" || user.trim().length < 3 || user.trim().length > 32) {
     throw new Error("O usuário deve ter entre 3 e 32 caracteres.");
@@ -114,6 +122,7 @@ export async function createUser({ user, password, imagen = null, role = "user" 
 }
 
 // BLOCO 10 — Valida campos permitidos e atualiza a data de alteração.
+// updateUser: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function updateUser(user_id, changes = {}) {
   return withFileQueue(USERS_FILE, async () => {
     const users = await readUsers();
@@ -177,6 +186,7 @@ export async function updateUser(user_id, changes = {}) {
 }
 
 // BLOCO 11 — Remove o registro com proteção contra gravações simultâneas.
+// deleteUser: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function deleteUser(user_id) {
   return withFileQueue(USERS_FILE, async () => {
     const users = await readUsers();
@@ -202,6 +212,7 @@ export async function deleteUser(user_id) {
 }
 
 // BLOCO 12 — Localiza o usuário e verifica a senha para liberar o login.
+// authenticateUser: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function authenticateUser(user, password) {
   const record = (await readUsers()).find(
     (item) => item.user.toLowerCase() === String(user).trim().toLowerCase(),
