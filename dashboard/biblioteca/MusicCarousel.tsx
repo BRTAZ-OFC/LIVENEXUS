@@ -8,9 +8,11 @@ type Props = {
   items: CatalogItem[];
   onOpen: (item: CatalogItem) => void;
 };
+// keyOf: define uma ação ou valor usado pelo módulo.
 const keyOf = (item: CatalogItem) =>
   item.videoId || item.playlistId || item.browseId || item.id || item.title || "";
 
+// MusicCarousel: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function MusicCarousel({ title, items, onOpen }: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
   const carouselItems = items.slice(0, 30);
@@ -21,6 +23,8 @@ export default function MusicCarousel({ title, items, onOpen }: Props) {
   if (!count) return null;
   const shift = (direction: number) =>
     trackRef.current?.scrollBy({ left: direction * step, behavior: "smooth" });
+
+  {/* Estrutura visual retornada: section. */}
 
   return (
     <section className="min-w-0 space-y-3">
@@ -54,6 +58,7 @@ export default function MusicCarousel({ title, items, onOpen }: Props) {
       <div ref={trackRef} className="overflow-x-auto" style={{ scrollbarWidth: "none" }}>
         <div className="flex w-max">
           {carouselItems.map((item, offset) => {
+            {/* Estrutura visual retornada: article. */}
             return (
               <article
                 key={`${keyOf(item)}-${offset}`}
