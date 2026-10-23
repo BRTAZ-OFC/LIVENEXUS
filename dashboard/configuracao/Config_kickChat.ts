@@ -12,6 +12,7 @@ const PUSHER_KEY = "34bf7a0ff419a2a775b9";
 const PUSHER_URL = `wss://ws-us2.pusher.com/app/${PUSHER_KEY}?protocol=7&client=js&version=8.4.0-rc2&flash=false`;
 
 // Normaliza entrada do usuário (nome, @nome, URL) para slug puro.
+// normalizeKickSlug: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function normalizeKickSlug(input) {
   const v = (input || "").trim().toLowerCase();
   const m = v.match(/kick\.com\/([a-z0-9_.-]+)/i);
@@ -22,6 +23,7 @@ function normalizeKickSlug(input) {
 
 // Fallback direto do browser: a API do Kick retorna CORS permissivo.
 // Usado SOMENTE quando o Worker falha (404, rede, ou formato inesperado).
+// resolveChatroomIdDirect: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function resolveChatroomIdDirect(slug) {
   const r = await fetch(`https://kick.com/api/v2/channels/${encodeURIComponent(slug)}`, {
     headers: { Accept: "application/json" },
@@ -36,6 +38,7 @@ async function resolveChatroomIdDirect(slug) {
   return data.chatroom.id;
 }
 
+// resolveChatroomId: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function resolveChatroomId(slug) {
   // Resolução direta do browser (CORS permissivo do Kick). Sem Worker.
   const chatroomId = await resolveChatroomIdDirect(slug);
@@ -43,6 +46,7 @@ async function resolveChatroomId(slug) {
   return chatroomId;
 }
 
+// parseKickRoles: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function parseKickRoles(sender) {
   const roles = [];
   const badges = sender?.identity?.badges || [];
@@ -59,6 +63,7 @@ function parseKickRoles(sender) {
 // TEMPORARY: cria captura bruta de evento Kick antes da classificação.
 // Preserva rawData (string) + parsedData (objeto), truncando em 30KB.
 // Não guarda WebSocket, funções, ou referências circulares.
+// createKickRawCapture: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function createKickRawCapture(msg) {
   let parsedData = null;
   let rawDataStr = null;
@@ -96,6 +101,7 @@ function createKickRawCapture(msg) {
   };
 }
 
+// connectKick: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function connectKick(channel, onMessage, onStatus, onMeta) {
   let ws = null,
     pingTimer = null,
