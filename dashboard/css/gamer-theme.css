@@ -1,6 +1,7 @@
 /* LIVENEXUS: Explica os estilos que definem o tema visual do painel. */
 /* Identidade visual global LiveNexus: gamer competitivo / cyber arena. */
 /* Estilos para :root. */
+/* Estilos para :root. */
 :root {
   color-scheme: dark;
   --background: #070b13;
@@ -24,12 +25,14 @@
 }
 
 /* Estilos para html. */
+/* Estilos para html. */
 html {
   background: var(--background);
   scrollbar-color: #256477 #080d16;
   scrollbar-width: thin;
 }
 
+/* Estilos para body. */
 /* Estilos para body. */
 body {
   color: var(--foreground);
@@ -41,17 +44,20 @@ body {
 }
 
 /* Estilos para ::selection. */
+/* Estilos para ::selection. */
 ::selection {
   color: #041018;
   background: var(--gamer-cyan);
 }
 
 /* Estilos para :focus-visible. */
+/* Estilos para :focus-visible. */
 :focus-visible {
   outline: 2px solid var(--gamer-cyan);
   outline-offset: 3px;
 }
 
+/* Estilos para a. */
 /* Estilos para a. */
 a {
   text-underline-offset: 3px;
@@ -65,12 +71,14 @@ button,
 input,
 select,
 /* Estilos para textarea. */
+/* Estilos para textarea. */
 textarea {
   accent-color: var(--gamer-cyan);
 }
 
 input,
 select,
+/* Estilos para textarea. */
 /* Estilos para textarea. */
 textarea {
   border-color: rgb(100 180 205 / 24%);
@@ -80,12 +88,14 @@ textarea {
 input:focus,
 select:focus,
 /* Estilos para textarea:focus. */
+/* Estilos para textarea:focus. */
 textarea:focus {
   border-color: var(--gamer-cyan);
   box-shadow: 0 0 0 3px rgb(34 211 238 / 10%);
   outline: none;
 }
 
+/* Estilos para button. */
 /* Estilos para button. */
 button {
   transition:
@@ -97,16 +107,19 @@ button {
 }
 
 /* Estilos para button:not(:disabled):hover. */
+/* Estilos para button:not(:disabled):hover. */
 button:not(:disabled):hover {
   border-color: rgb(34 211 238 / 42%);
 }
 
+/* Estilos para button:disabled. */
 /* Estilos para button:disabled. */
 button:disabled {
   cursor: not-allowed;
   filter: saturate(55%);
 }
 
+/* Estilos para hr. */
 /* Estilos para hr. */
 hr {
   border-color: rgb(100 180 205 / 16%);
@@ -121,6 +134,7 @@ hr {
 .dash-rounded-2xl-border-la2jyp,
 [class*="rounded-xl"][class*="border"][class*="bg-"],
 /* Estilos para [class*="rounded-2xl"][class*="border"][class*="bg-"]. */
+/* Estilos para [class*="rounded-2xl"][class*="border"][class*="bg-"]. */
 [class*="rounded-2xl"][class*="border"][class*="bg-"] {
   border-color: var(--gamer-line);
   box-shadow:
@@ -129,6 +143,7 @@ hr {
 }
 
 .auth-card,
+/* Estilos para .not-found-card. */
 /* Estilos para .not-found-card. */
 .not-found-card {
   background: linear-gradient(145deg, rgb(17 29 46 / 96%), rgb(9 15 27 / 98%));
@@ -144,16 +159,19 @@ hr {
 .dash-flex-h-9-y3vg7y,
 .dash-flex-h-10-8puoho,
 /* Estilos para .home-flex-h-8-1uzhtbn. */
+/* Estilos para .home-flex-h-8-1uzhtbn. */
 .home-flex-h-8-1uzhtbn {
   background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 48%, #8b5cf6 100%);
   box-shadow: 0 0 24px rgb(34 211 238 / 14%);
 }
 
 /* Estilos para .dash-flex-min-h-screen-axmrk9. */
+/* Estilos para .dash-flex-min-h-screen-axmrk9. */
 .dash-flex-min-h-screen-axmrk9 {
   background: transparent;
 }
 
+/* Estilos para .dash-flex-min-h-screen-16w20hu. */
 /* Estilos para .dash-flex-min-h-screen-16w20hu. */
 .dash-flex-min-h-screen-16w20hu {
   background: linear-gradient(180deg, #0b1422 0%, #080e19 100%);
@@ -162,12 +180,14 @@ hr {
 }
 
 /* Estilos para .dash-border-b-border-white-10-7389gy. */
+/* Estilos para .dash-border-b-border-white-10-7389gy. */
 .dash-border-b-border-white-10-7389gy {
   background: rgb(8 14 25 / 88%);
   border-color: rgb(34 211 238 / 16%);
   backdrop-filter: blur(16px);
 }
 
+/* Estilos para .dash-bg-violet-500-15-text-vi-1xm6n2h. */
 /* Estilos para .dash-bg-violet-500-15-text-vi-1xm6n2h. */
 .dash-bg-violet-500-15-text-vi-1xm6n2h {
   background: linear-gradient(100deg, rgb(34 211 238 / 13%), rgb(139 92 246 / 13%));
@@ -179,11 +199,13 @@ hr {
 .dash-chat-panel,
 .dash-speakers-panel,
 /* Estilos para .dash-rounded-2xl-border-la2jyp. */
+/* Estilos para .dash-rounded-2xl-border-la2jyp. */
 .dash-rounded-2xl-border-la2jyp {
   background: linear-gradient(145deg, rgb(15 24 40 / 96%), rgb(9 15 27 / 98%));
 }
 
 .dash-stat-card:hover,
+/* Estilos para .dash-rounded-2xl-border-la2jyp:hover. */
 /* Estilos para .dash-rounded-2xl-border-la2jyp:hover. */
 .dash-rounded-2xl-border-la2jyp:hover {
   border-color: rgb(34 211 238 / 34%);
@@ -191,10 +213,12 @@ hr {
 
 .dash-text-xs-font-bold-1eh0cdm,
 /* Estilos para .dash-panel-heading-icon. */
+/* Estilos para .dash-panel-heading-icon. */
 .dash-panel-heading-icon {
   color: var(--gamer-cyan);
 }
 
+/* Estilos para .home-relative-overflow-hidden-li6lbx. */
 /* Estilos para .home-relative-overflow-hidden-li6lbx. */
 .home-relative-overflow-hidden-li6lbx {
   border-color: rgb(34 211 238 / 21%);
@@ -206,10 +230,12 @@ hr {
 
 .home-inline-flex-items-center-1a3j2x0,
 /* Estilos para .home-mt-6-inline-flex-1bvzh69. */
+/* Estilos para .home-mt-6-inline-flex-1bvzh69. */
 .home-mt-6-inline-flex-1bvzh69 {
   box-shadow: 0 8px 26px rgb(34 211 238 / 12%);
 }
 
+/* Estilos para .button-primary. */
 /* Estilos para .button-primary. */
 .button-primary {
   color: #031017;
@@ -218,11 +244,13 @@ hr {
 }
 
 /* Estilos para .button-primary:hover. */
+/* Estilos para .button-primary:hover. */
 .button-primary:hover {
   filter: brightness(1.08);
   box-shadow: 0 10px 30px rgb(34 211 238 / 22%);
 }
 
+/* Estilos para .button-secondary. */
 /* Estilos para .button-secondary. */
 .button-secondary {
   border-color: rgb(100 180 205 / 24%);
@@ -231,10 +259,12 @@ hr {
 
 .not-found-eyebrow,
 /* Estilos para .auth-brand-mark + *. */
+/* Estilos para .auth-brand-mark + *. */
 .auth-brand-mark + * {
   text-shadow: 0 0 18px rgb(34 211 238 / 14%);
 }
 
+/* Estilos para ::-webkit-scrollbar. */
 /* Estilos para ::-webkit-scrollbar. */
 ::-webkit-scrollbar {
   width: 9px;
@@ -242,10 +272,12 @@ hr {
 }
 
 /* Estilos para ::-webkit-scrollbar-track. */
+/* Estilos para ::-webkit-scrollbar-track. */
 ::-webkit-scrollbar-track {
   background: #080d16;
 }
 
+/* Estilos para ::-webkit-scrollbar-thumb. */
 /* Estilos para ::-webkit-scrollbar-thumb. */
 ::-webkit-scrollbar-thumb {
   border: 2px solid #080d16;
@@ -253,6 +285,7 @@ hr {
   background: #245064;
 }
 
+/* Estilos para ::-webkit-scrollbar-thumb:hover. */
 /* Estilos para ::-webkit-scrollbar-thumb:hover. */
 ::-webkit-scrollbar-thumb:hover {
   background: #22a7c3;
@@ -269,6 +302,7 @@ hr {
   }
 
   /* Os letreiros precisam continuar em movimento mesmo com movimento reduzido ativo. */
+/* Estilos para .ln-marquee-motion. */
 /* Estilos para .ln-marquee-motion. */
   .ln-marquee-motion {
     animation-duration: 12s !important;
