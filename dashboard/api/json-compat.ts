@@ -23,10 +23,12 @@ const RESOURCE_TABLES: Record<string, string> = {
   "/api/rtc-identity": "rtc_registry",
 };
 
+// sessionOf: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function sessionOf(req: Request): Session {
   return readSession(req) as Session;
 }
 
+// requireUser: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function requireUser(req: Request, res: Response): Session {
   const session = sessionOf(req);
   if (!session?.user_id) {
@@ -36,6 +38,7 @@ function requireUser(req: Request, res: Response): Session {
   return session;
 }
 
+// requireAdmin: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function requireAdmin(req: Request, res: Response): Session {
   const session = sessionOf(req);
   if (!session?.user_id || session.role !== "admin") {
@@ -50,6 +53,7 @@ function requireAdmin(req: Request, res: Response): Session {
   return session;
 }
 
+// sendError: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function sendError(res: Response, error: unknown) {
   const message = error instanceof Error ? error.message : "Falha ao processar a API JSON.";
   const status = /não encontrado|não permitida/i.test(message)
@@ -60,6 +64,7 @@ function sendError(res: Response, error: unknown) {
   return res.status(status).json({ ok: false, error: message });
 }
 
+// registerJsonCompatRoutes: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function registerJsonCompatRoutes(app: Express) {
   for (const [route, tableId] of Object.entries(RESOURCE_TABLES)) {
     app.all(route, async (req: Request, res: Response) => {
