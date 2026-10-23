@@ -84,22 +84,17 @@ function sourceFor(row: ScenarioRecord): JsonObject {
 }
 
 type AlignmentType =
-  | "left"
-  | "center-h"
-  | "right"
-  | "top"
-  | "center-v"
-  | "bottom"
-  | "distribute-h"
-  | "distribute-v";
+  "left" | "center-h" | "right" | "top" | "center-v" | "bottom" | "distribute-h" | "distribute-v";
 
-function alignSelectedInstances<T extends { id?: string; x?: number; y?: number; width?: number; height?: number }>(
+function alignSelectedInstances<
+  T extends { id?: string; x?: number; y?: number; width?: number; height?: number },
+>(
   instances: T[],
   selectedIds: string[],
   type: AlignmentType,
   canvasWidth: number,
   canvasHeight: number,
-  alignToCanvas: boolean = false
+  alignToCanvas: boolean = false,
 ): T[] {
   if (selectedIds.length === 0) return instances;
 
@@ -143,8 +138,10 @@ function alignSelectedInstances<T extends { id?: string; x?: number; y?: number;
     });
   }
 
-  let minX = Infinity, maxX = -Infinity;
-  let minY = Infinity, maxY = -Infinity;
+  let minX = Infinity,
+    maxX = -Infinity;
+  let minY = Infinity,
+    maxY = -Infinity;
 
   selectedItems.forEach((item) => {
     const x = Number(item.x) || 0;
@@ -243,7 +240,9 @@ function alignSelectedInstances<T extends { id?: string; x?: number; y?: number;
 function normalizeScenario(row: ScenarioRecord): ScenarioConfig {
   const source = sourceFor(row);
   const backgroundSource = isObject(source.background) ? source.background : {};
-  const rawInstances = Array.isArray(source.instances) ? (source.instances as ScenarioInstance[]) : [];
+  const rawInstances = Array.isArray(source.instances)
+    ? (source.instances as ScenarioInstance[])
+    : [];
   const instances = rawInstances.map((item, idx) => ({
     ...item,
     id: item.id || `scen-inst-${idx}-${Math.random().toString(36).slice(2, 7)}`,
@@ -312,7 +311,9 @@ export default function ScenarioCanvas({
   const dragRef = useRef<DragState | null>(null);
   const [scale, setScale] = useState(1);
   const [scenario, setScenario] = useState<ScenarioConfig | null>(null);
-  const [subScenarios, setSubScenarios] = useState<{ id: string; name: string; instances: ScenarioInstance[] }[]>([]);
+  const [subScenarios, setSubScenarios] = useState<
+    { id: string; name: string; instances: ScenarioInstance[] }[]
+  >([]);
   const [selectedSubScenarioId, setSelectedSubScenarioId] = useState<string>("");
   const [rowKey, setRowKey] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -347,8 +348,16 @@ export default function ScenarioCanvas({
         if (!cancelled) {
           const normalized = normalizeScenario(row);
           setScenario(normalized);
-          setSubScenarios(normalized.subScenarios && normalized.subScenarios.length > 0 ? normalized.subScenarios : [{ id: 'sub-1', name: 'Sub Cenário 1', instances: normalized.instances }]);
-          setSelectedSubScenarioId(normalized.subScenarios && normalized.subScenarios.length > 0 ? normalized.subScenarios[0].id : 'sub-1');
+          setSubScenarios(
+            normalized.subScenarios && normalized.subScenarios.length > 0
+              ? normalized.subScenarios
+              : [{ id: "sub-1", name: "Sub Cenário 1", instances: normalized.instances }],
+          );
+          setSelectedSubScenarioId(
+            normalized.subScenarios && normalized.subScenarios.length > 0
+              ? normalized.subScenarios[0].id
+              : "sub-1",
+          );
           setRowKey(String(row.__rowKey ?? ""));
         }
       } catch (cause) {
@@ -376,7 +385,7 @@ export default function ScenarioCanvas({
 
   function syncInstancesToSubScenario(nextInstances: ScenarioInstance[]) {
     setSubScenarios((prev) =>
-      prev.map((s) => (s.id === selectedSubScenarioId ? { ...s, instances: nextInstances } : s))
+      prev.map((s) => (s.id === selectedSubScenarioId ? { ...s, instances: nextInstances } : s)),
     );
     setScenario((current) => (current ? { ...current, instances: nextInstances } : current));
   }
@@ -481,7 +490,7 @@ export default function ScenarioCanvas({
   function updateInstance(instanceId: string, patch: Partial<ScenarioInstance>) {
     if (!scenario) return;
     const nextInstances = scenario.instances.map((item, index) =>
-      (item.id || `${item.widgetId}-${index}`) === instanceId ? { ...item, ...patch } : item
+      (item.id || `${item.widgetId}-${index}`) === instanceId ? { ...item, ...patch } : item,
     );
     syncInstancesToSubScenario(nextInstances);
     setNotice("");
@@ -491,7 +500,7 @@ export default function ScenarioCanvas({
     if (!scenario) return;
     const idsToDelete = new Set(Array.isArray(instanceId) ? instanceId : [instanceId]);
     const nextInstances = scenario.instances.filter(
-      (item, index) => !idsToDelete.has(item.id || `${item.widgetId}-${index}`)
+      (item, index) => !idsToDelete.has(item.id || `${item.widgetId}-${index}`),
     );
     syncInstancesToSubScenario(nextInstances);
     setSelectedId((prev) => (prev && idsToDelete.has(prev) ? null : prev));
@@ -509,7 +518,7 @@ export default function ScenarioCanvas({
       type,
       CANVAS_WIDTH,
       CANVAS_HEIGHT,
-      alignToCanvas
+      alignToCanvas,
     );
     syncInstancesToSubScenario(aligned);
   }
@@ -523,7 +532,7 @@ export default function ScenarioCanvas({
     const instanceId = String(instance.id ?? String(instance.widgetId) + "-" + index);
     if (event.shiftKey || event.ctrlKey || event.metaKey) {
       setSelectedIds((prev) =>
-        prev.includes(instanceId) ? prev.filter((i) => i !== instanceId) : [...prev, instanceId]
+        prev.includes(instanceId) ? prev.filter((i) => i !== instanceId) : [...prev, instanceId],
       );
       setSelectedId(instanceId);
     } else {
@@ -581,7 +590,7 @@ export default function ScenarioCanvas({
     setNotice("");
     try {
       const updatedSubScenarios = subScenarios.map((s) =>
-        s.id === selectedSubScenarioId ? { ...s, instances: scenario.instances } : s
+        s.id === selectedSubScenarioId ? { ...s, instances: scenario.instances } : s,
       );
       const response = await fetch("/api/cenarios", {
         method: "PATCH",
@@ -667,7 +676,10 @@ export default function ScenarioCanvas({
             type="button"
             onClick={() => {
               const newId = `sub-${Date.now()}`;
-              setSubScenarios([...subScenarios, { id: newId, name: `Sub Cenário ${subScenarios.length + 1}`, instances: [] }]);
+              setSubScenarios([
+                ...subScenarios,
+                { id: newId, name: `Sub Cenário ${subScenarios.length + 1}`, instances: [] },
+              ]);
               setSelectedSubScenarioId(newId);
             }}
             className="inline-flex items-center gap-2 rounded-lg border border-cyan-300/30 bg-cyan-400/10 px-3 py-2 text-xs font-bold text-cyan-100 hover:bg-cyan-300/15"
@@ -676,8 +688,14 @@ export default function ScenarioCanvas({
           </button>
           <input
             type="text"
-            value={subScenarios.find(s => s.id === selectedSubScenarioId)?.name || ""}
-            onChange={(e) => setSubScenarios(subScenarios.map(s => s.id === selectedSubScenarioId ? { ...s, name: e.target.value } : s))}
+            value={subScenarios.find((s) => s.id === selectedSubScenarioId)?.name || ""}
+            onChange={(e) =>
+              setSubScenarios(
+                subScenarios.map((s) =>
+                  s.id === selectedSubScenarioId ? { ...s, name: e.target.value } : s,
+                ),
+              )
+            }
             className="w-36 rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-xs text-white"
           />
           <select
@@ -685,7 +703,11 @@ export default function ScenarioCanvas({
             onChange={(e) => handleSelectSubScenario(e.target.value)}
             className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-xs text-white"
           >
-            {subScenarios.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            {subScenarios.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
           </select>
           {scenario.background.type === "solid" && (
             <label
@@ -837,8 +859,8 @@ export default function ScenarioCanvas({
           {selectedIds.length > 1
             ? `${selectedIds.length} elementos selecionados`
             : selectedId
-            ? "1 elemento selecionado"
-            : "Nenhum elemento selecionado"}
+              ? "1 elemento selecionado"
+              : "Nenhum elemento selecionado"}
         </span>
       </div>
 
@@ -905,7 +927,7 @@ export default function ScenarioCanvas({
             }}
           >
             <div className="absolute inset-0" style={canvasBackground} />
-            {(subScenarios.find(s => s.id === selectedSubScenarioId)?.instances || [])
+            {(subScenarios.find((s) => s.id === selectedSubScenarioId)?.instances || [])
               .filter((instance) => instance.visible !== false)
               .slice()
               .sort((a, b) => (Number(a.zIndex) || 0) - (Number(b.zIndex) || 0))

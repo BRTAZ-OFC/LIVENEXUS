@@ -140,7 +140,10 @@ export function connectMultiChatPlatform(platform: ChatPlatform) {
       timestamp: typeof raw["timestamp"] === "number" ? raw["timestamp"] : Date.now(),
       eventType: typeof raw["eventType"] === "string" ? raw["eventType"] : null,
       emotes: raw["emotes"],
-      eventMeta: raw["eventMeta"] && typeof raw["eventMeta"] === "object" ? (raw["eventMeta"] as Record<string, unknown>) : null,
+      eventMeta:
+        raw["eventMeta"] && typeof raw["eventMeta"] === "object"
+          ? (raw["eventMeta"] as Record<string, unknown>)
+          : null,
       authorId: typeof raw["authorId"] === "string" ? raw["authorId"] : null,
       firstMsg: raw["firstMsg"] === true,
     };
@@ -169,9 +172,15 @@ export function connectMultiChatPlatform(platform: ChatPlatform) {
         : meta;
     patchPlatform(platform, {
       viewers:
-        typeof meta["viewers"] === "number" ? meta["viewers"] : meta["offline"] ? null : snapshot.statuses[platform].viewers,
+        typeof meta["viewers"] === "number"
+          ? meta["viewers"]
+          : meta["offline"]
+            ? null
+            : snapshot.statuses[platform].viewers,
       meta: String(
-        details["title"] ?? details["channelName"] ?? (meta["offline"] ? "Live offline" : snapshot.statuses[platform].meta),
+        details["title"] ??
+          details["channelName"] ??
+          (meta["offline"] ? "Live offline" : snapshot.statuses[platform].meta),
       ),
       streamMeta: meta["offline"] ? {} : { ...snapshot.statuses[platform].streamMeta, ...details },
     });

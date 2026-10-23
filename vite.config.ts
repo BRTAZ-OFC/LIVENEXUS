@@ -18,7 +18,7 @@ export default defineConfig(() => ({
   server: {
     host: "0.0.0.0",
     port: 3000,
-    allowedHosts: true,
+    allowedHosts: ["*"],
     proxy: {
       "/api": {
         target: process.env["API_URL"] || "http://localhost:3000",
@@ -29,6 +29,6 @@ export default defineConfig(() => ({
   preview: {
     host: "0.0.0.0",
     port: 3000,
-    allowedHosts: true,
+    allowedHosts: ["*"],
   },
 }));

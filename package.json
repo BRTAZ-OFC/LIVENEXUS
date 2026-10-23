@@ -1,7 +1,9 @@
 {
   "name": "livenexus",
   "private": true,
-  "sideEffects": ["**/*.css"],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",

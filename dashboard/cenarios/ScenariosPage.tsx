@@ -328,9 +328,7 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
                     <span className="block truncate text-[11px] font-bold text-slate-100">
                       {config.name || `Cenário ${index + 1}`}
                     </span>
-                    <span className="mt-0.5 block text-[9px] text-slate-500">
-                      Cena
-                    </span>
+                    <span className="mt-0.5 block text-[9px] text-slate-500">Cena</span>
                   </span>
                   <ArrowUpRight className="mt-0.5 h-3 w-3 shrink-0 text-slate-500 transition group-hover:text-cyan-200" />
                 </span>

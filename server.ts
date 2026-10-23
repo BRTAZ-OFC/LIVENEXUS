@@ -43,7 +43,7 @@ import {
 } from "./dashboard/login/session.js";
 
 /* Configure SESSION_SECRET na hospedagem para preservar as sessões entre reinicializações. */
-const sessionSecret = process.env.SESSION_SECRET || process.env["SESSION_SECRET"];
+const sessionSecret = process.env["SESSION_SECRET"];
 if (!sessionSecret) {
   console.warn("AVISO: SESSION_SECRET não configurado, usando segredo de desenvolvimento fraco.");
 }
@@ -101,15 +101,67 @@ const PUBLIC_API_ENDPOINTS = new Set([
   "GET /api/check-username",
   "GET /api/avaliacoes",
   "POST /api/avaliacoes",
+  "GET /api/overlay/canvas",
+  "GET /api/admin/lab/rtc/signal",
+  "POST /api/admin/lab/rtc/signal",
+  "DELETE /api/admin/lab/rtc/signal",
+  "GET /api/admin/lab/rtc/registry",
 ]);
+
+registerRtcSignalingRoutes(app);
+
+app.get("/api/overlay/canvas", async (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  const queryUserId = typeof req.query["user_id"] === "string" ? req.query["user_id"] : null;
+  const targetUserId = session?.user_id || queryUserId;
+
+  if (!targetUserId) {
+    return res.status(401).set(NO_CACHE).json({
+      ok: false,
+      message: "Identificação do usuário necessária para visualizar a overlay.",
+    });
+  }
+
+  try {
+    const rows = await listJsonTableRecords("overlays");
+    const overlays = rows
+      .filter((row: Record<string, unknown>) => String(row["user_id"] ?? "") === targetUserId)
+      .map((row: Record<string, unknown>) => {
+        const record = { ...row };
+        delete record["__rowKey"];
+        return record;
+      });
+    return res.set(NO_CACHE).json({ ok: true, overlays });
+  } catch (error) {
+    return res
+      .status(500)
+      .set(NO_CACHE)
+      .json({
+        ok: false,
+        message: errorMessage(error, "Não foi possível carregar o canvas de Overlay."),
+      });
+  }
+});
 
 app.use(/^\/api(?:\/.*)?$/, async (req: Request, res: Response, next: NextFunction) => {
   const requestPath = new URL(req.originalUrl, "http://localhost").pathname;
   const method = req.method === "HEAD" ? "GET" : req.method;
-  if (PUBLIC_API_ENDPOINTS.has(`${method} ${requestPath}`)) return next();
+
+  // Normaliza o path removendo barras duplicadas ou no final
+  const normalizedPath = requestPath.replace(/\/+$/, "") || "/";
+
+  const isPublic =
+    PUBLIC_API_ENDPOINTS.has(`${method} ${normalizedPath}`) ||
+    Array.from(PUBLIC_API_ENDPOINTS).some((p) => {
+      const [m, path] = p.split(" ");
+      return m === method && path === normalizedPath;
+    });
+
+  if (isPublic) return next();
 
   const session = readSession(req) as SessionData | null;
   if (!session?.user_id) {
+    console.warn(`[Auth API] Bloqueado (401): ${method} ${requestPath} - Motivo: Sem sessão`);
     return res.status(401).set(NO_CACHE).json({
       ok: false,
       message: "Faça login para acessar este recurso.",
@@ -119,6 +171,9 @@ app.use(/^\/api(?:\/.*)?$/, async (req: Request, res: Response, next: NextFuncti
   try {
     const user = await getUserById(session.user_id);
     if (!user || user.role !== session.role) {
+      console.warn(
+        `[Auth API] Bloqueado (401): ${method} ${requestPath} - Motivo: Usuário/Role inválido`,
+      );
       return res.status(401).set(NO_CACHE).json({
         ok: false,
         message: "Sessão inválida ou expirada. Entre novamente.",
@@ -687,37 +742,6 @@ app.delete("/api/plataformas", async (req: Request, res: Response) => {
   }
 });
 
-/* Leitura do canvas de Overlay: cada usuário recebe somente seus próprios registros JSON. */
-app.get("/api/overlay/canvas", async (req: Request, res: Response) => {
-  const session = readSession(req) as SessionData | null;
-  if (!session?.user_id) {
-    return res.status(401).set(NO_CACHE).json({
-      ok: false,
-      message: "Faça login para visualizar o canvas de Overlay.",
-    });
-  }
-
-  try {
-    const rows = await listJsonTableRecords("overlays");
-    const overlays = rows
-      .filter((row: Record<string, unknown>) => String(row["user_id"] ?? "") === session.user_id)
-      .map((row: Record<string, unknown>) => {
-        const record = { ...row };
-        delete record["__rowKey"];
-        return record;
-      });
-    return res.set(NO_CACHE).json({ ok: true, overlays });
-  } catch (error) {
-    return res
-      .status(500)
-      .set(NO_CACHE)
-      .json({
-        ok: false,
-        message: errorMessage(error, "Não foi possível carregar o canvas de Overlay."),
-      });
-  }
-});
-
 /* Grava a composição do canvas de Overlay no JSON do usuário autenticado. */
 app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
   const session = readSession(req) as SessionData | null;
@@ -745,12 +769,30 @@ app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
     const currentId = String(req.body?.currentId ?? "").trim();
     const name = String(input.name ?? "").trim();
     const createNew = req.body?.createNew === true;
-    if (!name || !requestedId) return res.status(400).set(NO_CACHE).json({ ok: false, message: "Nome e ID textual da overlay são obrigatórios." });
-    if (ownedRows.some((row: Record<string, unknown>) => String(row["id"] ?? "") === requestedId && String(row["id"] ?? "") !== currentId)) {
-      return res.status(409).set(NO_CACHE).json({ ok: false, message: "Já existe uma overlay com esse ID. Escolha outro nome." });
+    if (!name || !requestedId)
+      return res
+        .status(400)
+        .set(NO_CACHE)
+        .json({ ok: false, message: "Nome e ID textual da overlay são obrigatórios." });
+    if (
+      ownedRows.some(
+        (row: Record<string, unknown>) =>
+          String(row["id"] ?? "") === requestedId && String(row["id"] ?? "") !== currentId,
+      )
+    ) {
+      return res
+        .status(409)
+        .set(NO_CACHE)
+        .json({ ok: false, message: "Já existe uma overlay com esse ID. Escolha outro nome." });
     }
-    const existing = createNew ? undefined : ownedRows.find((row: Record<string, unknown>) => String(row["id"] ?? "") === currentId);
-    if (!createNew && !existing) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Overlay não encontrada. Se deseja criar outra, use Nova." });
+    const existing = createNew
+      ? undefined
+      : ownedRows.find((row: Record<string, unknown>) => String(row["id"] ?? "") === currentId);
+    if (!createNew && !existing)
+      return res
+        .status(404)
+        .set(NO_CACHE)
+        .json({ ok: false, message: "Overlay não encontrada. Se deseja criar outra, use Nova." });
 
     const settings = { ...input } as Record<string, unknown>;
     delete settings["id"];
@@ -762,6 +804,8 @@ app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
       id: requestedId,
       user_id: session.user_id,
       name,
+      type: String(input.type || "local"),
+      TIPO: String(input.type || "local").toUpperCase(),
       settings,
       updated_at: new Date().toISOString(),
     };
@@ -788,18 +832,35 @@ app.put("/api/overlay/canvas", async (req: Request, res: Response) => {
 /* Exclui somente a overlay pertencente ao usuário autenticado. */
 app.delete("/api/overlay/canvas", async (req: Request, res: Response) => {
   const session = readSession(req) as SessionData | null;
-  if (!session?.user_id) return res.status(401).set(NO_CACHE).json({ ok: false, message: "Faça login para excluir a overlay." });
+  if (!session?.user_id)
+    return res
+      .status(401)
+      .set(NO_CACHE)
+      .json({ ok: false, message: "Faça login para excluir a overlay." });
   const id = String(req.body?.id ?? "").trim();
-  if (!id) return res.status(400).set(NO_CACHE).json({ ok: false, message: "ID da overlay não fornecido." });
+  if (!id)
+    return res
+      .status(400)
+      .set(NO_CACHE)
+      .json({ ok: false, message: "ID da overlay não fornecido." });
   try {
     const rows = await listJsonTableRecords("overlays");
-    const existing = rows.find((row: Record<string, unknown>) => String(row["id"] ?? row["overlay_id"] ?? "") === id && String(row["user_id"] ?? "") === session.user_id);
-    if (!existing) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Overlay não encontrada." });
+    const existing = rows.find(
+      (row: Record<string, unknown>) =>
+        String(row["id"] ?? row["overlay_id"] ?? "") === id &&
+        String(row["user_id"] ?? "") === session.user_id,
+    );
+    if (!existing)
+      return res.status(404).set(NO_CACHE).json({ ok: false, message: "Overlay não encontrada." });
     const deleted = await deleteJsonTableRecord("overlays", String(existing["__rowKey"]));
-    if (!deleted) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Overlay não encontrada." });
+    if (!deleted)
+      return res.status(404).set(NO_CACHE).json({ ok: false, message: "Overlay não encontrada." });
     return res.set(NO_CACHE).json({ ok: true, message: "Overlay excluída." });
   } catch (error) {
-    return res.status(500).set(NO_CACHE).json({ ok: false, message: errorMessage(error, "Não foi possível excluir a overlay.") });
+    return res
+      .status(500)
+      .set(NO_CACHE)
+      .json({ ok: false, message: errorMessage(error, "Não foi possível excluir a overlay.") });
   }
 });
 
@@ -1007,7 +1068,6 @@ app.all(/^\/api\/(?:kick|twitch)(?:\/.*)?$/, async (req: Request, res: Response)
 
 /* Rotas legadas compatíveis com os arquivos JSON locais; sem D1/Cloudflare D1. */
 registerJsonCompatRoutes(app);
-registerRtcSignalingRoutes(app);
 
 /* API desconhecida retorna JSON em vez da página HTML. */
 app.all(/^\/api(?:\/.*)?$/, (req: Request, res: Response) => {
@@ -1081,7 +1141,7 @@ app.use(
   (req: Request, res: Response, next: NextFunction) => {
     const session = readSession(req) as SessionData | null;
     if (session?.role !== "admin") return sendAdminDenied(res);
-    next();
+    return next();
   },
 );
 

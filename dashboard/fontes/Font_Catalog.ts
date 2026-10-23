@@ -17,7 +17,7 @@ const BACKUP01_FONT_CATEGORIES = {
     "monospace",
   ],
   "Pixel / Arcade": ["Press Start 2P", "VT323", "Pixelify Sans", "Silkscreen"],
-  "Retrô": ["Monoton", "Bungee", "Bungee Shade", "Bangers", "Special Elite", "Rye"],
+  Retrô: ["Monoton", "Bungee", "Bungee Shade", "Bangers", "Special Elite", "Rye"],
   "Stencil / Industrial": ["Bebas Neue", "Anton", "Oswald", "Teko", "Black Ops One"],
   "Graffiti / Urbana": ["Permanent Marker"],
   "Horror / Fantasia": [
@@ -55,7 +55,7 @@ const DISTINCT_ADDITIONAL_FONT_CATEGORIES = {
     "Anonymous Pro",
   ],
   "Pixel / Arcade": ["DotGothic16", "Tiny5", "Micro 5"],
-  "Retrô": ["Limelight", "Righteous", "Titan One"],
+  Retrô: ["Limelight", "Righteous", "Titan One"],
   "Stencil / Industrial": ["Saira Stencil One", "Graduate", "Staatliches"],
   "Graffiti / Urbana": ["Rubik Spray Paint", "Modak", "Akronim", "Plaster"],
   "Horror / Fantasia": ["Butcherman", "Eater", "Fruktur", "UnifrakturCook", "Metal Mania"],
@@ -121,9 +121,7 @@ export const FONT_CATEGORIES = Object.fromEntries(
 
 export type FontCategory = keyof typeof FONT_CATEGORIES;
 
-export const FONT_FAMILIES: string[] = [
-  ...new Set(Object.values(FONT_CATEGORIES).flat()),
-];
+export const FONT_FAMILIES: string[] = [...new Set(Object.values(FONT_CATEGORIES).flat())];
 
 export const FONT_FAMILY_COUNT = FONT_FAMILIES.length;
 export const FONT_SOURCE = "https://github.com/google/fonts";

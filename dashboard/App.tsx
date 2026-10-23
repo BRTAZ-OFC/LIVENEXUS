@@ -4,6 +4,7 @@ import DashboardPage from "./dashboard";
 import LoginPage from "./login/index";
 import RegisterPage from "./login/registro";
 import DatabasePage from "./admin/banco";
+import OverlayReceiver from "./overlay/Overlay_Receiver";
 
 function NotFoundPage() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
       <Route path="/login/registro" element={<RegisterPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/admin/banco" element={<DatabasePage />} />
+      <Route path="/overlay/receiver/:id" element={<OverlayReceiver />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

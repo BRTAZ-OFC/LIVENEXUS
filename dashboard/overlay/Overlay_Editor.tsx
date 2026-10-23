@@ -87,7 +87,15 @@ type OverlayEditorProps = {
   onToggleLayerLock: (id: string) => void;
   onDeleteLayer: (id: string) => void;
   onAlignSelected?: (
-    type: "left" | "center-h" | "right" | "top" | "center-v" | "bottom" | "distribute-h" | "distribute-v",
+    type:
+      | "left"
+      | "center-h"
+      | "right"
+      | "top"
+      | "center-v"
+      | "bottom"
+      | "distribute-h"
+      | "distribute-v",
     alignToCanvas?: boolean,
   ) => void;
 };
@@ -2336,7 +2344,7 @@ export default function Overlay_Editor({
                           Math.max(
                             50,
                             Number(selectedInstanceConfig?.animationDurationMs ?? 650),
-                          )) * (Boolean(selectedInstanceConfig?.animationAlternate) ? 2 : 1)}{" "}
+                          )) * (selectedInstanceConfig?.animationAlternate ? 2 : 1)}{" "}
                       ms
                     </p>
                   )}
@@ -2379,7 +2387,10 @@ export default function Overlay_Editor({
                       type="button"
                       title="Alinhar à Esquerda"
                       onClick={() => onAlignSelected?.("left", alignToCanvas)}
-                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                      className={
+                        buttonClass +
+                        " flex items-center justify-center gap-1 text-[10px] py-1 px-1"
+                      }
                     >
                       <span>⇥</span> Esquerda
                     </button>
@@ -2387,7 +2398,10 @@ export default function Overlay_Editor({
                       type="button"
                       title="Centralizar Horizontalmente"
                       onClick={() => onAlignSelected?.("center-h", alignToCanvas)}
-                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                      className={
+                        buttonClass +
+                        " flex items-center justify-center gap-1 text-[10px] py-1 px-1"
+                      }
                     >
                       <span>↔</span> Centro Horiz.
                     </button>
@@ -2395,7 +2409,10 @@ export default function Overlay_Editor({
                       type="button"
                       title="Alinhar à Direita"
                       onClick={() => onAlignSelected?.("right", alignToCanvas)}
-                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                      className={
+                        buttonClass +
+                        " flex items-center justify-center gap-1 text-[10px] py-1 px-1"
+                      }
                     >
                       <span>⇤</span> Direita
                     </button>
@@ -2403,7 +2420,10 @@ export default function Overlay_Editor({
                       type="button"
                       title="Alinhar ao Topo"
                       onClick={() => onAlignSelected?.("top", alignToCanvas)}
-                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                      className={
+                        buttonClass +
+                        " flex items-center justify-center gap-1 text-[10px] py-1 px-1"
+                      }
                     >
                       <span>⤒</span> Topo
                     </button>
@@ -2411,7 +2431,10 @@ export default function Overlay_Editor({
                       type="button"
                       title="Centralizar Verticalmente"
                       onClick={() => onAlignSelected?.("center-v", alignToCanvas)}
-                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                      className={
+                        buttonClass +
+                        " flex items-center justify-center gap-1 text-[10px] py-1 px-1"
+                      }
                     >
                       <span>↕</span> Centro Vert.
                     </button>
@@ -2419,7 +2442,10 @@ export default function Overlay_Editor({
                       type="button"
                       title="Alinhar à Base"
                       onClick={() => onAlignSelected?.("bottom", alignToCanvas)}
-                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                      className={
+                        buttonClass +
+                        " flex items-center justify-center gap-1 text-[10px] py-1 px-1"
+                      }
                     >
                       <span>⤓</span> Base
                     </button>
@@ -2427,7 +2453,10 @@ export default function Overlay_Editor({
                       type="button"
                       title="Distribuir Espaço Horizontalmente"
                       onClick={() => onAlignSelected?.("distribute-h", alignToCanvas)}
-                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1 col-span-1"}
+                      className={
+                        buttonClass +
+                        " flex items-center justify-center gap-1 text-[10px] py-1 px-1 col-span-1"
+                      }
                     >
                       <span>⁞⁞</span> Dist. Horiz.
                     </button>
@@ -2435,7 +2464,10 @@ export default function Overlay_Editor({
                       type="button"
                       title="Distribuir Espaço Verticalmente"
                       onClick={() => onAlignSelected?.("distribute-v", alignToCanvas)}
-                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1 col-span-1"}
+                      className={
+                        buttonClass +
+                        " flex items-center justify-center gap-1 text-[10px] py-1 px-1 col-span-1"
+                      }
                     >
                       <span>≡</span> Dist. Vert.
                     </button>

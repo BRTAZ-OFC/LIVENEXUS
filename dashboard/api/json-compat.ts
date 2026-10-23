@@ -112,13 +112,15 @@ export function registerJsonCompatRoutes(app: Express) {
             );
             rowKey = String(byId?.__rowKey ?? "");
           }
-          if (!rowKey) return res.status(400).json({ ok: false, error: "Informe rowKey ou o ID da overlay." });
+          if (!rowKey)
+            return res.status(400).json({ ok: false, error: "Informe rowKey ou o ID da overlay." });
           const existing = rows.find((row) => row.__rowKey === rowKey);
           if (!existing || (tableId !== "galeria" && existing.user_id !== session.user_id)) {
             return res.status(404).json({ ok: false, error: "Registro não encontrado." });
           }
           const deleted = await deleteJsonTableRecord(tableId, rowKey);
-          if (!deleted) return res.status(404).json({ ok: false, error: "Registro não encontrado." });
+          if (!deleted)
+            return res.status(404).json({ ok: false, error: "Registro não encontrado." });
           return res.json({ ok: true, deleted });
         }
         res.set("Allow", "GET, POST, PATCH, PUT, DELETE");

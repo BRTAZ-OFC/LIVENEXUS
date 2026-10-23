@@ -10,6 +10,7 @@ import ScenarioCanvas from "./cenarios/Scenario_Canvas";
 import MultiChatPanel, { useMultiChatSnapshot } from "./multichat";
 import BibliotecaSearch from "./biblioteca/BibliotecaSearch";
 import GlobalMusicPlayer from "./biblioteca/GlobalMusicPlayer";
+import { RtcAutoPublisherBridge } from "./conexao/rtc/RtcAutoPublisherBridge";
 import { memo, useEffect, useState } from "react";
 import {
   AudioLines,
@@ -31,15 +32,7 @@ import {
   Volume2,
   Terminal,
 } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const MemoPlatformBioConnections = memo(PlatformBioConnections);
 const MemoOverlayCanvas = memo(OverlayCanvas);
@@ -173,7 +166,14 @@ function DashboardPage() {
     typeof window !== "undefined" ? sessionStorage.getItem("livenexus_editor_scenario_id") : null,
   );
   const [activeSection, setActiveSection] = useState<
-    "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios" | "biblioteca"
+    | "overview"
+    | "database"
+    | "admin-panel"
+    | "voice"
+    | "connections"
+    | "overlay"
+    | "scenarios"
+    | "biblioteca"
   >(() => {
     if (typeof window !== "undefined") {
       const admin = sessionStorage.getItem("livenexus_role") === "admin";
@@ -203,7 +203,14 @@ function DashboardPage() {
   // BLOCO 5 — Atualiza a seção selecionada e persiste a escolha.
   function handleSelectSection(
     section:
-      "overview" | "database" | "admin-panel" | "voice" | "connections" | "overlay" | "scenarios" | "biblioteca",
+      | "overview"
+      | "database"
+      | "admin-panel"
+      | "voice"
+      | "connections"
+      | "overlay"
+      | "scenarios"
+      | "biblioteca",
   ) {
     setActiveSection(section);
     setActiveScenarioId(null);
@@ -260,6 +267,19 @@ function DashboardPage() {
         setIsAdmin(admin);
         sessionStorage.setItem("livenexus_role", admin ? "admin" : "user");
         sessionStorage.setItem("livenexus_user_id", result.user.user_id);
+        window.dispatchEvent(
+          new CustomEvent("livenexus:user-auth-ready", {
+            detail: { userId: result.user.user_id },
+          }),
+        );
+
+        // Registra o RTC no rtc_registry.json ao carregar o dashboard (Publisher Ready)
+        const runtimeId = `rtc_723d9e62d2b04b6a_${result.user.user_id}`;
+        fetch(`/api/admin/lab/rtc/signal?runtimeId=${runtimeId}`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ type: "ready", fromRole: "publisher" }),
+        }).catch((err) => console.error("[RTC Auto Register] Falha:", err));
 
         if (!admin) {
           setActiveSection((section) =>
@@ -282,6 +302,7 @@ function DashboardPage() {
     }
 
     void verifySession();
+
     return () => {
       active = false;
     };
@@ -298,6 +319,7 @@ function DashboardPage() {
 
   return (
     <div className="dash-flex-min-h-screen-axmrk9">
+      <RtcAutoPublisherBridge />
       {/* BLOCO 8 — Menu lateral recolhível com atalhos das seções. */}
       <aside
         className={`dash-flex-min-h-screen-16w20hu ${sidebarExpanded ? "dash-w-52-p3mf56" : "dash-w-16-1j20ogi"}`}
@@ -374,7 +396,9 @@ function DashboardPage() {
             className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "biblioteca" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
           >
             <Library className="dash-h-2-5-w-2-5-16znhny" />
-            {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Biblioteca</span>}
+            {sidebarExpanded && (
+              <span className="dash-text-7px-font-semibold-r7z1tv">Biblioteca</span>
+            )}
           </button>
           {isAdmin && (
             <>

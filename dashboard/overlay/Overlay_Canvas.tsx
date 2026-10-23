@@ -6,7 +6,7 @@ import {
   type ComponentType,
   type CSSProperties,
 } from "react";
-import { Save, Trash2 } from "lucide-react";
+import { Save, Trash2, Copy, ExternalLink } from "lucide-react";
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import OverlayWidgetElementRenderer from "./Overlay_WidgetElementRenderer";
 import HorizontalMenu from "../components/HorizontalMenu";
@@ -77,6 +77,7 @@ type CanvasConfig = {
     colorEffectEnabled?: boolean;
     colorEffect?: string;
   };
+  type?: string;
 };
 type OverlayRow = {
   id?: string;
@@ -393,22 +394,17 @@ function sourceFor(row: OverlayRow): JsonObject {
 }
 
 type AlignmentType =
-  | "left"
-  | "center-h"
-  | "right"
-  | "top"
-  | "center-v"
-  | "bottom"
-  | "distribute-h"
-  | "distribute-v";
+  "left" | "center-h" | "right" | "top" | "center-v" | "bottom" | "distribute-h" | "distribute-v";
 
-function alignSelectedInstances<T extends { id?: string; x?: number; y?: number; width?: number; height?: number }>(
+function alignSelectedInstances<
+  T extends { id?: string; x?: number; y?: number; width?: number; height?: number },
+>(
   instances: T[],
   selectedIds: string[],
   type: AlignmentType,
   canvasWidth: number,
   canvasHeight: number,
-  alignToCanvas: boolean = false
+  alignToCanvas: boolean = false,
 ): T[] {
   if (selectedIds.length === 0) return instances;
 
@@ -452,8 +448,10 @@ function alignSelectedInstances<T extends { id?: string; x?: number; y?: number;
     });
   }
 
-  let minX = Infinity, maxX = -Infinity;
-  let minY = Infinity, maxY = -Infinity;
+  let minX = Infinity,
+    maxX = -Infinity;
+  let minY = Infinity,
+    maxY = -Infinity;
 
   selectedItems.forEach((item) => {
     const x = Number(item.x) || 0;
@@ -567,6 +565,7 @@ function getCanvasConfig(row: OverlayRow): CanvasConfig {
     background: isObject(source["background"])
       ? (source["background"] as CanvasBackground)
       : EMPTY_BACKGROUND,
+    type: String(source["type"] || "local"),
   };
 }
 
@@ -663,6 +662,7 @@ export default function OverlayCanvas() {
       colorEffectEnabled: false,
       colorEffect: "glass",
     },
+    type: "local",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -670,6 +670,17 @@ export default function OverlayCanvas() {
   const [notice, setNotice] = useState("");
   const [overlays, setOverlays] = useState<OverlayRow[]>([]);
   const [activeOverlayId, setActiveOverlayId] = useState<string | null>(null);
+  const [urlMode, setUrlMode] = useState<"local" | "rtc">("local");
+
+  const overlayUrl = useMemo(() => {
+    if (!activeOverlayId) return "";
+    const userId = typeof window !== "undefined" ? sessionStorage.getItem("livenexus_user_id") : "";
+    const base = `/overlay/receiver/${activeOverlayId}?user_id=${userId}`;
+    if (urlMode === "rtc") {
+      return `${base}&runtime_id=rtc_723d9e62d2b04b6a_${userId}`;
+    }
+    return base;
+  }, [activeOverlayId, urlMode]);
 
   const streamingContext = useStreaming();
   const liveActivityItems = streamingContext?.liveActivity?.items;
@@ -834,9 +845,12 @@ export default function OverlayCanvas() {
   useEffect(() => {
     function handleCanvasKeyDown(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
-      const activeIds = selectedInstanceIds.length > 0
-        ? selectedInstanceIds
-        : selectedInstanceId ? [selectedInstanceId] : [];
+      const activeIds =
+        selectedInstanceIds.length > 0
+          ? selectedInstanceIds
+          : selectedInstanceId
+            ? [selectedInstanceId]
+            : [];
 
       if (
         activeIds.length === 0 ||
@@ -886,8 +900,10 @@ export default function OverlayCanvas() {
   function selectOverlay(id: string) {
     const row = overlays.find((item) => String(item.id ?? "") === id);
     if (!row) return;
-    setConfig(getCanvasConfig(row));
+    const canvasConfig = getCanvasConfig(row);
+    setConfig(canvasConfig);
     setActiveOverlayId(id);
+    setUrlMode(canvasConfig.type === "rtc" ? "rtc" : "local");
     setSelectedInstanceId(null);
     setError("");
     setNotice("");
@@ -1241,13 +1257,13 @@ export default function OverlayCanvas() {
     setSelectedInstanceIds((current) => current.filter((id) => !idsToDelete.has(id)));
   }
 
-  function handleAlignSelected(
-    type: AlignmentType,
-    alignToCanvas: boolean = false,
-  ) {
-    const activeIds = selectedInstanceIds.length > 0
-      ? selectedInstanceIds
-      : selectedInstanceId ? [selectedInstanceId] : [];
+  function handleAlignSelected(type: AlignmentType, alignToCanvas: boolean = false) {
+    const activeIds =
+      selectedInstanceIds.length > 0
+        ? selectedInstanceIds
+        : selectedInstanceId
+          ? [selectedInstanceId]
+          : [];
     if (activeIds.length === 0) return;
 
     setConfig((current) => ({
@@ -1417,9 +1433,62 @@ export default function OverlayCanvas() {
   return (
     <section className="relative flex w-full min-w-0 flex-col items-center gap-4 px-2 pb-40 pt-[10px]">
       <div className="flex w-full items-center justify-between gap-3 border-b border-white/10 pb-3">
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h2 className="text-base font-bold text-white">Configurações de Overlay</h2>
           <p className="text-xs text-slate-400">Gerencie e edite suas overlays no canvas</p>
+
+          {activeOverlayId && (
+            <div className="mt-3 flex flex-col gap-2 max-w-2xl">
+              <div className="flex items-center gap-2">
+                <div className="flex rounded-lg bg-slate-900 p-1 border border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUrlMode("local");
+                      setConfig((prev) => ({ ...prev, type: "local" }));
+                    }}
+                    className={`px-3 py-1 text-[10px] font-bold rounded-md transition ${urlMode === "local" ? "bg-violet-600 text-white shadow" : "text-slate-400 hover:text-white"}`}
+                  >
+                    LOCAL
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUrlMode("rtc");
+                      setConfig((prev) => ({ ...prev, type: "rtc" }));
+                    }}
+                    className={`px-3 py-1 text-[10px] font-bold rounded-md transition ${urlMode === "rtc" ? "bg-cyan-600 text-white shadow" : "text-slate-400 hover:text-white"}`}
+                  >
+                    RTC
+                  </button>
+                </div>
+                <div className="flex-1 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-950 border border-white/5 overflow-hidden">
+                  <code className="text-[10px] text-cyan-300 truncate font-mono">{overlayUrl}</code>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.origin + overlayUrl);
+                      setNotice("URL copiada para a área de transferência!");
+                      setTimeout(() => setNotice(""), 3000);
+                    }}
+                    className="p-1 hover:text-cyan-400 transition"
+                    title="Copiar URL"
+                  >
+                    <Copy size={14} />
+                  </button>
+                  <a
+                    href={overlayUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1 hover:text-cyan-400 transition"
+                    title="Abrir Link"
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex flex-row items-center gap-2 shrink-0">
           {!editorOpen && (

@@ -92,9 +92,7 @@ export default function HorizontalMenu({
     const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
     const itemPositions = items.map(
       (item) =>
-        item.getBoundingClientRect().left -
-        track.getBoundingClientRect().left +
-        currentScroll,
+        item.getBoundingClientRect().left - track.getBoundingClientRect().left + currentScroll,
     );
 
     let target = currentScroll;
