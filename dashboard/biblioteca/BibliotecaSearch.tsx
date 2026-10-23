@@ -87,7 +87,7 @@ export default function BibliotecaSearch() {
   const [libraryBusy, setLibraryBusy] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [link, setLink] = useState("");
-  const [linkTitle, setLinkTitle] = useState("");
+  const [previewItem, setPreviewItem] = useState<CatalogItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingHome, setLoadingHome] = useState(true);
   const [error, setError] = useState("");
@@ -339,14 +339,44 @@ export default function BibliotecaSearch() {
     return { ...current, [kind]: current[kind].filter((saved) => itemId(saved) !== id) };
   });
 
-  async function handleAddLink(event: FormEvent<HTMLFormElement>) {
+  async function handlePreviewLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setNotice("");
-    let item: CatalogItem;
-    try { item = parseLink(link, linkTitle); } catch (err) { setError(err instanceof Error ? err.message : "Link inválido."); return; }
-    const kind = itemCategory(item); const id = itemId(item);
-    if (CATEGORIES.some((entry) => libraryRef.current[entry.key].some((saved) => itemId(saved) === id))) { setError("Esse item já está na biblioteca."); return; }
-    await mutateLibrary((current) => ({ ...current, [kind]: [...current[kind], item] }));
-    setLink(""); setLinkTitle("");
+    setLoading(true);
+    try { 
+      const item = parseLink(link, "");
+      
+      let browseId = item.browseId || (item.playlistId ? (String(item.playlistId).startsWith("VL") ? item.playlistId : `VL${item.playlistId}`) : "");
+      if (browseId) {
+          const response = await fetch(`/api/ytmusic/browse?browseId=${encodeURIComponent(browseId)}`, { credentials: "same-origin", headers: { Accept: "application/json" }, cache: "no-store" });
+          const data = await response.json();
+          if (data.ok) {
+            if (data.title) item.title = data.title;
+            if (data.thumbnail) item.thumbnail = data.thumbnail;
+            
+            // Construir descrição
+            let description = "";
+            if (data.subtitle) description += data.subtitle + " • ";
+            if (data.viewCount) description += data.viewCount + " • ";
+            if (data.trackCount) description += data.trackCount + " itens • ";
+            if (data.duration) description += data.duration;
+            
+            (item as any).fullDescription = description.replace(/ • $/, "");
+            (item as any).year = data.year;
+          }
+      }
+
+      const kind = itemCategory(item); const id = itemId(item);
+      if (CATEGORIES.some((entry) => libraryRef.current[entry.key].some((saved) => itemId(saved) === id))) { setError("Esse item já está na biblioteca."); return; }
+      setPreviewItem(item);
+    } catch (err) { setError(err instanceof Error ? err.message : "Link inválido."); }
+    finally { setLoading(false); }
+  }
+
+  async function confirmAdd() {
+    if (!previewItem) return;
+    const kind = itemCategory(previewItem);
+    await mutateLibrary((current) => ({ ...current, [kind]: [...current[kind], previewItem] }));
+    setLink(""); setPreviewItem(null);
   }
 
   const librarySections = () => <div className="space-y-8">
@@ -470,11 +500,47 @@ export default function BibliotecaSearch() {
 
     {view === "personal" && !detailItem && <div className="space-y-6">
       <section className="rounded-xl border border-white/10 bg-[#0d1120] p-4"><h2 className="text-sm font-bold text-white">Biblioteca pessoal</h2><p className="mt-1 text-xs text-slate-400">Cole um link de música, álbum, artista ou playlist do YouTube ou YouTube Music.</p>
-        <form onSubmit={(event) => void handleAddLink(event)} className="mt-4 space-y-3">
-          <label className="block"><span className="mb-1 block text-xs text-slate-400">Link</span><input value={link} onChange={(event) => setLink(event.target.value)} required type="url" placeholder="https://music.youtube.com/watch?v=..." className="h-11 w-full rounded-lg border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-cyan-300/50" /></label>
-          <label className="block"><span className="mb-1 block text-xs text-slate-400">Nome (opcional)</span><input value={linkTitle} onChange={(event) => setLinkTitle(event.target.value)} placeholder="Nome para exibir na biblioteca" className="h-11 w-full rounded-lg border border-white/10 bg-black/20 px-3 text-sm text-white outline-none focus:border-cyan-300/50" /></label>
-          <button type="submit" disabled={libraryBusy || !link.trim()} className="inline-flex items-center gap-2 rounded-lg bg-cyan-300 px-4 py-2.5 text-sm font-bold text-slate-950 disabled:opacity-50">{libraryBusy ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Link2 className="h-4 w-4" />}Adicionar à biblioteca pessoal</button>
+        <form onSubmit={(event) => void handlePreviewLink(event)} className="mt-4 space-y-3">
+          <label className="block">
+            <span className="mb-1 block text-xs text-slate-400">Link</span>
+            <div className="flex h-11 w-full items-center rounded-lg border border-white/10 bg-black/20 text-sm focus-within:border-cyan-300/50">
+              <input
+                value={link}
+                onChange={(event) => setLink(event.target.value)}
+                required
+                type="url"
+                placeholder="https://music.youtube.com/watch?v=..."
+                className="h-full flex-1 bg-transparent px-3 text-white outline-none"
+              />
+              <div className="flex h-full items-center border-l border-white/10 px-3">
+                <button
+                  type="submit"
+                  disabled={libraryBusy || !link.trim() || loading}
+                  className="text-cyan-300 hover:text-white disabled:opacity-50"
+                  aria-label="Buscar"
+                >
+                  {loading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+          </label>
         </form>
+        {previewItem && (
+          <div className="mt-4 flex flex-col gap-3 rounded-lg border border-cyan-300/30 bg-cyan-400/5 p-4">
+            <div className="flex gap-4">
+              {previewItem.thumbnail ? <img src={previewItem.thumbnail} alt="" className="h-20 w-20 rounded object-cover" /> : <div className="flex h-20 w-20 items-center justify-center rounded bg-white/5"><Music2 className="h-10 w-10 text-cyan-200" /></div>}
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold uppercase tracking-wider text-cyan-300">{previewItem.type}</p>
+                <p className="text-lg font-bold text-white leading-tight">{previewItem.title || previewItem.name || "Sem título"}</p>
+                {(previewItem as any).year && <p className="text-xs text-slate-400">{(previewItem as any).year}</p>}
+              </div>
+            </div>
+            {(previewItem as any).fullDescription && (
+              <p className="text-sm text-slate-300 bg-black/20 p-2 rounded">{ (previewItem as any).fullDescription }</p>
+            )}
+            <button type="button" onClick={() => void confirmAdd()} className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-300 px-3 py-2 text-sm font-bold text-slate-950 disabled:opacity-50">Adicionar à Biblioteca</button>
+          </div>
+        )}
       </section>
       {librarySections()}
     </div>}

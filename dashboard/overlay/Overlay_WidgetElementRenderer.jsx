@@ -218,7 +218,7 @@ export default function WidgetElementRenderer({
 
   const baseStyle = {
     color: config.textColor || "#ffffff",
-    fontSize: config.fontSize || "14px",
+    fontSize: config.fontSize || "clamp(10px, 4.4cqw, 24px)",
     fontFamily: config.fontFamily || "Inter, sans-serif",
     fontWeight: config.fontWeight || "normal",
     textAlign: config.textAlign || "left",
@@ -1410,7 +1410,7 @@ export default function WidgetElementRenderer({
         color: config.textColor || "#ffffff",
         fontSize:
           config.fontSize ||
-          (textType === "title" ? "32px" : textType === "subtitle" ? "20px" : "14px"),
+          (textType === "title" ? "clamp(16px, 8cqw, 48px)" : textType === "subtitle" ? "clamp(12px, 6cqw, 32px)" : "clamp(10px, 4.4cqw, 24px)"),
         fontFamily: config.fontFamily || "Inter, sans-serif",
         fontWeight:
           config.fontWeight ||
@@ -1576,7 +1576,7 @@ export default function WidgetElementRenderer({
       return (
         <div className="w-full h-full flex items-center justify-center p-2" style={containerStyle}>
           <IconComponent
-            size={parseInt(config.fontSize) || 32}
+            className="w-[8cqw] h-[8cqw]"
             style={{ color: config.textColor || "#ffffff" }}
           />
         </div>
@@ -1637,12 +1637,12 @@ export default function WidgetElementRenderer({
 
       return (
         <div
-          className="w-full h-full flex items-center gap-2 px-3 py-1.5 justify-center"
+          className="w-full h-full flex items-center gap-[0.5cqw] px-[1cqw] py-[0.5cqw] justify-center"
           style={containerStyle}
         >
           {displayMode !== "text" && (
             <span
-              style={{ color: iconColor, width: fSize, height: fSize }}
+              style={{ color: iconColor, width: '4cqw', height: '4cqw' }}
               className="shrink-0 flex items-center justify-center"
             >
               <SocialIcon style={{ width: "100%", height: "100%" }} />
@@ -1652,7 +1652,7 @@ export default function WidgetElementRenderer({
             <span
               style={{
                 color: textCol,
-                fontSize: fSize,
+                fontSize: '3.5cqw',
                 fontFamily: fFamily,
                 fontWeight: "bold",
               }}
@@ -1678,6 +1678,8 @@ export default function WidgetElementRenderer({
       className={`w-full h-full ${uniqueClass}`}
       style={{
         "--glow-color": config.effShadowColor || "#a855f7",
+        containerType: 'size',
+        containerName: 'widget'
       }}
     >
       {styleBlock}
