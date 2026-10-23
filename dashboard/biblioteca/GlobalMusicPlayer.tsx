@@ -26,12 +26,14 @@ import {
   type MusicTrack,
 } from "./musicPlayerEngine";
 
+// timeLabel: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function timeLabel(seconds: number) {
   if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
   const total = Math.floor(seconds);
   return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
 }
 
+// GlobalMusicPlayer: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function GlobalMusicPlayer() {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [player, setPlayer] = useState(getMusicPlayerState());
