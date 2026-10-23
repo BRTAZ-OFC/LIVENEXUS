@@ -284,13 +284,13 @@ function rowsFromTable(definition, data, users) {
 
 // getJsonTableDefinitions: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getJsonTableDefinitions() {
-  return Object.values(DEFINITIONS).map(({ id, title, file, ownerScoped, shape, fields }) => ({
-    id,
-    title,
-    file,
-    ownerScoped,
-    shape,
-    ...(fields ? { fields } : {}),
+  return Object.values(DEFINITIONS).map((definition) => ({
+    id: definition.id,
+    title: definition.title,
+    file: definition.file,
+    ownerScoped: definition.ownerScoped,
+    shape: definition.shape,
+    ...("fields" in definition ? { fields: definition.fields } : {}),
   }));
 }
 
