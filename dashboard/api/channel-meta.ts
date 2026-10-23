@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como são consultadas as informações do canal. */
 /**
  * Live Nexus — Channel Meta Worker (Kick resolve + meta)
  * SEPARADO do channel-verify. Sem setInterval. Sob demanda direta.
