@@ -16,6 +16,7 @@ const MAX_SIGNALS = 200;
 const SIGNAL_TTL_MS = 60_000;
 const NO_CACHE = { "Cache-Control": "no-store, no-cache, must-revalidate", Pragma: "no-cache" };
 
+// updateRegistry: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function updateRegistry(req: Request, runtimeId: string) {
   try {
     const session = readSession(req) as { user_id: string } | null;
@@ -46,12 +47,14 @@ async function updateRegistry(req: Request, runtimeId: string) {
   }
 }
 
+// clean: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function clean(queue: Signal[]) {
   const cutoff = Date.now() - SIGNAL_TTL_MS;
   return queue.filter((signal) => signal.timestamp > cutoff);
 }
 
 // Endpoint compatível com o cliente RTC copiado de BACKUP01.
+// registerRtcSignalingRoutes: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function registerRtcSignalingRoutes(app: Express) {
   // Rota para descoberta de sessões ativas
   app.get("/api/admin/lab/rtc/registry", async (_req: Request, res: Response) => {
