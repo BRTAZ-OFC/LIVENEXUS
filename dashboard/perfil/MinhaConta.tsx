@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
-import { CircleUserRound, Pencil, Trash2, X, Upload, UserRound, LockKeyhole } from "lucide-react";
+import { CircleUserRound, Pencil, Trash2, X, Upload, UserRound, LockKeyhole, Images, Plus } from "lucide-react";
 
 type AccountUser = { user_id: string; user: string; role?: "admin" | "user"; imagen?: string | null };
 type ApiResult = { ok?: boolean; message?: string; user?: AccountUser };
+type Album = { id: number; name: string; description: string };
 const buttonBase: CSSProperties = { display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 40, borderRadius: 10, padding: "9px 16px", fontSize: 13, fontWeight: 650, cursor: "pointer", whiteSpace: "nowrap" };
 const inputStyle: CSSProperties = { width: "100%", boxSizing: "border-box", border: "1px solid #334155", background: "#080d19", color: "#e2e8f0", borderRadius: 9, padding: "11px 12px", outline: "none", fontSize: 14 };
 const labelStyle: CSSProperties = { display: "grid", gap: 7, color: "#cbd5e1", fontSize: 13 };
@@ -17,6 +18,12 @@ export default function MinhaConta() {
   const [repeatPassword, setRepeatPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [activeSubmenu, setActiveSubmenu] = useState("Visão Geral");
+  const [albumModalOpen, setAlbumModalOpen] = useState(false);
+  const [albumName, setAlbumName] = useState("");
+  const [albumDescription, setAlbumDescription] = useState("");
+  const [albums, setAlbums] = useState<Album[]>([]);
+  const [albumMessage, setAlbumMessage] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -33,6 +40,18 @@ export default function MinhaConta() {
       .catch((error: unknown) => { if (alive) setMessage(error instanceof Error ? error.message : "Erro ao carregar a conta."); });
     return () => { alive = false; };
   }, []);
+
+  function createAlbum(event: FormEvent) {
+    event.preventDefault();
+    const name = albumName.trim();
+    const description = albumDescription.trim();
+    if (!name) { setAlbumMessage("Informe o nome do álbum."); return; }
+    setAlbums((current) => [...current, { id: Date.now(), name, description }]);
+    setAlbumName("");
+    setAlbumDescription("");
+    setAlbumMessage("");
+    setAlbumModalOpen(false);
+  }
 
   function closeModal() {
     setModal(null); setEditMode(null); setMessage("");
@@ -126,9 +145,37 @@ export default function MinhaConta() {
       </div>
       <nav aria-label="Menu da conta" style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", marginTop: 4, padding: "10px 2px", borderBottom: "1px solid #263449" }}>
         {["Visão Geral", "Crescimento", "Audiência", "Engajamento", "Monetização", "Imagens"].map((label) => (
-          <a key={label} href="#" onClick={(event) => event.preventDefault()} style={{ color: "#cbd5e1", textDecoration: "none", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>{label}</a>
+          <a key={label} href="#" aria-current={activeSubmenu === label ? "page" : undefined} onClick={(event) => { event.preventDefault(); setActiveSubmenu(label); setAlbumMessage(""); }} style={{ color: activeSubmenu === label ? "#a78bfa" : "#cbd5e1", textDecoration: "none", fontSize: 13, fontWeight: activeSubmenu === label ? 750 : 600, whiteSpace: "nowrap", borderBottom: activeSubmenu === label ? "2px solid #8b5cf6" : "2px solid transparent", paddingBottom: 10, marginBottom: -11 }}>{label}</a>
         ))}
       </nav>
+      {activeSubmenu === "Imagens" && <section style={{ marginTop: 4, width: "100%", boxSizing: "border-box", border: "1px solid #263449", background: "#0b1220", borderRadius: 12, padding: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", width: "100%" }}>
+          <button type="button" onClick={() => { setAlbumName(""); setAlbumDescription(""); setAlbumMessage(""); setAlbumModalOpen(true); }} style={{ ...buttonBase, border: "1px solid #6d5bd0", background: "#5b4acb", color: "#fff" }}><Plus size={16} />Criar álbum</button>
+        </div>
+        {albumMessage && <p role="status" style={{ color: "#fca5a5", fontSize: 13, marginTop: 12 }}>{albumMessage}</p>}
+        {albums.length > 0 && <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 14, marginTop: 16 }}>
+          {albums.map((album) => <article key={album.id} style={{ overflow: "hidden", border: "1px solid #263449", borderRadius: 11, background: "#111b2d", minWidth: 0 }}>
+            <div style={{ height: 116, display: "grid", placeItems: "center", background: "#172033", color: "#a78bfa" }}><Images size={34} strokeWidth={1.5} /></div>
+            <div style={{ padding: 12 }}><h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, overflowWrap: "anywhere" }}>{album.name}</h3><p style={{ margin: "7px 0 0", color: "#94a3b8", fontSize: 12, lineHeight: 1.5, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{album.description}</p></div>
+          </article>)}
+        </div>}
+      </section>}
+      {albumModalOpen && <div style={overlay} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setAlbumModalOpen(false); }}>
+        <section role="dialog" aria-modal="true" aria-labelledby="album-modal-title" style={modalCard}>
+          <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 20 }}>
+            <h2 id="album-modal-title" style={{ fontSize: 20, fontWeight: 750 }}>Criar álbum</h2>
+            <button type="button" aria-label="Fechar" onClick={() => setAlbumModalOpen(false)} style={{ ...buttonBase, minHeight: 34, width: 34, padding: 0, border: "1px solid #334155", background: "transparent", color: "#cbd5e1" }}><X size={17} /></button>
+          </header>
+          <form onSubmit={createAlbum} style={{ display: "grid", gap: 14 }}>
+            <label style={labelStyle}>Nome do álbum<input style={inputStyle} value={albumName} onChange={(event) => setAlbumName(event.target.value)} maxLength={80} required autoFocus /></label>
+            <label style={labelStyle}>Descrição<textarea style={{ ...inputStyle, minHeight: 100, resize: "vertical" }} value={albumDescription} onChange={(event) => setAlbumDescription(event.target.value)} maxLength={500} /></label>
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 8 }}>
+              <button type="button" onClick={() => setAlbumModalOpen(false)} style={{ ...buttonBase, border: "1px solid #334155", background: "transparent", color: "#e2e8f0" }}>Cancelar</button>
+              <button type="submit" style={{ ...buttonBase, border: 0, background: "#5b4acb", color: "#fff" }}>Criar álbum</button>
+            </div>
+          </form>
+        </section>
+      </div>}
       {message && !modal && <p role="status" style={{ color: "#fca5a5", marginTop: 14, fontSize: 13 }}>{message}</p>}
       <input ref={fileInput} type="file" accept="image/*" hidden onChange={(event) => void chooseImage(event.target.files?.[0])} />
       {modal && <div style={overlay} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !busy) closeModal(); }}>
