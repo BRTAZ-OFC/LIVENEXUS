@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como a conexão envia o áudio e o vídeo publicados. */
 // Publisher RTC Automático do LiveNexus
 // Reproduz a fórmula funcional comprovada no laboratório de referência
 // Canal oficial: "livenexus-rtc-live"
