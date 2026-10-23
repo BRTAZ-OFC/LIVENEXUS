@@ -13,6 +13,7 @@ type ReviewRow = {
   data_atualizacao?: string;
 };
 
+// ReviewsManager: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function ReviewsManager({
   reviews,
   onUpdate,
@@ -52,6 +53,8 @@ export default function ReviewsManager({
       setSubmitting(false);
     }
   }
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div className="space-y-4">
