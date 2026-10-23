@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica as ações usadas para cadastrar, consultar, alterar, excluir e validar usuários. */
 /**
  * CRUD server-side para usuários armazenados em JSON.
  * IMPORTANTE: usar somente no servidor Node.js; nunca importar este arquivo no frontend.
