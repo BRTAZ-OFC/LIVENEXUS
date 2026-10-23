@@ -9,6 +9,7 @@ import { diag, pushError } from "../painel-admin/Admin_streamingDiagnostics";
 import { twitchPipelineDiagnostic } from "../painel-admin/Admin_twitchPipelineDiagnostic";
 import { fetchTwitchStreamInfo } from "./Config_twitchStreamInfo";
 
+// parseTwitchRoles: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function parseTwitchRoles(line) {
   const roles = [];
   if (!line.startsWith("@")) return roles;
@@ -24,6 +25,7 @@ function parseTwitchRoles(line) {
   return [...new Set(roles)];
 }
 
+// parseTwitchTags: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function parseTwitchTags(line) {
   if (!line.startsWith("@")) return {};
   const tagsPart = line.slice(1, line.indexOf(" :"));
@@ -38,6 +40,7 @@ function parseTwitchTags(line) {
 // Parser estrutural de linha IRC: separa tags, prefix, command, params e trailing.
 // Não depende de regex específicas por tipo de mensagem — identifica o command
 // estruturalmente e extrai trailing corretamente, como o laboratório comprovado.
+// parseIrcLine: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function parseIrcLine(line) {
   const parsed = { tags: {}, prefix: null, command: null, params: [], trailing: "" };
   let rest = line;
@@ -82,6 +85,7 @@ function parseIrcLine(line) {
 }
 
 // Extrai roles a partir das tags já parseadas (badges).
+// parseRolesFromTags: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function parseRolesFromTags(tags) {
   const roles = [];
   const badges = (tags["badges"] || "").split(",");
@@ -95,6 +99,7 @@ function parseRolesFromTags(tags) {
   return [...new Set(roles)];
 }
 
+// connectTwitch: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function connectTwitch(channel, onMessage, onStatus, onMeta) {
   let ws = null,
     reconnectTimer = null,
