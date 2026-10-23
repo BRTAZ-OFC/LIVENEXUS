@@ -12,11 +12,13 @@
 const GQL_URL = "https://gql.twitch.tv/gql";
 const CLIENT_ID = "kimne78kx3ncx6brgo4mv6wki5h1ko";
 
+// sanitizeLogin: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function sanitizeLogin(login) {
   const v = (login || "").trim().toLowerCase().replace(/^@/, "");
   return /^[a-z0-9_]{1,25}$/.test(v) ? v : null;
 }
 
+// fetchTwitchStreamInfo: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function fetchTwitchStreamInfo(login) {
   const chan = sanitizeLogin(login);
   if (!chan) return null;
