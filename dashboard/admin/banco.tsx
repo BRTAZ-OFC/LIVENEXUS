@@ -72,18 +72,21 @@ type PlatformDraft = {
 };
 
 /* BLOCO 4 — Helpers para formatar valores, datas e cabeçalhos de autenticação. */
+// displayValue: executa a etapa descrita pelo nome da função.
 function displayValue(value: unknown) {
   if (value === null || value === undefined || value === "") return "—";
   const text = String(value);
   return text.length > 8 ? `${text.slice(0, 7)}…` : text;
 }
 
+// formatDate: executa a etapa descrita pelo nome da função.
 function formatDate(value?: string) {
   if (!value) return "—";
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString("pt-BR");
 }
 
+// getAuthHeaders: executa a etapa descrita pelo nome da função.
 function getAuthHeaders(): HeadersInit {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -203,6 +206,7 @@ const JSON_TABLES: Array<{
   },
 ];
 
+// jsonColumnLabel: executa a etapa descrita pelo nome da função.
 function jsonColumnLabel(field: string) {
   const labels: Record<string, string> = {
     id: "ID",
@@ -254,6 +258,7 @@ function jsonColumnLabel(field: string) {
     .toLocaleUpperCase("pt-BR");
 }
 
+// readableJsonValue: executa a etapa descrita pelo nome da função.
 function readableJsonValue(value: unknown): string {
   if (value === null || value === undefined || value === "") return "—";
   if (Array.isArray(value))
@@ -269,11 +274,13 @@ function readableJsonValue(value: unknown): string {
   return String(value);
 }
 
+// jsonCellValue: executa a etapa descrita pelo nome da função.
 function jsonCellValue(value: unknown) {
   const text = readableJsonValue(value);
   return text.length > 8 ? `${text.slice(0, 7)}…` : text;
 }
 
+// createEmptyJsonRecord: executa a etapa descrita pelo nome da função.
 function createEmptyJsonRecord(tableId: string, fields: string[]): Record<string, unknown> {
   const now = new Date().toISOString();
   const record: Record<string, unknown> = {};
@@ -355,6 +362,7 @@ type JsonValueFieldProps = {
   depth?: number;
 };
 
+// JsonValueField: executa a etapa descrita pelo nome da função.
 function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProps) {
   const [newPropertyName, setNewPropertyName] = useState("");
   const label = jsonColumnLabel(name);
@@ -368,6 +376,7 @@ function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProp
         : /^(fields)$/i.test(name)
           ? { name: "", type: "texto" }
           : "";
+    {/* Estrutura visual: fieldset. */}
     return (
       <fieldset
         className={`min-w-0 rounded-lg border border-white/10 p-3 ${depth > 0 ? "mt-2" : ""}`}
@@ -415,6 +424,7 @@ function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProp
 
   if (value !== null && typeof value === "object") {
     const record = value as Record<string, unknown>;
+    {/* Estrutura visual: fieldset. */}
     return (
       <fieldset
         className={`min-w-0 rounded-lg border border-white/10 p-3 ${depth > 0 ? "mt-2" : ""}`}
@@ -476,6 +486,7 @@ function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProp
   }
 
   if (typeof value === "boolean") {
+    {/* Estrutura visual: label. */}
     return (
       <label className="flex min-w-0 items-center gap-2 rounded-lg border border-white/10 p-2 text-[10px] text-slate-300">
         <span className="min-w-0 flex-1">{label}</span>
@@ -494,6 +505,7 @@ function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProp
     typeof value === "string" &&
     (stringValue.length > 80 ||
       /^(message|mensagem|resposta_admin|description|descricao|prompt|content)$/i.test(name));
+  {/* Estrutura visual: label. */}
   return (
     <label className="block min-w-0 space-y-1 text-[10px] text-slate-400">
       <span>{label}</span>
@@ -525,6 +537,7 @@ function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProp
 }
 
 /* BLOCO 5 — Controla seleção de tabelas, registros, edição, exclusão e carregamento. */
+// DatabasePage: executa a etapa descrita pelo nome da função.
 export default function DatabasePage({ embedded = false }: { embedded?: boolean } = {}) {
   const [selectedTable, setSelectedTable] = useState(() => {
     if (typeof window !== "undefined") {
@@ -1033,6 +1046,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   }
 
   if (!embedded && !isAdmin) {
+    {/* Estrutura visual: main. */}
     return (
       <main className="db-flex-min-h-screen-ejpwfw">
         <section className="db-rounded-xl-border-1yymjbi">
@@ -1047,6 +1061,8 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
       </main>
     );
   }
+
+  {/* Estrutura visual: div. */}
 
   return (
     <div className={embedded ? "db-flex-min-h-0-1yrwjzw" : "db-flex-min-h-screen-axmrk9"}>
@@ -1220,6 +1236,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     )}
                     {users.map((row) => {
                       const editing = editingId === row.user_id && draft !== null;
+                      {/* Estrutura visual: tr. */}
                       return (
                         <tr key={row.user_id} className="db-bg-white-0-02-lcbolw">
                           <td className="db-max-w-44-px-2-5-1uhmtbx" title={row.user_id}>
@@ -1392,6 +1409,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     )}
                     {reviews.map((row) => {
                       const editing = reviewEditingId === row.avaliacao_id && reviewDraft !== null;
+                      {/* Estrutura visual: tr. */}
                       return (
                         <tr key={row.avaliacao_id} className="db-bg-white-0-02-lcbolw">
                           <td className="db-max-w-44-px-2-5-1uhmtbx" title={row.avaliacao_id}>
@@ -1798,6 +1816,7 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     )}
                     {platforms.map((row) => {
                       const editing = platformEditingId === row.id && platformDraft !== null;
+                      {/* Estrutura visual: tr. */}
                       return (
                         <tr key={row.id} className="db-bg-white-0-02-lcbolw">
                           <td className="db-max-w-44-px-2-5-1uhmtbx" title={row.id}>
