@@ -13,6 +13,7 @@ const CONNECTIONS_FILE = resolve(
 const CHALLENGE_TTL_MS = 30 * 60 * 1000;
 const PLATFORMS = new Set(["twitch", "kick", "youtube"]);
 
+// readDatabase: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function readDatabase() {
   try {
     const parsed = JSON.parse(await readFile(CONNECTIONS_FILE, "utf8"));
@@ -23,6 +24,7 @@ async function readDatabase() {
   }
 }
 
+// normalizeChannel: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function normalizeChannel(platform, input) {
   let value = String(input ?? "").trim();
   if (!value || value.length > 300) throw new Error("Informe um canal válido.");
@@ -54,12 +56,14 @@ function normalizeChannel(platform, input) {
   return platform === "youtube" ? (value.startsWith("UC") ? value : `@${value}`) : value;
 }
 
+// code: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function code() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
   const bytes = randomBytes(6);
   return "LNX-" + Array.from(bytes, (byte) => chars[byte % chars.length]).join("");
 }
 
+// fetchBio: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function fetchBio(platform, channel) {
   let response;
   if (platform === "twitch") {
@@ -112,6 +116,7 @@ async function fetchBio(platform, channel) {
   return description?.[1]?.replace(/&amp;/g, "&").replace(/&#39;/g, "'") ?? null;
 }
 
+// createChannelChallenge: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function createChannelChallenge(userId, platformInput, channelInput) {
   if (!userId) throw new Error("Autenticação necessária.");
   const platform = String(platformInput ?? "")
@@ -174,6 +179,7 @@ export async function createChannelChallenge(userId, platformInput, channelInput
   };
 }
 
+// verifyChannelChallenge: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function verifyChannelChallenge(userId, challengeIdInput) {
   if (!userId) throw new Error("Autenticação necessária.");
   const challengeId = String(challengeIdInput ?? "").trim();
