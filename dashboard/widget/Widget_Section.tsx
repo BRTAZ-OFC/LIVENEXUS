@@ -4,6 +4,7 @@ import { TWITCH_WIDGETS_CATALOG } from "./Widget_twitchWidgetsCatalog";
 import { isSubscriptionEvent, isRaidEvent } from "./eventClassification";
 import { AlertCircle, ArrowRight, Eye, EyeOff, Search, CheckCircle2, Tv } from "lucide-react";
 
+// WIDGET_DESCRIPTIONS: valor ou configuração reutilizada neste módulo.
 const WIDGET_DESCRIPTIONS = {
   "manual-death-counter": "Contador manual; controle o valor no Config do editor.",
   "manual-clock": "Exibe o horário atual no fuso escolhido no Config do editor.",
@@ -71,6 +72,7 @@ const WIDGET_DESCRIPTIONS = {
 };
 
 // Mapeamento rigoroso das plataformas pertencentes ao fluxo de cada widget
+// WIDGET_PLATFORMS: valor ou configuração reutilizada neste módulo.
 const WIDGET_PLATFORMS = {
   // Manual / Player Local
   "manual-death-counter": [],
@@ -121,6 +123,7 @@ const WIDGET_PLATFORMS = {
 };
 
 // Avaliação de estado real da combinação Widget × Plataforma
+// evaluateWidgetPlatformStatus: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function evaluateWidgetPlatformStatus(
   widgetId,
   platform,
@@ -442,6 +445,7 @@ function evaluateWidgetPlatformStatus(
 }
 
 // Helper para estilização compacta dos badges de estado
+// StatusBadgePill: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function StatusBadgePill({ status }) {
   if (status.state === "functional") {
     return (
@@ -478,12 +482,14 @@ function StatusBadgePill({ status }) {
   );
 }
 
+// PLATFORM_COLORS: valor ou configuração reutilizada neste módulo.
 const PLATFORM_COLORS = {
   Twitch: { text: "text-purple-400", bg: "bg-purple-950/40", border: "border-purple-500/30" },
   Kick: { text: "text-emerald-400", bg: "bg-emerald-950/40", border: "border-emerald-500/30" },
   YouTube: { text: "text-red-400", bg: "bg-red-950/40", border: "border-red-500/30" },
 };
 
+// WidgetsSection: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function WidgetsSection() {
   const { connections, streamMeta, liveActivity } = useStreaming();
 
