@@ -4,6 +4,7 @@ type OverlayUser = {
   role?: string;
 };
 
+// OverlaySection: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function OverlaySection({ users }: { users?: OverlayUser[] }) {
   return (
     <div className="space-y-6">
