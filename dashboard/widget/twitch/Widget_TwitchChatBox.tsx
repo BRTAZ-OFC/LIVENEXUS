@@ -7,6 +7,7 @@ import {
   visibleChatText,
 } from "../Overlay_platformData";
 
+// TwitchChatBox: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function TwitchChatBox({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = platformIsOnline(connections, config);
@@ -96,6 +97,8 @@ export default function TwitchChatBox({ config = {} }) {
     if (roles.includes("subscriber")) return "[Sub]";
     return "";
   };
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div
