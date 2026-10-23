@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como as mensagens recebidas de sinalização são tratadas. */
 // Minimal signaling storage for WebRTC negotiation in the RTC Lab
 // In-memory queue with time-to-live cleanup
 
