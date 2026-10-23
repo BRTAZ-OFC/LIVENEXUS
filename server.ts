@@ -616,6 +616,7 @@ app.post("/api/account/delete", async (req: Request, res: Response) => {
       const admins = (await listUsers()).filter((user) => user.role === "admin");
       if (admins.length <= 1) return res.status(400).set(NO_CACHE).json({ ok: false, message: "Não é possível excluir o único administrador do sistema." });
     }
+    await PlataformasJohnson.delete(session.user_id);
     await deleteUserJsonRecords(session.user_id);
     const deleted = await deleteUser(session.user_id);
     if (!deleted) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Conta não encontrada." });
