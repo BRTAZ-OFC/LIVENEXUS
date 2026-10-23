@@ -13,6 +13,7 @@
  * Secrets: env.TWITCH_CLIENT_ID e env.TWITCH_CLIENT_SECRET (NUNCA hardcoded, NUNCA retornados).
  * Sem setInterval.
  */
+// isAllowedOrigin: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function isAllowedOrigin(origin) {
   if (!origin) return false;
   try {
@@ -27,12 +28,14 @@ const HELIX_STREAMS = "https://api.twitch.tv/helix/streams";
 const TOKEN_URL = "https://id.twitch.tv/oauth2/token";
 const META_TTL = 25_000; // 25s
 
+// json: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function json(obj, status = 200, corsH = {}) {
   return new Response(JSON.stringify(obj), {
     status,
     headers: { "Content-Type": "application/json", ...corsH },
   });
 }
+// corsFor: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function corsFor(request) {
   const origin = request.headers.get("Origin") || "";
   return isAllowedOrigin(origin)
@@ -42,6 +45,7 @@ function corsFor(request) {
 
 // Normaliza login Twitch: aceita "xqc", "@xqc", "https://twitch.tv/xqc", "https://www.twitch.tv/xqc".
 // Valida caracteres de username Twitch (a-z0-9_, 4-25 chars). Retorna null se inválido.
+// normalizeLogin: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function normalizeLogin(input) {
   const v = (input || "").trim();
   if (!v) return null;
@@ -54,6 +58,7 @@ function normalizeLogin(input) {
 
 // soft rate limit (in-memory por isolate)
 const rlCounters = new Map();
+// rateLimit: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function rateLimit(key, limit, windowMs) {
   const now = Date.now();
   const e = rlCounters.get(key);
@@ -67,6 +72,7 @@ function rateLimit(key, limit, windowMs) {
 }
 
 // --- App access token (client credentials) ---
+// getAppToken: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function getAppToken(env) {
   const params = new URLSearchParams({
     client_id: env.TWITCH_CLIENT_ID,
@@ -83,6 +89,7 @@ async function getAppToken(env) {
 }
 
 // Consulta Helix /streams sob demanda
+// fetchHelix: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function fetchHelix(login, env) {
   const token = await getAppToken(env);
   if (!token) return { error: "token" };
@@ -96,11 +103,13 @@ async function fetchHelix(login, env) {
 }
 
 // Helix thumbnail_url vem com placeholders {width}/{height}; normaliza para 1280x720.
+// normalizeThumbnail: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function normalizeThumbnail(url) {
   if (typeof url !== "string" || !url) return null;
   return url.replace("{width}", "1280").replace("{height}", "720");
 }
 
+// buildMeta: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function buildMeta(d) {
   const s = d?.data?.[0];
   if (!s)
@@ -122,6 +131,7 @@ function buildMeta(d) {
   };
 }
 
+// handleMeta: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function handleMeta(request, env, corsH) {
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   if (!rateLimit(`tmeta:${ip}`, 30, 60_000))
