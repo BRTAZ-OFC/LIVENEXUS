@@ -18,6 +18,7 @@ const META: Record<ChatPlatform, { placeholder: string; Icon: typeof RadioTower 
   YouTube: { placeholder: "@canal ou URL do canal", Icon: Youtube },
 };
 
+// AdminConnectionsPage: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function AdminConnectionsPage() {
   const state = useMultiChatSnapshot();
   const [channels, setChannels] = useState(getMultiChatSnapshot().channels);
@@ -126,6 +127,8 @@ export default function AdminConnectionsPage() {
     setNotice("Todas as conexões administrativas foram desconectadas.");
   }
 
+  {/* Estrutura visual retornada: div. */}
+
   return (
     <div className="w-full space-y-5">
       <header className="flex flex-wrap items-center justify-between gap-3">
@@ -167,6 +170,7 @@ export default function AdminConnectionsPage() {
             item.status.toLowerCase(),
           );
           const online = ["connected", "open"].includes(item.status.toLowerCase());
+          {/* Estrutura visual retornada: article. */}
           return (
             <article
               key={platform}
