@@ -413,7 +413,7 @@ function DashboardPage() {
           </button>
           <button
             type="button"
-            onClick={() => handleSelectSection("biblioteca")
+            onClick={() => handleSelectSection("biblioteca")}
             title="Biblioteca"
             aria-label="Biblioteca"
             className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "biblioteca" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
