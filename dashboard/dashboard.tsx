@@ -83,28 +83,24 @@ function DashboardOverview() {
       </div>
 
       <div className="dash-live-stats">
-        <article className="dash-stat-card h-[300px]">
+        <article className="dash-stat-card">
           <div className="dash-stat-label">
-            <Radio /> Espectadores por plataforma
+            <Radio /> Quantidade de espectadores por plataforma
           </div>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={[
-                { platform: "Twitch", viewers: chatState.statuses.Twitch.viewers ?? 0 },
-                { platform: "YouTube", viewers: chatState.statuses.YouTube.viewers ?? 0 },
-                { platform: "Kick", viewers: chatState.statuses.Kick.viewers ?? 0 },
-              ]}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-              <XAxis dataKey="platform" stroke="#94a3b8" fontSize={12} />
-              <YAxis stroke="#94a3b8" fontSize={12} />
-              <Tooltip
-                contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155" }}
-                itemStyle={{ color: "#e2e8f0" }}
-              />
-              <Bar dataKey="viewers" fill="#8b5cf6" />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="dash-platform-counts">
+            <span>
+              <i className="dash-platform-dot twitch" /> Twitch{" "}
+              <b>{(chatState.statuses.Twitch.viewers ?? 0).toLocaleString("pt-BR")}</b>
+            </span>
+            <span>
+              <i className="dash-platform-dot youtube" /> YouTube{" "}
+              <b>{(chatState.statuses.YouTube.viewers ?? 0).toLocaleString("pt-BR")}</b>
+            </span>
+            <span>
+              <i className="dash-platform-dot kick" /> KICK{" "}
+              <b>{(chatState.statuses.Kick.viewers ?? 0).toLocaleString("pt-BR")}</b>
+            </span>
+          </div>
         </article>
         <article className="dash-stat-card">
           <div className="dash-stat-label">

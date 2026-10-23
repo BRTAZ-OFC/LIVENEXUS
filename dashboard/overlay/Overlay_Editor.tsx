@@ -86,6 +86,10 @@ type OverlayEditorProps = {
   onToggleLayerVisibility: (id: string) => void;
   onToggleLayerLock: (id: string) => void;
   onDeleteLayer: (id: string) => void;
+  onAlignSelected?: (
+    type: "left" | "center-h" | "right" | "top" | "center-v" | "bottom" | "distribute-h" | "distribute-v",
+    alignToCanvas?: boolean,
+  ) => void;
 };
 
 const MENUS = [
@@ -801,8 +805,10 @@ export default function Overlay_Editor({
   onToggleLayerVisibility,
   onToggleLayerLock,
   onDeleteLayer,
+  onAlignSelected,
 }: OverlayEditorProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [alignToCanvas, setAlignToCanvas] = useState(true);
   const [activeMenu, setActiveMenu] = useState<MenuName>("INICIO");
   const [selectedWidgetId, setSelectedWidgetId] = useState<string | null>(null);
   const [selectedFontCategory, setSelectedFontCategory] = useState<
@@ -2350,7 +2356,98 @@ export default function Overlay_Editor({
               </div>
             )}
             {activeMenu === "ALINHAMENTO" && (
-              <div className="grid h-full min-h-0 min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-2 overflow-hidden">
+              <div className="grid h-full min-h-0 min-w-0 grid-cols-3 gap-3 overflow-hidden">
+                {/* Seção 1: Botões Globais de Alinhamento */}
+                <section className="flex min-h-0 min-w-0 flex-col gap-2 border-r border-white/10 pr-3 overflow-y-auto">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">
+                      Alinhamento de elementos
+                    </p>
+                    <label className="flex items-center gap-1.5 text-[9px] text-violet-300 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={alignToCanvas}
+                        onChange={(e) => setAlignToCanvas(e.target.checked)}
+                        className="h-3 w-3 accent-violet-500"
+                      />
+                      Ao canvas
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5 pt-1">
+                    <button
+                      type="button"
+                      title="Alinhar à Esquerda"
+                      onClick={() => onAlignSelected?.("left", alignToCanvas)}
+                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                    >
+                      <span>⇥</span> Esquerda
+                    </button>
+                    <button
+                      type="button"
+                      title="Centralizar Horizontalmente"
+                      onClick={() => onAlignSelected?.("center-h", alignToCanvas)}
+                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                    >
+                      <span>↔</span> Centro Horiz.
+                    </button>
+                    <button
+                      type="button"
+                      title="Alinhar à Direita"
+                      onClick={() => onAlignSelected?.("right", alignToCanvas)}
+                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                    >
+                      <span>⇤</span> Direita
+                    </button>
+                    <button
+                      type="button"
+                      title="Alinhar ao Topo"
+                      onClick={() => onAlignSelected?.("top", alignToCanvas)}
+                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                    >
+                      <span>⤒</span> Topo
+                    </button>
+                    <button
+                      type="button"
+                      title="Centralizar Verticalmente"
+                      onClick={() => onAlignSelected?.("center-v", alignToCanvas)}
+                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                    >
+                      <span>↕</span> Centro Vert.
+                    </button>
+                    <button
+                      type="button"
+                      title="Alinhar à Base"
+                      onClick={() => onAlignSelected?.("bottom", alignToCanvas)}
+                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1"}
+                    >
+                      <span>⤓</span> Base
+                    </button>
+                    <button
+                      type="button"
+                      title="Distribuir Espaço Horizontalmente"
+                      onClick={() => onAlignSelected?.("distribute-h", alignToCanvas)}
+                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1 col-span-1"}
+                    >
+                      <span>⁞⁞</span> Dist. Horiz.
+                    </button>
+                    <button
+                      type="button"
+                      title="Distribuir Espaço Verticalmente"
+                      onClick={() => onAlignSelected?.("distribute-v", alignToCanvas)}
+                      className={buttonClass + " flex items-center justify-center gap-1 text-[10px] py-1 px-1 col-span-1"}
+                    >
+                      <span>≡</span> Dist. Vert.
+                    </button>
+                  </div>
+                  <p className="text-[9px] text-slate-400">
+                    {alignToCanvas
+                      ? "Alinha os elementos selecionados aos limites do canvas."
+                      : "Alinha os elementos selecionados em relação ao grupo."}
+                  </p>
+                </section>
+
+                {/* Seção 2: Grade e Área Segura */}
                 <section className="flex min-h-0 min-w-0 flex-col gap-3 border-r border-white/10 pr-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">
                     Grade e área segura
@@ -2405,9 +2502,11 @@ export default function Overlay_Editor({
                     Exibir Área Segura (Safe Area)
                   </label>
                 </section>
+
+                {/* Seção 3: Linhas-Guia Manuais */}
                 <section className="flex min-h-0 min-w-0 flex-col gap-2 overflow-y-auto">
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-300">
-                    Linhas-guia manuais sem limite
+                    Linhas-guia manuais
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <button
@@ -2415,19 +2514,18 @@ export default function Overlay_Editor({
                       onClick={() => onAddGuide("vertical")}
                       className={buttonClass}
                     >
-                      + Linha Guia Vertical
+                      + Guia Vertical
                     </button>
                     <button
                       type="button"
                       onClick={() => onAddGuide("horizontal")}
                       className={buttonClass}
                     >
-                      + Linha Guia Horizontal
+                      + Guia Horizontal
                     </button>
                   </div>
                   <p className="text-[10px] text-slate-400">
-                    As linhas novas começam no centro do canvas. Você pode adicionar quantas
-                    precisar.
+                    As linhas novas começam no centro do canvas.
                   </p>
                   {(gridSettings.verticalGuides.length > 0 ||
                     gridSettings.horizontalGuides.length > 0) && (
@@ -2438,7 +2536,7 @@ export default function Overlay_Editor({
                           className="flex items-center justify-between gap-2 rounded border border-white/10 px-2 py-1 text-[10px] text-slate-200"
                         >
                           <span>
-                            Linha vertical {index + 1} — {Math.round(guide.x)} px
+                            Vertical {index + 1} — {Math.round(guide.x)} px
                           </span>
                           <button
                             type="button"
@@ -2462,7 +2560,7 @@ export default function Overlay_Editor({
                           className="flex items-center justify-between gap-2 rounded border border-white/10 px-2 py-1 text-[10px] text-slate-200"
                         >
                           <span>
-                            Linha horizontal {index + 1} — {Math.round(guide.y)} px
+                            Horizontal {index + 1} — {Math.round(guide.y)} px
                           </span>
                           <button
                             type="button"

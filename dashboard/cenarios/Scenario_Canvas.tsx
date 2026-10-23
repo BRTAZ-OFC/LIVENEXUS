@@ -83,14 +83,189 @@ function sourceFor(row: ScenarioRecord): JsonObject {
   return row as unknown as JsonObject;
 }
 
+type AlignmentType =
+  | "left"
+  | "center-h"
+  | "right"
+  | "top"
+  | "center-v"
+  | "bottom"
+  | "distribute-h"
+  | "distribute-v";
+
+function alignSelectedInstances<T extends { id?: string; x?: number; y?: number; width?: number; height?: number }>(
+  instances: T[],
+  selectedIds: string[],
+  type: AlignmentType,
+  canvasWidth: number,
+  canvasHeight: number,
+  alignToCanvas: boolean = false
+): T[] {
+  if (selectedIds.length === 0) return instances;
+
+  const targetIds = new Set(selectedIds);
+  const selectedItems = instances.filter((item) => item.id && targetIds.has(item.id));
+  if (selectedItems.length === 0) return instances;
+
+  if (selectedItems.length === 1 || alignToCanvas) {
+    return instances.map((item) => {
+      if (!item.id || !targetIds.has(item.id)) return item;
+      const w = Math.max(1, Number(item.width) || 100);
+      const h = Math.max(1, Number(item.height) || 100);
+      let newX = Number(item.x) || 0;
+      let newY = Number(item.y) || 0;
+
+      switch (type) {
+        case "left":
+          newX = 0;
+          break;
+        case "center-h":
+          newX = Math.round((canvasWidth - w) / 2);
+          break;
+        case "right":
+          newX = Math.round(canvasWidth - w);
+          break;
+        case "top":
+          newY = 0;
+          break;
+        case "center-v":
+          newY = Math.round((canvasHeight - h) / 2);
+          break;
+        case "bottom":
+          newY = Math.round(canvasHeight - h);
+          break;
+      }
+      return {
+        ...item,
+        x: Math.max(0, Math.min(canvasWidth - w, newX)),
+        y: Math.max(0, Math.min(canvasHeight - h, newY)),
+      };
+    });
+  }
+
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
+
+  selectedItems.forEach((item) => {
+    const x = Number(item.x) || 0;
+    const y = Number(item.y) || 0;
+    const w = Math.max(1, Number(item.width) || 100);
+    const h = Math.max(1, Number(item.height) || 100);
+    if (x < minX) minX = x;
+    if (x + w > maxX) maxX = x + w;
+    if (y < minY) minY = y;
+    if (y + h > maxY) maxY = y + h;
+  });
+
+  const boundingCenterX = Math.round((minX + maxX) / 2);
+  const boundingCenterY = Math.round((minY + maxY) / 2);
+
+  if (type === "distribute-h" && selectedItems.length >= 3) {
+    const sorted = [...selectedItems].sort((a, b) => (Number(a.x) || 0) - (Number(b.x) || 0));
+    const firstX = Number(sorted[0].x) || 0;
+    const lastX = Number(sorted[sorted.length - 1].x) || 0;
+    const totalSpan = lastX - firstX;
+    const step = totalSpan / (sorted.length - 1);
+    const posMap = new Map<string, number>();
+    sorted.forEach((item, idx) => {
+      if (item.id) posMap.set(item.id, Math.round(firstX + step * idx));
+    });
+
+    return instances.map((item) => {
+      if (!item.id || !targetIds.has(item.id) || !posMap.has(item.id)) return item;
+      const w = Math.max(1, Number(item.width) || 100);
+      const newX = posMap.get(item.id)!;
+      return {
+        ...item,
+        x: Math.max(0, Math.min(canvasWidth - w, newX)),
+      };
+    });
+  }
+
+  if (type === "distribute-v" && selectedItems.length >= 3) {
+    const sorted = [...selectedItems].sort((a, b) => (Number(a.y) || 0) - (Number(b.y) || 0));
+    const firstY = Number(sorted[0].y) || 0;
+    const lastY = Number(sorted[sorted.length - 1].y) || 0;
+    const totalSpan = lastY - firstY;
+    const step = totalSpan / (sorted.length - 1);
+    const posMap = new Map<string, number>();
+    sorted.forEach((item, idx) => {
+      if (item.id) posMap.set(item.id, Math.round(firstY + step * idx));
+    });
+
+    return instances.map((item) => {
+      if (!item.id || !targetIds.has(item.id) || !posMap.has(item.id)) return item;
+      const h = Math.max(1, Number(item.height) || 100);
+      const newY = posMap.get(item.id)!;
+      return {
+        ...item,
+        y: Math.max(0, Math.min(canvasHeight - h, newY)),
+      };
+    });
+  }
+
+  return instances.map((item) => {
+    if (!item.id || !targetIds.has(item.id)) return item;
+    const w = Math.max(1, Number(item.width) || 100);
+    const h = Math.max(1, Number(item.height) || 100);
+    let newX = Number(item.x) || 0;
+    let newY = Number(item.y) || 0;
+
+    switch (type) {
+      case "left":
+        newX = minX;
+        break;
+      case "center-h":
+        newX = Math.round(boundingCenterX - w / 2);
+        break;
+      case "right":
+        newX = Math.round(maxX - w);
+        break;
+      case "top":
+        newY = minY;
+        break;
+      case "center-v":
+        newY = Math.round(boundingCenterY - h / 2);
+        break;
+      case "bottom":
+        newY = Math.round(maxY - h);
+        break;
+    }
+
+    return {
+      ...item,
+      x: Math.max(0, Math.min(canvasWidth - w, newX)),
+      y: Math.max(0, Math.min(canvasHeight - h, newY)),
+    };
+  });
+}
+
 function normalizeScenario(row: ScenarioRecord): ScenarioConfig {
   const source = sourceFor(row);
   const backgroundSource = isObject(source.background) ? source.background : {};
+  const rawInstances = Array.isArray(source.instances) ? (source.instances as ScenarioInstance[]) : [];
+  const instances = rawInstances.map((item, idx) => ({
+    ...item,
+    id: item.id || `scen-inst-${idx}-${Math.random().toString(36).slice(2, 7)}`,
+  }));
+
+  const rawSubScenarios = Array.isArray(source.subScenarios) ? source.subScenarios : [];
+  const subScenarios = rawSubScenarios.map((sub: any, subIdx: number) => ({
+    id: String(sub.id || `sub-${subIdx + 1}`),
+    name: String(sub.name || `Sub Cenário ${subIdx + 1}`),
+    instances: Array.isArray(sub.instances)
+      ? sub.instances.map((item: any, idx: number) => ({
+          ...item,
+          id: item.id || `scen-sub-inst-${idx}-${Math.random().toString(36).slice(2, 7)}`,
+        }))
+      : [],
+  }));
+
   return {
     id: String(row.id ?? source.id ?? ""),
     name: String(source.name ?? row.name ?? "Cenário"),
     visualizerSize: { width: CANVAS_WIDTH, height: CANVAS_HEIGHT },
-    instances: Array.isArray(source.instances) ? (source.instances as ScenarioInstance[]) : [],
+    instances,
     background: {
       type: String(backgroundSource.type ?? "transparent"),
       color: typeof backgroundSource.color === "string" ? backgroundSource.color : "#07111f",
@@ -101,7 +276,7 @@ function normalizeScenario(row: ScenarioRecord): ScenarioConfig {
       image: typeof backgroundSource.image === "string" ? backgroundSource.image : "",
       opacity: Math.max(0, Math.min(100, Number(backgroundSource.opacity ?? 100))),
     },
-    subScenarios: Array.isArray(source.subScenarios) ? (source.subScenarios as { id: string; name: string; instances: ScenarioInstance[] }[]) : [],
+    subScenarios,
   };
 }
 
@@ -141,6 +316,7 @@ export default function ScenarioCanvas({
   const [selectedSubScenarioId, setSelectedSubScenarioId] = useState<string>("");
   const [rowKey, setRowKey] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -198,13 +374,35 @@ export default function ScenarioCanvas({
     return () => observer.disconnect();
   }, []);
 
+  function syncInstancesToSubScenario(nextInstances: ScenarioInstance[]) {
+    setSubScenarios((prev) =>
+      prev.map((s) => (s.id === selectedSubScenarioId ? { ...s, instances: nextInstances } : s))
+    );
+    setScenario((current) => (current ? { ...current, instances: nextInstances } : current));
+  }
+
+  function handleSelectSubScenario(subId: string) {
+    setSelectedSubScenarioId(subId);
+    setSelectedId(null);
+    setSelectedIds([]);
+    const sub = subScenarios.find((s) => s.id === subId);
+    if (sub && scenario) {
+      setScenario({
+        ...scenario,
+        instances: sub.instances,
+      });
+    }
+  }
+
   useEffect(() => {
     function handleCanvasKeyDown(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
+      const activeIds = selectedIds.length > 0 ? selectedIds : selectedId ? [selectedId] : [];
+
       if (
-        !selectedId ||
+        activeIds.length === 0 ||
         !scenario ||
-        target?.closest("input,textarea,select,button,a,[contenteditable='true'],[role='textbox']")
+        target?.closest("input, textarea, select, [contenteditable='true'], [role='textbox']")
       ) {
         return;
       }
@@ -212,19 +410,12 @@ export default function ScenarioCanvas({
 
       if (event.key === "Delete" || event.key === "Backspace") {
         event.preventDefault();
-        deleteInstance(selectedId);
-        setSelectedId(null);
+        deleteInstance(activeIds);
         setNotice("");
         return;
       }
 
       const step = event.shiftKey ? 10 : 1;
-      const selected = scenario.instances.find(
-        (item, index) =>
-          String(item.id ?? String(item.widgetId) + "-" + index) === selectedId,
-      );
-      if (!selected) return;
-
       let dx = 0;
       let dy = 0;
       if (event.key === "ArrowLeft") dx = -step;
@@ -234,33 +425,25 @@ export default function ScenarioCanvas({
       else return;
 
       event.preventDefault();
-      setScenario((current) =>
-        current
-          ? {
-              ...current,
-              instances: current.instances.map((item, index) => {
-                if (
-                  String(item.id ?? String(item.widgetId) + "-" + index) !== selectedId
-                ) {
-                  return item;
-                }
-                const width = Math.max(1, Number(item.width) || 320);
-                const height = Math.max(1, Number(item.height) || 120);
-                return {
-                  ...item,
-                  x: Math.max(0, Math.min(CANVAS_WIDTH - width, (Number(item.x) || 0) + dx)),
-                  y: Math.max(0, Math.min(CANVAS_HEIGHT - height, (Number(item.y) || 0) + dy)),
-                };
-              }),
-            }
-          : current,
-      );
+      const targetSet = new Set(activeIds);
+      const nextInstances = scenario.instances.map((item, index) => {
+        const itemKey = item.id || `${item.widgetId}-${index}`;
+        if (!targetSet.has(itemKey)) return item;
+        const width = Math.max(1, Number(item.width) || 320);
+        const height = Math.max(1, Number(item.height) || 120);
+        return {
+          ...item,
+          x: Math.max(0, Math.min(CANVAS_WIDTH - width, (Number(item.x) || 0) + dx)),
+          y: Math.max(0, Math.min(CANVAS_HEIGHT - height, (Number(item.y) || 0) + dy)),
+        };
+      });
+      syncInstancesToSubScenario(nextInstances);
       setNotice("");
     }
 
     window.addEventListener("keydown", handleCanvasKeyDown);
     return () => window.removeEventListener("keydown", handleCanvasKeyDown);
-  }, [scenario, selectedId]);
+  }, [scenario, selectedId, selectedIds, selectedSubScenarioId]);
 
   const canvasBackground = useMemo(
     () => backgroundStyle(scenario?.background ?? { type: "transparent" }),
@@ -287,67 +470,48 @@ export default function ScenarioCanvas({
       visible: true,
       config: { ...(definition.defaultConfig || {}) },
     };
-    
-    setSubScenarios(currentSubScenarios => 
-        currentSubScenarios.map(s => s.id === selectedSubScenarioId ? { ...s, instances: [...s.instances, instance] } : s)
-    );
-    
-    setScenario((current) =>
-      current ? { ...current, instances: [...current.instances, instance] } : current,
-    );
+
+    const nextInstances = [...scenario.instances, instance];
+    syncInstancesToSubScenario(nextInstances);
     setSelectedId(id);
+    setSelectedIds([id]);
     setNotice("");
   }
 
   function updateInstance(instanceId: string, patch: Partial<ScenarioInstance>) {
-    setSubScenarios(currentSubScenarios => 
-        currentSubScenarios.map(s => ({
-            ...s,
-            instances: s.instances.map((item, index) => 
-                String(item.id ?? String(item.widgetId) + "-" + index) === instanceId
-                    ? { ...item, ...patch }
-                    : item
-            )
-        }))
+    if (!scenario) return;
+    const nextInstances = scenario.instances.map((item, index) =>
+      (item.id || `${item.widgetId}-${index}`) === instanceId ? { ...item, ...patch } : item
     );
-
-    setScenario((current) =>
-      current
-        ? {
-            ...current,
-            instances: current.instances.map((item, index) =>
-              String(item.id ?? String(item.widgetId) + "-" + index) === instanceId
-                ? { ...item, ...patch }
-                : item,
-            ),
-          }
-        : current,
-    );
+    syncInstancesToSubScenario(nextInstances);
     setNotice("");
   }
 
-  function deleteInstance(instanceId: string) {
-    setSubScenarios(currentSubScenarios => 
-        currentSubScenarios.map(s => ({
-            ...s,
-            instances: s.instances.filter(
-                (item, index) =>
-                    String(item.id ?? String(item.widgetId) + "-" + index) !== instanceId
-            )
-        }))
+  function deleteInstance(instanceId: string | string[]) {
+    if (!scenario) return;
+    const idsToDelete = new Set(Array.isArray(instanceId) ? instanceId : [instanceId]);
+    const nextInstances = scenario.instances.filter(
+      (item, index) => !idsToDelete.has(item.id || `${item.widgetId}-${index}`)
     );
+    syncInstancesToSubScenario(nextInstances);
+    setSelectedId((prev) => (prev && idsToDelete.has(prev) ? null : prev));
+    setSelectedIds((prev) => prev.filter((id) => !idsToDelete.has(id)));
+  }
 
-    setScenario((current) =>
-      current
-        ? {
-            ...current,
-            instances: current.instances.filter(
-              (item, index) =>
-                String(item.id ?? String(item.widgetId) + "-" + index) !== instanceId,
-            ),
-          }
-        : current,
+  function handleAlignSelected(type: AlignmentType, alignToCanvas: boolean = false) {
+    if (!scenario) return;
+    const activeIds = selectedIds.length > 0 ? selectedIds : selectedId ? [selectedId] : [];
+    if (activeIds.length === 0) return;
+
+    const aligned = alignSelectedInstances(
+      scenario.instances,
+      activeIds,
+      type,
+      CANVAS_WIDTH,
+      CANVAS_HEIGHT,
+      alignToCanvas
     );
+    syncInstancesToSubScenario(aligned);
   }
 
   function beginDrag(
@@ -357,7 +521,16 @@ export default function ScenarioCanvas({
     mode: "move" | "resize",
   ) {
     const instanceId = String(instance.id ?? String(instance.widgetId) + "-" + index);
-    setSelectedId(instanceId);
+    if (event.shiftKey || event.ctrlKey || event.metaKey) {
+      setSelectedIds((prev) =>
+        prev.includes(instanceId) ? prev.filter((i) => i !== instanceId) : [...prev, instanceId]
+      );
+      setSelectedId(instanceId);
+    } else {
+      setSelectedId(instanceId);
+      setSelectedIds([instanceId]);
+    }
+
     if (
       mode === "move" &&
       (event.target as HTMLElement).closest("button,input,textarea,select,a,[data-no-widget-drag]")
@@ -407,6 +580,9 @@ export default function ScenarioCanvas({
     setError("");
     setNotice("");
     try {
+      const updatedSubScenarios = subScenarios.map((s) =>
+        s.id === selectedSubScenarioId ? { ...s, instances: scenario.instances } : s
+      );
       const response = await fetch("/api/cenarios", {
         method: "PATCH",
         credentials: "include",
@@ -420,6 +596,7 @@ export default function ScenarioCanvas({
             visualizerSize: { width: CANVAS_WIDTH, height: CANVAS_HEIGHT },
             instances: scenario.instances,
             background: scenario.background,
+            subScenarios: updatedSubScenarios,
           },
         }),
       });
@@ -505,7 +682,7 @@ export default function ScenarioCanvas({
           />
           <select
             value={selectedSubScenarioId}
-            onChange={(e) => setSelectedSubScenarioId(e.target.value)}
+            onChange={(e) => handleSelectSubScenario(e.target.value)}
             className="rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-xs text-white"
           >
             {subScenarios.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -554,12 +731,12 @@ export default function ScenarioCanvas({
           <button
             type="button"
             onClick={() => {
-              if (selectedId) {
-                deleteInstance(selectedId);
-                setSelectedId(null);
+              const active = selectedIds.length > 0 ? selectedIds : selectedId ? [selectedId] : [];
+              if (active.length > 0) {
+                deleteInstance(active);
               }
             }}
-            disabled={!selectedId}
+            disabled={!selectedId && selectedIds.length === 0}
             className="inline-flex items-center gap-2 rounded-lg border border-rose-400/20 px-3 py-2 text-xs text-rose-200 disabled:opacity-40"
           >
             <Trash2 size={14} /> Excluir selecionado
@@ -575,6 +752,95 @@ export default function ScenarioCanvas({
           </button>
         </div>
       </header>
+
+      <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-cyan-300/10 bg-slate-950/60 p-2 text-xs">
+        <div className="flex flex-wrap items-center gap-1">
+          <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-cyan-300">
+            Alinhamento:
+          </span>
+          <button
+            type="button"
+            title="Esquerda"
+            disabled={!selectedId && selectedIds.length === 0}
+            onClick={() => handleAlignSelected("left", true)}
+            className="rounded border border-white/10 bg-slate-900 px-2 py-1 text-[11px] text-slate-200 hover:border-cyan-300 hover:text-white disabled:opacity-30"
+          >
+            ⇥ Esquerda
+          </button>
+          <button
+            type="button"
+            title="Centro Horizontal"
+            disabled={!selectedId && selectedIds.length === 0}
+            onClick={() => handleAlignSelected("center-h", true)}
+            className="rounded border border-white/10 bg-slate-900 px-2 py-1 text-[11px] text-slate-200 hover:border-cyan-300 hover:text-white disabled:opacity-30"
+          >
+            ↔ Centro H
+          </button>
+          <button
+            type="button"
+            title="Direita"
+            disabled={!selectedId && selectedIds.length === 0}
+            onClick={() => handleAlignSelected("right", true)}
+            className="rounded border border-white/10 bg-slate-900 px-2 py-1 text-[11px] text-slate-200 hover:border-cyan-300 hover:text-white disabled:opacity-30"
+          >
+            ⇤ Direita
+          </button>
+          <button
+            type="button"
+            title="Topo"
+            disabled={!selectedId && selectedIds.length === 0}
+            onClick={() => handleAlignSelected("top", true)}
+            className="rounded border border-white/10 bg-slate-900 px-2 py-1 text-[11px] text-slate-200 hover:border-cyan-300 hover:text-white disabled:opacity-30"
+          >
+            ⤒ Topo
+          </button>
+          <button
+            type="button"
+            title="Centro Vertical"
+            disabled={!selectedId && selectedIds.length === 0}
+            onClick={() => handleAlignSelected("center-v", true)}
+            className="rounded border border-white/10 bg-slate-900 px-2 py-1 text-[11px] text-slate-200 hover:border-cyan-300 hover:text-white disabled:opacity-30"
+          >
+            ↕ Centro V
+          </button>
+          <button
+            type="button"
+            title="Base"
+            disabled={!selectedId && selectedIds.length === 0}
+            onClick={() => handleAlignSelected("bottom", true)}
+            className="rounded border border-white/10 bg-slate-900 px-2 py-1 text-[11px] text-slate-200 hover:border-cyan-300 hover:text-white disabled:opacity-30"
+          >
+            ⤓ Base
+          </button>
+          {selectedIds.length >= 3 && (
+            <>
+              <button
+                type="button"
+                title="Distribuir Horizontalmente"
+                onClick={() => handleAlignSelected("distribute-h", false)}
+                className="rounded border border-white/10 bg-slate-900 px-2 py-1 text-[11px] text-slate-200 hover:border-cyan-300 hover:text-white"
+              >
+                ⁞⁞ Dist. H
+              </button>
+              <button
+                type="button"
+                title="Distribuir Verticalmente"
+                onClick={() => handleAlignSelected("distribute-v", false)}
+                className="rounded border border-white/10 bg-slate-900 px-2 py-1 text-[11px] text-slate-200 hover:border-cyan-300 hover:text-white"
+              >
+                ≡ Dist. V
+              </button>
+            </>
+          )}
+        </div>
+        <span className="text-[10px] text-slate-400">
+          {selectedIds.length > 1
+            ? `${selectedIds.length} elementos selecionados`
+            : selectedId
+            ? "1 elemento selecionado"
+            : "Nenhum elemento selecionado"}
+        </span>
+      </div>
 
       <div className="w-full min-w-0">
         <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">

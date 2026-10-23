@@ -385,25 +385,182 @@ function isObject(value: unknown): value is JsonObject {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
+function sourceFor(row: OverlayRow): JsonObject {
+  if (isObject(row.settings) && Object.keys(row.settings).length) return row.settings;
+  if (isObject(row.config) && Object.keys(row.config).length) return row.config;
+  if (isObject(row.data) && Object.keys(row.data).length) return row.data;
+  return row as unknown as JsonObject;
+}
+
+type AlignmentType =
+  | "left"
+  | "center-h"
+  | "right"
+  | "top"
+  | "center-v"
+  | "bottom"
+  | "distribute-h"
+  | "distribute-v";
+
+function alignSelectedInstances<T extends { id?: string; x?: number; y?: number; width?: number; height?: number }>(
+  instances: T[],
+  selectedIds: string[],
+  type: AlignmentType,
+  canvasWidth: number,
+  canvasHeight: number,
+  alignToCanvas: boolean = false
+): T[] {
+  if (selectedIds.length === 0) return instances;
+
+  const targetIds = new Set(selectedIds);
+  const selectedItems = instances.filter((item) => item.id && targetIds.has(item.id));
+  if (selectedItems.length === 0) return instances;
+
+  if (selectedItems.length === 1 || alignToCanvas) {
+    return instances.map((item) => {
+      if (!item.id || !targetIds.has(item.id)) return item;
+      const w = Math.max(1, Number(item.width) || 100);
+      const h = Math.max(1, Number(item.height) || 100);
+      let newX = Number(item.x) || 0;
+      let newY = Number(item.y) || 0;
+
+      switch (type) {
+        case "left":
+          newX = 0;
+          break;
+        case "center-h":
+          newX = Math.round((canvasWidth - w) / 2);
+          break;
+        case "right":
+          newX = Math.round(canvasWidth - w);
+          break;
+        case "top":
+          newY = 0;
+          break;
+        case "center-v":
+          newY = Math.round((canvasHeight - h) / 2);
+          break;
+        case "bottom":
+          newY = Math.round(canvasHeight - h);
+          break;
+      }
+      return {
+        ...item,
+        x: Math.max(0, Math.min(canvasWidth - w, newX)),
+        y: Math.max(0, Math.min(canvasHeight - h, newY)),
+      };
+    });
+  }
+
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
+
+  selectedItems.forEach((item) => {
+    const x = Number(item.x) || 0;
+    const y = Number(item.y) || 0;
+    const w = Math.max(1, Number(item.width) || 100);
+    const h = Math.max(1, Number(item.height) || 100);
+    if (x < minX) minX = x;
+    if (x + w > maxX) maxX = x + w;
+    if (y < minY) minY = y;
+    if (y + h > maxY) maxY = y + h;
+  });
+
+  const boundingCenterX = Math.round((minX + maxX) / 2);
+  const boundingCenterY = Math.round((minY + maxY) / 2);
+
+  if (type === "distribute-h" && selectedItems.length >= 3) {
+    const sorted = [...selectedItems].sort((a, b) => (Number(a.x) || 0) - (Number(b.x) || 0));
+    const firstX = Number(sorted[0].x) || 0;
+    const lastX = Number(sorted[sorted.length - 1].x) || 0;
+    const totalSpan = lastX - firstX;
+    const step = totalSpan / (sorted.length - 1);
+    const posMap = new Map<string, number>();
+    sorted.forEach((item, idx) => {
+      if (item.id) posMap.set(item.id, Math.round(firstX + step * idx));
+    });
+
+    return instances.map((item) => {
+      if (!item.id || !targetIds.has(item.id) || !posMap.has(item.id)) return item;
+      const w = Math.max(1, Number(item.width) || 100);
+      const newX = posMap.get(item.id)!;
+      return {
+        ...item,
+        x: Math.max(0, Math.min(canvasWidth - w, newX)),
+      };
+    });
+  }
+
+  if (type === "distribute-v" && selectedItems.length >= 3) {
+    const sorted = [...selectedItems].sort((a, b) => (Number(a.y) || 0) - (Number(b.y) || 0));
+    const firstY = Number(sorted[0].y) || 0;
+    const lastY = Number(sorted[sorted.length - 1].y) || 0;
+    const totalSpan = lastY - firstY;
+    const step = totalSpan / (sorted.length - 1);
+    const posMap = new Map<string, number>();
+    sorted.forEach((item, idx) => {
+      if (item.id) posMap.set(item.id, Math.round(firstY + step * idx));
+    });
+
+    return instances.map((item) => {
+      if (!item.id || !targetIds.has(item.id) || !posMap.has(item.id)) return item;
+      const h = Math.max(1, Number(item.height) || 100);
+      const newY = posMap.get(item.id)!;
+      return {
+        ...item,
+        y: Math.max(0, Math.min(canvasHeight - h, newY)),
+      };
+    });
+  }
+
+  return instances.map((item) => {
+    if (!item.id || !targetIds.has(item.id)) return item;
+    const w = Math.max(1, Number(item.width) || 100);
+    const h = Math.max(1, Number(item.height) || 100);
+    let newX = Number(item.x) || 0;
+    let newY = Number(item.y) || 0;
+
+    switch (type) {
+      case "left":
+        newX = minX;
+        break;
+      case "center-h":
+        newX = Math.round(boundingCenterX - w / 2);
+        break;
+      case "right":
+        newX = Math.round(maxX - w);
+        break;
+      case "top":
+        newY = minY;
+        break;
+      case "center-v":
+        newY = Math.round(boundingCenterY - h / 2);
+        break;
+      case "bottom":
+        newY = Math.round(maxY - h);
+        break;
+    }
+
+    return {
+      ...item,
+      x: Math.max(0, Math.min(canvasWidth - w, newX)),
+      y: Math.max(0, Math.min(canvasHeight - h, newY)),
+    };
+  });
+}
+
 function getCanvasConfig(row: OverlayRow): CanvasConfig {
-  const source =
-    isObject(row.settings) && Object.keys(row.settings).length
-      ? row.settings
-      : isObject(row.config) && Object.keys(row.config).length
-        ? row.config
-        : isObject(row.data) && Object.keys(row.data).length
-          ? row.data
-          : (row as unknown as JsonObject);
+  const source = sourceFor(row);
   return {
-    ...source,
-    ...(typeof row.id === "string" ? { id: row.id } : {}),
+    id: String(row.id ?? source["id"] ?? ""),
     name: String(source["name"] ?? row.name ?? "Overlay"),
     visualizerSize: isObject(source["visualizerSize"])
       ? (source["visualizerSize"] as CanvasConfig["visualizerSize"])
       : DEFAULT_SIZE,
     instances: Array.isArray(source["instances"])
-      ? (source["instances"] as CanvasInstance[]).map((instance) => ({
+      ? (source["instances"] as CanvasInstance[]).map((instance, index) => ({
           ...instance,
+          id: instance.id || `ov-inst-${index}-${Math.random().toString(36).slice(2, 7)}`,
           config: transparentWidgetConfig(isObject(instance.config) ? instance.config : {}),
         }))
       : [],
@@ -465,11 +622,12 @@ export default function OverlayCanvas() {
   const [scale, setScale] = useState(1);
   const resizeStart = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [selectedInstanceId, setSelectedInstanceId] = useState<string | null>(null);
+  const [selectedInstanceIds, setSelectedInstanceIds] = useState<string[]>([]);
   const [editorOpen, setEditorOpen] = useState(false);
 
   useEffect(() => {
-    setEditorOpen(Boolean(selectedInstanceId));
-  }, [selectedInstanceId]);
+    setEditorOpen(Boolean(selectedInstanceId || selectedInstanceIds.length > 0));
+  }, [selectedInstanceId, selectedInstanceIds]);
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const textDraftsRef = useRef<Record<string, string>>({});
   const [gridSettings, setGridSettings] = useState<CanvasGridSettings>({
@@ -676,9 +834,13 @@ export default function OverlayCanvas() {
   useEffect(() => {
     function handleCanvasKeyDown(event: KeyboardEvent) {
       const target = event.target as HTMLElement | null;
+      const activeIds = selectedInstanceIds.length > 0
+        ? selectedInstanceIds
+        : selectedInstanceId ? [selectedInstanceId] : [];
+
       if (
-        !selectedInstanceId ||
-        target?.closest("input,textarea,select,button,a,[contenteditable='true'],[role='textbox']")
+        activeIds.length === 0 ||
+        target?.closest("input, textarea, select, [contenteditable='true'], [role='textbox']")
       ) {
         return;
       }
@@ -686,22 +848,11 @@ export default function OverlayCanvas() {
 
       if (event.key === "Delete" || event.key === "Backspace") {
         event.preventDefault();
-        setConfig((current) => ({
-          ...current,
-          instances: (current.instances || []).filter(
-            (item, index) => (item.id || `${item.widgetId}-${index}`) !== selectedInstanceId,
-          ),
-        }));
-        setSelectedInstanceId(null);
+        deleteInstance(activeIds);
         return;
       }
 
       const step = event.shiftKey ? 10 : 1;
-      const selected = (config.instances || []).find(
-        (item, index) => (item.id || `${item.widgetId}-${index}`) === selectedInstanceId,
-      );
-      if (!selected) return;
-
       let dx = 0;
       let dy = 0;
       if (event.key === "ArrowLeft") dx = -step;
@@ -711,10 +862,12 @@ export default function OverlayCanvas() {
       else return;
 
       event.preventDefault();
+      const targetSet = new Set(activeIds);
       setConfig((current) => ({
         ...current,
         instances: (current.instances || []).map((item, index) => {
-          if ((item.id || `${item.widgetId}-${index}`) !== selectedInstanceId) return item;
+          const itemKey = item.id || `${item.widgetId}-${index}`;
+          if (!targetSet.has(itemKey)) return item;
           const width = Math.max(1, Number(item.width) || 280);
           const height = Math.max(1, Number(item.height) || 120);
           return {
@@ -728,7 +881,7 @@ export default function OverlayCanvas() {
 
     window.addEventListener("keydown", handleCanvasKeyDown);
     return () => window.removeEventListener("keydown", handleCanvasKeyDown);
-  }, [config.instances, selectedInstanceId, size.width, size.height]);
+  }, [config.instances, selectedInstanceId, selectedInstanceIds, size.width, size.height]);
 
   function selectOverlay(id: string) {
     const row = overlays.find((item) => String(item.id ?? "") === id);
@@ -1076,14 +1229,38 @@ export default function OverlayCanvas() {
     }));
   }
 
-  function deleteInstance(instanceId: string) {
+  function deleteInstance(instanceId: string | string[]) {
+    const idsToDelete = new Set(Array.isArray(instanceId) ? instanceId : [instanceId]);
     setConfig((current) => ({
       ...current,
       instances: (current.instances || []).filter(
-        (item, index) => (item.id || `${item.widgetId}-${index}`) !== instanceId,
+        (item, index) => !idsToDelete.has(item.id || `${item.widgetId}-${index}`),
       ),
     }));
-    setSelectedInstanceId((current) => (current === instanceId ? null : current));
+    setSelectedInstanceId((current) => (current && idsToDelete.has(current) ? null : current));
+    setSelectedInstanceIds((current) => current.filter((id) => !idsToDelete.has(id)));
+  }
+
+  function handleAlignSelected(
+    type: AlignmentType,
+    alignToCanvas: boolean = false,
+  ) {
+    const activeIds = selectedInstanceIds.length > 0
+      ? selectedInstanceIds
+      : selectedInstanceId ? [selectedInstanceId] : [];
+    if (activeIds.length === 0) return;
+
+    setConfig((current) => ({
+      ...current,
+      instances: alignSelectedInstances(
+        current.instances || [],
+        activeIds,
+        type,
+        size.width,
+        size.height,
+        alignToCanvas,
+      ),
+    }));
   }
 
   function updateGridSettings(patch: Partial<CanvasGridSettings>) {
@@ -1238,38 +1415,44 @@ export default function OverlayCanvas() {
   }
 
   return (
-    <section className="relative flex w-full min-w-0 flex-col items-center gap-4 px-2 pb-40 pt-4">
-      <div className="fixed right-4 top-20 z-[100] flex flex-row items-center gap-2">
-        {!editorOpen && (
+    <section className="relative flex w-full min-w-0 flex-col items-center gap-4 px-2 pb-40 pt-[10px]">
+      <div className="flex w-full items-center justify-between gap-3 border-b border-white/10 pb-3">
+        <div className="min-w-0">
+          <h2 className="text-base font-bold text-white">Configurações de Overlay</h2>
+          <p className="text-xs text-slate-400">Gerencie e edite suas overlays no canvas</p>
+        </div>
+        <div className="flex flex-row items-center gap-2 shrink-0">
+          {!editorOpen && (
+            <button
+              type="button"
+              onClick={() => setEditorOpen(true)}
+              className="inline-flex h-9 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-violet-400/40 bg-slate-950 px-3 text-xs font-semibold text-violet-100 shadow transition hover:bg-violet-500/15"
+              title="Visualizar editor de overlay"
+            >
+              Visualizar editor
+            </button>
+          )}
           <button
             type="button"
-            onClick={() => setEditorOpen(true)}
-            className="inline-flex min-h-9 items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-violet-400/40 bg-slate-950 px-3 py-2 text-xs font-semibold text-violet-100 shadow-lg hover:bg-violet-500/15"
-            title="Visualizar editor de overlay"
+            onClick={() => void deleteOverlay()}
+            disabled={saving || !activeOverlayId}
+            title="Excluir overlay"
+            aria-label="Excluir overlay"
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-rose-400/30 bg-slate-950 px-3 text-xs font-semibold text-rose-200 shadow transition hover:bg-rose-500/10 disabled:opacity-40"
           >
-            Visualizar editor
+            <Trash2 size={16} /> Deletar
           </button>
-        )}
-        <button
-          type="button"
-          onClick={() => void deleteOverlay()}
-          disabled={saving || !activeOverlayId}
-          title="Excluir overlay"
-          aria-label="Excluir overlay"
-          className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-rose-400/30 bg-slate-950 px-3 text-xs font-semibold text-rose-200 shadow-lg hover:bg-rose-500/10 disabled:opacity-40"
-        >
-          <Trash2 size={16} /> Deletar
-        </button>
-        <button
-          type="button"
-          onClick={() => void saveOverlay()}
-          disabled={saving || loading}
-          title="Salvar overlay"
-          aria-label="Salvar overlay"
-          className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-violet-600 px-3 text-xs font-semibold text-white shadow-lg hover:bg-violet-500 disabled:opacity-50"
-        >
-          <Save size={16} /> Salvar
-        </button>
+          <button
+            type="button"
+            onClick={() => void saveOverlay()}
+            disabled={saving || loading}
+            title="Salvar overlay"
+            aria-label="Salvar overlay"
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-violet-600 px-3.5 text-xs font-semibold text-white shadow transition hover:bg-violet-500 disabled:opacity-50"
+          >
+            <Save size={16} /> Salvar
+          </button>
+        </div>
       </div>
       {error && (
         <p role="alert" className="w-full text-xs text-rose-200">
@@ -2106,6 +2289,7 @@ export default function OverlayCanvas() {
             }))
           }
           onDeleteLayer={(id) => deleteInstance(id)}
+          onAlignSelected={handleAlignSelected}
           onAddGuide={(orientation) => {
             const id = `guide-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
             if (orientation === "vertical")

@@ -116,8 +116,7 @@ function ScenarioThumbnail({ row }: { row: ScenarioRecord }) {
 
   return (
     <div
-      className="relative w-full overflow-hidden border-b border-cyan-100/10 bg-[#060b15]"
-      style={{ aspectRatio: `${config.visualizerSize.width} / ${config.visualizerSize.height}` }}
+      className="relative w-[130px] h-[130px] overflow-hidden rounded-t-xl border-b border-cyan-100/10 bg-[#060b15] shrink-0"
       aria-label={`Miniatura do cenário ${config.name}`}
     >
       <div className="absolute inset-0" style={getPreviewBackground(config.background)} />
@@ -311,7 +310,7 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
           Carregando cenários...
         </div>
       ) : scenarios.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div className="flex flex-wrap gap-5">
           {scenarios.map((scenario, index) => {
             const id = String(scenario.id ?? "");
             const config = getScenarioConfig(scenario);
@@ -321,19 +320,19 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
                 key={id || `scenario-${index}`}
                 onClick={() => id && onOpenScenario(id)}
                 disabled={!id}
-                className="group min-w-0 overflow-hidden rounded-xl border border-cyan-300/15 bg-slate-950/60 text-left transition hover:-translate-y-0.5 hover:border-cyan-300/45 hover:shadow-[0_12px_36px_rgba(34,211,238,0.08)] disabled:cursor-not-allowed"
+                className="group flex flex-col w-[130px] overflow-hidden rounded-xl border border-cyan-300/15 bg-slate-950/60 text-left transition hover:-translate-y-0.5 hover:border-cyan-300/45 hover:shadow-[0_12px_36px_rgba(34,211,238,0.08)] disabled:cursor-not-allowed"
               >
                 <ScenarioThumbnail row={scenario} />
-                <span className="flex items-start justify-between gap-3 p-4">
+                <span className="flex items-start justify-between gap-1 p-2 w-full">
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-bold text-slate-100">
+                    <span className="block truncate text-[11px] font-bold text-slate-100">
                       {config.name || `Cenário ${index + 1}`}
                     </span>
-                    <span className="mt-1 block text-[11px] text-slate-500">
-                      Canvas de transmissão
+                    <span className="mt-0.5 block text-[9px] text-slate-500">
+                      Cena
                     </span>
                   </span>
-                  <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-slate-500 transition group-hover:text-cyan-200" />
+                  <ArrowUpRight className="mt-0.5 h-3 w-3 shrink-0 text-slate-500 transition group-hover:text-cyan-200" />
                 </span>
               </button>
             );

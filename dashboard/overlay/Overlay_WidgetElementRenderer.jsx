@@ -1,10 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef, useEffect } from "react";
 import { useStreaming } from "../widget/runtime";
 import { TWITCH_WIDGETS_CATALOG } from "../widget/Widget_twitchWidgetsCatalog";
 import { TextMarquee } from "../widget/Overlay_textMarquee";
 import StructuralWidgetRenderer from "./Overlay_StructuralWidgetRenderer";
 import { getTemplateForWidget } from "./templates/Overlay_index";
-import { resolveWidgetCategory } from "./Overlay_prebuiltStructuralCatalog";
+import { resolveWidgetCategory, STRUCTURAL_PREMOLDS_ARCHETYPES } from "./Overlay_prebuiltStructuralCatalog";
 import {
   platformIsOnline,
   platformMeta,
@@ -203,6 +203,31 @@ export function resolveDataBinding(
   }
 }
 
+export function getWidgetBaseDimensions(widgetId, config = {}) {
+  if (config?.structuralPreset) {
+    const presetId = String(config.structuralPreset).padStart(2, "0");
+    const archetype = STRUCTURAL_PREMOLDS_ARCHETYPES.find(
+      (a) => a.id === config.structuralPreset || String(a.number).padStart(2, "0") === presetId
+    );
+    if (archetype && archetype.defaultWidth && archetype.defaultHeight) {
+      return { baseWidth: archetype.defaultWidth, baseHeight: archetype.defaultHeight };
+    }
+  }
+
+  const catalogEntry = TWITCH_WIDGETS_CATALOG.find((w) => w.id === widgetId);
+  if (catalogEntry && catalogEntry.defaultWidth && catalogEntry.defaultHeight) {
+    return { baseWidth: catalogEntry.defaultWidth, baseHeight: catalogEntry.defaultHeight };
+  }
+
+  if (widgetId === "library-text") return { baseWidth: 320, baseHeight: 60 };
+  if (widgetId === "library-social") return { baseWidth: 280, baseHeight: 50 };
+  if (widgetId === "library-icon") return { baseWidth: 60, baseHeight: 60 };
+  if (widgetId === "library-shape") return { baseWidth: 200, baseHeight: 100 };
+  if (widgetId === "library-line") return { baseWidth: 300, baseHeight: 20 };
+
+  return { baseWidth: 320, baseHeight: 120 };
+}
+
 export default function WidgetElementRenderer({
   widgetId,
   elementKey,
@@ -215,6 +240,50 @@ export default function WidgetElementRenderer({
   instanceName,
 }) {
   const { connections, streamMeta, liveActivity } = useStreaming();
+  const innerRef = useRef(null);
+
+  useEffect(() => {
+    const el = innerRef.current;
+    if (!el || !el.parentElement) return;
+
+    const parentEl = el.parentElement;
+
+    function updateScale() {
+      if (!parentEl || !el) return;
+      const W = Math.max(20, parentEl.clientWidth || parentEl.offsetWidth);
+      const H = Math.max(20, parentEl.clientHeight || parentEl.offsetHeight);
+
+      const { baseWidth, baseHeight } = getWidgetBaseDimensions(widgetId, config);
+
+      const scale = Math.max(0.05, Math.min(W / baseWidth, H / baseHeight));
+      const targetWidth = Math.max(baseWidth, Math.round(W / scale));
+      const targetHeight = Math.max(baseHeight, Math.round(H / scale));
+
+      el.style.width = `${targetWidth}px`;
+      el.style.height = `${targetHeight}px`;
+      el.style.transform = `scale(${scale})`;
+      el.style.transformOrigin = "top left";
+    }
+
+    updateScale();
+
+    const observer = new ResizeObserver(() => {
+      requestAnimationFrame(updateScale);
+    });
+
+    observer.observe(parentEl);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [
+    widgetId,
+    config?.structuralPreset,
+    config?.targetWidgetId,
+    config?.widgetId,
+    config?.width,
+    config?.height,
+  ]);
 
   const baseStyle = {
     color: config.textColor || "#ffffff",
@@ -1675,7 +1744,7 @@ export default function WidgetElementRenderer({
 
   return (
     <div
-      className={`w-full h-full ${uniqueClass}`}
+      className={`w-full h-full relative overflow-hidden ${uniqueClass}`}
       style={{
         "--glow-color": config.effShadowColor || "#a855f7",
         containerType: 'size',
@@ -1683,7 +1752,16 @@ export default function WidgetElementRenderer({
       }}
     >
       {styleBlock}
-      {renderContent()}
+      <div 
+        ref={innerRef}
+        className="absolute left-0 top-0 overflow-hidden pointer-events-auto"
+        style={{
+          transformOrigin: 'top left',
+        }}
+      >
+        {renderContent()}
+      </div>
     </div>
   );
+
 }
