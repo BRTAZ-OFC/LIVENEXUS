@@ -51,9 +51,11 @@ const ttsListeners = new Set<(message: MultiChatMessage) => void>();
 const pendingTts: MultiChatMessage[] = [];
 const handles: Partial<Record<ChatPlatform, ConnectorHandle>> = {};
 
+// notify: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function notify() {
   listeners.forEach((listener) => listener(snapshot));
 }
+// patchPlatform: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function patchPlatform(platform: ChatPlatform, patch: Partial<PlatformState>) {
   snapshot = {
     ...snapshot,
@@ -61,9 +63,11 @@ function patchPlatform(platform: ChatPlatform, patch: Partial<PlatformState>) {
   };
   notify();
 }
+// getMultiChatSnapshot: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getMultiChatSnapshot() {
   return snapshot;
 }
+// subscribeMultiChat: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function subscribeMultiChat(listener: (value: MultiChatSnapshot) => void) {
   listeners.add(listener);
   listener(snapshot);
@@ -71,6 +75,7 @@ export function subscribeMultiChat(listener: (value: MultiChatSnapshot) => void)
     listeners.delete(listener);
   };
 }
+// useMultiChatSnapshot: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function useMultiChatSnapshot() {
   const [value, setValue] = useState(snapshot);
   useEffect(() => subscribeMultiChat(setValue), []);
@@ -78,6 +83,7 @@ export function useMultiChatSnapshot() {
 }
 
 // Assinatura seletiva para telas que só precisam do estado dos canais, não das mensagens.
+// useMultiChatStatusSnapshot: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function useMultiChatStatusSnapshot() {
   const [value, setValue] = useState(() => ({
     channels: snapshot.channels,
@@ -96,10 +102,12 @@ export function useMultiChatStatusSnapshot() {
   );
   return value;
 }
+// setMultiChatChannel: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function setMultiChatChannel(platform: ChatPlatform, channel: string) {
   snapshot = { ...snapshot, channels: { ...snapshot.channels, [platform]: channel } };
   notify();
 }
+// subscribeTtsMessages: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function subscribeTtsMessages(listener: (message: MultiChatMessage) => void) {
   ttsListeners.add(listener);
   while (pendingTts.length) listener(pendingTts.shift()!);
@@ -107,6 +115,7 @@ export function subscribeTtsMessages(listener: (message: MultiChatMessage) => vo
     ttsListeners.delete(listener);
   };
 }
+// publishTts: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function publishTts(message: MultiChatMessage) {
   if (ttsListeners.size) ttsListeners.forEach((listener) => listener(message));
   else {
@@ -114,6 +123,7 @@ function publishTts(message: MultiChatMessage) {
     if (pendingTts.length > 100) pendingTts.shift();
   }
 }
+// connectMultiChatPlatform: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function connectMultiChatPlatform(platform: ChatPlatform) {
   const channel = snapshot.channels[platform].trim();
   if (!channel || handles[platform]) return;
@@ -201,6 +211,7 @@ export function connectMultiChatPlatform(platform: ChatPlatform) {
     });
   }
 }
+// disconnectMultiChatPlatform: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function disconnectMultiChatPlatform(platform: ChatPlatform) {
   try {
     handles[platform]?.disconnect();
@@ -210,12 +221,15 @@ export function disconnectMultiChatPlatform(platform: ChatPlatform) {
   delete handles[platform];
   patchPlatform(platform, { status: "idle", detail: "Desconectado", viewers: null, meta: "" });
 }
+// disconnectAllMultiChat: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function disconnectAllMultiChat() {
   PLATFORMS.forEach(disconnectMultiChatPlatform);
 }
 
+// MultiChatPanel: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function MultiChatPanel() {
   const state = useMultiChatSnapshot();
+  {/* Estrutura visual retornada: section. */}
   return (
     <section className="dash-chat-panel">
       <header className="dash-panel-header">
