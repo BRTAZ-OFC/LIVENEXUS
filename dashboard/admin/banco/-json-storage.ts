@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como os arquivos de dados são lidos e gravados com segurança. */
 import { randomUUID } from "node:crypto";
 import { mkdir, rename, unlink, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
