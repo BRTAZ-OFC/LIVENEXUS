@@ -11,6 +11,7 @@ import {
   Radio,
 } from "lucide-react";
 
+// STATUS_LABEL_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const STATUS_LABEL_TEMPLATES = [
   {
     id: "01",
@@ -273,6 +274,7 @@ export const STATUS_LABEL_TEMPLATES = [
   },
 ];
 
+// UPTIME_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const UPTIME_TEMPLATES = [
   {
     id: "01",
@@ -509,6 +511,7 @@ export const UPTIME_TEMPLATES = [
   },
 ];
 
+// COMMANDS_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const COMMANDS_TEMPLATES = [
   {
     id: "01",
@@ -799,6 +802,7 @@ export const COMMANDS_TEMPLATES = [
   },
 ];
 
+// MILESTONES_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const MILESTONES_TEMPLATES = [
   {
     id: "01",
@@ -1052,6 +1056,7 @@ export const MILESTONES_TEMPLATES = [
   },
 ];
 
+// RULES_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const RULES_TEMPLATES = [
   {
     id: "01",
@@ -1283,6 +1288,7 @@ export const RULES_TEMPLATES = [
   },
 ];
 
+// SCHEDULE_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const SCHEDULE_TEMPLATES = [
   {
     id: "01",
@@ -1552,6 +1558,7 @@ export const SCHEDULE_TEMPLATES = [
   },
 ];
 
+// SCHEDULE_TICKER_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const SCHEDULE_TICKER_TEMPLATES = [
   {
     id: "01",
@@ -1742,6 +1749,7 @@ export const SCHEDULE_TICKER_TEMPLATES = [
   },
 ];
 
+// MODERATOR_FEED_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const MODERATOR_FEED_TEMPLATES = [
   {
     id: "01",
