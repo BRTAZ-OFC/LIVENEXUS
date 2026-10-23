@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { useStreaming } from "../runtime";
 import { Twitch, Youtube, Users } from "lucide-react";
 
+// KickIcon: define um componente ou configuração reutilizável.
 const KickIcon = ({ className = "h-4 w-4" }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-label="Kick">
     <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7.5V7H9v3.5l2.5-3.5H13l-3 4 3.5 6h-1.8L9 12v5zm7.5 0h-2V7h2v10z" />
@@ -35,6 +36,7 @@ const PLATFORM_CONFIGS = [
   },
 ];
 
+// MultiViewersCounter: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function MultiViewersCounter({ config = {}, elementKey = "full_widget" }) {
   const { connections } = useStreaming();
   const prevViewersRef = useRef({ Twitch: null, Kick: null, YouTube: null });
@@ -97,6 +99,8 @@ export default function MultiViewersCounter({ config = {}, elementKey = "full_wi
     fontFamily: config.fontFamily || "Inter, sans-serif",
   };
 
+  {/* Estrutura visual retornada: div. */}
+
   return (
     <div
       style={containerStyle}
@@ -130,6 +134,8 @@ export default function MultiViewersCounter({ config = {}, elementKey = "full_wi
               : "0"
             : "OFFLINE";
           const IconComponent = plat.icon;
+
+          {/* Estrutura visual retornada: div. */}
 
           return (
             <div
