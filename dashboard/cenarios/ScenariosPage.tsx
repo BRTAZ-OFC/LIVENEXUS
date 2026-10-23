@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica a tela que lista, cria e organiza os cenários. */
 import { useEffect, useMemo, useState, type CSSProperties, type FormEvent } from "react";
 import { ArrowUpRight, Layers, LoaderCircle, MonitorPlay, Plus, X } from "lucide-react";
 
