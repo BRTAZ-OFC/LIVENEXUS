@@ -159,6 +159,33 @@ export default function MinhaConta() {
     if (albumFileInput.current) albumFileInput.current.value = "";
   }
 
+  async function deleteAlbum(album: Album) {
+    if (!window.confirm(`Deletar o álbum "${album.name}" e todas as imagens dele?`)) return;
+    setBusy(true);
+    setAlbumMessage("");
+    try {
+      const response = await fetch(`/api/galeria-usuarios/${encodeURIComponent(album.id)}`, {
+        method: "DELETE",
+        credentials: "same-origin",
+        headers: galleryHeaders(),
+        cache: "no-store",
+      });
+      const result = await response.json() as { ok?: boolean; message?: string };
+      if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível excluir o álbum.");
+      setAlbums((current) => current.filter((item) => item.id !== album.id));
+      setVisibleAlbumCount((current) => Math.max(ALBUMS_PER_PAGE, Math.min(current, albums.length - 1)));
+      if (selectedAlbumId === album.id) {
+        setSelectedAlbumId(null);
+        setSelectedImage(null);
+        setUploadNotices([]);
+      }
+    } catch (error) {
+      setAlbumMessage(error instanceof Error ? error.message : "Não foi possível excluir o álbum.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function deleteAlbumImage(imageId: string) {
     if (selectedAlbumId === null) return;
     try {
@@ -281,10 +308,12 @@ export default function MinhaConta() {
           {albumMessage && <p role="status" style={{ color: "#fca5a5", fontSize: 13, marginTop: 12 }}>{albumMessage}</p>}
           {albums.length > 0 && <>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 14, marginTop: 16 }}>
-              {albums.slice(0, visibleAlbumCount).map((album) => <button key={album.id} type="button" onClick={() => { setSelectedAlbumId(album.id); setUploadNotices([]); }} aria-label={`Abrir álbum ${album.name}`} style={{ textAlign: "left", overflow: "hidden", border: "1px solid #263449", borderRadius: 11, background: "#111b2d", minWidth: 0, padding: 0, color: "inherit", cursor: "pointer" }}>
-                <div style={{ aspectRatio: "1 / 1", width: "100%", display: "grid", placeItems: "center", background: "#172033", color: "#a78bfa", overflow: "hidden" }}>{album.images[0] ? <img src={album.images[0].url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <Images size={30} strokeWidth={1.5} />}</div>
+              {albums.slice(0, visibleAlbumCount).map((album) => <div key={album.id} role="button" tabIndex={0} onClick={() => { setSelectedAlbumId(album.id); setUploadNotices([]); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setSelectedAlbumId(album.id); setUploadNotices([]); } }} aria-label={`Abrir álbum ${album.name}`} style={{ position: "relative", textAlign: "left", overflow: "hidden", border: "1px solid #263449", borderRadius: 11, background: "#111b2d", minWidth: 0, padding: 0, color: "inherit", cursor: "pointer" }}>
+                <div style={{ position: "relative", aspectRatio: "1 / 1", width: "100%", display: "grid", placeItems: "center", background: "#172033", color: "#a78bfa", overflow: "hidden" }}>{album.images[0] ? <img src={album.images[0].url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <Images size={30} strokeWidth={1.5} />}
+                  <button type="button" disabled={busy} onClick={(event) => { event.stopPropagation(); void deleteAlbum(album); }} aria-label={`Deletar álbum ${album.name}`} title="Deletar álbum" style={{ position: "absolute", top: 8, right: 8, width: 32, height: 32, display: "grid", placeItems: "center", border: "1px solid #f87171", borderRadius: 8, background: "rgba(127, 29, 29, 0.94)", color: "#fff", cursor: busy ? "not-allowed" : "pointer", opacity: busy ? 0.6 : 1 }}><Trash2 size={15} /></button>
+                </div>
                 <div style={{ padding: 10 }}><h3 style={{ margin: 0, fontSize: 13, fontWeight: 700, overflowWrap: "anywhere" }}>{album.name}</h3><p style={{ margin: "6px 0 0", color: "#94a3b8", fontSize: 11, lineHeight: 1.45, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{album.description}</p></div>
-              </button>)}
+              </div>)}
             </div>
             {albums.length > visibleAlbumCount && <div style={{ display: "flex", justifyContent: "center", marginTop: 18 }}>
               <button type="button" onClick={() => setVisibleAlbumCount((current) => current + ALBUMS_PER_PAGE)} style={{ ...buttonBase, border: "1px solid #475569", background: "#111b2d", color: "#e2e8f0" }}>Ver mais</button>
