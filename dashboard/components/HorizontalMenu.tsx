@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica o menu horizontal e a troca entre suas opções. */
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
