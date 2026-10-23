@@ -10,6 +10,7 @@ import {
 } from "../Overlay_platformData";
 import { Sparkles, Trophy, Heart, Flame } from "lucide-react";
 
+// TwitchEventList: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function TwitchEventList({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = platformIsOnline(connections, config);
@@ -24,16 +25,22 @@ export default function TwitchEventList({ config = {} }) {
   const getEventIcon = (type) => {
     switch (type) {
       case "twitch_sub":
+        {/* Estrutura visual retornada: Heart. */}
         return <Heart className="h-3.5 w-3.5 text-rose-400" />;
       case "twitch_resub":
+        {/* Estrutura visual retornada: Trophy. */}
         return <Trophy className="h-3.5 w-3.5 text-yellow-400" />;
       case "twitch_subgift":
+        {/* Estrutura visual retornada: Sparkles. */}
         return <Sparkles className="h-3.5 w-3.5 text-purple-400" />;
       case "twitch_bits":
+        {/* Estrutura visual retornada: Flame. */}
         return <Flame className="h-3.5 w-3.5 text-cyan-400" />;
       case "twitch_raid":
+        {/* Estrutura visual retornada: Flame. */}
         return <Flame className="h-3.5 w-3.5 text-orange-400" />;
       default:
+        {/* Estrutura visual retornada: Sparkles. */}
         return <Sparkles className="h-3.5 w-3.5 text-indigo-400" />;
     }
   };
@@ -59,6 +66,8 @@ export default function TwitchEventList({ config = {} }) {
         return `${author} interagiu`;
     }
   };
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div
