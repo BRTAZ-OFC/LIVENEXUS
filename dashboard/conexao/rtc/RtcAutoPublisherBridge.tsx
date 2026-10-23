@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica a ligação automática usada para publicar mídia na conexão RTC. */
 // Ponte de ciclo de vida para o Publisher RTC Automático
 // Conecta a Central (runtimeId) e o StreamingProvider ao WebRTC P2P
 import { useLocation } from "react-router-dom";
