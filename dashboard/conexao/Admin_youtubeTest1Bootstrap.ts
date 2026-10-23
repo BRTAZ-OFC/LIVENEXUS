@@ -3,6 +3,7 @@
 // Resolve live do YouTube a partir de identificador (@handle, url ou videoId)
 // Extrai dados estruturados do InnerTube: apiKey, continuation, clientContext, viewers, videoId, etc.
 
+// resolveYouTubeLiveBootstrap: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function resolveYouTubeLiveBootstrap(identifier) {
   if (!identifier) {
     return { ok: false, error: "Identificador do YouTube não fornecido." };
