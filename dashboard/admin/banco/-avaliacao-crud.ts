@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica as ações usadas para consultar, criar, alterar e excluir avaliações. */
 /**
  * CRUD server-side para avaliações armazenadas em JSON.
  * IMPORTANTE: usar somente no servidor Node.js; nunca importar este arquivo no frontend.
