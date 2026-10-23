@@ -5,6 +5,7 @@ import { useStreaming } from "@/dashboard/widget/runtime";
 import { RtcPublisher } from "./rtcPublisher.js";
 import { registerActivePublisher, unregisterActivePublisher } from "./ReloadRTC.js";
 
+// useRtcPublisher: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function useRtcPublisher({ enabled = true } = {}) {
   const globalStreaming = useStreaming();
 
