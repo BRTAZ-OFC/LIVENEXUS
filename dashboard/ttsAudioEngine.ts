@@ -47,6 +47,7 @@ const PIPER_VOICES: Record<string, { model?: string; config?: string }> = {
   },
 };
 
+// getEngine: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function getEngine(voice: string, onProgress?: (message: string) => void) {
   const selectedVoice = PIPER_VOICES[voice] ? voice : "pt_BR-faber-medium";
   if (!enginePromises.has(selectedVoice)) {
@@ -77,6 +78,7 @@ async function getEngine(voice: string, onProgress?: (message: string) => void) 
   return enginePromises.get(selectedVoice)!;
 }
 
+// makeImpulse: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function makeImpulse(context: AudioContext, seconds: number, decay: number) {
   const length = Math.floor(context.sampleRate * seconds);
   const impulse = context.createBuffer(2, length, context.sampleRate);
@@ -89,6 +91,7 @@ function makeImpulse(context: AudioContext, seconds: number, decay: number) {
   return impulse;
 }
 
+// makeDistortion: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function makeDistortion(context: AudioContext, amount: number) {
   const node = context.createWaveShaper();
   const samples = 44100;
@@ -103,6 +106,7 @@ function makeDistortion(context: AudioContext, amount: number) {
   return node;
 }
 
+// playProcessedSpeech: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function playProcessedSpeech(
   text: string,
   settings: ProcessedTtsSettings,
