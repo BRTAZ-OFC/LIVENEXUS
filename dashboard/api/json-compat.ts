@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como as requisições de dados são recebidas e encaminhadas. */
 import type { Express, Request, Response } from "express";
 import {
   getJsonTableDefinitions,
