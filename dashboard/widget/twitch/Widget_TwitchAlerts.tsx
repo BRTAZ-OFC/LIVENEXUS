@@ -8,6 +8,7 @@ import {
 } from "../Overlay_platformData";
 import { Sparkles, Trophy, Heart, Flame } from "lucide-react";
 
+// TwitchAlerts: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function TwitchAlerts({ config = {} }) {
   const { liveActivity } = useStreaming();
   const [activeAlert, setActiveAlert] = useState(null);
