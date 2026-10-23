@@ -34,6 +34,7 @@ import {
   deleteJsonTableRecord,
 } from "./dashboard/admin/banco/-json-tables-crud.js";
 import { registerJsonCompatRoutes } from "./dashboard/api/json-compat.ts";
+import { registerRtcSignalingRoutes } from "./dashboard/api/rtc-signaling.ts";
 import {
   createSessionToken,
   createSessionCookie,
@@ -1006,6 +1007,7 @@ app.all(/^\/api\/(?:kick|twitch)(?:\/.*)?$/, async (req: Request, res: Response)
 
 /* Rotas legadas compatíveis com os arquivos JSON locais; sem D1/Cloudflare D1. */
 registerJsonCompatRoutes(app);
+registerRtcSignalingRoutes(app);
 
 /* API desconhecida retorna JSON em vez da página HTML. */
 app.all(/^\/api(?:\/.*)?$/, (req: Request, res: Response) => {
