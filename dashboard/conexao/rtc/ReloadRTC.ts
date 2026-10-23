@@ -43,6 +43,7 @@ if (typeof window !== "undefined") {
 /**
  * Processa a ordem de recarga internamente quando acionada localmente ou recebida de outra aba.
  */
+// handleIncomingReload: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function handleIncomingReload(reason, newValues, broadcast = true) {
   if (newValues !== undefined && newValues !== null) {
     latestScenarioValues = newValues;
@@ -130,6 +131,7 @@ function handleIncomingReload(reason, newValues, broadcast = true) {
  * @param {Function} [options.onSnapshot] Callback para disparo de snapshot com novos valores
  * @param {Function} [options.onReload] Callback para reinicialização/reconexão completa da conexão
  */
+// registerActivePublisher: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function registerActivePublisher(publisher, { onSnapshot = null, onReload = null } = {}) {
   activePublisherInstance = publisher;
   activeSnapshotCallback = onSnapshot;
@@ -145,6 +147,7 @@ export function registerActivePublisher(publisher, { onSnapshot = null, onReload
  * Remove o registro da instância quando o Publisher for desmontado ou desativado.
  * @param {Object} publisher Instância a ser removida
  */
+// unregisterActivePublisher: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function unregisterActivePublisher(publisher) {
   if (activePublisherInstance === publisher) {
     activePublisherInstance = null;
@@ -156,6 +159,7 @@ export function unregisterActivePublisher(publisher) {
 /**
  * Retorna os últimos valores de cenário/subcenário capturados para transmissão RTC.
  */
+// getLatestScenarioValues: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getLatestScenarioValues() {
   return latestScenarioValues;
 }
@@ -163,6 +167,7 @@ export function getLatestScenarioValues() {
 /**
  * Define ou atualiza os últimos valores de cenário para futuras reconexões.
  */
+// setLatestScenarioValues: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function setLatestScenarioValues(values) {
   latestScenarioValues = values;
 }
@@ -177,6 +182,7 @@ export function setLatestScenarioValues(values) {
  * @param {Object} [newValues=null] Novos valores de cenário, subcenário ou mortes a serem transmitidos
  * @returns {boolean} Sucesso do acionamento
  */
+// triggerReloadRTC: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function triggerReloadRTC(reason = "shortcut", newValues = null) {
   try {
     handleIncomingReload(reason, newValues, true);
