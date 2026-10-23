@@ -4,6 +4,7 @@
 import { useLocation } from "react-router-dom";
 import { useRtcPublisher } from "./useRtcPublisher.js";
 
+// RtcAutoPublisherBridge: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function RtcAutoPublisherBridge() {
   const location = useLocation();
 
