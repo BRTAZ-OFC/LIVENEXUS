@@ -72,10 +72,12 @@ export const WIDGET_TEMPLATES_MAP = {
   "twitch-moderator-feed": MODERATOR_FEED_TEMPLATES,
 };
 
+// getTemplatesForWidget: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getTemplatesForWidget(widgetId) {
   return WIDGET_TEMPLATES_MAP[widgetId] || [];
 }
 
+// getTemplateForWidget: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getTemplateForWidget(widgetId, templateId) {
   const templates = getTemplatesForWidget(widgetId);
   return (
