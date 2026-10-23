@@ -1,6 +1,7 @@
 import React from "react";
 import { Sparkles, Smile } from "lucide-react";
 
+// getChatWords: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function getChatWords(messages = []) {
   const wordCounts = {};
   messages.forEach((msg) => {
@@ -30,6 +31,8 @@ export const WORD_CLOUD_TEMPLATES = [
     badge: "Neon Cloud",
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 6);
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 rounded-none bg-slate-950/90 flex flex-col justify-between select-none text-left shadow-xl">
@@ -70,6 +73,8 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 6);
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-black/85 border border-white/10 flex flex-col justify-between select-none text-left shadow-xl">
           <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase">
@@ -109,6 +114,8 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 3);
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full rounded-full bg-slate-950/90 border border-purple-500/40 p-4 flex flex-col items-center justify-center select-none shadow-xl aspect-square text-center">
           <Sparkles className="h-6 w-6 text-purple-400 mb-1" />
@@ -135,6 +142,8 @@ export const WORD_CLOUD_TEMPLATES = [
     badge: "Terms Grid",
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 4);
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 rounded-xl bg-black/80 border border-white/10 flex flex-col justify-between select-none text-left">
@@ -174,6 +183,8 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 3);
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3 bg-black border border-cyan-400 font-mono text-xs flex flex-col justify-between select-none text-left">
           <span className="text-[8.5px] text-cyan-300">[VOCAB_FREQUENCY_SCANNER]</span>
@@ -205,6 +216,8 @@ export const WORD_CLOUD_TEMPLATES = [
     badge: "Big Top 3",
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 3);
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/90 border border-purple-500/30 flex flex-col justify-between select-none text-left shadow-xl">
@@ -248,6 +261,8 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 4);
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-2 flex flex-col justify-center select-none text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
           {!isOnline ? (
@@ -280,6 +295,8 @@ export const WORD_CLOUD_TEMPLATES = [
     badge: "Footer Strip",
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 5);
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full px-4 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left">
@@ -319,6 +336,8 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 5);
 
+      {/* Estrutura visual retornada: div. */}
+
       return (
         <div className="w-full h-full p-3.5 rounded-2xl bg-black/85 border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.18)] flex flex-col justify-between select-none text-left">
           <span className="text-[9px] font-mono text-purple-300 uppercase font-bold">
@@ -354,6 +373,8 @@ export const WORD_CLOUD_TEMPLATES = [
     badge: "Esports Board",
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 4);
+
+      {/* Estrutura visual retornada: div. */}
 
       return (
         <div className="w-full h-full rounded-xl bg-slate-950 border border-slate-700 flex flex-col overflow-hidden select-none text-left shadow-2xl">
