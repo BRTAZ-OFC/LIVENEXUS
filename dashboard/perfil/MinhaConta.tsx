@@ -7,6 +7,7 @@ type Album = { id: number; name: string; description: string };
 const buttonBase: CSSProperties = { display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 40, borderRadius: 10, padding: "9px 16px", fontSize: 13, fontWeight: 650, cursor: "pointer", whiteSpace: "nowrap" };
 const inputStyle: CSSProperties = { width: "100%", boxSizing: "border-box", border: "1px solid #334155", background: "#080d19", color: "#e2e8f0", borderRadius: 9, padding: "11px 12px", outline: "none", fontSize: 14 };
 const labelStyle: CSSProperties = { display: "grid", gap: 7, color: "#cbd5e1", fontSize: 13 };
+const ALBUMS_PER_PAGE = 15;
 
 export default function MinhaConta() {
   const [user, setUser] = useState<AccountUser | null>(null);
@@ -23,6 +24,7 @@ export default function MinhaConta() {
   const [albumName, setAlbumName] = useState("");
   const [albumDescription, setAlbumDescription] = useState("");
   const [albums, setAlbums] = useState<Album[]>([]);
+  const [visibleAlbumCount, setVisibleAlbumCount] = useState(ALBUMS_PER_PAGE);
   const [albumMessage, setAlbumMessage] = useState("");
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -47,6 +49,7 @@ export default function MinhaConta() {
     const description = albumDescription.trim();
     if (!name) { setAlbumMessage("Informe o nome do álbum."); return; }
     setAlbums((current) => [...current, { id: Date.now(), name, description }]);
+    setVisibleAlbumCount((current) => Math.max(current, ALBUMS_PER_PAGE));
     setAlbumName("");
     setAlbumDescription("");
     setAlbumMessage("");
@@ -153,12 +156,17 @@ export default function MinhaConta() {
           <button type="button" onClick={() => { setAlbumName(""); setAlbumDescription(""); setAlbumMessage(""); setAlbumModalOpen(true); }} style={{ ...buttonBase, border: "1px solid #6d5bd0", background: "#5b4acb", color: "#fff" }}><Plus size={16} />Criar álbum</button>
         </div>
         {albumMessage && <p role="status" style={{ color: "#fca5a5", fontSize: 13, marginTop: 12 }}>{albumMessage}</p>}
-        {albums.length > 0 && <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 14, marginTop: 16 }}>
-          {albums.map((album) => <article key={album.id} style={{ overflow: "hidden", border: "1px solid #263449", borderRadius: 11, background: "#111b2d", minWidth: 0 }}>
-            <div style={{ height: 116, display: "grid", placeItems: "center", background: "#172033", color: "#a78bfa" }}><Images size={34} strokeWidth={1.5} /></div>
-            <div style={{ padding: 12 }}><h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, overflowWrap: "anywhere" }}>{album.name}</h3><p style={{ margin: "7px 0 0", color: "#94a3b8", fontSize: 12, lineHeight: 1.5, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{album.description}</p></div>
-          </article>)}
-        </div>}
+        {albums.length > 0 && <>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 14, marginTop: 16 }}>
+            {albums.slice(0, visibleAlbumCount).map((album) => <article key={album.id} style={{ overflow: "hidden", border: "1px solid #263449", borderRadius: 11, background: "#111b2d", minWidth: 0 }}>
+              <div style={{ aspectRatio: "1 / 1", width: "100%", display: "grid", placeItems: "center", background: "#172033", color: "#a78bfa" }}><Images size={30} strokeWidth={1.5} /></div>
+              <div style={{ padding: 10 }}><h3 style={{ margin: 0, fontSize: 13, fontWeight: 700, overflowWrap: "anywhere" }}>{album.name}</h3><p style={{ margin: "6px 0 0", color: "#94a3b8", fontSize: 11, lineHeight: 1.45, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{album.description}</p></div>
+            </article>)}
+          </div>
+          {albums.length > visibleAlbumCount && <div style={{ display: "flex", justifyContent: "center", marginTop: 18 }}>
+            <button type="button" onClick={() => setVisibleAlbumCount((current) => current + ALBUMS_PER_PAGE)} style={{ ...buttonBase, border: "1px solid #475569", background: "#111b2d", color: "#e2e8f0" }}>Ver mais</button>
+          </div>}
+        </>}
       </section>}
       {albumModalOpen && <div style={overlay} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setAlbumModalOpen(false); }}>
         <section role="dialog" aria-modal="true" aria-labelledby="album-modal-title" style={modalCard}>
