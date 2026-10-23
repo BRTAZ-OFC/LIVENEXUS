@@ -121,6 +121,7 @@ const LAYERS = {
   L: "L — desconhecido",
 };
 
+// classifyLayer: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function classifyLayer({ platform, step, status, message }) {
   const m = String(message || "").toLowerCase();
   const s = String(step || "").toLowerCase();
@@ -145,6 +146,7 @@ export function classifyLayer({ platform, step, status, message }) {
 }
 
 // pushError({ platform, step, status, message, context }) -> classifica e empilha (cap 100)
+// pushError: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function pushError(e = {}) {
   const layer = classifyLayer(e);
   const entry = {
@@ -165,12 +167,14 @@ export function pushError(e = {}) {
 
 // TEMPORARY: raw Kick event capture for diagnostic (no behavior change).
 // Buffer em memória dos 10 últimos eventos brutos antes da classificação.
+// pushKickRawEvent: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function pushKickRawEvent(entry) {
   if (!diag.Kick.rawEvents) diag.Kick.rawEvents = [];
   diag.Kick.rawEvents.unshift(entry);
   if (diag.Kick.rawEvents.length > 10) diag.Kick.rawEvents.length = 10;
 }
 
+// probableCause: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function probableCause(layer, e) {
   switch (layer) {
     case LAYERS.G:
@@ -195,21 +199,27 @@ function probableCause(layer, e) {
 }
 
 // --- Estado de app/UI ---
+// setAppSection: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function setAppSection(section) {
   diag.App.activeSection = section;
 }
+// setVisibility: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function setVisibility(v) {
   diag.App.visibilityState = v;
 }
 
 // --- Snapshot/persistência ---
 let persistenceSnapshot = null;
+// snapshotDiag: define uma ação ou valor usado pelo módulo.
 export const snapshotDiag = () => JSON.parse(JSON.stringify(diag));
+// startPersistenceTest: define uma ação ou valor usado pelo módulo.
 export const startPersistenceTest = () => {
   persistenceSnapshot = snapshotDiag();
   return persistenceSnapshot;
 };
+// getPersistenceSnapshot: define uma ação ou valor usado pelo módulo.
 export const getPersistenceSnapshot = () => persistenceSnapshot;
+// clearPersistenceSnapshot: define uma ação ou valor usado pelo módulo.
 export const clearPersistenceSnapshot = () => {
   persistenceSnapshot = null;
 };
@@ -223,16 +233,20 @@ export const labStore = {
   ttsEvents: [],
   currentTestRunId: null,
 };
+// addWorkerResult: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function addWorkerResult(r) {
   labStore.workerResults.unshift(r);
   if (labStore.workerResults.length > 60) labStore.workerResults.length = 60;
 }
+// setQueueTest: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function setQueueTest(r) {
   labStore.queueTest = r;
 }
+// setMultiTest: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function setMultiTest(r) {
   labStore.multiTest = r;
 }
+// setBurstTest: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function setBurstTest(r) {
   labStore.burstTest = r;
 }
@@ -240,6 +254,7 @@ export function setBurstTest(r) {
 // --- Isolamento de execução de teste (testRunId) + eventos de ciclo de vida TTS ---
 // diag-only: não altera comportamento da fila. Só registra quando um teste está ativo.
 let _evtSeq = 0;
+// startTestRun: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function startTestRun() {
   const id =
     typeof crypto !== "undefined" && crypto.randomUUID
@@ -248,9 +263,11 @@ export function startTestRun() {
   labStore.currentTestRunId = id;
   return id;
 }
+// endTestRun: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function endTestRun() {
   labStore.currentTestRunId = null;
 }
+// pushTtsEvent: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function pushTtsEvent(ev) {
   ev.ts = ev.ts || new Date().toISOString();
   updateBacklog(ev); // always-on, diag-only: mede a fila REAL (mesmo sem teste ativo)
@@ -260,6 +277,7 @@ export function pushTtsEvent(ev) {
   labStore.ttsEvents.unshift(ev);
   if (labStore.ttsEvents.length > 2000) labStore.ttsEvents.length = 2000;
 }
+// getTestRunEvents: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getTestRunEvents(testRunId) {
   return labStore.ttsEvents.filter((e) => e.testRunId === testRunId);
 }
@@ -278,12 +296,14 @@ let _canceled = 0;
 let _ttsErrors = 0;
 const HORIZON_MS = 120000;
 
+// trimRolling: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function trimRolling() {
   const cutoff = Date.now() - HORIZON_MS;
   while (_receivedTs.length && _receivedTs[0] < cutoff) _receivedTs.shift();
   while (_spokenTs.length && _spokenTs[0] < cutoff) _spokenTs.shift();
 }
 
+// updateBacklog: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function updateBacklog(ev) {
   const now = Date.now();
   const id = ev.diagnosticMessageId;
@@ -349,11 +369,13 @@ function updateBacklog(ev) {
   trimRolling();
 }
 
+// resetBacklogQueue: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function resetBacklogQueue() {
   _canceled += _activeQueue.size;
   _activeQueue.clear();
 }
 
+// getBacklogMetrics: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getBacklogMetrics() {
   trimRolling();
   const now = Date.now();
@@ -415,6 +437,7 @@ export function getBacklogMetrics() {
   };
 }
 
+// getBacklogByPlatform: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getBacklogByPlatform() {
   const byPlat = {};
   for (const p of ["Kick", "Twitch"])
@@ -459,6 +482,7 @@ export const BACKLOG_LIMITS = {
   growingGrowthPerMin: 0,
 };
 
+// classifyBacklog: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function classifyBacklog(m) {
   const L = BACKLOG_LIMITS;
   if (m.queueGrowthPerMinute >= L.criticalGrowthPerMin && m.queueLength > 0) return "CRITICAL";
@@ -467,6 +491,7 @@ export function classifyBacklog(m) {
   return "HEALTHY";
 }
 
+// resetDiag: define uma ação ou valor usado pelo módulo.
 export const resetDiag = () => {
   Object.assign(diag.Kick, initial.Kick);
   Object.assign(diag.Twitch, initial.Twitch);
@@ -494,6 +519,7 @@ export const resetDiag = () => {
 };
 
 // Hook: re-rendera o componente a cada `ms` para refletir o estado mutável do diag.
+// useDiagTick: define uma ação ou valor usado pelo módulo.
 export const useDiagTick = (ms = 1000) => {
   const [, setT] = useState(0);
   useEffect(() => {
