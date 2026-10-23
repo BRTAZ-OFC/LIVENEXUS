@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como os carrosséis mostram listas de músicas, álbuns, artistas e playlists. */
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight, Music2 } from "lucide-react";
 import type { CatalogItem } from "./catalogSources";
