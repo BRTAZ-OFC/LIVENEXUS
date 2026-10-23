@@ -5,6 +5,7 @@
 
 const WORKER_LIVE_CHAT_ENDPOINT = "https://youtube-innertube.radiotweet.workers.dev/live-chat";
 
+// parseYouTubeViewers: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function parseYouTubeViewers(raw) {
   if (typeof raw === "number" && Number.isFinite(raw)) return raw;
   if (!raw || typeof raw !== "string") return null;
@@ -29,6 +30,7 @@ export function parseYouTubeViewers(raw) {
   return null;
 }
 
+// parseYouTubeRoles: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function parseYouTubeRoles(item) {
   const roles = [];
   const badges = item?.authorBadges || [];
@@ -54,6 +56,7 @@ function parseYouTubeRoles(item) {
   return roles.length > 0 ? [...new Set(roles)] : ["normal"];
 }
 
+// processYouTubeChatAction: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function processYouTubeChatAction(act, onMessage, seenIds = null) {
   if (!act || !onMessage) return;
 
@@ -323,6 +326,7 @@ function processYouTubeChatAction(act, onMessage, seenIds = null) {
   }
 }
 
+// connectYouTube: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function connectYouTube(channel, onMessage, onStatus, onMeta) {
   let stopped = false;
   let metaTimer = null;
