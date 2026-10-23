@@ -1,5 +1,6 @@
 /* LIVENEXUS: Explica os estilos da área de voz e leitura de texto. */
 /* Estilos para .tts-page. */
+/* Estilos para .tts-page. */
 .tts-page {
   width: 100%;
   max-width: none;
@@ -10,6 +11,7 @@
   color: #f4f4f5;
 }
 /* Estilos para .tts-page-heading. */
+/* Estilos para .tts-page-heading. */
 .tts-page-heading {
   display: flex;
   align-items: center;
@@ -17,11 +19,13 @@
   gap: 16px;
 }
 /* Estilos para .tts-page-heading h1. */
+/* Estilos para .tts-page-heading h1. */
 .tts-page-heading h1 {
   font-size: 28px;
   font-weight: 800;
   margin: 5px 0;
 }
+/* Estilos para .tts-page-heading p. */
 /* Estilos para .tts-page-heading p. */
 .tts-page-heading p {
   color: #9ca3af;
@@ -29,12 +33,14 @@
   margin: 0;
 }
 /* Estilos para .tts-eyebrow. */
+/* Estilos para .tts-eyebrow. */
 .tts-eyebrow {
   font-size: 10px;
   letter-spacing: 0.14em;
   font-weight: 800;
   color: #a78bfa;
 }
+/* Estilos para .tts-status. */
 /* Estilos para .tts-status. */
 .tts-status {
   border: 1px solid #334155;
@@ -45,11 +51,13 @@
   background: #111827;
 }
 /* Estilos para .tts-status.active. */
+/* Estilos para .tts-status.active. */
 .tts-status.active {
   color: #86efac;
   border-color: #166534;
   background: #052e16;
 }
+/* Estilos para .tts-card. */
 /* Estilos para .tts-card. */
 .tts-card {
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -60,12 +68,14 @@
   min-width: 0;
 }
 /* Estilos para .tts-card-title. */
+/* Estilos para .tts-card-title. */
 .tts-card-title {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 20px;
 }
+/* Estilos para .tts-title-icon. */
 /* Estilos para .tts-title-icon. */
 .tts-title-icon {
   display: grid;
@@ -77,15 +87,18 @@
   color: white;
 }
 /* Estilos para .tts-title-icon svg. */
+/* Estilos para .tts-title-icon svg. */
 .tts-title-icon svg {
   width: 20px;
   height: 20px;
 }
 /* Estilos para .tts-title-icon.amber. */
+/* Estilos para .tts-title-icon.amber. */
 .tts-title-icon.amber {
   background: #78350f;
   color: #fbbf24;
 }
+/* Estilos para .tts-card-title h2. */
 /* Estilos para .tts-card-title h2. */
 .tts-card-title h2 {
   font-size: 15px;
@@ -93,17 +106,20 @@
   margin: 0;
 }
 /* Estilos para .tts-card-title p. */
+/* Estilos para .tts-card-title p. */
 .tts-card-title p {
   font-size: 11px;
   color: #9ca3af;
   margin: 4px 0 0;
 }
 /* Estilos para .tts-main-grid. */
+/* Estilos para .tts-main-grid. */
 .tts-main-grid {
   display: grid;
   grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.15fr);
   gap: 22px;
 }
+/* Estilos para .tts-input-column. */
 /* Estilos para .tts-input-column. */
 .tts-input-column {
   display: grid;
@@ -112,6 +128,7 @@
   min-width: 0;
 }
 /* Estilos para .tts-input-column label. */
+/* Estilos para .tts-input-column label. */
 .tts-input-column label {
   display: block;
   font-size: 11px;
@@ -119,6 +136,7 @@
   font-weight: 650;
 }
 .tts-input-column select,
+/* Estilos para .tts-input-column textarea. */
 /* Estilos para .tts-input-column textarea. */
 .tts-input-column textarea {
   display: block;
@@ -133,10 +151,12 @@
   outline: none;
 }
 /* Estilos para .tts-input-column textarea. */
+/* Estilos para .tts-input-column textarea. */
 .tts-input-column textarea {
   resize: vertical;
   min-height: 90px;
 }
+/* Estilos para .tts-char-count. */
 /* Estilos para .tts-char-count. */
 .tts-char-count {
   float: right;
@@ -144,10 +164,12 @@
   font-weight: 400;
 }
 /* Estilos para .tts-label. */
+/* Estilos para .tts-label. */
 .tts-label {
   font-size: 11px;
   color: #a1a1aa;
 }
+/* Estilos para .tts-samples. */
 /* Estilos para .tts-samples. */
 .tts-samples {
   display: flex;
@@ -158,6 +180,7 @@
 .tts-samples button,
 .tts-actions button,
 .tts-queue-toolbar button,
+/* Estilos para .tts-queue-add button. */
 /* Estilos para .tts-queue-add button. */
 .tts-queue-add button {
   display: inline-flex;
@@ -176,9 +199,11 @@
 .tts-actions button:hover,
 .tts-queue-toolbar button:hover,
 /* Estilos para .tts-queue-add button:hover. */
+/* Estilos para .tts-queue-add button:hover. */
 .tts-queue-add button:hover {
   background: #20263a;
 }
+/* Estilos para .tts-actions. */
 /* Estilos para .tts-actions. */
 .tts-actions {
   display: flex;
@@ -186,16 +211,19 @@
   gap: 8px;
 }
 /* Estilos para .tts-actions button.primary. */
+/* Estilos para .tts-actions button.primary. */
 .tts-actions button.primary {
   background: #6d28d9;
   border-color: #7c3aed;
   color: white;
 }
 /* Estilos para .tts-actions button:disabled. */
+/* Estilos para .tts-actions button:disabled. */
 .tts-actions button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+/* Estilos para .tts-faders. */
 /* Estilos para .tts-faders. */
 .tts-faders {
   display: grid;
@@ -207,6 +235,7 @@
   padding: 16px;
 }
 /* Estilos para .tts-range. */
+/* Estilos para .tts-range. */
 .tts-range {
   min-width: 0;
   display: grid;
@@ -214,20 +243,24 @@
   align-content: start;
 }
 /* Estilos para .tts-range > span. */
+/* Estilos para .tts-range > span. */
 .tts-range > span {
   font-size: 11px;
   color: #a1a1aa;
 }
+/* Estilos para .tts-range > strong. */
 /* Estilos para .tts-range > strong. */
 .tts-range > strong {
   font-size: 18px;
   color: white;
 }
 /* Estilos para .tts-range input. */
+/* Estilos para .tts-range input. */
 .tts-range input {
   width: 100%;
   accent-color: #8b5cf6;
 }
+/* Estilos para .tts-range small. */
 /* Estilos para .tts-range small. */
 .tts-range small {
   display: flex;
@@ -236,11 +269,13 @@
   font-size: 9px;
 }
 /* Estilos para .tts-presets. */
+/* Estilos para .tts-presets. */
 .tts-presets {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
 }
+/* Estilos para .tts-presets button. */
 /* Estilos para .tts-presets button. */
 .tts-presets button {
   display: grid;
@@ -256,16 +291,19 @@
   cursor: pointer;
 }
 /* Estilos para .tts-presets button small. */
+/* Estilos para .tts-presets button small. */
 .tts-presets button small {
   font-size: 9px;
   color: #9ca3af;
   font-weight: 400;
 }
 /* Estilos para .tts-presets button.selected. */
+/* Estilos para .tts-presets button.selected. */
 .tts-presets button.selected {
   border-color: #8b5cf6;
   background: #4c1d9533;
 }
+/* Estilos para .tts-queue-toolbar. */
 /* Estilos para .tts-queue-toolbar. */
 .tts-queue-toolbar {
   display: flex;
@@ -275,16 +313,19 @@
   flex-wrap: wrap;
 }
 /* Estilos para .tts-queue-toolbar > div. */
+/* Estilos para .tts-queue-toolbar > div. */
 .tts-queue-toolbar > div {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
 }
 /* Estilos para .tts-notice. */
+/* Estilos para .tts-notice. */
 .tts-notice {
   font-size: 11px;
   color: #a5b4fc;
 }
+/* Estilos para .tts-now-speaking. */
 /* Estilos para .tts-now-speaking. */
 .tts-now-speaking {
   display: flex;
@@ -297,11 +338,13 @@
   margin: 14px 0;
 }
 /* Estilos para .tts-now-speaking div. */
+/* Estilos para .tts-now-speaking div. */
 .tts-now-speaking div {
   display: grid;
   gap: 4px;
   min-width: 0;
 }
+/* Estilos para .tts-now-speaking small. */
 /* Estilos para .tts-now-speaking small. */
 .tts-now-speaking small {
   font-size: 9px;
@@ -309,11 +352,13 @@
   color: #a78bfa;
 }
 /* Estilos para .tts-now-speaking strong. */
+/* Estilos para .tts-now-speaking strong. */
 .tts-now-speaking strong {
   font-size: 12px;
   font-weight: 500;
   overflow-wrap: anywhere;
 }
+/* Estilos para .tts-pulse. */
 /* Estilos para .tts-pulse. */
 .tts-pulse {
   width: 9px;
@@ -323,10 +368,12 @@
   flex: none;
 }
 /* Estilos para .tts-pulse.on. */
+/* Estilos para .tts-pulse.on. */
 .tts-pulse.on {
   background: #4ade80;
   box-shadow: 0 0 12px #4ade8080;
 }
+/* Estilos para .tts-queue-add. */
 /* Estilos para .tts-queue-add. */
 .tts-queue-add {
   display: flex;
@@ -336,11 +383,13 @@
   padding: 4px 0 14px;
 }
 /* Estilos para .tts-queue-add > span. */
+/* Estilos para .tts-queue-add > span. */
 .tts-queue-add > span {
   font-size: 11px;
   color: #a1a1aa;
   margin-right: 4px;
 }
+/* Estilos para .tts-queue-list. */
 /* Estilos para .tts-queue-list. */
 .tts-queue-list {
   display: grid;
@@ -348,6 +397,7 @@
   max-height: 300px;
   overflow: auto;
 }
+/* Estilos para .tts-queue-list article. */
 /* Estilos para .tts-queue-list article. */
 .tts-queue-list article {
   display: grid;
@@ -360,9 +410,11 @@
   padding: 10px;
 }
 /* Estilos para .tts-queue-list article strong. */
+/* Estilos para .tts-queue-list article strong. */
 .tts-queue-list article strong {
   font-size: 11px;
 }
+/* Estilos para .tts-queue-list article p. */
 /* Estilos para .tts-queue-list article p. */
 .tts-queue-list article p {
   font-size: 11px;
@@ -371,10 +423,12 @@
   overflow-wrap: anywhere;
 }
 /* Estilos para .tts-queue-list article > small. */
+/* Estilos para .tts-queue-list article > small. */
 .tts-queue-list article > small {
   font-size: 9px;
   color: #9ca3af;
 }
+/* Estilos para .tts-tier. */
 /* Estilos para .tts-tier. */
 .tts-tier {
   font-size: 9px;
@@ -385,10 +439,12 @@
   color: #d4d4d8;
 }
 /* Estilos para .tts-tier.broadcaster. */
+/* Estilos para .tts-tier.broadcaster. */
 .tts-tier.broadcaster {
   background: #7f1d1d;
   color: #fecaca;
 }
+/* Estilos para .tts-tier.moderator. */
 /* Estilos para .tts-tier.moderator. */
 .tts-tier.moderator {
   background: #064e3b;
@@ -396,10 +452,12 @@
 }
 .tts-tier.vip,
 /* Estilos para .tts-tier.subscriber. */
+/* Estilos para .tts-tier.subscriber. */
 .tts-tier.subscriber {
   background: #581c87;
   color: #e9d5ff;
 }
+/* Estilos para .tts-empty. */
 /* Estilos para .tts-empty. */
 .tts-empty {
   border: 1px dashed #34394a;
@@ -411,9 +469,11 @@
 }
 @media (max-width: 1100px) {
 /* Estilos para .tts-main-grid. */
+/* Estilos para .tts-main-grid. */
   .tts-main-grid {
     grid-template-columns: 1fr;
   }
+/* Estilos para .tts-presets. */
 /* Estilos para .tts-presets. */
   .tts-presets {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -421,35 +481,43 @@
 }
 @media (max-width: 700px) {
 /* Estilos para .tts-page. */
+/* Estilos para .tts-page. */
   .tts-page {
     padding: 14px;
   }
 /* Estilos para .tts-page-heading. */
+/* Estilos para .tts-page-heading. */
   .tts-page-heading {
     align-items: flex-start;
   }
+/* Estilos para .tts-faders. */
 /* Estilos para .tts-faders. */
   .tts-faders {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 12px;
   }
 /* Estilos para .tts-presets. */
+/* Estilos para .tts-presets. */
   .tts-presets {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+/* Estilos para .tts-queue-list article. */
 /* Estilos para .tts-queue-list article. */
   .tts-queue-list article {
     grid-template-columns: auto minmax(0, 1fr);
     align-items: start;
   }
 /* Estilos para .tts-queue-list article p. */
+/* Estilos para .tts-queue-list article p. */
   .tts-queue-list article p {
     grid-column: 1/-1;
   }
 /* Estilos para .tts-queue-list article > small. */
+/* Estilos para .tts-queue-list article > small. */
   .tts-queue-list article > small {
     grid-column: 1/-1;
   }
+/* Estilos para .tts-queue-toolbar. */
 /* Estilos para .tts-queue-toolbar. */
   .tts-queue-toolbar {
     align-items: flex-start;
@@ -458,11 +526,13 @@
 }
 
 /* Estilos para .tts-voice-effects. */
+/* Estilos para .tts-voice-effects. */
 .tts-voice-effects {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
+/* Estilos para .tts-voice-effects button. */
 /* Estilos para .tts-voice-effects button. */
 .tts-voice-effects button {
   display: flex;
@@ -482,10 +552,12 @@
     background 0.15s;
 }
 /* Estilos para .tts-voice-effects button strong. */
+/* Estilos para .tts-voice-effects button strong. */
 .tts-voice-effects button strong {
   font-size: 12px;
   font-weight: 750;
 }
+/* Estilos para .tts-voice-effects button small. */
 /* Estilos para .tts-voice-effects button small. */
 .tts-voice-effects button small {
   font-size: 10px;
@@ -494,15 +566,18 @@
 }
 .tts-voice-effects button:hover,
 /* Estilos para .tts-voice-effects button.selected. */
+/* Estilos para .tts-voice-effects button.selected. */
 .tts-voice-effects button.selected {
   border-color: #8b5cf6;
   background: #21133c;
 }
 /* Estilos para .tts-effect-intensity. */
+/* Estilos para .tts-effect-intensity. */
 .tts-effect-intensity {
   max-width: 520px;
   margin-top: 18px;
 }
+/* Estilos para .tts-effect-note. */
 /* Estilos para .tts-effect-note. */
 .tts-effect-note {
   margin: 14px 0 0;
@@ -516,11 +591,13 @@
 }
 @media (max-width: 720px) {
 /* Estilos para .tts-voice-effects. */
+/* Estilos para .tts-voice-effects. */
   .tts-voice-effects {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
+/* Estilos para .tts-engine-caption. */
 /* Estilos para .tts-engine-caption. */
 .tts-engine-caption {
   display: block;
@@ -532,16 +609,19 @@
 
 /* Filtros de leitura TTS — painel inspirado no BACKUP01 */
 /* Estilos para .tts-filters-card. */
+/* Estilos para .tts-filters-card. */
 .tts-filters-card {
   display: grid;
   gap: 16px;
 }
+/* Estilos para .tts-filter-top. */
 /* Estilos para .tts-filter-top. */
 .tts-filter-top {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
+/* Estilos para .tts-filter-field. */
 /* Estilos para .tts-filter-field. */
 .tts-filter-field {
   display: grid;
@@ -552,6 +632,7 @@
 }
 .tts-filter-field input,
 .tts-filter-field select,
+/* Estilos para .tts-filter-entry input. */
 /* Estilos para .tts-filter-entry input. */
 .tts-filter-entry input {
   width: 100%;
@@ -565,6 +646,7 @@
   outline: none;
 }
 /* Estilos para .tts-filter-free. */
+/* Estilos para .tts-filter-free. */
 .tts-filter-free {
   margin: 0;
   padding: 10px 12px;
@@ -575,12 +657,14 @@
   font-size: 11px;
 }
 /* Estilos para .tts-filter-grid. */
+/* Estilos para .tts-filter-grid. */
 .tts-filter-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   align-items: start;
 }
+/* Estilos para .tts-filter-group. */
 /* Estilos para .tts-filter-group. */
 .tts-filter-group {
   display: grid;
@@ -593,6 +677,7 @@
 }
 .tts-filter-group h3,
 /* Estilos para .tts-filter-diagnostic-heading h3. */
+/* Estilos para .tts-filter-diagnostic-heading h3. */
 .tts-filter-diagnostic-heading h3 {
   margin: 0;
   color: #c4b5fd;
@@ -602,6 +687,7 @@
   text-transform: uppercase;
 }
 /* Estilos para .tts-filter-toggle. */
+/* Estilos para .tts-filter-toggle. */
 .tts-filter-toggle {
   display: flex;
   align-items: flex-start;
@@ -610,11 +696,13 @@
   min-width: 0;
 }
 /* Estilos para .tts-filter-toggle input. */
+/* Estilos para .tts-filter-toggle input. */
 .tts-filter-toggle input {
   margin-top: 2px;
   accent-color: #8b5cf6;
   flex: none;
 }
+/* Estilos para .tts-filter-toggle span. */
 /* Estilos para .tts-filter-toggle span. */
 .tts-filter-toggle span {
   display: grid;
@@ -622,11 +710,13 @@
   min-width: 0;
 }
 /* Estilos para .tts-filter-toggle b. */
+/* Estilos para .tts-filter-toggle b. */
 .tts-filter-toggle b {
   color: #e4e4e7;
   font-size: 11px;
   font-weight: 600;
 }
+/* Estilos para .tts-filter-toggle small. */
 /* Estilos para .tts-filter-toggle small. */
 .tts-filter-toggle small {
   color: #71717a;
@@ -634,12 +724,14 @@
   line-height: 1.4;
 }
 /* Estilos para .tts-filter-entry. */
+/* Estilos para .tts-filter-entry. */
 .tts-filter-entry {
   display: flex;
   gap: 6px;
   min-width: 0;
 }
 .tts-filter-entry button,
+/* Estilos para .tts-filter-chip-list button. */
 /* Estilos para .tts-filter-chip-list button. */
 .tts-filter-chip-list button {
   display: inline-flex;
@@ -653,6 +745,7 @@
   flex: none;
 }
 /* Estilos para .tts-filter-chip-list. */
+/* Estilos para .tts-filter-chip-list. */
 .tts-filter-chip-list {
   display: flex;
   flex-wrap: wrap;
@@ -660,6 +753,7 @@
   max-height: 95px;
   overflow: auto;
 }
+/* Estilos para .tts-filter-chip-list span. */
 /* Estilos para .tts-filter-chip-list span. */
 .tts-filter-chip-list span {
   display: inline-flex;
@@ -675,12 +769,14 @@
   overflow-wrap: anywhere;
 }
 /* Estilos para .tts-filter-chip-list button. */
+/* Estilos para .tts-filter-chip-list button. */
 .tts-filter-chip-list button {
   padding: 2px;
   border: 0;
   background: transparent;
   color: #fca5a5;
 }
+/* Estilos para .tts-filter-diagnostics. */
 /* Estilos para .tts-filter-diagnostics. */
 .tts-filter-diagnostics {
   display: grid;
@@ -689,6 +785,7 @@
   border-top: 1px solid #272c3a;
 }
 /* Estilos para .tts-filter-diagnostic-heading. */
+/* Estilos para .tts-filter-diagnostic-heading. */
 .tts-filter-diagnostic-heading {
   display: flex;
   justify-content: space-between;
@@ -696,6 +793,7 @@
   gap: 10px;
   flex-wrap: wrap;
 }
+/* Estilos para .tts-filter-diagnostic-heading button. */
 /* Estilos para .tts-filter-diagnostic-heading button. */
 .tts-filter-diagnostic-heading button {
   display: inline-flex;
@@ -710,12 +808,14 @@
 }
 .tts-filter-stats,
 /* Estilos para .tts-filter-reasons. */
+/* Estilos para .tts-filter-reasons. */
 .tts-filter-reasons {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 .tts-filter-stats span,
+/* Estilos para .tts-filter-reasons span. */
 /* Estilos para .tts-filter-reasons span. */
 .tts-filter-reasons span {
   border: 1px solid #272c3a;
@@ -727,10 +827,12 @@
 }
 .tts-filter-stats b,
 /* Estilos para .tts-filter-reasons b. */
+/* Estilos para .tts-filter-reasons b. */
 .tts-filter-reasons b {
   color: #fff;
   margin-left: 4px;
 }
+/* Estilos para .tts-filter-events. */
 /* Estilos para .tts-filter-events. */
 .tts-filter-events {
   display: grid;
@@ -738,6 +840,7 @@
   max-height: 300px;
   overflow: auto;
 }
+/* Estilos para .tts-filter-events article. */
 /* Estilos para .tts-filter-events article. */
 .tts-filter-events article {
   display: grid;
@@ -752,27 +855,33 @@
 .tts-filter-events time,
 .tts-filter-events span,
 /* Estilos para .tts-filter-events small. */
+/* Estilos para .tts-filter-events small. */
 .tts-filter-events small {
   color: #9ca3af;
   font-size: 10px;
 }
 /* Estilos para .tts-filter-events b. */
+/* Estilos para .tts-filter-events b. */
 .tts-filter-events b {
   font-size: 9px;
 }
+/* Estilos para .tts-filter-events b.accepted. */
 /* Estilos para .tts-filter-events b.accepted. */
 .tts-filter-events b.accepted {
   color: #86efac;
 }
 /* Estilos para .tts-filter-events b.blocked. */
+/* Estilos para .tts-filter-events b.blocked. */
 .tts-filter-events b.blocked {
   color: #fca5a5;
 }
+/* Estilos para .tts-filter-events small. */
 /* Estilos para .tts-filter-events small. */
 .tts-filter-events small {
   grid-column: 1 / -1;
   color: #c4b5fd;
 }
+/* Estilos para .tts-filter-events p. */
 /* Estilos para .tts-filter-events p. */
 .tts-filter-events p {
   grid-column: 1 / -1;
@@ -782,6 +891,7 @@
   overflow-wrap: anywhere;
 }
 /* Estilos para .tts-filter-footer. */
+/* Estilos para .tts-filter-footer. */
 .tts-filter-footer {
   margin: 0;
   color: #71717a;
@@ -790,9 +900,11 @@
 }
 @media (max-width: 1000px) {
 /* Estilos para .tts-filter-grid. */
+/* Estilos para .tts-filter-grid. */
   .tts-filter-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+/* Estilos para .tts-filter-top. */
 /* Estilos para .tts-filter-top. */
   .tts-filter-top {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -801,13 +913,16 @@
 @media (max-width: 620px) {
   .tts-filter-grid,
 /* Estilos para .tts-filter-top. */
+/* Estilos para .tts-filter-top. */
   .tts-filter-top {
     grid-template-columns: 1fr;
   }
 /* Estilos para .tts-filter-events article. */
+/* Estilos para .tts-filter-events article. */
   .tts-filter-events article {
     grid-template-columns: auto minmax(0, 1fr);
   }
+/* Estilos para .tts-filter-events span. */
 /* Estilos para .tts-filter-events span. */
   .tts-filter-events span {
     grid-column: 1 / -1;
@@ -815,10 +930,12 @@
 }
 
 /* Estilos para .tts-filter-flagged. */
+/* Estilos para .tts-filter-flagged. */
 .tts-filter-flagged {
   display: grid;
   gap: 7px;
 }
+/* Estilos para .tts-filter-flagged h3. */
 /* Estilos para .tts-filter-flagged h3. */
 .tts-filter-flagged h3 {
   margin: 0;
@@ -829,11 +946,13 @@
   text-transform: uppercase;
 }
 /* Estilos para .tts-filter-flagged > p. */
+/* Estilos para .tts-filter-flagged > p. */
 .tts-filter-flagged > p {
   margin: 0;
   color: #71717a;
   font-size: 10px;
 }
+/* Estilos para .tts-filter-flagged > div. */
 /* Estilos para .tts-filter-flagged > div. */
 .tts-filter-flagged > div {
   display: flex;
@@ -845,6 +964,7 @@
   padding: 8px 10px;
 }
 /* Estilos para .tts-filter-flagged label. */
+/* Estilos para .tts-filter-flagged label. */
 .tts-filter-flagged label {
   display: flex;
   align-items: center;
@@ -855,14 +975,17 @@
   font-size: 11px;
 }
 /* Estilos para .tts-filter-flagged label input. */
+/* Estilos para .tts-filter-flagged label input. */
 .tts-filter-flagged label input {
   accent-color: #ef4444;
 }
+/* Estilos para .tts-filter-flagged small. */
 /* Estilos para .tts-filter-flagged small. */
 .tts-filter-flagged small {
   color: #9ca3af;
   font-size: 10px;
 }
+/* Estilos para .tts-filter-flagged button. */
 /* Estilos para .tts-filter-flagged button. */
 .tts-filter-flagged button {
   display: inline-flex;
@@ -875,12 +998,14 @@
 
 /* Botão de filtros junto ao estado Pronto */
 /* Estilos para .tts-heading-actions. */
+/* Estilos para .tts-heading-actions. */
 .tts-heading-actions {
   display: flex;
   align-items: center;
   gap: 8px;
   flex: none;
 }
+/* Estilos para .tts-filter-open-button. */
 /* Estilos para .tts-filter-open-button. */
 .tts-filter-open-button {
   display: inline-flex;
@@ -898,11 +1023,13 @@
 }
 .tts-filter-open-button:hover,
 /* Estilos para .tts-filter-open-button.selected. */
+/* Estilos para .tts-filter-open-button.selected. */
 .tts-filter-open-button.selected {
   border-color: #8b5cf6;
   background: #2e1065;
   color: #fff;
 }
+/* Estilos para .multichat-tts-status. */
 /* Estilos para .multichat-tts-status. */
 .multichat-tts-status {
   display: inline-flex;
@@ -912,18 +1039,22 @@
   margin-top: 1px;
 }
 /* Estilos para .multichat-tts-status.allowed. */
+/* Estilos para .multichat-tts-status.allowed. */
 .multichat-tts-status.allowed {
   color: #22c55e;
 }
+/* Estilos para .multichat-tts-status.muted. */
 /* Estilos para .multichat-tts-status.muted. */
 .multichat-tts-status.muted {
   color: #ef4444;
 }
 @media (max-width: 520px) {
 /* Estilos para .tts-heading-actions. */
+/* Estilos para .tts-heading-actions. */
   .tts-heading-actions {
     gap: 5px;
   }
+/* Estilos para .tts-filter-open-button. */
 /* Estilos para .tts-filter-open-button. */
   .tts-filter-open-button {
     padding: 6px 9px;
@@ -931,12 +1062,14 @@
 }
 
 /* Estilos para .tts-heading-actions. */
+/* Estilos para .tts-heading-actions. */
 .tts-heading-actions {
   display: flex;
   align-items: center;
   gap: 8px;
   flex: none;
 }
+/* Estilos para .tts-filter-open-button. */
 /* Estilos para .tts-filter-open-button. */
 .tts-filter-open-button {
   display: inline-flex;
@@ -954,6 +1087,7 @@
 }
 .tts-filter-open-button:hover,
 /* Estilos para .tts-filter-open-button.selected. */
+/* Estilos para .tts-filter-open-button.selected. */
 .tts-filter-open-button.selected {
   border-color: #8b5cf6;
   background: #2e1065;
@@ -961,10 +1095,12 @@
 }
 @media (max-width: 520px) {
 /* Estilos para .tts-heading-actions. */
+/* Estilos para .tts-heading-actions. */
   .tts-heading-actions {
     gap: 5px;
     flex-wrap: wrap;
   }
+/* Estilos para .tts-filter-open-button. */
 /* Estilos para .tts-filter-open-button. */
   .tts-filter-open-button {
     padding: 6px 9px;
@@ -972,6 +1108,7 @@
 }
 
 /* Conectores de plataforma no submenu Voz & TTS */
+/* Estilos para .tts-filter-open-button. */
 /* Estilos para .tts-filter-open-button. */
 .tts-filter-open-button {
   display: inline-flex;
@@ -989,17 +1126,20 @@
 }
 .tts-filter-open-button:hover,
 /* Estilos para .tts-filter-open-button.selected. */
+/* Estilos para .tts-filter-open-button.selected. */
 .tts-filter-open-button.selected {
   border-color: #8b5cf6;
   background: #21133c;
   color: #ede9fe;
 }
 /* Estilos para .tts-platform-grid. */
+/* Estilos para .tts-platform-grid. */
 .tts-platform-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
+/* Estilos para .tts-platform-card. */
 /* Estilos para .tts-platform-card. */
 .tts-platform-card {
   display: grid;
@@ -1012,6 +1152,7 @@
   background: #06081080;
 }
 /* Estilos para .tts-platform-card-heading. */
+/* Estilos para .tts-platform-card-heading. */
 .tts-platform-card-heading {
   display: flex;
   align-items: center;
@@ -1019,10 +1160,12 @@
   min-width: 0;
 }
 /* Estilos para .tts-platform-card-heading > div. */
+/* Estilos para .tts-platform-card-heading > div. */
 .tts-platform-card-heading > div {
   min-width: 0;
   flex: 1;
 }
+/* Estilos para .tts-platform-card-heading h3. */
 /* Estilos para .tts-platform-card-heading h3. */
 .tts-platform-card-heading h3 {
   margin: 0;
@@ -1031,11 +1174,13 @@
   font-weight: 750;
 }
 /* Estilos para .tts-platform-card-heading p. */
+/* Estilos para .tts-platform-card-heading p. */
 .tts-platform-card-heading p {
   margin: 3px 0 0;
   color: #71717a;
   font-size: 10px;
 }
+/* Estilos para .tts-platform-icon. */
 /* Estilos para .tts-platform-icon. */
 .tts-platform-icon {
   display: grid;
@@ -1049,11 +1194,13 @@
   color: #d4d4d8;
 }
 /* Estilos para .tts-platform-icon.twitch. */
+/* Estilos para .tts-platform-icon.twitch. */
 .tts-platform-icon.twitch {
   border-color: #8b5cf655;
   background: #8b5cf61a;
   color: #c4b5fd;
 }
+/* Estilos para .tts-platform-icon.kick. */
 /* Estilos para .tts-platform-icon.kick. */
 .tts-platform-icon.kick {
   border-color: #22c55e55;
@@ -1061,11 +1208,13 @@
   color: #86efac;
 }
 /* Estilos para .tts-platform-icon.youtube. */
+/* Estilos para .tts-platform-icon.youtube. */
 .tts-platform-icon.youtube {
   border-color: #ef444455;
   background: #ef44441a;
   color: #fca5a5;
 }
+/* Estilos para .tts-platform-dot. */
 /* Estilos para .tts-platform-dot. */
 .tts-platform-dot {
   width: 9px;
@@ -1075,19 +1224,23 @@
   background: #52525b;
 }
 /* Estilos para .tts-platform-dot.online. */
+/* Estilos para .tts-platform-dot.online. */
 .tts-platform-dot.online {
   background: #4ade80;
   box-shadow: 0 0 10px #4ade8060;
 }
+/* Estilos para .tts-platform-dot.pending. */
 /* Estilos para .tts-platform-dot.pending. */
 .tts-platform-dot.pending {
   background: #fbbf24;
   box-shadow: 0 0 8px #fbbf2440;
 }
 /* Estilos para .tts-platform-dot.error. */
+/* Estilos para .tts-platform-dot.error. */
 .tts-platform-dot.error {
   background: #f87171;
 }
+/* Estilos para .tts-platform-field. */
 /* Estilos para .tts-platform-field. */
 .tts-platform-field {
   display: grid;
@@ -1096,6 +1249,7 @@
   font-size: 11px;
   font-weight: 650;
 }
+/* Estilos para .tts-platform-field input. */
 /* Estilos para .tts-platform-field input. */
 .tts-platform-field input {
   width: 100%;
@@ -1109,13 +1263,16 @@
   outline: none;
 }
 /* Estilos para .tts-platform-field input:focus. */
+/* Estilos para .tts-platform-field input:focus. */
 .tts-platform-field input:focus {
   border-color: #8b5cf6;
 }
 /* Estilos para .tts-platform-field input:disabled. */
+/* Estilos para .tts-platform-field input:disabled. */
 .tts-platform-field input:disabled {
   opacity: 0.55;
 }
+/* Estilos para .tts-platform-status. */
 /* Estilos para .tts-platform-status. */
 .tts-platform-status {
   min-width: 0;
@@ -1126,6 +1283,7 @@
   background: #060810;
 }
 /* Estilos para .tts-platform-status > span. */
+/* Estilos para .tts-platform-status > span. */
 .tts-platform-status > span {
   color: #71717a;
   font-size: 9px;
@@ -1134,6 +1292,7 @@
   text-transform: uppercase;
 }
 /* Estilos para .tts-platform-status p. */
+/* Estilos para .tts-platform-status p. */
 .tts-platform-status p {
   margin: 5px 0 0;
   color: #d4d4d8;
@@ -1141,17 +1300,21 @@
   overflow-wrap: anywhere;
 }
 /* Estilos para .tts-platform-status p.online. */
+/* Estilos para .tts-platform-status p.online. */
 .tts-platform-status p.online {
   color: #86efac;
 }
+/* Estilos para .tts-platform-status p.pending. */
 /* Estilos para .tts-platform-status p.pending. */
 .tts-platform-status p.pending {
   color: #fcd34d;
 }
 /* Estilos para .tts-platform-status p.error. */
+/* Estilos para .tts-platform-status p.error. */
 .tts-platform-status p.error {
   color: #fca5a5;
 }
+/* Estilos para .tts-platform-status small. */
 /* Estilos para .tts-platform-status small. */
 .tts-platform-status small {
   display: block;
@@ -1160,6 +1323,7 @@
   font-size: 10px;
   overflow-wrap: anywhere;
 }
+/* Estilos para .tts-platform-action. */
 /* Estilos para .tts-platform-action. */
 .tts-platform-action {
   display: flex;
@@ -1177,14 +1341,17 @@
   cursor: pointer;
 }
 /* Estilos para .tts-platform-action:hover. */
+/* Estilos para .tts-platform-action:hover. */
 .tts-platform-action:hover {
   background: #7c3aed;
 }
+/* Estilos para .tts-platform-action:disabled. */
 /* Estilos para .tts-platform-action:disabled. */
 .tts-platform-action:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
+/* Estilos para .tts-platform-action.disconnect. */
 /* Estilos para .tts-platform-action.disconnect. */
 .tts-platform-action.disconnect {
   border-color: #ef444455;
@@ -1192,10 +1359,12 @@
   color: #fca5a5;
 }
 /* Estilos para .tts-platform-action.disconnect:hover. */
+/* Estilos para .tts-platform-action.disconnect:hover. */
 .tts-platform-action.disconnect:hover {
   background: #ef44442b;
 }
 @media (max-width: 900px) {
+/* Estilos para .tts-platform-grid. */
 /* Estilos para .tts-platform-grid. */
   .tts-platform-grid {
     grid-template-columns: 1fr;
