@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como as tabelas de dados são identificadas e administradas. */
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
