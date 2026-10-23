@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como os participantes trocam mensagens para iniciar a conexão RTC. */
 // Cliente de Signaling HTTP de Ultra-Baixa Latência para a infraestrutura RTC Automática do LiveNexus
 // Otimizado para estabelecer conexão WebRTC completa entre 1 a 3 segundos (meta: < 6s)
 
