@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica os estilos gerais compartilhados pela aplicação. */
 /* Entrada global dos estilos: carrega Tailwind uma única vez e importa os módulos por responsabilidade. */
 @import "tailwindcss" source(none);
 @source "../";
