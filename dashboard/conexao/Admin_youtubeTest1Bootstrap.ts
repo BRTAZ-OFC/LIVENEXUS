@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica a preparação e os testes da conexão com o YouTube. */
 // dashboard/conexao/Admin_youtubeTest1Bootstrap.js
 // Resolve live do YouTube a partir de identificador (@handle, url ou videoId)
 // Extrai dados estruturados do InnerTube: apiKey, continuation, clientContext, viewers, videoId, etc.
