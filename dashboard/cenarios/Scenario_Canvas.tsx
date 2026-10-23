@@ -72,10 +72,12 @@ const CANVAS_WIDTH = 1920;
 const CANVAS_HEIGHT = 1080;
 const catalog = TWITCH_WIDGETS_CATALOG as unknown as WidgetDefinition[];
 
+// isObject: executa a etapa descrita pelo nome da função.
 function isObject(value: unknown): value is JsonObject {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
+// sourceFor: executa a etapa descrita pelo nome da função.
 function sourceFor(row: ScenarioRecord): JsonObject {
   if (isObject(row.settings) && Object.keys(row.settings).length) return row.settings;
   if (isObject(row.config) && Object.keys(row.config).length) return row.config;
@@ -237,6 +239,7 @@ function alignSelectedInstances<
   });
 }
 
+// normalizeScenario: executa a etapa descrita pelo nome da função.
 function normalizeScenario(row: ScenarioRecord): ScenarioConfig {
   const source = sourceFor(row);
   const backgroundSource = isObject(source.background) ? source.background : {};
@@ -279,6 +282,7 @@ function normalizeScenario(row: ScenarioRecord): ScenarioConfig {
   };
 }
 
+// backgroundStyle: executa a etapa descrita pelo nome da função.
 function backgroundStyle(background: CanvasBackground): CSSProperties {
   if (background.type === "solid") return { backgroundColor: background.color || "#07111f" };
   if (background.type === "gradient")
@@ -300,6 +304,7 @@ function backgroundStyle(background: CanvasBackground): CSSProperties {
   };
 }
 
+// ScenarioCanvas: executa a etapa descrita pelo nome da função.
 export default function ScenarioCanvas({
   scenarioId,
   onBack,
@@ -626,6 +631,7 @@ export default function ScenarioCanvas({
   }
 
   if (loading) {
+    {/* Estrutura visual: div. */}
     return (
       <div className="flex min-h-64 items-center justify-center gap-2 text-sm text-slate-300">
         <LoaderCircle className="h-4 w-4 animate-spin text-cyan-300" /> Carregando canvas 1080p...
@@ -634,6 +640,7 @@ export default function ScenarioCanvas({
   }
 
   if (!scenario) {
+    {/* Estrutura visual: section. */}
     return (
       <section className="space-y-4 p-4 sm:p-6">
         <button
@@ -652,6 +659,8 @@ export default function ScenarioCanvas({
       </section>
     );
   }
+
+  {/* Estrutura visual: section. */}
 
   return (
     <section className="flex w-full min-w-0 flex-col gap-4 p-3 sm:p-5">
@@ -969,6 +978,7 @@ export default function ScenarioCanvas({
                   cursor: "move",
                   touchAction: "none",
                 };
+                {/* Estrutura visual: div. */}
                 return (
                   <div
                     key={instanceId}
