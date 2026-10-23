@@ -1,6 +1,7 @@
 import React from "react";
 import { Vote, Gift, Flame, Trophy, Crown } from "lucide-react";
 
+// CHATTER_LEADERBOARD_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const CHATTER_LEADERBOARD_TEMPLATES = [
   {
     id: "01",
@@ -445,6 +446,7 @@ export const CHATTER_LEADERBOARD_TEMPLATES = [
   },
 ];
 
+// POLL_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const POLL_TEMPLATES = [
   {
     id: "01",
@@ -847,6 +849,7 @@ export const POLL_TEMPLATES = [
   },
 ];
 
+// RAFFLE_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const RAFFLE_TEMPLATES = [
   {
     id: "01",
@@ -1123,6 +1126,7 @@ export const RAFFLE_TEMPLATES = [
   },
 ];
 
+// SUB_TRAIN_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const SUB_TRAIN_TEMPLATES = [
   {
     id: "01",
