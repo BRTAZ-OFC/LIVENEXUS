@@ -6,6 +6,7 @@ import { dirname } from "node:path";
 const queues = new Map();
 
 // BLOCO 1 — Serializa operações que modificam o mesmo arquivo.
+// withFileQueue: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function withFileQueue(filePath, operation) {
   const previous = queues.get(filePath) ?? Promise.resolve();
   const current = previous.then(operation);
@@ -27,6 +28,7 @@ export function withFileQueue(filePath, operation) {
 }
 
 // BLOCO 2 — Grava primeiro em arquivo temporário e depois o substitui.
+// writeJsonAtomically: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function writeJsonAtomically(filePath, data) {
   await mkdir(dirname(filePath), { recursive: true });
 
