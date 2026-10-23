@@ -4,6 +4,7 @@ import { platformIsOnline, platformMessages, visibleChatText } from "../Overlay_
 import { Sparkles, MessageSquare } from "lucide-react";
 
 // 1. TwitchWordCloud (Nuvem de Palavras)
+// TwitchWordCloud: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function TwitchWordCloud({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = platformIsOnline(connections, config);
@@ -75,6 +76,8 @@ export function TwitchWordCloud({ config = {} }) {
     "text-[8px] text-slate-400",
   ];
 
+  {/* Estrutura visual retornada: div. */}
+
   return (
     <div
       className="w-full h-full p-4 flex flex-col justify-start text-left"
@@ -114,6 +117,7 @@ export function TwitchWordCloud({ config = {} }) {
 }
 
 // 2. TwitchEmoteShower (Chuva de Emotes)
+// TwitchEmoteShower: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function TwitchEmoteShower({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = connections?.Twitch?.status === "connected";
@@ -144,6 +148,8 @@ export function TwitchEmoteShower({ config = {} }) {
       setFloatingEmotes((prev) => [...prev, ...newEmotes].slice(-15)); // max 15 emotes floating
     }
   }, [liveActivity?.lastMessage, isOnline]);
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div
