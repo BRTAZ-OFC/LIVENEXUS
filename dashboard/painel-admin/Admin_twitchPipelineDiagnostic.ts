@@ -35,6 +35,7 @@ const RAW_MSG_ID_KEYS = [
   "viewermilestone",
 ];
 
+// emptyRawMsgIdCounts: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function emptyRawMsgIdCounts() {
   return {
     sub: 0,
@@ -138,6 +139,7 @@ let rawLinesGeneral = [];
 let rawLinesRelevant = [];
 let rawUsernoticeFull = [];
 
+// pushHistory: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function pushHistory(stage, data = {}) {
   const entry = {
     timestamp: new Date().toISOString(),
@@ -155,11 +157,13 @@ function pushHistory(stage, data = {}) {
   if (history.length > MAX_HISTORY) history.splice(0, history.length - MAX_HISTORY);
 }
 
+// getHistory: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function getHistory() {
   return history.slice();
 }
 
 // --- Classificação de linha IRC relevante (string-based, independente do parser) ---
+// isRelevantRawLine: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function isRelevantRawLine(line) {
   if (!line) return false;
   if (line.includes(" CAP ")) return true;
@@ -176,6 +180,7 @@ function isRelevantRawLine(line) {
   return false;
 }
 
+// buildSnapshot: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function buildSnapshot() {
   return {
     ...state,
@@ -184,6 +189,7 @@ function buildSnapshot() {
   };
 }
 
+// emit: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function emit() {
   for (const fn of listeners) {
     try {
@@ -194,12 +200,14 @@ function emit() {
   }
 }
 
+// subscribe: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function subscribe(fn) {
   if (typeof fn !== "function") return () => {};
   listeners.add(fn);
   return () => listeners.delete(fn);
 }
 
+// getSnapshot: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function getSnapshot() {
   return buildSnapshot();
 }
@@ -461,6 +469,7 @@ const twitchPipelineDiagnostic = {
 };
 
 // --- Serialização do relatório completo em texto puro ---
+// fmtTime: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function fmtTime(iso) {
   if (!iso) return "—";
   try {
@@ -470,6 +479,7 @@ function fmtTime(iso) {
   }
 }
 
+// buildReport: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function buildReport(liveActivity, messages) {
   const s = getSnapshot();
   const hist = getHistory();
