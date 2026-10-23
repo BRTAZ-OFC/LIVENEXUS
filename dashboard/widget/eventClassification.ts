@@ -8,6 +8,7 @@
 //   Kick:    kick_sub, kick_gift, kick_raid
 
 // Inscrição/adesão (sem gift): sub, resub, membership, kick_sub
+// isSubscriptionEvent: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function isSubscriptionEvent(e) {
   const t = e?.eventType;
   return (
@@ -16,6 +17,7 @@ export function isSubscriptionEvent(e) {
 }
 
 // Gift de inscrição: subgift (twitch), kick_gift, youtube_membership_gifting, youtube_gift_membership_received
+// isGiftSubscriptionEvent: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function isGiftSubscriptionEvent(e) {
   const t = e?.eventType;
   return (
@@ -27,6 +29,7 @@ export function isGiftSubscriptionEvent(e) {
 }
 
 // Raid: twitch_raid, kick_raid. YouTube não tem raid.
+// isRaidEvent: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function isRaidEvent(e) {
   const t = e?.eventType;
   return t === "twitch_raid" || t === "kick_raid";
@@ -35,12 +38,14 @@ export function isRaidEvent(e) {
 // Apoio financeiro (NÃO somar entre si — unidades diferentes):
 //   twitch_bits = bits (inteiro, sem moeda)
 //   youtube_superchat / youtube_supersticker = dinheiro (amountText, currency)
+// isFinancialSupportEvent: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function isFinancialSupportEvent(e) {
   const t = e?.eventType;
   return t === "twitch_bits" || t === "youtube_superchat" || t === "youtube_supersticker";
 }
 
 // Evento especial (alerta): sub/gift/raid/financeiro/announcement.
+// isSpecialEvent: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function isSpecialEvent(e) {
   return (
     isSubscriptionEvent(e) ||
@@ -52,6 +57,7 @@ export function isSpecialEvent(e) {
 }
 
 // Plataforma legível.
+// getEventPlatform: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getEventPlatform(e) {
   const p = e?.platform;
   if (p === "Twitch" || p === "YouTube" || p === "Kick") return p;
@@ -59,6 +65,7 @@ export function getEventPlatform(e) {
 }
 
 // Rótulo curto do tipo real do evento (preserva a nomenclatura da plataforma).
+// getEventDisplayType: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getEventDisplayType(e) {
   switch (e?.eventType) {
     case "twitch_sub":
