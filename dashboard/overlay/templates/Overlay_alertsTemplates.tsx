@@ -1,6 +1,7 @@
 import React from "react";
 import { Bell, Award, Zap, Trophy, Sparkles, Terminal, Activity } from "lucide-react";
 
+// ALERTS_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const ALERTS_TEMPLATES = [
   {
     id: "01",
@@ -380,6 +381,7 @@ export const ALERTS_TEMPLATES = [
   },
 ];
 
+// EVENT_LIST_TEMPLATES: valor ou configuração reutilizada neste módulo.
 export const EVENT_LIST_TEMPLATES = [
   {
     id: "01",
