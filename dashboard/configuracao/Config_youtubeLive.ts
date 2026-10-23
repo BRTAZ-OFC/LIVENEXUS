@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica as opções usadas para configurar a transmissão ao vivo do YouTube. */
 // Conexão oficial ao YouTube: Bootstrap 1-shot + polling contínuo de chat e eventos via Cloudflare Worker.
 // 100% alinhado com a fórmula validada no Painel Admin -> Laboratório -> Teste YouTube 1.
 // connectYouTube(channel, onMessage, onStatus, onMeta) -> { disconnect }
