@@ -124,6 +124,11 @@ export default function MinhaConta() {
           <button type="button" onClick={() => { setModal("delete"); setMessage(""); }} style={{ ...buttonBase, border: "1px solid #7f1d1d", background: "#35151b", color: "#fecaca" }}><Trash2 size={16} />Deletar conta</button>
         </div>
       </div>
+      <nav aria-label="Menu da conta" style={{ display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap", marginTop: 4, padding: "10px 2px", borderBottom: "1px solid #263449" }}>
+        {["Visão Geral", "Crescimento", "Audiência", "Engajamento", "Monetização", "Imagens"].map((label) => (
+          <a key={label} href="#" onClick={(event) => event.preventDefault()} style={{ color: "#cbd5e1", textDecoration: "none", fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>{label}</a>
+        ))}
+      </nav>
       {message && !modal && <p role="status" style={{ color: "#fca5a5", marginTop: 14, fontSize: 13 }}>{message}</p>}
       <input ref={fileInput} type="file" accept="image/*" hidden onChange={(event) => void chooseImage(event.target.files?.[0])} />
       {modal && <div style={overlay} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !busy) closeModal(); }}>
