@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { RtcConsumer } from "./rtcConsumer.js";
 
+// useRtcConsumer: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function useRtcConsumer({ runtimeId, enabled = true } = {}) {
   const [streamState, setStreamState] = useState({
     liveActivity: { items: [], lastMessage: null, lastEvent: null },
