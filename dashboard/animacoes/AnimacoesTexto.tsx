@@ -15,10 +15,12 @@ const ANIMACOES_TEXTO_INTEIRO = new Set([
   "light-speed-in",
 ]);
 
+// inverterKeyframes: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function inverterKeyframes(keyframes) {
   return [...keyframes].reverse().map(({ offset, ...frame }) => frame);
 }
 
+// embaralharCaractere: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function embaralharCaractere() {
   return GLIFOS[Math.floor(Math.random() * GLIFOS.length)];
 }
@@ -104,6 +106,7 @@ const EASING = {
   "light-speed-in": "cubic-bezier(0.23, 1, 0.32, 1)",
 };
 
+// AnimacoesTexto: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function AnimacoesTexto({
   texto = "",
   tipo = "cascata",
@@ -284,6 +287,8 @@ export default function AnimacoesTexto({
     );
     return () => clearTimeout(timer);
   }, [repetir, caracteres.length, atrasoSeguro, duracaoSegura, vaiEVem, tipoValido, versao]);
+
+  {/* Estrutura visual retornada: span. */}
 
   return (
     <span
