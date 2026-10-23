@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como a conexão RTC é reiniciada quando necessário. */
 // ReloadRTC.js — Módulo inteligente para recarga, reconexão e sincronização do Publisher RTC.
 // Sincroniza atalhos globais, mantém a constância da sessão e garante reconexão e envio de novos valores.
 
