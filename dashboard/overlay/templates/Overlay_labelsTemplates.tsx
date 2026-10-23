@@ -1,6 +1,7 @@
 import React from "react";
 import { Award, Sparkles, Flame, Trophy, Users } from "lucide-react";
 
+// createLabelTemplates: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
   const colorMap = {
     purple: {
@@ -48,6 +49,8 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
         const u = user || (isOnline ? "Aguardando dados" : "Live não conectada");
         const d = detail || (isOnline ? "Nenhum registro" : "Live offline");
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full p-2.5 rounded-none bg-slate-950/90 flex items-center gap-3 select-none text-left shadow-xl`}
@@ -80,6 +83,8 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando" : "Offline");
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full px-3 rounded-full bg-slate-900/90 border ${c.border} flex items-center justify-between select-none shadow-md text-left`}
@@ -104,6 +109,8 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, detail, isOnline = false }) => {
         const u = user || (isOnline ? "Standby" : "Offline");
         const d = detail || "";
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
@@ -131,6 +138,8 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       badge: "Circular Tag",
       render: ({ user, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando" : "Offline");
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
@@ -161,6 +170,8 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, detail, isOnline = false }) => {
         const u = user || (isOnline ? "WAITING" : "OFFLINE");
         const d = detail || "";
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
@@ -197,6 +208,8 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
         const u = user || (isOnline ? "Aguardando" : "Offline");
         const d = detail || "";
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div className="w-full h-full px-3.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
             <div className="flex items-center gap-2 truncate">
@@ -223,6 +236,8 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando dados" : "Live offline");
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div className="w-full h-full p-2.5 rounded-xl bg-black/80 border border-white/10 flex flex-col justify-between select-none text-left shadow-lg">
             <span className={`text-[8px] font-mono ${c.textBadge} font-bold uppercase`}>
@@ -247,6 +262,8 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       badge: "Glass Tag",
       render: ({ user, detail, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando" : "Offline");
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
@@ -279,6 +296,8 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando" : "Offline");
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full px-3 rounded-xl bg-black/90 border ${c.border} flex items-center gap-2 select-none text-left`}
@@ -307,6 +326,8 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando" : "Offline");
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full p-2 rounded-lg bg-slate-900 border-r-4 ${c.border} border-t border-b border-l border-white/10 flex items-center justify-between select-none text-left shadow-md`}
@@ -329,6 +350,7 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
   ];
 }
 
+// createCounterTemplates: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) {
   const colorMap = {
     purple: {
@@ -356,6 +378,8 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       badge: "Big Number",
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
@@ -387,6 +411,8 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full px-3.5 rounded-full bg-slate-900/90 border ${c.border} flex items-center justify-between select-none shadow-md`}
@@ -412,6 +438,8 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full p-2 rounded-full bg-slate-950/90 border ${c.border} flex flex-col items-center justify-center select-none text-center shadow-xl aspect-square`}
@@ -436,6 +464,8 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       badge: "Esports Box",
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div className="w-full h-full p-2.5 rounded-xl bg-black/85 border border-white/10 flex items-center justify-between select-none text-left shadow-lg">
@@ -463,6 +493,8 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       badge: "Cyber Counter",
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
@@ -494,6 +526,8 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div className="w-full h-full p-2 flex flex-col justify-end select-none text-left drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
             <span className={`text-[8.5px] font-mono ${c.textAcc} uppercase font-bold`}>
@@ -517,6 +551,8 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       badge: "Split Header",
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div className="w-full h-full rounded-xl bg-slate-950 border border-white/10 flex flex-col overflow-hidden select-none text-left shadow-xl">
@@ -545,6 +581,8 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div
             className={`w-full h-full p-2.5 rounded-2xl bg-black/85 border ${c.border} flex items-center justify-between select-none text-left shadow-xl`}
@@ -572,6 +610,8 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
+        {/* Estrutura visual retornada: div. */}
+
         return (
           <div className="w-full h-full px-3.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
             <div className="flex items-center gap-2">
@@ -596,6 +636,8 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       badge: "Honor Plate",
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
