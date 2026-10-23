@@ -3,7 +3,12 @@ import { CircleUserRound, Pencil, Trash2, X, Upload, UserRound, LockKeyhole, Ima
 
 type AccountUser = { user_id: string; user: string; role?: "admin" | "user"; imagen?: string | null };
 type ApiResult = { ok?: boolean; message?: string; user?: AccountUser };
-type AlbumImage = { id: string; name: string; dataUrl: string; type: string; size: number };\ntype Album = { id: number; name: string; description: string; images: AlbumImage[] };\ntype UploadNotice = { id: string; kind: "format" | "size" | "error"; text: string };\nconst MAX_IMAGE_SIZE = 5 * 1024 * 1024;\nconst WARN_IMAGE_SIZE = 4 * 1024 * 1024;
+type AlbumImage = { id: string; name: string; url: string; type: string; size: number; created_at?: string; filename?: string };
+type ApiAlbum = { id: string; user_id: string; nome: string; descricao: string; imagens: AlbumImage[]; data_criacao: string; data_edicao: string };
+type Album = { id: string; user_id: string; name: string; description: string; images: AlbumImage[]; data_criacao: string; data_edicao: string };
+type UploadNotice = { id: string; kind: "format" | "size" | "error"; text: string };
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const WARN_IMAGE_SIZE = 4 * 1024 * 1024;
 const buttonBase: CSSProperties = { display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 40, borderRadius: 10, padding: "9px 16px", fontSize: 13, fontWeight: 650, cursor: "pointer", whiteSpace: "nowrap" };
 const inputStyle: CSSProperties = { width: "100%", boxSizing: "border-box", border: "1px solid #334155", background: "#080d19", color: "#e2e8f0", borderRadius: 9, padding: "11px 12px", outline: "none", fontSize: 14 };
 const labelStyle: CSSProperties = { display: "grid", gap: 7, color: "#cbd5e1", fontSize: 13 };
@@ -26,7 +31,11 @@ export default function MinhaConta() {
   const [albums, setAlbums] = useState<Album[]>([]);
   const [visibleAlbumCount, setVisibleAlbumCount] = useState(ALBUMS_PER_PAGE);
   const [albumMessage, setAlbumMessage] = useState("");
+  const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<AlbumImage | null>(null);
+  const [uploadNotices, setUploadNotices] = useState<UploadNotice[]>([]);
   const fileInput = useRef<HTMLInputElement>(null);
+  const albumFileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let alive = true;
@@ -43,20 +52,133 @@ export default function MinhaConta() {
     return () => { alive = false; };
   }, []);
 
-  function createAlbum(event: FormEvent) {
-    event.preventDefault();
-    const name = albumName.trim();
-    const description = albumDescription.trim();
-    if (!name) { setAlbumMessage("Informe o nome do álbum."); return; }
-    setAlbums((current) => [...current, { id: Date.now(), name, description, images: [] }]);
-    setVisibleAlbumCount((current) => Math.max(current, ALBUMS_PER_PAGE));
-    setAlbumName("");
-    setAlbumDescription("");
-    setAlbumMessage("");
-    setAlbumModalOpen(false);
+  function normalizeAlbum(input: ApiAlbum): Album {
+    return {
+      id: input.id,
+      user_id: input.user_id,
+      name: input.nome,
+      description: input.descricao,
+      images: Array.isArray(input.imagens) ? input.imagens : [],
+      data_criacao: input.data_criacao,
+      data_edicao: input.data_edicao,
+    };
   }
 
-  function addUploadNotice(kind: UploadNotice["kind"], text: string) {\n    setUploadNotices((current) => [...current, { id: `${Date.now()}-${Math.random()}`, kind, text }]);\n  }\n\n  async function uploadAlbumImages(fileList: FileList | null) {\n    const albumId = selectedAlbumId;\n    if (!fileList || albumId === null) return;\n    const files = Array.from(fileList);\n    const accepted: AlbumImage[] = [];\n    for (const file of files) {\n      const extension = file.name.split(".").pop()?.toLowerCase();\n      const isAllowed = (file.type === "image/png" && extension === "png") || (file.type === "image/gif" && extension === "gif");\n      if (!isAllowed) { addUploadNotice("format", "Este formato nao e permitido neste ambiente."); continue; }\n      if (file.size > MAX_IMAGE_SIZE) { addUploadNotice("size", "Este tamanho de arquivo ultrapassa o limite permitido de 5 MB por imagem."); continue; }\n      if (file.size > WARN_IMAGE_SIZE) addUploadNotice("size", "Este tamanho de arquivo ultrapasa o tamanho permitido de 4 MB por imagen.");\n      try {\n        const dataUrl = await new Promise<string>((resolve, reject) => {\n          const reader = new FileReader();\n          reader.onerror = () => reject(new Error("Não foi possível ler o arquivo."));\n          reader.onload = () => resolve(String(reader.result));\n          reader.readAsDataURL(file);\n        });\n        accepted.push({ id: `${Date.now()}-${Math.random()}-${file.name}`, name: file.name, dataUrl, type: file.type, size: file.size });\n      } catch { addUploadNotice("error", `Não foi possível carregar a imagem ${file.name}.`); }\n    }\n    if (accepted.length) setAlbums((current) => current.map((album) => album.id === albumId ? { ...album, images: [...album.images, ...accepted] } : album));\n    if (albumFileInput.current) albumFileInput.current.value = "";\n  }\n\n  function deleteAlbumImage(imageId: string) {\n    if (selectedAlbumId === null) return;\n    setAlbums((current) => current.map((album) => album.id === selectedAlbumId ? { ...album, images: album.images.filter((image) => image.id !== imageId) } : album));\n    setSelectedImage(null);\n  }\n\n  function closeModal() {
+  function galleryHeaders(json = false): Headers {
+    const headers = new Headers({ Accept: "application/json" });
+    const token = sessionStorage.getItem("livenexus_token");
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+    if (json) headers.set("Content-Type", "application/json");
+    return headers;
+  }
+
+  useEffect(() => {
+    if (!user?.user_id) return;
+    let alive = true;
+    fetch("/api/galeria-usuarios", {
+      credentials: "same-origin",
+      headers: galleryHeaders(),
+      cache: "no-store",
+    })
+      .then(async (response) => {
+        const result = await response.json() as { ok?: boolean; message?: string; albums?: ApiAlbum[] };
+        if (!response.ok || !result.ok) throw new Error(result.message || "Não foi possível carregar os álbuns.");
+        if (alive) setAlbums((result.albums ?? []).map(normalizeAlbum));
+      })
+      .catch((error: unknown) => {
+        if (alive) setAlbumMessage(error instanceof Error ? error.message : "Não foi possível carregar os álbuns.");
+      });
+    return () => { alive = false; };
+  }, [user?.user_id]);
+
+  async function createAlbum(event: FormEvent) {
+    event.preventDefault();
+    const nome = albumName.trim();
+    const descricao = albumDescription.trim();
+    if (!nome) { setAlbumMessage("Informe o nome do álbum."); return; }
+    try {
+      const response = await fetch("/api/galeria-usuarios", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: galleryHeaders(true),
+        body: JSON.stringify({ nome, descricao }),
+        cache: "no-store",
+      });
+      const result = await response.json() as { ok?: boolean; message?: string; album?: ApiAlbum };
+      if (!response.ok || !result.ok || !result.album) throw new Error(result.message || "Não foi possível criar o álbum.");
+      setAlbums((current) => [...current, normalizeAlbum(result.album!)]);
+      setVisibleAlbumCount((current) => Math.max(current, ALBUMS_PER_PAGE));
+      setAlbumName("");
+      setAlbumDescription("");
+      setAlbumMessage("");
+      setAlbumModalOpen(false);
+    } catch (error) {
+      setAlbumMessage(error instanceof Error ? error.message : "Não foi possível criar o álbum.");
+    }
+  }
+
+  function addUploadNotice(kind: UploadNotice["kind"], text: string) {
+    setUploadNotices((current) => [...current, { id: `${Date.now()}-${Math.random()}`, kind, text }]);
+  }
+
+  async function uploadAlbumImages(fileList: FileList | null) {
+    const albumId = selectedAlbumId;
+    if (!fileList || albumId === null) return;
+    const files = Array.from(fileList);
+    for (const file of files) {
+      const extension = file.name.split(".").pop()?.toLowerCase();
+      const isAllowed = (file.type === "image/png" && extension === "png") || (file.type === "image/gif" && extension === "gif");
+      if (!isAllowed) {
+        addUploadNotice("format", "Este formato nao e permitido neste ambiente.");
+        continue;
+      }
+      if (file.size > MAX_IMAGE_SIZE) {
+        addUploadNotice("size", "Este tamanho de arquivo ultrapassa o limite permitido de 5 MB por imagem.");
+        continue;
+      }
+      if (file.size > WARN_IMAGE_SIZE) addUploadNotice("size", "Este tamanho de arquivo ultrapasa o tamanho permitido de 4 MB por imagen.");
+      try {
+        const headers = galleryHeaders();
+        headers.set("Content-Type", file.type);
+        headers.set("X-File-Name", encodeURIComponent(file.name));
+        const response = await fetch(`/api/galeria-usuarios/${encodeURIComponent(albumId)}/imagens`, {
+          method: "POST",
+          credentials: "same-origin",
+          headers,
+          body: file,
+          cache: "no-store",
+        });
+        const result = await response.json() as { ok?: boolean; message?: string; album?: ApiAlbum };
+        if (!response.ok || !result.ok || !result.album) throw new Error(result.message || `Não foi possível carregar ${file.name}.`);
+        const updated = normalizeAlbum(result.album);
+        setAlbums((current) => current.map((album) => album.id === albumId ? updated : album));
+      } catch (error) {
+        addUploadNotice("error", error instanceof Error ? error.message : `Não foi possível carregar a imagem ${file.name}.`);
+      }
+    }
+    if (albumFileInput.current) albumFileInput.current.value = "";
+  }
+
+  async function deleteAlbumImage(imageId: string) {
+    if (selectedAlbumId === null) return;
+    try {
+      const response = await fetch(`/api/galeria-usuarios/${encodeURIComponent(selectedAlbumId)}/imagens/${encodeURIComponent(imageId)}`, {
+        method: "DELETE",
+        credentials: "same-origin",
+        headers: galleryHeaders(),
+        cache: "no-store",
+      });
+      const result = await response.json() as { ok?: boolean; message?: string; album?: ApiAlbum };
+      if (!response.ok || !result.ok || !result.album) throw new Error(result.message || "Não foi possível excluir a imagem.");
+      const updated = normalizeAlbum(result.album);
+      setAlbums((current) => current.map((album) => album.id === selectedAlbumId ? updated : album));
+      setSelectedImage(null);
+    } catch (error) {
+      addUploadNotice("error", error instanceof Error ? error.message : "Não foi possível excluir a imagem.");
+    }
+  }
+
+  function closeModal() {
     setModal(null); setEditMode(null); setMessage("");
     setCurrentPassword(""); setNewPassword(""); setRepeatPassword("");
     if (user) setUsername(user.user);
@@ -151,7 +273,59 @@ export default function MinhaConta() {
           <a key={label} href="#" aria-current={activeSubmenu === label ? "page" : undefined} onClick={(event) => { event.preventDefault(); setActiveSubmenu(label); setAlbumMessage(""); }} style={{ color: activeSubmenu === label ? "#a78bfa" : "#cbd5e1", textDecoration: "none", fontSize: 13, fontWeight: activeSubmenu === label ? 750 : 600, whiteSpace: "nowrap", borderBottom: activeSubmenu === label ? "2px solid #8b5cf6" : "2px solid transparent", paddingBottom: 10, marginBottom: -11 }}>{label}</a>
         ))}
       </nav>
-      {activeSubmenu === "Imagens" && <section style={{ marginTop: 4, width: "100%", boxSizing: "border-box", border: "1px solid #263449", background: "#0b1220", borderRadius: 12, padding: 16 }}>\n        {selectedAlbumId === null ? <>\n          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", width: "100%" }}>\n            <button type="button" onClick={() => { setAlbumName(""); setAlbumDescription(""); setAlbumMessage(""); setAlbumModalOpen(true); }} style={{ ...buttonBase, border: "1px solid #6d5bd0", background: "#5b4acb", color: "#fff" }}><Plus size={16} />Criar álbum</button>\n          </div>\n          {albumMessage && <p role="status" style={{ color: "#fca5a5", fontSize: 13, marginTop: 12 }}>{albumMessage}</p>}\n          {albums.length > 0 && <>\n            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 14, marginTop: 16 }}>\n              {albums.slice(0, visibleAlbumCount).map((album) => <button key={album.id} type="button" onClick={() => { setSelectedAlbumId(album.id); setUploadNotices([]); }} aria-label={`Abrir álbum ${album.name}`} style={{ textAlign: "left", overflow: "hidden", border: "1px solid #263449", borderRadius: 11, background: "#111b2d", minWidth: 0, padding: 0, color: "inherit", cursor: "pointer" }}>\n                <div style={{ aspectRatio: "1 / 1", width: "100%", display: "grid", placeItems: "center", background: "#172033", color: "#a78bfa", overflow: "hidden" }}>{album.images[0] ? <img src={album.images[0].dataUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <Images size={30} strokeWidth={1.5} />}</div>\n                <div style={{ padding: 10 }}><h3 style={{ margin: 0, fontSize: 13, fontWeight: 700, overflowWrap: "anywhere" }}>{album.name}</h3><p style={{ margin: "6px 0 0", color: "#94a3b8", fontSize: 11, lineHeight: 1.45, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{album.description}</p></div>\n              </button>)}\n            </div>\n            {albums.length > visibleAlbumCount && <div style={{ display: "flex", justifyContent: "center", marginTop: 18 }}>\n              <button type="button" onClick={() => setVisibleAlbumCount((current) => current + ALBUMS_PER_PAGE)} style={{ ...buttonBase, border: "1px solid #475569", background: "#111b2d", color: "#e2e8f0" }}>Ver mais</button>\n            </div>}\n          </>}\n        </> : (() => {\n          const album = albums.find((item) => item.id === selectedAlbumId);\n          if (!album) return null;\n          return <div>\n            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 18 }}>\n              <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>\n                <button type="button" onClick={() => { setSelectedAlbumId(null); setSelectedImage(null); setUploadNotices([]); }} aria-label="Voltar aos álbuns" style={{ ...buttonBase, minHeight: 36, padding: "7px 10px", border: "1px solid #334155", background: "transparent", color: "#e2e8f0" }}><ArrowLeft size={16} />Voltar</button>\n                <div><h2 style={{ margin: 0, fontSize: 18, fontWeight: 750 }}>{album.name}</h2><p style={{ margin: "4px 0 0", color: "#94a3b8", fontSize: 12 }}>{album.images.length} imagens</p></div>\n              </div>\n              <button type="button" onClick={() => albumFileInput.current?.click()} style={{ ...buttonBase, border: "1px solid #6d5bd0", background: "#5b4acb", color: "#fff" }}><Upload size={16} />Upload de imagens</button>\n              <input ref={albumFileInput} type="file" accept=".png,.gif,image/png,image/gif" multiple hidden onChange={(event) => void uploadAlbumImages(event.target.files)} />\n            </div>\n            {uploadNotices.length > 0 && <div aria-live="polite" style={{ display: "grid", gap: 8, marginBottom: 16 }}>\n              {uploadNotices.map((notice) => <div key={notice.id} role="status" style={{ display: "flex", alignItems: "flex-start", gap: 7, color: notice.kind === "format" ? "#fca5a5" : "#fcd34d", fontSize: 12, lineHeight: 1.5 }}><span style={{ display: "inline-flex", flex: "0 0 auto", marginTop: 1 }}>{notice.kind === "format" ? <AlertCircle size={15} /> : <AlertTriangle size={15} />}</span><span>{notice.text}</span><button type="button" aria-label="Fechar aviso" onClick={() => setUploadNotices((current) => current.filter((item) => item.id !== notice.id))} style={{ marginLeft: "auto", border: 0, background: "transparent", color: "inherit", cursor: "pointer", padding: 0 }}><X size={14} /></button></div>)}\n            </div>}\n            {album.images.length > 0 ? <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 12 }}>\n              {album.images.map((image) => <button key={image.id} type="button" onClick={() => setSelectedImage(image)} aria-label={`Ampliar imagem ${image.name}`} style={{ padding: 0, border: "1px solid #334155", borderRadius: 9, overflow: "hidden", background: "#111b2d", cursor: "pointer", minWidth: 0 }}>\n                <img src={image.dataUrl} alt={image.name} title={image.name} style={{ display: "block", width: "100%", aspectRatio: "1 / 1", objectFit: "cover" }} />\n              </button>)}\n            </div> : <div style={{ padding: "36px 12px", textAlign: "center", color: "#94a3b8", fontSize: 13, border: "1px dashed #334155", borderRadius: 10 }}>Este álbum ainda não tem imagens.</div>}\n          </div>;\n        })()}\n      </section>}\n      {selectedImage && <div style={{ ...overlay, zIndex: 1100 }} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedImage(null); }}>\n        <section role="dialog" aria-modal="true" aria-label={selectedImage.name} style={{ width: "min(100%, 1000px)", maxHeight: "90vh", overflow: "auto", border: "1px solid #334155", borderRadius: 14, padding: 14, background: "#0b1220", boxSizing: "border-box" }}>\n          <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>\n            <span style={{ color: "#cbd5e1", fontSize: 13, overflowWrap: "anywhere" }}>{selectedImage.name}</span>\n            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>\n              <button type="button" onClick={() => deleteAlbumImage(selectedImage.id)} style={{ ...buttonBase, minHeight: 34, padding: "7px 10px", border: "1px solid #991b1b", background: "#35151b", color: "#fecaca" }}><Trash2 size={15} />Deletar imagem</button>\n              <button type="button" aria-label="Fechar imagem" onClick={() => setSelectedImage(null)} style={{ ...buttonBase, minHeight: 34, width: 34, padding: 0, border: "1px solid #334155", background: "transparent", color: "#cbd5e1" }}><X size={16} /></button>\n            </div>\n          </header>\n          <div style={{ display: "grid", placeItems: "center", minHeight: 120, maxHeight: "72vh", overflow: "auto" }}><img src={selectedImage.dataUrl} alt={selectedImage.name} style={{ display: "block", maxWidth: "100%", maxHeight: "70vh", objectFit: "contain" }} /></div>\n        </section>\n      </div>}\n      {albumModalOpen && <div style={overlay} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setAlbumModalOpen(false); }}>
+      {activeSubmenu === "Imagens" && <section style={{ marginTop: 4, width: "100%", boxSizing: "border-box", border: "1px solid #263449", background: "#0b1220", borderRadius: 12, padding: 16 }}>
+        {selectedAlbumId === null ? <>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", width: "100%" }}>
+            <button type="button" onClick={() => { setAlbumName(""); setAlbumDescription(""); setAlbumMessage(""); setAlbumModalOpen(true); }} style={{ ...buttonBase, border: "1px solid #6d5bd0", background: "#5b4acb", color: "#fff" }}><Plus size={16} />Criar álbum</button>
+          </div>
+          {albumMessage && <p role="status" style={{ color: "#fca5a5", fontSize: 13, marginTop: 12 }}>{albumMessage}</p>}
+          {albums.length > 0 && <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 14, marginTop: 16 }}>
+              {albums.slice(0, visibleAlbumCount).map((album) => <button key={album.id} type="button" onClick={() => { setSelectedAlbumId(album.id); setUploadNotices([]); }} aria-label={`Abrir álbum ${album.name}`} style={{ textAlign: "left", overflow: "hidden", border: "1px solid #263449", borderRadius: 11, background: "#111b2d", minWidth: 0, padding: 0, color: "inherit", cursor: "pointer" }}>
+                <div style={{ aspectRatio: "1 / 1", width: "100%", display: "grid", placeItems: "center", background: "#172033", color: "#a78bfa", overflow: "hidden" }}>{album.images[0] ? <img src={album.images[0].url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <Images size={30} strokeWidth={1.5} />}</div>
+                <div style={{ padding: 10 }}><h3 style={{ margin: 0, fontSize: 13, fontWeight: 700, overflowWrap: "anywhere" }}>{album.name}</h3><p style={{ margin: "6px 0 0", color: "#94a3b8", fontSize: 11, lineHeight: 1.45, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{album.description}</p></div>
+              </button>)}
+            </div>
+            {albums.length > visibleAlbumCount && <div style={{ display: "flex", justifyContent: "center", marginTop: 18 }}>
+              <button type="button" onClick={() => setVisibleAlbumCount((current) => current + ALBUMS_PER_PAGE)} style={{ ...buttonBase, border: "1px solid #475569", background: "#111b2d", color: "#e2e8f0" }}>Ver mais</button>
+            </div>}
+          </>}
+        </> : (() => {
+          const album = albums.find((item) => item.id === selectedAlbumId);
+          if (!album) return null;
+          return <div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+                <button type="button" onClick={() => { setSelectedAlbumId(null); setSelectedImage(null); setUploadNotices([]); }} aria-label="Voltar aos álbuns" style={{ ...buttonBase, minHeight: 36, padding: "7px 10px", border: "1px solid #334155", background: "transparent", color: "#e2e8f0" }}><ArrowLeft size={16} />Voltar</button>
+                <div><h2 style={{ margin: 0, fontSize: 18, fontWeight: 750 }}>{album.name}</h2><p style={{ margin: "4px 0 0", color: "#94a3b8", fontSize: 12 }}>{album.images.length} imagens</p></div>
+              </div>
+              <button type="button" onClick={() => albumFileInput.current?.click()} style={{ ...buttonBase, border: "1px solid #6d5bd0", background: "#5b4acb", color: "#fff" }}><Upload size={16} />Upload de imagens</button>
+              <input ref={albumFileInput} type="file" accept=".png,.gif,image/png,image/gif" multiple hidden onChange={(event) => void uploadAlbumImages(event.target.files)} />
+            </div>
+            {uploadNotices.length > 0 && <div aria-live="polite" style={{ display: "grid", gap: 8, marginBottom: 16 }}>
+              {uploadNotices.map((notice) => <div key={notice.id} role="status" style={{ display: "flex", alignItems: "flex-start", gap: 7, color: notice.kind === "format" ? "#fca5a5" : "#fcd34d", fontSize: 12, lineHeight: 1.5 }}><span style={{ display: "inline-flex", flex: "0 0 auto", marginTop: 1 }}>{notice.kind === "format" ? <AlertCircle size={15} /> : <AlertTriangle size={15} />}</span><span>{notice.text}</span><button type="button" aria-label="Fechar aviso" onClick={() => setUploadNotices((current) => current.filter((item) => item.id !== notice.id))} style={{ marginLeft: "auto", border: 0, background: "transparent", color: "inherit", cursor: "pointer", padding: 0 }}><X size={14} /></button></div>)}
+            </div>}
+            {album.images.length > 0 ? <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0, 1fr))", gap: 12 }}>
+              {album.images.map((image) => <button key={image.id} type="button" onClick={() => setSelectedImage(image)} aria-label={`Ampliar imagem ${image.name}`} style={{ padding: 0, border: "1px solid #334155", borderRadius: 9, overflow: "hidden", background: "#111b2d", cursor: "pointer", minWidth: 0 }}>
+                <img src={image.url} alt={image.name} title={image.name} style={{ display: "block", width: "100%", aspectRatio: "1 / 1", objectFit: "cover" }} />
+              </button>)}
+            </div> : <div style={{ padding: "36px 12px", textAlign: "center", color: "#94a3b8", fontSize: 13, border: "1px dashed #334155", borderRadius: 10 }}>Este álbum ainda não tem imagens.</div>}
+          </div>;
+        })()}
+      </section>}
+      {selectedImage && <div style={{ ...overlay, zIndex: 1100 }} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedImage(null); }}>
+        <section role="dialog" aria-modal="true" aria-label={selectedImage.name} style={{ width: "min(100%, 1000px)", maxHeight: "90vh", overflow: "auto", border: "1px solid #334155", borderRadius: 14, padding: 14, background: "#0b1220", boxSizing: "border-box" }}>
+          <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
+            <span style={{ color: "#cbd5e1", fontSize: 13, overflowWrap: "anywhere" }}>{selectedImage.name}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <button type="button" onClick={() => deleteAlbumImage(selectedImage.id)} style={{ ...buttonBase, minHeight: 34, padding: "7px 10px", border: "1px solid #991b1b", background: "#35151b", color: "#fecaca" }}><Trash2 size={15} />Deletar imagem</button>
+              <button type="button" aria-label="Fechar imagem" onClick={() => setSelectedImage(null)} style={{ ...buttonBase, minHeight: 34, width: 34, padding: 0, border: "1px solid #334155", background: "transparent", color: "#cbd5e1" }}><X size={16} /></button>
+            </div>
+          </header>
+          <div style={{ display: "grid", placeItems: "center", minHeight: 120, maxHeight: "72vh", overflow: "auto" }}><img src={selectedImage.url} alt={selectedImage.name} style={{ display: "block", maxWidth: "100%", maxHeight: "70vh", objectFit: "contain" }} /></div>
+        </section>
+      </div>}
+      {albumModalOpen && <div style={overlay} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setAlbumModalOpen(false); }}>
         <section role="dialog" aria-modal="true" aria-labelledby="album-modal-title" style={modalCard}>
           <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 20 }}>
             <h2 id="album-modal-title" style={{ fontSize: 20, fontWeight: 750 }}>Criar álbum</h2>
