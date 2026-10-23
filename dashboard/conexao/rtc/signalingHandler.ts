@@ -7,11 +7,13 @@ const signalQueues = new Map(); // runtimeId -> Array<{ id, fromRole, toRole, ty
 const MAX_SIGNALS = 200;
 const SIGNAL_TTL_MS = 60000; // 1 minute
 
+// cleanupSignals: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function cleanupSignals(queue) {
   const cutoff = Date.now() - SIGNAL_TTL_MS;
   return queue.filter((sig) => sig.timestamp > cutoff);
 }
 
+// handleSignalingRequest: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function handleSignalingRequest(req, res) {
   res.setHeader("Content-Type", "application/json");
 
