@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica o recurso usado pela tela para receber mídia RTC. */
 // Hook para inicialização e ciclo de vida do Consumer RTC Automático
 import { useEffect, useRef, useState, useCallback } from "react";
 import { RtcConsumer } from "./rtcConsumer.js";
