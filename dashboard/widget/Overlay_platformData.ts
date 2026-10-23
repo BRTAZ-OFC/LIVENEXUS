@@ -18,6 +18,7 @@ export const MULTIPLATFORM_WIDGET_IDS = new Set([
   "twitch-event-list",
 ]);
 
+// usesPlatformData: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function usesPlatformData(instance) {
   return (
     MULTIPLATFORM_WIDGET_IDS.has(instance?.widgetId) ||
@@ -38,6 +39,7 @@ export const YOUTUBE_EVENT_LABELS = Object.freeze({
   youtube_poll: "Enquete do YouTube",
 });
 
+// selectedPlatforms: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function selectedPlatforms(config = {}) {
   // Instâncias da etapa anterior com `platform` mantêm a escolha ao abrir a versão nova.
   // Uma instância sem configuração de origem usa as três plataformas habilitadas.
@@ -49,6 +51,7 @@ export function selectedPlatforms(config = {}) {
   return STREAM_PLATFORMS.filter((platform) => requested.includes(platform));
 }
 
+// platformMessages: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function platformMessages(liveActivity, config = {}) {
   const platforms = selectedPlatforms(config);
   return (liveActivity?.items || []).filter(
@@ -56,6 +59,7 @@ export function platformMessages(liveActivity, config = {}) {
   );
 }
 
+// platformEvents: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function platformEvents(liveActivity, config = {}) {
   const platforms = selectedPlatforms(config);
   return (liveActivity?.items || []).filter(
@@ -63,12 +67,14 @@ export function platformEvents(liveActivity, config = {}) {
   );
 }
 
+// platformIsOnline: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function platformIsOnline(connections, config = {}) {
   return selectedPlatforms(config).some(
     (platform) => connections?.[platform]?.status === "connected",
   );
 }
 
+// platformViewers: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function platformViewers(connections, config = {}, { aggregate = true } = {}) {
   const online = selectedPlatforms(config).filter(
     (platform) => connections?.[platform]?.status === "connected",
@@ -81,6 +87,7 @@ export function platformViewers(connections, config = {}, { aggregate = true } =
     : null;
 }
 
+// platformMeta: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function platformMeta(streamMeta, connections, config = {}, field) {
   const platform = selectedPlatforms(config).find((source) => {
     if (connections?.[source]?.status !== "connected") return false;
@@ -95,6 +102,7 @@ export function platformMeta(streamMeta, connections, config = {}, field) {
 }
 
 // A limpeza é apenas visual: a mensagem original do contexto e o TTS ficam intactos.
+// visibleChatText: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function visibleChatText(item) {
   const text = String(item?.text || "");
   if (item?.platform !== "Kick") return text;
@@ -124,6 +132,7 @@ export function visibleChatText(item) {
     .trim();
 }
 
+// eventLabel: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function eventLabel(event) {
   if (event?.platform === "YouTube")
     return YOUTUBE_EVENT_LABELS[event.eventType] || event.eventType;
@@ -136,6 +145,7 @@ export function eventLabel(event) {
   return event?.eventType || "";
 }
 
+// eventDetails: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function eventDetails(event) {
   const meta = event?.eventMeta || {};
   if (event?.platform !== "YouTube") return event?.text || "";
@@ -163,6 +173,7 @@ export function eventDetails(event) {
   return values.join(" · ");
 }
 
+// genericEventAllowed: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function genericEventAllowed(event) {
   return (
     event?.platform === "Twitch" ||
