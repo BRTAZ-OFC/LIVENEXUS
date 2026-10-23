@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica a tela que conecta e desconecta plataformas de chat. */
 import { useEffect, useState } from "react";
 import { RadioTower, Radio, Youtube, Wifi, WifiOff, Trash2, Activity } from "lucide-react";
 import {
