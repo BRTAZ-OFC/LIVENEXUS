@@ -8,6 +8,7 @@ import { Clock, Eye, Zap, Timer, Sparkles } from "lucide-react";
  * 2. De Tempo em Tempo ('interval')
  * 3. Somente com Evento ('event')
  */
+// TempoVisivelConfig: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function TempoVisivelConfig({ instance, onUpdateInstance }) {
   if (!instance) return null;
 
