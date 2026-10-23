@@ -525,3 +525,45 @@ export const overlayJohnson = createJsonTableCrud("overlays");
 export const rtcIdentityJohnson = createJsonTableCrud("rtc_registry");
 export const schemasJohnson = createJsonTableCrud("schemas");
 export const templateJohnson = createJsonTableCrud("templates");
+
+/** Remove registros associados a uma conta de todas as tabelas JSON declaradas. */
+export async function deleteUserJsonRecords(userId) {
+  const targetId = String(userId ?? "").trim();
+  if (!targetId) throw new Error("ID do usuário não fornecido.");
+  for (const definition of Object.values(DEFINITIONS)) {
+    await withFileQueue(fileFor(definition), async () => {
+      const data = await readTable(definition);
+      let changed = false;
+      if (definition.shape === "array") {
+        const next = data.filter((record) => {
+          if (!isRecord(record)) return true;
+          if (String(record.user_id ?? record.userId ?? "") === targetId) { changed = true; return false; }
+          return true;
+        });
+        if (changed) await writeJsonAtomically(fileFor(definition), next);
+        return;
+      }
+      if (definition.shape === "userObject" || definition.shape === "userList") {
+        if (Object.hasOwn(data, targetId)) { delete data[targetId]; changed = true; }
+        for (const [key, value] of Object.entries(data)) {
+          if (definition.shape === "userObject" && isRecord(value) && String(value.user_id ?? value.userId ?? "") === targetId) {
+            delete data[key]; changed = true;
+          } else if (definition.shape === "userList" && Array.isArray(value)) {
+            const next = value.filter((record) => {
+              if (!isRecord(record)) return true;
+              if (String(record.user_id ?? record.userId ?? "") === targetId) { changed = true; return false; }
+              return true;
+            });
+            if (next.length !== value.length) { if (next.length) data[key] = next; else delete data[key]; }
+          }
+        }
+        if (changed) await writeJsonAtomically(fileFor(definition), data);
+        return;
+      }
+      for (const [key, value] of Object.entries(data)) {
+        if (isRecord(value) && String(value.user_id ?? value.userId ?? "") === targetId) { delete data[key]; changed = true; }
+      }
+      if (changed) await writeJsonAtomically(fileFor(definition), data);
+    });
+  }
+}
