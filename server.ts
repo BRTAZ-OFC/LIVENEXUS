@@ -11,8 +11,6 @@ import {
   updateUser,
   deleteUser,
   getUserById,
-  updateUser,
-  authenticateUser,
 } from "./dashboard/admin/banco/-crud.js";
 import {
   PlataformasJohnson,
@@ -614,6 +612,10 @@ app.post("/api/account/delete", async (req: Request, res: Response) => {
   const session = readSession(req) as SessionData | null;
   if (!session?.user_id) return res.status(401).set(NO_CACHE).json({ ok: false, message: "Faça login novamente." });
   try {
+    if (session.role === "admin") {
+      const admins = (await listUsers()).filter((user) => user.role === "admin");
+      if (admins.length <= 1) return res.status(400).set(NO_CACHE).json({ ok: false, message: "Não é possível excluir o único administrador do sistema." });
+    }
     await deleteUserJsonRecords(session.user_id);
     const deleted = await deleteUser(session.user_id);
     if (!deleted) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Conta não encontrada." });
