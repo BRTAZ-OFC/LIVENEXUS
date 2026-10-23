@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica as mensagens e os caminhos usados para estabelecer a conexão RTC. */
 import type { Express, Request, Response } from "express";
 import { readSession } from "../login/session.js";
 import { rtcIdentityJohnson } from "../admin/banco/-json-tables-crud.js";
