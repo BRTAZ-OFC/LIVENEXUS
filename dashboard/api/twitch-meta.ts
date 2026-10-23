@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como são consultadas as informações da Twitch. */
 /**
  * Live Nexus — Twitch Meta Worker (Helix oficial)
  * SEPARADO do channel-meta. Sem setInterval. Sob demanda direta.
