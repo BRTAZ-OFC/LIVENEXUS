@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica os controles e as opções de animação aplicadas aos textos. */
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./animacoes.css";
 
