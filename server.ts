@@ -114,7 +114,6 @@ const PUBLIC_API_ENDPOINTS = new Set([
 ]);
 
 registerRtcSignalingRoutes(app);
-registerUserGalleryRoutes(app);
 
 app.get("/api/overlay/canvas", async (req: Request, res: Response) => {
   const session = readSession(req) as SessionData | null;
@@ -194,6 +193,8 @@ app.use(/^\/api(?:\/.*)?$/, async (req: Request, res: Response, next: NextFuncti
     });
   }
 });
+
+registerUserGalleryRoutes(app);
 
 /* Cadastro e login. O CRUD JSON nunca é importado pelo frontend. */
 app.post("/api/auth/register", async (req: Request, res: Response) => {
