@@ -20,6 +20,7 @@ export type CatalogItem = {
 
 // O catálogo da Biblioteca usa exclusivamente YouTube Music e YouTube.
 // As consultas e continuações são feitas pela API existente do LIVENEXUS.
+// uniqueCatalogItems: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function uniqueCatalogItems(items: CatalogItem[]) {
   const seen = new Set<string>();
   return items.filter((item) => {
