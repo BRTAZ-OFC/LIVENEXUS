@@ -37,6 +37,7 @@ const YT_WEB_CONTEXT = {
   },
 };
 
+// corsHeaders: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function corsHeaders() {
   return {
     "Access-Control-Allow-Origin": "*",
@@ -46,6 +47,7 @@ function corsHeaders() {
   };
 }
 
+// jsonResponse: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -54,6 +56,7 @@ export function jsonResponse(data, status = 200) {
 }
 
 // Parser modular reutilizável para itens do YouTube Music (suporta responsiveListItem e twoRowItem)
+// parseMusicItemRenderer: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function parseMusicItemRenderer(it, type) {
   if (!it) return null;
 
@@ -227,6 +230,7 @@ function parseMusicItemRenderer(it, type) {
 }
 
 // Extrai o token de continuação seguro de um array continuations
+// extractContinuationToken: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function extractContinuationToken(continuations) {
   if (!Array.isArray(continuations)) return null;
   for (const c of continuations) {
@@ -238,6 +242,7 @@ function extractContinuationToken(continuations) {
 }
 
 // Localiza musicShelfRenderer na resposta inicial do InnerTube
+// findMusicShelf: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function findMusicShelf(data) {
   if (!data) return null;
   const tabs = data.contents?.tabbedSearchResultsRenderer?.tabs;
@@ -262,6 +267,7 @@ function findMusicShelf(data) {
 }
 
 // Localiza musicShelfContinuation na resposta de continuação do InnerTube
+// findMusicShelfContinuation: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function findMusicShelfContinuation(contData) {
   if (!contData) return null;
   if (contData.continuationContents?.musicShelfContinuation) {
@@ -277,6 +283,7 @@ function findMusicShelfContinuation(contData) {
 }
 
 // 1. Passo individual de continuação do InnerTube (devolve itens e o token seguinte)
+// fetchCategoryStep: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function fetchCategoryStep(query, type, continuationToken = null) {
   const params = CATEGORY_PARAMS[type];
   const items = [];
@@ -350,6 +357,7 @@ export async function fetchCategoryStep(query, type, continuationToken = null) {
 }
 
 // 2. Busca com paginação completa no YouTube Music (percorre toda a cadeia sem limite artificial)
+// fetchCategory: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function fetchCategory(query, type) {
   const allItems = [];
   const seenIds = new Set();
@@ -394,6 +402,7 @@ export async function fetchCategory(query, type) {
 }
 
 // 1.1 Passo individual de busca nativa do YouTube via InnerTube (youtubei/v1/search)
+// fetchYouTubeInnerTubeStep: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function fetchYouTubeInnerTubeStep(query, continuationToken = null) {
   if (!query || !query.trim()) return { items: [], continuation: null };
   const q = query.trim();
@@ -582,6 +591,7 @@ export async function fetchYouTubeInnerTubeStep(query, continuationToken = null)
 }
 
 // 1.2 Busca nativa do YouTube via InnerTube com paginação completa (youtubei/v1/search)
+// fetchYouTubeInnerTube: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function fetchYouTubeInnerTube(query) {
   if (!query || !query.trim()) return [];
   const q = query.trim();
@@ -622,6 +632,7 @@ export async function fetchYouTubeInnerTube(query) {
 // 2. Busca do PACOTE ESTRUTURADO (Músicas, Artistas, Álbuns, Playlists, YouTube)
 // Modo 'initial': entrega a 1ª página imediatamente e devolve os tokens de continuation para carregamento progressivo.
 // Modo 'full': aguarda toda a cadeia de continuation ser percorrida.
+// handleSearchBundle: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function handleSearchBundle(query, mode = "initial") {
   if (!query || !query.trim()) {
     return jsonResponse(
@@ -720,6 +731,7 @@ export async function handleSearchBundle(query, mode = "initial") {
 }
 
 // 3. Browse estruturado de Álbum, Playlist ou Artista
+// handleBrowse: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function handleBrowse(browseId) {
   if (!browseId) {
     return jsonResponse({ ok: false, error: "browseId é obrigatório" }, 400);
@@ -896,6 +908,7 @@ export async function handleBrowse(browseId) {
 }
 
 // 4. Continuidade estruturada: Rádio / Related / Next
+// handleNextRadio: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function handleNextRadio(videoId) {
   if (!videoId) {
     return jsonResponse({ ok: false, error: "videoId é obrigatório" }, 400);
@@ -947,6 +960,7 @@ export async function handleNextRadio(videoId) {
 }
 
 // Handler de requisições HTTP (padrão Fetch / Cloudflare Worker / Node Express / Vite)
+// handleRequest: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function handleRequest(request) {
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders() });
