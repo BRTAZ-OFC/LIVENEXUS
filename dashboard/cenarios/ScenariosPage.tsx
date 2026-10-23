@@ -41,10 +41,12 @@ type ScenariosPageProps = {
   onOpenScenario: (scenarioId: string) => void;
 };
 
+// isObject: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function isObject(value: unknown): value is JsonObject {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
+// getScenarioConfig: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function getScenarioConfig(row: ScenarioRecord): ScenarioConfig {
   const source: JsonObject =
     isObject(row.settings) && Object.keys(row.settings).length
@@ -75,6 +77,7 @@ function getScenarioConfig(row: ScenarioRecord): ScenarioConfig {
   };
 }
 
+// getPreviewBackground: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function getPreviewBackground(background: ScenarioConfig["background"]): CSSProperties {
   if (background.type === "solid") {
     return {
@@ -105,6 +108,7 @@ function getPreviewBackground(background: ScenarioConfig["background"]): CSSProp
   };
 }
 
+// ScenarioThumbnail: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function ScenarioThumbnail({ row }: { row: ScenarioRecord }) {
   const config = useMemo(() => getScenarioConfig(row), [row]);
   const visibleInstances = config.instances.filter((instance) => instance.visible !== false);
@@ -114,6 +118,8 @@ function ScenarioThumbnail({ row }: { row: ScenarioRecord }) {
     "border-lime-300/70 bg-lime-400/15 text-lime-100",
     "border-blue-300/70 bg-blue-400/20 text-blue-100",
   ];
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div
@@ -140,6 +146,8 @@ function ScenarioThumbnail({ row }: { row: ScenarioRecord }) {
           Math.min(100 - y, ((Number(instance.height) || 60) / config.visualizerSize.height) * 100),
         );
         const label = String(instance.name || instance.widgetId || `Widget ${index + 1}`);
+
+        {/* Estrutura visual retornada: div. */}
 
         return (
           <div
@@ -177,6 +185,7 @@ function ScenarioThumbnail({ row }: { row: ScenarioRecord }) {
   );
 }
 
+// ScenariosPage: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
   const [scenarios, setScenarios] = useState<ScenarioRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -270,6 +279,8 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
     }
   }
 
+  {/* Estrutura visual retornada: section. */}
+
   return (
     <section className="w-full min-w-0 px-4 py-6 sm:px-6">
       <header className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-cyan-300/10 pb-5">
@@ -315,6 +326,7 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
           {scenarios.map((scenario, index) => {
             const id = String(scenario.id ?? "");
             const config = getScenarioConfig(scenario);
+            {/* Estrutura visual retornada: button. */}
             return (
               <button
                 type="button"
