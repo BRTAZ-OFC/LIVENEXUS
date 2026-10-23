@@ -11,6 +11,8 @@ import {
   updateUser,
   deleteUser,
   getUserById,
+  updateUser,
+  authenticateUser,
 } from "./dashboard/admin/banco/-crud.js";
 import {
   PlataformasJohnson,
@@ -27,6 +29,7 @@ import {
   deleteAvaliacao,
 } from "./dashboard/admin/banco/-avaliacao-crud.js";
 import {
+  deleteUserJsonRecords,
   getJsonTableDefinitions,
   listJsonTableRecords,
   createJsonTableRecord,
@@ -559,6 +562,7 @@ app.get("/api/auth/me", async (req: Request, res: Response) => {
         user_id: user.user_id,
         user: user.user,
         role: user.role,
+        imagen: user.imagen ?? null,
       },
     });
   } catch (error) {
@@ -570,6 +574,53 @@ app.get("/api/auth/me", async (req: Request, res: Response) => {
         error: errorMessage(error, "Falha ao obter dados do usuário."),
       });
   }
+});
+
+/* Gerenciamento da própria conta autenticada. */
+app.post("/api/account/username", async (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) return res.status(401).set(NO_CACHE).json({ ok: false, message: "Faça login novamente." });
+  try {
+    const user = await updateUser(session.user_id, { user: req.body?.user });
+    return res.set(NO_CACHE).json({ ok: true, user, message: "Nome da conta atualizado." });
+  } catch (error) { return res.status(400).set(NO_CACHE).json({ ok: false, message: errorMessage(error, "Não foi possível atualizar o nome da conta.") }); }
+});
+
+app.post("/api/account/password", async (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) return res.status(401).set(NO_CACHE).json({ ok: false, message: "Faça login novamente." });
+  try {
+    const currentUser = await getUserById(session.user_id);
+    if (!currentUser || !(await authenticateUser(currentUser.user, req.body?.currentPassword))) return res.status(400).set(NO_CACHE).json({ ok: false, message: "A senha atual está incorreta." });
+    const newPassword = req.body?.newPassword;
+    if (typeof newPassword !== "string" || newPassword.length < 8) return res.status(400).set(NO_CACHE).json({ ok: false, message: "A nova senha deve ter pelo menos 8 caracteres." });
+    await updateUser(session.user_id, { password: newPassword });
+    return res.set(NO_CACHE).json({ ok: true, message: "Senha alterada com sucesso." });
+  } catch (error) { return res.status(400).set(NO_CACHE).json({ ok: false, message: errorMessage(error, "Não foi possível alterar a senha.") }); }
+});
+
+app.post("/api/account/image", async (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) return res.status(401).set(NO_CACHE).json({ ok: false, message: "Faça login novamente." });
+  const imagen = req.body?.imagen;
+  if (typeof imagen !== "string" || !/^data:image\/(jpeg|png|webp|gif);base64,/.test(imagen) || imagen.length > 350000) return res.status(400).set(NO_CACHE).json({ ok: false, message: "Imagem inválida ou maior que o limite permitido." });
+  try {
+    const user = await updateUser(session.user_id, { imagen });
+    return res.set(NO_CACHE).json({ ok: true, user, message: "Imagem de perfil atualizada." });
+  } catch (error) { return res.status(400).set(NO_CACHE).json({ ok: false, message: errorMessage(error, "Não foi possível salvar a imagem.") }); }
+});
+
+app.post("/api/account/delete", async (req: Request, res: Response) => {
+  const session = readSession(req) as SessionData | null;
+  if (!session?.user_id) return res.status(401).set(NO_CACHE).json({ ok: false, message: "Faça login novamente." });
+  try {
+    await deleteUserJsonRecords(session.user_id);
+    const deleted = await deleteUser(session.user_id);
+    if (!deleted) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Conta não encontrada." });
+    res.setHeader("Set-Cookie", clearSessionCookie());
+    res.setHeader("Clear-Site-Data", '"cookies", "storage"');
+    return res.set(NO_CACHE).json({ ok: true, message: "Conta e dados associados excluídos permanentemente." });
+  } catch (error) { return res.status(400).set(NO_CACHE).json({ ok: false, message: errorMessage(error, "Não foi possível excluir a conta e seus dados.") }); }
 });
 
 app.post("/api/channel-verify/challenge", async (req: Request, res: Response) => {
