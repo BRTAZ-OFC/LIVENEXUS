@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica os controles do reprodutor de música compartilhado entre telas. */
 import { useEffect, useRef, useState } from "react";
 import {
   ListMusic,
