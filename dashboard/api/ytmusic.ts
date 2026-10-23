@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como as buscas e os dados de música do YouTube são tratados. */
 // Cloudflare Worker & API Handler — YouTube Music InnerTube Bridge
 // Sem scraping HTML/Markdown. Sem regex sobre páginas de busca. Sem Jina.
 // Dados estruturados nativos obtidos via YouTube Music InnerTube API (WEB_REMIX).
