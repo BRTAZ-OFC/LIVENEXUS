@@ -1,6 +1,7 @@
 /* LIVENEXUS: Explica as opções para configurar a verificação do canal. */
 // Cliente do verificador de bio integrado ao servidor do LIVENEXUS.
 // Não usa Worker externo: os desafios e o resultado são tratados pela API local.
+// post: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function post(path, body) {
   const token = sessionStorage.getItem("livenexus_token");
   const userId = sessionStorage.getItem("livenexus_user_id");
