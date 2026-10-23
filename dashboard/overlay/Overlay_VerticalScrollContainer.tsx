@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 
+// VerticalScrollContainer: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function VerticalScrollContainer({
   children,
   className = "",
@@ -49,6 +50,8 @@ export default function VerticalScrollContainer({
   };
 
   const hasButtons = canScrollUp || canScrollDown;
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div className={`relative flex items-center w-full gap-1.5 ${className}`}>
