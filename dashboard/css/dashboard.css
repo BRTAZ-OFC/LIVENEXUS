@@ -3,11 +3,13 @@
 
 /* BLOCO 001 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-flex-min-h-screen-16w20hu. */
+/* Estilos para .dash-flex-min-h-screen-16w20hu. */
 .dash-flex-min-h-screen-16w20hu {
   @apply flex min-h-screen shrink-0 flex-col border-r border-white/10 bg-[#0b0e19] transition-[width] duration-200;
 }
 
 /* BLOCO 002 — estilo de elemento; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-w-52-p3mf56. */
 /* Estilos para .dash-w-52-p3mf56. */
 .dash-w-52-p3mf56 {
   @apply w-52;
@@ -15,11 +17,13 @@
 
 /* BLOCO 003 — estilo de elemento; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-w-16-1j20ogi. */
+/* Estilos para .dash-w-16-1j20ogi. */
 .dash-w-16-1j20ogi {
   @apply w-16;
 }
 
 /* BLOCO 004 — botões do menu: reduzir a altura sem alterar a largura da sidebar. */
+/* Estilos para .dash-flex-h-11-141hbqq. */
 /* Estilos para .dash-flex-h-11-141hbqq. */
 .dash-flex-h-11-141hbqq {
   @apply mx-auto flex h-9 items-center rounded-lg transition;
@@ -31,11 +35,13 @@
 
 /* BLOCO 005 — botões com texto: ocupar menos espaço dentro da sidebar expandida. */
 /* Estilos para .dash-gap-3-px-3-x5a6yh. */
+/* Estilos para .dash-gap-3-px-3-x5a6yh. */
 .dash-gap-3-px-3-x5a6yh {
   @apply w-[92%] gap-3 px-3;
 }
 
 /* BLOCO 006 — botões recolhidos: manter apenas um botão compacto para o ícone. */
+/* Estilos para .dash-justify-center-160tcmj. */
 /* Estilos para .dash-justify-center-160tcmj. */
 .dash-justify-center-160tcmj {
   @apply w-9 justify-center px-0;
@@ -43,11 +49,13 @@
 
 /* BLOCO 008 — tipografia e aparência; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-bg-violet-500-15-text-vi-1xm6n2h. */
+/* Estilos para .dash-bg-violet-500-15-text-vi-1xm6n2h. */
 .dash-bg-violet-500-15-text-vi-1xm6n2h {
   @apply bg-violet-500/15 text-violet-200;
 }
 
 /* BLOCO 009 — tipografia e aparência; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-text-white-fmef8d. */
 /* Estilos para .dash-text-white-fmef8d. */
 .dash-text-white-fmef8d {
   @apply text-slate-300;
@@ -59,11 +67,13 @@
 
 /* BLOCO 011 — tipografia e aparência; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-flex-min-h-screen-axmrk9. */
+/* Estilos para .dash-flex-min-h-screen-axmrk9. */
 .dash-flex-min-h-screen-axmrk9 {
   @apply flex min-h-screen bg-[#080a13] text-slate-100;
 }
 
 /* BLOCO 012 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-flex-h-73px-1rxqrjy. */
 /* Estilos para .dash-flex-h-73px-1rxqrjy. */
 .dash-flex-h-73px-1rxqrjy {
   @apply flex h-[73px] items-center justify-center border-b border-white/10;
@@ -71,11 +81,13 @@
 
 /* BLOCO 013 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-flex-h-9-y3vg7y. */
+/* Estilos para .dash-flex-h-9-y3vg7y. */
 .dash-flex-h-9-y3vg7y {
   @apply flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400;
 }
 
 /* BLOCO 014 — tipografia e aparência; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-h-5-w-5-8794lx. */
 /* Estilos para .dash-h-5-w-5-8794lx. */
 .dash-h-5-w-5-8794lx {
   @apply h-5 w-5 text-white;
@@ -83,11 +95,13 @@
 
 /* BLOCO 015 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-flex-flex-1-xgledq. */
+/* Estilos para .dash-flex-flex-1-xgledq. */
 .dash-flex-flex-1-xgledq {
   @apply flex flex-1 flex-col gap-2 p-2 pt-4;
 }
 
 /* BLOCO 016 — estilo de elemento; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-h-2-5-w-2-5-16znhny. */
 /* Estilos para .dash-h-2-5-w-2-5-16znhny. */
 .dash-h-2-5-w-2-5-16znhny {
   @apply h-2.5 w-2.5 shrink-0;
@@ -95,11 +109,13 @@
 
 /* BLOCO 017 — tipografia e aparência; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-text-7px-font-semibold-r7z1tv. */
+/* Estilos para .dash-text-7px-font-semibold-r7z1tv. */
 .dash-text-7px-font-semibold-r7z1tv {
   @apply text-[14px] font-semibold;
 }
 
 /* BLOCO 018 — tipografia e aparência; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-m-2-flex-16sm6c8. */
 /* Estilos para .dash-m-2-flex-16sm6c8. */
 .dash-m-2-flex-16sm6c8 {
   @apply m-2 flex h-10 items-center justify-center rounded-lg border border-white/10 text-slate-300;
@@ -111,11 +127,13 @@
 
 /* BLOCO 019 — estilo de elemento; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-h-5-w-5-sv0uoi. */
+/* Estilos para .dash-h-5-w-5-sv0uoi. */
 .dash-h-5-w-5-sv0uoi {
   @apply h-5 w-5;
 }
 
 /* BLOCO 020 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-min-w-0-flex-1-1g3oh63. */
 /* Estilos para .dash-min-w-0-flex-1-1g3oh63. */
 .dash-min-w-0-flex-1-1g3oh63 {
   @apply min-w-0 flex-1;
@@ -123,11 +141,13 @@
 
 /* BLOCO 021 — estilo de elemento; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-border-b-border-white-10-7389gy. */
+/* Estilos para .dash-border-b-border-white-10-7389gy. */
 .dash-border-b-border-white-10-7389gy {
   @apply border-b border-white/10 bg-[#0d1120]/80;
 }
 
 /* BLOCO 022 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-flex-w-full-1h42rcq. */
 /* Estilos para .dash-flex-w-full-1h42rcq. */
 .dash-flex-w-full-1h42rcq {
   @apply flex w-full items-center justify-between px-6 py-4;
@@ -139,11 +159,13 @@
 
 /* BLOCO 023 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-flex-items-center-1bpln9w. */
+/* Estilos para .dash-flex-items-center-1bpln9w. */
 .dash-flex-items-center-1bpln9w {
   @apply flex items-center gap-3;
 }
 
 /* BLOCO 024 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-flex-h-10-8puoho. */
 /* Estilos para .dash-flex-h-10-8puoho. */
 .dash-flex-h-10-8puoho {
   @apply flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400;
@@ -151,17 +173,20 @@
 
 /* BLOCO 025 — tipografia e aparência; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-text-lg-font-extrabold-1h5z3qk. */
+/* Estilos para .dash-text-lg-font-extrabold-1h5z3qk. */
 .dash-text-lg-font-extrabold-1h5z3qk {
   @apply text-lg font-extrabold text-white;
 }
 
 /* BLOCO 026 — tipografia e aparência; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-text-cyan-300-bbfjjq. */
+/* Estilos para .dash-text-cyan-300-bbfjjq. */
 .dash-text-cyan-300-bbfjjq {
   @apply text-cyan-300;
 }
 
 /* BLOCO 027 — tipografia e aparência; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-inline-flex-items-center-11vpqzb. */
 /* Estilos para .dash-inline-flex-items-center-11vpqzb. */
 .dash-inline-flex-items-center-11vpqzb {
   @apply inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-slate-300 transition;
@@ -173,11 +198,13 @@
 
 /* BLOCO 028 — estilo de elemento; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-h-4-w-4-3ulyf2. */
+/* Estilos para .dash-h-4-w-4-3ulyf2. */
 .dash-h-4-w-4-3ulyf2 {
   @apply h-4 w-4;
 }
 
 /* BLOCO 029 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-w-full-px-6-n4tgk. */
 /* Estilos para .dash-w-full-px-6-n4tgk. */
 .dash-w-full-px-6-n4tgk {
   @apply w-full px-6 py-8;
@@ -189,11 +216,13 @@
 
 /* BLOCO 030 — tipografia e aparência; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-text-xs-font-bold-1eh0cdm. */
+/* Estilos para .dash-text-xs-font-bold-1eh0cdm. */
 .dash-text-xs-font-bold-1eh0cdm {
   @apply text-xs font-bold uppercase tracking-[0.22em] text-cyan-300;
 }
 
 /* BLOCO 031 — tipografia e aparência; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-mt-3-text-3xl-1fv0i93. */
 /* Estilos para .dash-mt-3-text-3xl-1fv0i93. */
 .dash-mt-3-text-3xl-1fv0i93 {
   @apply mt-3 text-3xl font-extrabold tracking-tight text-white;
@@ -205,11 +234,13 @@
 
 /* BLOCO 032 — tipografia e aparência; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-mt-3-max-w-2xl-1oz8868. */
+/* Estilos para .dash-mt-3-max-w-2xl-1oz8868. */
 .dash-mt-3-max-w-2xl-1oz8868 {
   @apply mt-3 max-w-2xl text-sm leading-6 text-slate-400;
 }
 
 /* BLOCO 033 — estrutura, alinhamento e dimensões; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-mt-9-grid-dk8xjy. */
 /* Estilos para .dash-mt-9-grid-dk8xjy. */
 .dash-mt-9-grid-dk8xjy {
   @apply mt-9 grid gap-5;
@@ -225,11 +256,13 @@
 
 /* BLOCO 034 — estilo de elemento; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-rounded-2xl-border-la2jyp. */
+/* Estilos para .dash-rounded-2xl-border-la2jyp. */
 .dash-rounded-2xl-border-la2jyp {
   @apply rounded-2xl border border-white/10 bg-[#0d1120] p-6;
 }
 
 /* BLOCO 035 — tipografia e aparência; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-flex-h-11-w12n1q. */
 /* Estilos para .dash-flex-h-11-w12n1q. */
 .dash-flex-h-11-w12n1q {
   @apply flex h-11 w-11 items-center justify-center rounded-xl bg-violet-400/10 text-violet-300;
@@ -237,11 +270,13 @@
 
 /* BLOCO 036 — tipografia e aparência; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-mt-5-text-lg-1wxow0h. */
+/* Estilos para .dash-mt-5-text-lg-1wxow0h. */
 .dash-mt-5-text-lg-1wxow0h {
   @apply mt-5 text-lg font-bold text-white;
 }
 
 /* BLOCO 037 — tipografia e aparência; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-mt-2-text-sm-n1yf0y. */
 /* Estilos para .dash-mt-2-text-sm-n1yf0y. */
 .dash-mt-2-text-sm-n1yf0y {
   @apply mt-2 text-sm leading-6 text-slate-400;
@@ -249,11 +284,13 @@
 
 /* BLOCO 038 — tipografia e aparência; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-mt-5-inline-flex-1wra89i. */
+/* Estilos para .dash-mt-5-inline-flex-1wra89i. */
 .dash-mt-5-inline-flex-1wra89i {
   @apply mt-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-500;
 }
 
 /* BLOCO 039 — tipografia e aparência; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-flex-h-11-a0p84e. */
 /* Estilos para .dash-flex-h-11-a0p84e. */
 .dash-flex-h-11-a0p84e {
   @apply flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300;
@@ -261,11 +298,13 @@
 
 /* BLOCO 040 — tipografia e aparência; origem dashboard/dashboard.tsx. */
 /* Estilos para .dash-flex-h-11-r1ook6. */
+/* Estilos para .dash-flex-h-11-r1ook6. */
 .dash-flex-h-11-r1ook6 {
   @apply flex h-11 w-11 items-center justify-center rounded-xl bg-fuchsia-400/10 text-fuchsia-300;
 }
 
 /* BLOCO 041 — estilo de elemento; origem dashboard/dashboard.tsx. */
+/* Estilos para .dash-w-full-px-6-5ebeye. */
 /* Estilos para .dash-w-full-px-6-5ebeye. */
 .dash-w-full-px-6-5ebeye {
   @apply w-full px-6 py-6;
@@ -277,119 +316,148 @@
 
 /* BLOCO 042 — Dashboard de transmissão: quatro indicadores horizontais e áreas laterais. */
 /* Estilos para .dash-overview. */
+/* Estilos para .dash-overview. */
 .dash-overview {
   @apply w-full min-w-0 px-4 py-6;
 }
+/* Estilos para .dash-overview-heading. */
 /* Estilos para .dash-overview-heading. */
 .dash-overview-heading {
   @apply mb-5 flex flex-wrap items-center justify-between gap-3;
 }
 /* Estilos para .dash-preview-tag. */
+/* Estilos para .dash-preview-tag. */
 .dash-preview-tag {
   @apply rounded-full border border-cyan-400/20 bg-cyan-400/5 px-3 py-1.5 text-xs text-cyan-200/70;
 }
+/* Estilos para .dash-live-stats. */
 /* Estilos para .dash-live-stats. */
 .dash-live-stats {
   @apply grid grid-cols-1 gap-3;
 }
 /* Estilos para .dash-stat-card. */
+/* Estilos para .dash-stat-card. */
 .dash-stat-card {
   @apply min-w-0 rounded-xl border border-white/10 bg-[#0d1120] p-4;
 }
+/* Estilos para .dash-stat-label. */
 /* Estilos para .dash-stat-label. */
 .dash-stat-label {
   @apply flex items-center gap-2 text-xs font-semibold text-slate-400;
 }
 /* Estilos para .dash-stat-label svg. */
+/* Estilos para .dash-stat-label svg. */
 .dash-stat-label svg {
   @apply h-4 w-4 shrink-0 text-cyan-300;
 }
+/* Estilos para .dash-platform-counts. */
 /* Estilos para .dash-platform-counts. */
 .dash-platform-counts {
   @apply mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-300;
 }
 /* Estilos para .dash-platform-counts span. */
+/* Estilos para .dash-platform-counts span. */
 .dash-platform-counts span {
   @apply inline-flex items-center gap-1.5;
 }
+/* Estilos para .dash-platform-counts b. */
 /* Estilos para .dash-platform-counts b. */
 .dash-platform-counts b {
   @apply font-bold text-white;
 }
 /* Estilos para .dash-platform-dot. */
+/* Estilos para .dash-platform-dot. */
 .dash-platform-dot {
   @apply h-2 w-2 rounded-full;
 }
+/* Estilos para .dash-platform-dot.twitch. */
 /* Estilos para .dash-platform-dot.twitch. */
 .dash-platform-dot.twitch {
   @apply bg-violet-400;
 }
 /* Estilos para .dash-platform-dot.youtube. */
+/* Estilos para .dash-platform-dot.youtube. */
 .dash-platform-dot.youtube {
   @apply bg-red-400;
 }
+/* Estilos para .dash-platform-dot.kick. */
 /* Estilos para .dash-platform-dot.kick. */
 .dash-platform-dot.kick {
   @apply bg-emerald-400;
 }
 /* Estilos para .dash-stat-number. */
+/* Estilos para .dash-stat-number. */
 .dash-stat-number {
   @apply mt-3 block text-2xl font-bold tracking-tight text-white;
 }
 /* Estilos para .dash-stat-caption. */
+/* Estilos para .dash-stat-caption. */
 .dash-stat-caption {
   @apply mt-1 block text-[11px] text-slate-500;
 }
+/* Estilos para .dash-live-workspace. */
 /* Estilos para .dash-live-workspace. */
 .dash-live-workspace {
   @apply mt-4 grid min-w-0 grid-cols-1 gap-4;
 }
 .dash-chat-panel,
 /* Estilos para .dash-speakers-panel. */
+/* Estilos para .dash-speakers-panel. */
 .dash-speakers-panel {
   @apply flex h-[640px] min-h-[640px] min-w-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0d1120];
 }
+/* Estilos para .dash-panel-header. */
 /* Estilos para .dash-panel-header. */
 .dash-panel-header {
   @apply flex items-center justify-between gap-3 border-b border-white/10 px-4 py-4;
 }
 /* Estilos para .dash-panel-header h2. */
+/* Estilos para .dash-panel-header h2. */
 .dash-panel-header h2 {
   @apply text-sm font-bold text-white;
 }
+/* Estilos para .dash-panel-header p. */
 /* Estilos para .dash-panel-header p. */
 .dash-panel-header p {
   @apply mt-1 text-xs text-slate-500;
 }
 /* Estilos para .dash-icon-button. */
+/* Estilos para .dash-icon-button. */
 .dash-icon-button {
   @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 text-slate-400 transition;
 }
+/* Estilos para .dash-icon-button:hover. */
 /* Estilos para .dash-icon-button:hover. */
 .dash-icon-button:hover {
   @apply bg-white/5 text-white;
 }
 .dash-icon-button svg,
 /* Estilos para .dash-panel-heading-icon. */
+/* Estilos para .dash-panel-heading-icon. */
 .dash-panel-heading-icon {
   @apply h-[18px] w-[18px];
 }
+/* Estilos para .dash-panel-heading-icon. */
 /* Estilos para .dash-panel-heading-icon. */
 .dash-panel-heading-icon {
   @apply text-cyan-300;
 }
 /* Estilos para .dash-chat-toolbar. */
+/* Estilos para .dash-chat-toolbar. */
 .dash-chat-toolbar {
   @apply flex items-center gap-2 border-b border-white/5 px-4 py-3 text-[11px] text-slate-500;
 }
+/* Estilos para .dash-chat-status-dot. */
 /* Estilos para .dash-chat-status-dot. */
 .dash-chat-status-dot {
   @apply h-2 w-2 rounded-full bg-slate-600;
 }
 /* Estilos para .dash-chat-demo-label. */
+/* Estilos para .dash-chat-demo-label. */
 .dash-chat-demo-label {
   @apply ml-auto rounded bg-white/5 px-2 py-1 text-[10px] uppercase tracking-wider text-slate-500;
 }
+/* Estilos para .dash-chat-messages. */
 /* Estilos para .dash-chat-messages. */
 .dash-chat-messages {
   @apply flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-3 py-4;
@@ -397,86 +465,107 @@
   scrollbar-color: #384056 transparent;
 }
 /* Estilos para .dash-chat-empty. */
+/* Estilos para .dash-chat-empty. */
 .dash-chat-empty {
   @apply m-auto flex max-w-[250px] flex-col items-center gap-3 text-center;
 }
+/* Estilos para .dash-chat-empty svg. */
 /* Estilos para .dash-chat-empty svg. */
 .dash-chat-empty svg {
   @apply h-8 w-8 text-slate-600;
 }
 /* Estilos para .dash-chat-empty strong. */
+/* Estilos para .dash-chat-empty strong. */
 .dash-chat-empty strong {
   @apply text-sm font-semibold text-slate-300;
 }
+/* Estilos para .dash-chat-empty span. */
 /* Estilos para .dash-chat-empty span. */
 .dash-chat-empty span {
   @apply text-xs leading-5 text-slate-500;
 }
 /* Estilos para .dash-chat-composer. */
+/* Estilos para .dash-chat-composer. */
 .dash-chat-composer {
   @apply flex items-center gap-2 border-t border-white/10 p-3;
 }
 /* Estilos para .dash-chat-composer input. */
+/* Estilos para .dash-chat-composer input. */
 .dash-chat-composer input {
   @apply min-w-0 flex-1 rounded-lg border border-white/10 bg-black/20 px-3 py-2.5 text-xs text-slate-400 outline-none placeholder:text-slate-600;
 }
+/* Estilos para .dash-chat-composer button. */
 /* Estilos para .dash-chat-composer button. */
 .dash-chat-composer button {
   @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-400/10 text-cyan-200;
 }
 .dash-chat-composer button:disabled,
 /* Estilos para .dash-chat-composer input:disabled. */
+/* Estilos para .dash-chat-composer input:disabled. */
 .dash-chat-composer input:disabled {
   @apply cursor-not-allowed opacity-60;
 }
+/* Estilos para .dash-chat-composer svg. */
 /* Estilos para .dash-chat-composer svg. */
 .dash-chat-composer svg {
   @apply h-4 w-4;
 }
 /* Estilos para .dash-speakers-empty. */
+/* Estilos para .dash-speakers-empty. */
 .dash-speakers-empty {
   @apply flex flex-col items-center gap-2 border-b border-white/5 px-5 py-5 text-center;
 }
+/* Estilos para .dash-speakers-empty-icon. */
 /* Estilos para .dash-speakers-empty-icon. */
 .dash-speakers-empty-icon {
   @apply flex h-10 w-10 items-center justify-center rounded-full bg-violet-400/10 text-violet-300;
 }
 /* Estilos para .dash-speakers-empty-icon svg. */
+/* Estilos para .dash-speakers-empty-icon svg. */
 .dash-speakers-empty-icon svg {
   @apply h-5 w-5;
 }
+/* Estilos para .dash-speakers-empty strong. */
 /* Estilos para .dash-speakers-empty strong. */
 .dash-speakers-empty strong {
   @apply text-xs font-semibold text-slate-300;
 }
 /* Estilos para .dash-speakers-empty span. */
+/* Estilos para .dash-speakers-empty span. */
 .dash-speakers-empty span {
   @apply text-[11px] leading-4 text-slate-500;
 }
+/* Estilos para .dash-speakers-list. */
 /* Estilos para .dash-speakers-list. */
 .dash-speakers-list {
   @apply flex-1 divide-y divide-white/5 px-3;
 }
 /* Estilos para .dash-speakers-list li.is-empty. */
+/* Estilos para .dash-speakers-list li.is-empty. */
 .dash-speakers-list li.is-empty {
   @apply opacity-45;
 }
+/* Estilos para .dash-speakers-list li. */
 /* Estilos para .dash-speakers-list li. */
 .dash-speakers-list li {
   @apply flex min-w-0 items-center gap-2 py-3;
 }
 /* Estilos para .dash-speaker-rank. */
+/* Estilos para .dash-speaker-rank. */
 .dash-speaker-rank {
   @apply w-4 shrink-0 text-center text-[10px] font-bold text-slate-500;
 }
+/* Estilos para .dash-speaker-avatar. */
 /* Estilos para .dash-speaker-avatar. */
 .dash-speaker-avatar {
   @apply flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/5 text-[10px] text-slate-400;
 }
 /* Estilos para .dash-speaker-placeholder. */
+/* Estilos para .dash-speaker-placeholder. */
 .dash-speaker-placeholder {
   @apply min-w-0 flex-1 truncate text-[11px] text-slate-500;
 }
+/* Estilos para .dash-speakers-list li b. */
 /* Estilos para .dash-speakers-list li b. */
 .dash-speakers-list li b {
   @apply text-[11px] font-semibold text-slate-400;
@@ -484,13 +573,16 @@
 
 @media (min-width: 900px) {
 /* Estilos para .dash-overview. */
+/* Estilos para .dash-overview. */
   .dash-overview {
     @apply px-6;
   }
 /* Estilos para .dash-live-stats. */
+/* Estilos para .dash-live-stats. */
   .dash-live-stats {
     @apply grid-cols-4;
   }
+/* Estilos para .dash-live-workspace. */
 /* Estilos para .dash-live-workspace. */
   .dash-live-workspace {
     grid-template-columns: minmax(0, 1fr) 280px;
@@ -498,10 +590,12 @@
 }
 @media (max-width: 899px) {
 /* Estilos para .dash-live-workspace. */
+/* Estilos para .dash-live-workspace. */
   .dash-live-workspace {
     @apply grid-cols-1;
   }
   .dash-chat-panel,
+/* Estilos para .dash-speakers-panel. */
 /* Estilos para .dash-speakers-panel. */
   .dash-speakers-panel {
     height: 640px;
