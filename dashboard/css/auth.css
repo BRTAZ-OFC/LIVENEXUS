@@ -3,17 +3,20 @@
 
 /* BLOCO 001 — tipografia e aparência; origem nas páginas de autenticação. */
 /* Estilos para .auth-page. */
+/* Estilos para .auth-page. */
 .auth-page {
   @apply relative flex min-h-screen items-center justify-center overflow-hidden bg-[#080a13] px-4 py-12 text-slate-100;
 }
 
 /* BLOCO 002 — estrutura, alinhamento e dimensões; origem nas páginas de autenticação. */
 /* Estilos para .auth-pointer-events-none-abso-13gjxy4. */
+/* Estilos para .auth-pointer-events-none-abso-13gjxy4. */
 .auth-pointer-events-none-abso-13gjxy4 {
   @apply pointer-events-none absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-violet-600/20 blur-[120px];
 }
 
 /* BLOCO 003 — estrutura, alinhamento e dimensões; origem nas páginas de autenticação. */
+/* Estilos para .auth-card. */
 /* Estilos para .auth-card. */
 .auth-card {
   @apply relative w-full max-w-md rounded-3xl border border-white/10 bg-[#0d1120]/90 p-7 shadow-2xl shadow-black/40;
@@ -25,11 +28,13 @@
 
 /* BLOCO 004 — estrutura, alinhamento e dimensões; origem nas páginas de autenticação. */
 /* Estilos para .auth-brand. */
+/* Estilos para .auth-brand. */
 .auth-brand {
   @apply mb-8 flex items-center gap-3;
 }
 
 /* BLOCO 005 — estrutura, alinhamento e dimensões; origem nas páginas de autenticação. */
+/* Estilos para .auth-brand-mark. */
 /* Estilos para .auth-brand-mark. */
 .auth-brand-mark {
   @apply flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-400;
@@ -37,11 +42,13 @@
 
 /* BLOCO 006 — tipografia e aparência; origem nas páginas de autenticação. */
 /* Estilos para .auth-h-5-w-5-8794lx. */
+/* Estilos para .auth-h-5-w-5-8794lx. */
 .auth-h-5-w-5-8794lx {
   @apply h-5 w-5 text-white;
 }
 
 /* BLOCO 007 — tipografia e aparência; origem nas páginas de autenticação. */
+/* Estilos para .auth-text-lg-font-extrabold-1h5z3qk. */
 /* Estilos para .auth-text-lg-font-extrabold-1h5z3qk. */
 .auth-text-lg-font-extrabold-1h5z3qk {
   @apply text-lg font-extrabold text-white;
@@ -49,11 +56,13 @@
 
 /* BLOCO 008 — tipografia e aparência; origem nas páginas de autenticação. */
 /* Estilos para .auth-text-cyan-300-bbfjjq. */
+/* Estilos para .auth-text-cyan-300-bbfjjq. */
 .auth-text-cyan-300-bbfjjq {
   @apply text-cyan-300;
 }
 
 /* BLOCO 009 — tipografia e aparência; origem nas páginas de autenticação. */
+/* Estilos para .auth-eyebrow-login. */
 /* Estilos para .auth-eyebrow-login. */
 .auth-eyebrow-login {
   @apply text-xs font-bold uppercase tracking-[0.2em] text-violet-300;
@@ -61,11 +70,13 @@
 
 /* BLOCO 010 — tipografia e aparência; origem nas páginas de autenticação. */
 /* Estilos para .auth-title. */
+/* Estilos para .auth-title. */
 .auth-title {
   @apply mt-2 text-3xl font-extrabold text-white;
 }
 
 /* BLOCO 011 — tipografia e aparência; origem nas páginas de autenticação. */
+/* Estilos para .auth-description. */
 /* Estilos para .auth-description. */
 .auth-description {
   @apply mt-3 text-sm leading-6 text-slate-400;
@@ -73,11 +84,13 @@
 
 /* BLOCO 012 — estilo de elemento; origem nas páginas de autenticação. */
 /* Estilos para .auth-form. */
+/* Estilos para .auth-form. */
 .auth-form {
   @apply mt-7 space-y-5;
 }
 
 /* BLOCO 013 — tipografia e aparência; origem nas páginas de autenticação. */
+/* Estilos para .auth-field-label. */
 /* Estilos para .auth-field-label. */
 .auth-field-label {
   @apply block text-sm font-medium text-slate-200;
@@ -85,17 +98,20 @@
 
 /* BLOCO 014 — estrutura, alinhamento e dimensões; origem nas páginas de autenticação. */
 /* Estilos para .auth-field-shell. */
+/* Estilos para .auth-field-shell. */
 .auth-field-shell {
   @apply mt-2 flex items-center gap-3 rounded-xl border border-white/10 bg-black/20 px-3;
 }
 
 /* BLOCO 015 — tipografia e aparência; origem nas páginas de autenticação. */
 /* Estilos para .auth-h-4-w-4-f89m3f. */
+/* Estilos para .auth-h-4-w-4-f89m3f. */
 .auth-h-4-w-4-f89m3f {
   @apply h-4 w-4 text-slate-500;
 }
 
 /* BLOCO 016 — tipografia e aparência; origem nas páginas de autenticação. */
+/* Estilos para .auth-input. */
 /* Estilos para .auth-input. */
 .auth-input {
   @apply w-full bg-transparent py-3 text-sm outline-none;
@@ -107,6 +123,7 @@
 
 /* BLOCO 017 — tipografia e aparência; origem nas páginas de autenticação. */
 /* Estilos para .auth-submit. */
+/* Estilos para .auth-submit. */
 .auth-submit {
   @apply flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-3.5 text-sm font-bold text-white transition;
 
@@ -117,11 +134,13 @@
 
 /* BLOCO 018 — estilo de elemento; origem nas páginas de autenticação. */
 /* Estilos para .auth-h-4-w-4-3ulyf2. */
+/* Estilos para .auth-h-4-w-4-3ulyf2. */
 .auth-h-4-w-4-3ulyf2 {
   @apply h-4 w-4;
 }
 
 /* BLOCO 019 — tipografia e aparência; origem nas páginas de autenticação. */
+/* Estilos para .auth-message. */
 /* Estilos para .auth-message. */
 .auth-message {
   @apply rounded-xl border border-amber-300/20 bg-amber-300/[0.06] p-3 text-xs leading-5 text-amber-100;
@@ -129,11 +148,13 @@
 
 /* BLOCO 020 — tipografia e aparência; origem nas páginas de autenticação. */
 /* Estilos para .auth-footer. */
+/* Estilos para .auth-footer. */
 .auth-footer {
   @apply mt-6 text-center text-sm text-slate-400;
 }
 
 /* BLOCO 021 — tipografia e aparência; origem nas páginas de autenticação. */
+/* Estilos para .auth-link. */
 /* Estilos para .auth-link. */
 .auth-link {
   @apply font-semibold text-cyan-300;
@@ -145,6 +166,7 @@
 
 /* BLOCO 022 — tipografia e aparência; origem nas páginas de autenticação. */
 /* Estilos para .auth-back-link. */
+/* Estilos para .auth-back-link. */
 .auth-back-link {
   @apply mt-5 block text-center text-xs text-slate-500;
 
@@ -155,17 +177,20 @@
 
 /* BLOCO 023 — estrutura, alinhamento e dimensões; origem nas páginas de autenticação. */
 /* Estilos para .auth-pointer-events-none-abso-kxfgfw. */
+/* Estilos para .auth-pointer-events-none-abso-kxfgfw. */
 .auth-pointer-events-none-abso-kxfgfw {
   @apply pointer-events-none absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-cyan-600/15 blur-[120px];
 }
 
 /* BLOCO 024 — tipografia e aparência; origem nas páginas de autenticação. */
 /* Estilos para .auth-eyebrow-register. */
+/* Estilos para .auth-eyebrow-register. */
 .auth-eyebrow-register {
   @apply text-xs font-bold uppercase tracking-[0.2em] text-cyan-300;
 }
 
 /* BLOCO 025 — tipografia e aparência; origem nas páginas de autenticação. */
+/* Estilos para .auth-text-xs-leading-5-vfygoe. */
 /* Estilos para .auth-text-xs-leading-5-vfygoe. */
 .auth-text-xs-leading-5-vfygoe {
   @apply text-xs leading-5 text-amber-200/90;
