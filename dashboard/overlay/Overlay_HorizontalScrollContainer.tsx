@@ -10,6 +10,7 @@ type Props = {
 };
 
 /** Adaptador para manter os submenus do editor na regra horizontal global do LIVENEXUS. */
+// HorizontalScrollContainer: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function HorizontalScrollContainer({
   children,
   className = "",
