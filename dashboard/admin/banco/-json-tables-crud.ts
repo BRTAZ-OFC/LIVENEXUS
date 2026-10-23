@@ -45,6 +45,7 @@ const DEFINITIONS = Object.freeze({
     file: "galeria-usuarios.json",
     shape: "userList",
     ownerScoped: true,
+    fields: ["id", "user_id", "nome", "descricao", "imagens", "data_edicao", "data_criacao"],
   },
   image_store: {
     id: "image_store",
@@ -283,12 +284,13 @@ function rowsFromTable(definition, data, users) {
 
 // getJsonTableDefinitions: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getJsonTableDefinitions() {
-  return Object.values(DEFINITIONS).map(({ id, title, file, ownerScoped, shape }) => ({
+  return Object.values(DEFINITIONS).map(({ id, title, file, ownerScoped, shape, fields }) => ({
     id,
     title,
     file,
     ownerScoped,
     shape,
+    ...(fields ? { fields } : {}),
   }));
 }
 
