@@ -1,4 +1,5 @@
 // Widgets cujo renderer não implementa renderização de fragmentos independentes.
+// NON_FRAGMENTABLE_WIDGET_IDS: valor ou configuração reutilizada neste módulo.
 export const NON_FRAGMENTABLE_WIDGET_IDS = [
   "manual-pix-widget",
   "react-hub-widget",
@@ -35,6 +36,7 @@ export const NON_FRAGMENTABLE_WIDGET_IDS = [
 
 // Apenas fragmentos com suporte explícito no renderer/componentes reais.
 // Os valores dinâmicos são obtidos pela própria widget (dados da live, relógio, etc.).
+// WIDGET_ELEMENTS_MAP: valor ou configuração reutilizada neste módulo.
 export const WIDGET_ELEMENTS_MAP = {
   "manual-death-counter": [{ key: "count", label: "Contagem de mortes" }],
   "manual-clock": [
@@ -64,16 +66,19 @@ export const WIDGET_ELEMENTS_MAP = {
   ],
 };
 
+// isWidgetFragmentable: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function isWidgetFragmentable(widgetId) {
   if (!widgetId || NON_FRAGMENTABLE_WIDGET_IDS.includes(widgetId)) return false;
   return Boolean(WIDGET_ELEMENTS_MAP[widgetId]);
 }
 
+// getWidgetInternalElements: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getWidgetInternalElements(widgetId) {
   if (!widgetId || !isWidgetFragmentable(widgetId)) return [];
   return WIDGET_ELEMENTS_MAP[widgetId] || [];
 }
 
+// getWidgetDefaultDimensions: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getWidgetDefaultDimensions(widgetId, isFullWidget) {
   if (!isFullWidget) {
     return { width: 260, height: 50 };
