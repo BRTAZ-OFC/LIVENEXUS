@@ -2,6 +2,7 @@ import React from "react";
 import { useStreaming } from "./runtime";
 
 // A enquete nativa é um evento do fluxo global, independente de comandos de chat.
+// YouTubeNativePoll: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function YouTubeNativePoll({ config = {}, elementKey = "full_widget" }) {
   const { liveActivity } = useStreaming();
   const poll = (liveActivity?.items || []).find(
@@ -12,6 +13,7 @@ export default function YouTubeNativePoll({ config = {}, elementKey = "full_widg
   const options = Array.isArray(meta.options) ? meta.options : [];
 
   if (!poll)
+    {/* Estrutura visual retornada: div. */}
     return (
       <div className="flex h-full items-center justify-center text-xs text-slate-400">
         Aguardando enquete do YouTube
@@ -28,6 +30,7 @@ export default function YouTubeNativePoll({ config = {}, elementKey = "full_widg
           typeof option === "string" ? option : option.text || option.label || option.title;
         const votes =
           typeof option === "object" && option !== null ? (option.voteCount ?? option.votes) : null;
+        {/* Estrutura visual retornada: div. */}
         return (
           <div
             key={typeof option === "object" && option !== null ? (option.id ?? index) : index}
@@ -46,6 +49,8 @@ export default function YouTubeNativePoll({ config = {}, elementKey = "full_widg
   if (elementKey === "poll_options") return choices;
   if (elementKey === "poll_status")
     return status && <span className="text-slate-300">{status}</span>;
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div
