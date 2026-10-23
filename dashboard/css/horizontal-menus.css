@@ -1,11 +1,13 @@
 /* LIVENEXUS: Explica os estilos dos menus horizontais. */
 /* Menus horizontais globais: sem barra nem rolagem manual. Somente os botões externos movem a faixa. */
 /* Estilos para .lnx-horizontal-menu. */
+/* Estilos para .lnx-horizontal-menu. */
 .lnx-horizontal-menu {
   min-width: 0;
   gap: 0;
 }
 
+/* Estilos para .lnx-horizontal-menu-track. */
 /* Estilos para .lnx-horizontal-menu-track. */
 .lnx-horizontal-menu-track {
   min-width: 0;
@@ -19,12 +21,14 @@
 }
 
 /* Estilos para .lnx-horizontal-menu-track::-webkit-scrollbar. */
+/* Estilos para .lnx-horizontal-menu-track::-webkit-scrollbar. */
 .lnx-horizontal-menu-track::-webkit-scrollbar {
   display: none !important;
   width: 0;
   height: 0;
 }
 
+/* Estilos para .lnx-horizontal-menu-content. */
 /* Estilos para .lnx-horizontal-menu-content. */
 .lnx-horizontal-menu-content {
   width: max-content;
@@ -34,10 +38,12 @@
 }
 
 /* Estilos para .lnx-horizontal-menu-content > *. */
+/* Estilos para .lnx-horizontal-menu-content > *. */
 .lnx-horizontal-menu-content > * {
   flex-shrink: 0;
 }
 
+/* Estilos para .lnx-horizontal-menu-arrow. */
 /* Estilos para .lnx-horizontal-menu-arrow. */
 .lnx-horizontal-menu-arrow {
   flex-shrink: 0;
