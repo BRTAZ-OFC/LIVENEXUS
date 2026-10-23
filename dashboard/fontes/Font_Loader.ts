@@ -7,6 +7,7 @@ const GOOGLE_FONTS_STYLESHEET_ID = "livenexus-google-fonts";
  * O repositório de origem utilizava fontes remotas; não havia arquivos
  * .woff/.woff2 locais para copiar.
  */
+// loadGoogleFont: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function loadGoogleFont(fontFamily: string): void {
   if (typeof document === "undefined" || !fontFamily || isSystemFont(fontFamily)) return;
 
@@ -21,6 +22,7 @@ export function loadGoogleFont(fontFamily: string): void {
 }
 
 /** Carrega todas as fontes do catálogo em uma única folha de estilos. */
+// loadAllGoogleFonts: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function loadAllGoogleFonts(): void {
   if (typeof document === "undefined") return;
   if (document.getElementById(GOOGLE_FONTS_STYLESHEET_ID)) return;
@@ -33,14 +35,17 @@ export function loadAllGoogleFonts(): void {
   document.head.appendChild(link);
 }
 
+// isSystemFont: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function isSystemFont(fontFamily: string): boolean {
   return fontFamily === "monospace" || fontFamily === "sans-serif";
 }
 
+// getFontLinkId: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function getFontLinkId(fontFamily: string): string {
   return `livenexus-font-${fontFamily.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 }
 
+// buildGoogleFontsUrl: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function buildGoogleFontsUrl(families: string[]): string {
   const params = families
     .map((family) => `family=${encodeURIComponent(family).replace(/%20/g, "+")}:wght@400;700`)
