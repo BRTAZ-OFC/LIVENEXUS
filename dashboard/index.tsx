@@ -62,6 +62,7 @@ type AvaliacaoPublica = {
 };
 
 /* BLOCO 4 — Monta navegação, apresentação da plataforma, recursos e rodapé. */
+// HomePage: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function HomePage() {
   // Estados do formulário de avaliação
   const [nota, setNota] = useState(0);
@@ -217,6 +218,7 @@ function HomePage() {
   });
 
   if (viewMode === "all") {
+    {/* Estrutura visual retornada: div. */}
     return (
       <div className="home-relative-min-h-screen-1rsop7t py-12 px-5 md:px-12">
         <div className="max-w-6xl mx-auto space-y-8">
@@ -318,6 +320,8 @@ function HomePage() {
       </div>
     );
   }
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div className="home-relative-min-h-screen-1rsop7t">
@@ -565,6 +569,7 @@ function HomePage() {
           <div id="recursos" className="home-mt-12-grid-fygkd8">
             {features.map((feature) => {
               const Icon = feature.icon;
+              {/* Estrutura visual retornada: article. */}
               return (
                 <article key={feature.title} className="group home-rounded-2xl-border-49lope">
                   <div className="home-mb-5-flex-1pgn79f">
