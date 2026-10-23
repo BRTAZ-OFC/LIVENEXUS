@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica os controles de teste da conexão RTC na área administrativa. */
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Radio,
