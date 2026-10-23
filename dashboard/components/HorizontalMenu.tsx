@@ -19,6 +19,7 @@ type ScrollEdges = {
  * Menu horizontal padronizado do LiveNexus.
  * A faixa não aceita rolagem manual; o deslocamento é feito pelos botões externos.
  */
+// HorizontalMenu: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function HorizontalMenu({
   children,
   ariaLabel = "Menu horizontal",
@@ -110,6 +111,8 @@ export default function HorizontalMenu({
       behavior: "smooth",
     });
   }
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div className={`lnx-horizontal-menu flex w-full min-w-0 items-center ${className}`}>
