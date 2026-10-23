@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica a tela que mostra e permite administrar tabelas de dados. */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, RefreshCw, Save, Trash2, X } from "lucide-react";
 
