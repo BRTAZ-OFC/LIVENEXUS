@@ -44,6 +44,7 @@ const SEEDS: Record<Category, string> = {
   artists: "artistas populares Brasil",
   playlists: "playlists populares Brasil",
 };
+// itemId: guarda o resultado ou a ação indicada pelo nome.
 const itemId = (item: CatalogItem) =>
   String(
     item.videoId ||
@@ -52,6 +53,7 @@ const itemId = (item: CatalogItem) =>
       item.id ||
       `${item.type}:${item.title || item.name || ""}`,
   ).trim();
+// itemCategory: executa a etapa descrita pelo nome da função.
 function itemCategory(item: CatalogItem): Category {
   if (item.type === "album" || String(item.playlistId || "").startsWith("OLAK5uy_"))
     return "albums";
@@ -60,6 +62,7 @@ function itemCategory(item: CatalogItem): Category {
     return "playlists";
   return "songs";
 }
+// normalizeLibrary: executa a etapa descrita pelo nome da função.
 function normalizeLibrary(value: any): PersonalLibrary {
   const result: PersonalLibrary = {
     songs: Array.isArray(value?.songs) ? value.songs : [],
@@ -78,6 +81,7 @@ function normalizeLibrary(value: any): PersonalLibrary {
     });
   return result;
 }
+// unique: executa a etapa descrita pelo nome da função.
 function unique(items: CatalogItem[]) {
   const seen = new Set<string>();
   return items.filter((item) => {
@@ -87,6 +91,7 @@ function unique(items: CatalogItem[]) {
     return true;
   });
 }
+// normalizeBundle: executa a etapa descrita pelo nome da função.
 function normalizeBundle(data: any): CatalogItem[] {
   const songs = (data.songs || []).map((item: any) => ({
     ...item,
@@ -119,6 +124,7 @@ function normalizeBundle(data: any): CatalogItem[] {
   }));
   return unique([...songs, ...artists, ...albums, ...playlists, ...youtube]);
 }
+// itemUrl: executa a etapa descrita pelo nome da função.
 function itemUrl(item: CatalogItem) {
   if (item.url) return item.url;
   if (item.videoId) return `https://music.youtube.com/watch?v=${item.videoId}`;
@@ -126,6 +132,7 @@ function itemUrl(item: CatalogItem) {
   if (item.browseId) return `https://music.youtube.com/browse/${item.browseId}`;
   return "";
 }
+// parseLink: executa a etapa descrita pelo nome da função.
 function parseLink(raw: string, titleInput: string): CatalogItem {
   let url: URL;
   try {
@@ -181,6 +188,7 @@ function parseLink(raw: string, titleInput: string): CatalogItem {
   } as CatalogItem;
 }
 
+// BibliotecaSearch: executa a etapa descrita pelo nome da função.
 export default function BibliotecaSearch() {
   const [view, setView] = useState<View>("categories");
   const [query, setQuery] = useState("");
@@ -733,6 +741,7 @@ export default function BibliotecaSearch() {
       {CATEGORIES.map((entry) => {
         const Icon = entry.icon;
         const items = library[entry.key];
+        {/* Estrutura visual: section. */}
         return (
           <section key={entry.key} className="space-y-3">
             <header className="flex items-center gap-2 text-white">
@@ -816,6 +825,8 @@ export default function BibliotecaSearch() {
     </div>
   );
 
+  {/* Estrutura visual: section. */}
+
   return (
     <section className="w-full min-w-0 px-4 py-6 sm:px-8">
       <header className="mb-5">
@@ -839,6 +850,7 @@ export default function BibliotecaSearch() {
           ] as const
         ).map((entry) => {
           const Icon = entry.icon;
+          {/* Estrutura visual: button. */}
           return (
             <button
               key={entry.key}
@@ -996,6 +1008,7 @@ export default function BibliotecaSearch() {
                 <div className="space-y-2">
                   {(section.items || []).map((entry: any, entryIndex: number) => {
                     const isTrack = Boolean(entry.videoId);
+                    {/* Estrutura visual: article. */}
                     return (
                       <article
                         key={entry.videoId || entry.browseId || entryIndex}
@@ -1136,6 +1149,7 @@ export default function BibliotecaSearch() {
                   const Icon =
                     CATEGORIES.find((entry) => entry.key === itemCategory(item))?.icon || Music2;
                   const saved = isSaved(item);
+                  {/* Estrutura visual: article. */}
                   return (
                     <article
                       key={itemId(item)}
