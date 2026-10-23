@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como os dados das plataformas conectadas são organizados e salvos. */
 import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
