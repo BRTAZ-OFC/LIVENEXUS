@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica quais fontes são usadas para buscar músicas e informações. */
 export type CatalogItem = {
   id?: string;
   videoId?: string;
