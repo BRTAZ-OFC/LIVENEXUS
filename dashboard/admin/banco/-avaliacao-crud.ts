@@ -11,6 +11,7 @@ import { withFileQueue, writeJsonAtomically } from "./-json-storage.js";
 
 const AVALIACOES_FILE = resolve(dirname(fileURLToPath(import.meta.url)), "json", "avaliacao.json");
 
+// readAvaliacoes: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function readAvaliacoes() {
   try {
     const parsed = JSON.parse(await readFile(AVALIACOES_FILE, "utf8"));
@@ -23,10 +24,12 @@ async function readAvaliacoes() {
   }
 }
 
+// writeAvaliacoes: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function writeAvaliacoes(avaliacoes) {
   await writeJsonAtomically(AVALIACOES_FILE, avaliacoes);
 }
 
+// listAvaliacoes: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function listAvaliacoes() {
   const list = await readAvaliacoes();
   return list.sort(
@@ -34,6 +37,7 @@ export async function listAvaliacoes() {
   );
 }
 
+// createAvaliacao: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function createAvaliacao({ nome, nota, mensagem }) {
   if (typeof nome !== "string" || !nome.trim() || nome.trim().length > 100) {
     throw new Error("O nome deve ter entre 1 e 100 caracteres.");
@@ -76,6 +80,7 @@ export async function createAvaliacao({ nome, nota, mensagem }) {
  * @param {Record<string, unknown>} [changes]
  * @param {string | null} [adminUser]
  */
+// updateAvaliacao: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function updateAvaliacao(avaliacao_id, changes = {}, adminUser = null) {
   return withFileQueue(AVALIACOES_FILE, async () => {
     const avaliacoes = await readAvaliacoes();
@@ -150,6 +155,7 @@ export async function updateAvaliacao(avaliacao_id, changes = {}, adminUser = nu
   });
 }
 
+// deleteAvaliacao: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function deleteAvaliacao(avaliacao_id) {
   return withFileQueue(AVALIACOES_FILE, async () => {
     const avaliacoes = await readAvaliacoes();
