@@ -58,6 +58,7 @@ if (typeof window !== "undefined") {
 /**
  * Normaliza e registra um erro no canal global
  */
+// reportRealError: executa a etapa descrita pelo nome da função.
 export function reportRealError(input: ReportErrorInput) {
   const errObj = input.error instanceof Error ? input.error : null;
   const rawMessage =
