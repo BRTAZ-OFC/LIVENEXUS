@@ -23,6 +23,7 @@ import { useStreaming, StreamingContext } from "@/dashboard/widget/runtime";
 import TwitchChatBox from "@/dashboard/widget/twitch/Widget_TwitchChatBox";
 import { RtcSignalingClient } from "./rtcSignalingClient";
 
+// AdminRtcTestLabSection: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function AdminRtcTestLabSection() {
   const { user, isAuthenticated } = useAuth();
   const globalStreaming = useStreaming();
@@ -241,6 +242,8 @@ export default function AdminRtcTestLabSection() {
   };
 
   const isDataChannelOpen = rtcState.dataChannelState === "open";
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div className="max-w-7xl mx-auto space-y-6 pb-12">
