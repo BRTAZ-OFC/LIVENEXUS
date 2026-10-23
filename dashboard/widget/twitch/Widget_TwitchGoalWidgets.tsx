@@ -3,6 +3,7 @@ import { useStreaming } from "../runtime";
 import { Award, Flame, Zap } from "lucide-react";
 
 // 1. TwitchSubGoal (Meta de Subs)
+// TwitchSubGoal: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function TwitchSubGoal({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = connections?.Twitch?.status === "connected";
@@ -29,6 +30,8 @@ export function TwitchSubGoal({ config = {} }) {
     config.targetValue && Number(config.targetValue) > 0 ? Number(config.targetValue) : 50;
   const percentage =
     targetValue > 0 ? Math.min(Math.round((subCount / targetValue) * 100), 100) : 0;
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div
@@ -67,6 +70,7 @@ export function TwitchSubGoal({ config = {} }) {
 }
 
 // 2. TwitchBitsGoal (Meta de Bits)
+// TwitchBitsGoal: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function TwitchBitsGoal({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = connections?.Twitch?.status === "connected";
@@ -90,6 +94,8 @@ export function TwitchBitsGoal({ config = {} }) {
     config.targetValue && Number(config.targetValue) > 0 ? Number(config.targetValue) : 2500;
   const percentage =
     targetValue > 0 ? Math.min(Math.round((currentBits / targetValue) * 100), 100) : 0;
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div
@@ -127,6 +133,7 @@ export function TwitchBitsGoal({ config = {} }) {
 }
 
 // 3. TwitchRaidGoal (Meta de Raids)
+// TwitchRaidGoal: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function TwitchRaidGoal({ config = {} }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = connections?.Twitch?.status === "connected";
@@ -149,6 +156,8 @@ export function TwitchRaidGoal({ config = {} }) {
     config.targetValue && Number(config.targetValue) > 0 ? Number(config.targetValue) : 5;
   const percentage =
     targetValue > 0 ? Math.min(Math.round((currentRaids / targetValue) * 100), 100) : 0;
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div
