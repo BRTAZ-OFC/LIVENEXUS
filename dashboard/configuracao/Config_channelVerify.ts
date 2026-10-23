@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica as opções para configurar a verificação do canal. */
 // Cliente do verificador de bio integrado ao servidor do LIVENEXUS.
 // Não usa Worker externo: os desafios e o resultado são tratados pela API local.
 async function post(path, body) {
