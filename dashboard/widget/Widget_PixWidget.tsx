@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { useStreaming } from "./runtime";
 
 // Função utilitária para gerar payload Pix BR Code (EMV QRCPS) padrão Banco Central
+// generatePixPayload: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function generatePixPayload(
   key = "",
   name = "LIVENEXUS STREAMER",
@@ -82,6 +83,7 @@ export function generatePixPayload(
   return payload + crcStr;
 }
 
+// PixWidget: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function PixWidget({ config = {}, instanceId }) {
   const { liveActivity } = useStreaming();
   const [copied, setCopied] = useState(false);
@@ -152,6 +154,7 @@ export default function PixWidget({ config = {}, instanceId }) {
   const presetStyle = Number(config.structuralPreset) || 1;
 
   // Renderização elegante adaptada aos presets visuais já existentes no LiveNexus
+  {/* Estrutura visual retornada: div. */}
   return (
     <div
       className="w-full h-full flex flex-col items-center justify-between p-4 rounded-xl text-white shadow-xl select-none transition-all duration-300"
