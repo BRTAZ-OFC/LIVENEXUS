@@ -108,20 +108,24 @@ const DEFINITIONS = Object.freeze({
   },
 });
 
+// definitionFor: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function definitionFor(tableId) {
   const definition = DEFINITIONS[String(tableId ?? "")];
   if (!definition) throw new Error("Tabela JSON não permitida.");
   return definition;
 }
 
+// fileFor: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function fileFor(definition) {
   return resolve(JSON_DIRECTORY, definition.file);
 }
 
+// emptyValue: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function emptyValue(definition) {
   return definition.shape === "array" ? [] : {};
 }
 
+// readTable: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function readTable(definition) {
   try {
     const parsed = JSON.parse(await readFile(fileFor(definition), "utf8"));
@@ -140,14 +144,17 @@ async function readTable(definition) {
   }
 }
 
+// isRecord: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function isRecord(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
+// rowKey: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function rowKey(...parts) {
   return parts.map((part) => encodeURIComponent(String(part))).join("|");
 }
 
+// parseRowKey: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function parseRowKey(value) {
   if (typeof value !== "string" || !value.trim())
     throw new Error("Identificador do registro não fornecido.");
@@ -159,6 +166,7 @@ function parseRowKey(value) {
   }
 }
 
+// recordId: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function recordId(record, index) {
   return String(
     record?.id ??
@@ -169,6 +177,7 @@ function recordId(record, index) {
   );
 }
 
+// normalizeRecord: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function normalizeRecord(record, forcedUserId) {
   if (!isRecord(record)) throw new Error("O registro deve ser um objeto JSON.");
   const next = { ...record };
@@ -186,6 +195,7 @@ function normalizeRecord(record, forcedUserId) {
   return next;
 }
 
+// assertLocalUser: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function assertLocalUser(userId) {
   const id = String(userId ?? "").trim();
   if (!id) throw new Error("Informe o user_id de um usuário existente em usuario.json.");
@@ -194,16 +204,19 @@ async function assertLocalUser(userId) {
   return user.user_id;
 }
 
+// validateOptionalUserId: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function validateOptionalUserId(record) {
   if (record.user_id === undefined || record.user_id === null) return record;
   record.user_id = await assertLocalUser(record.user_id);
   return record;
 }
 
+// validUserIds: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function validUserIds() {
   return new Set((await listUsers()).map((user) => user.user_id));
 }
 
+// defaultUserValue: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function defaultUserValue(tableId, userId) {
   if (tableId === "biblioteca") {
     return { user_id: userId, songs: [], albums: [], artists: [], playlists: [] };
@@ -216,6 +229,7 @@ function defaultUserValue(tableId, userId) {
   return { user_id: userId };
 }
 
+// rowsFromTable: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function rowsFromTable(definition, data, users) {
   const rows = [];
   if (definition.shape === "array") {
@@ -267,6 +281,7 @@ function rowsFromTable(definition, data, users) {
   return rows;
 }
 
+// getJsonTableDefinitions: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getJsonTableDefinitions() {
   return Object.values(DEFINITIONS).map(({ id, title, file, ownerScoped, shape }) => ({
     id,
@@ -277,6 +292,7 @@ export function getJsonTableDefinitions() {
   }));
 }
 
+// listJsonTableRecords: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function listJsonTableRecords(tableId) {
   const definition = definitionFor(tableId);
   const data = await readTable(definition);
@@ -284,6 +300,7 @@ export async function listJsonTableRecords(tableId) {
   return rowsFromTable(definition, data, users);
 }
 
+// createJsonTableRecord: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function createJsonTableRecord(tableId, input) {
   const definition = definitionFor(tableId);
   let record = normalizeRecord(input);
@@ -349,6 +366,7 @@ export async function createJsonTableRecord(tableId, input) {
   });
 }
 
+// updateJsonTableRecord: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function updateJsonTableRecord(tableId, inputRowKey, inputRecord) {
   const definition = definitionFor(tableId);
   const [kind, ...parts] = parseRowKey(inputRowKey);
@@ -432,6 +450,7 @@ export async function updateJsonTableRecord(tableId, inputRowKey, inputRecord) {
   });
 }
 
+// deleteJsonTableRecord: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export async function deleteJsonTableRecord(tableId, inputRowKey) {
   const definition = definitionFor(tableId);
   const [kind, ...parts] = parseRowKey(inputRowKey);
@@ -480,6 +499,7 @@ export async function deleteJsonTableRecord(tableId, inputRowKey) {
   });
 }
 
+// createJsonTableCrud: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function createJsonTableCrud(tableId) {
   definitionFor(tableId);
   return Object.freeze({
