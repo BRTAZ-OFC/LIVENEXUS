@@ -1,12 +1,15 @@
 import { useMemo, createContext, useContext } from "react";
 import { useMultiChatSnapshot } from "../multichat";
 
+// PLATFORMS: valor ou configuração reutilizada neste módulo.
 const PLATFORMS = ["Twitch", "Kick", "YouTube"] as const;
 
 /** Contexto para permitir injeção de dados externos (ex: via WebRTC Consumer) */
+// StreamingContext: valor ou configuração reutilizada neste módulo.
 export const StreamingContext = createContext<any>(null);
 
 /** Adapta o estado do multichat do LIVENEXUS à interface usada pelos widgets migrados. */
+// useStreaming: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function useStreaming() {
   const contextValue = useContext(StreamingContext);
   const snapshot = useMultiChatSnapshot();
