@@ -24,6 +24,7 @@
   --color-border: var(--border);
 }
 
+/* Estilos para :root. */
 :root {
   --radius: 0.75rem;
   --background: oklch(0.12 0.03 260);
