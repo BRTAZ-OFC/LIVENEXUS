@@ -50,7 +50,9 @@ type DiagnosticState = {
   events: Diagnostic[];
 };
 
+// STORAGE_KEY: valor ou configuração reutilizada neste módulo.
 const STORAGE_KEY = "livenexus:tts-filters-v1";
+// EVENT_KEYS: valor ou configuração reutilizada neste módulo.
 const EVENT_KEYS = [
   "twitch_sub",
   "twitch_resub",
@@ -68,6 +70,7 @@ const EVENT_KEYS = [
   "youtube_gift_membership_received",
   "youtube_poll",
 ];
+// defaultRules: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function defaultRules(): RuleSet {
   return {
     roles: { broadcaster: true, moderator: true, vip: true, subscriber: true, normal: true },
@@ -93,6 +96,7 @@ function defaultRules(): RuleSet {
     priorities: { broadcaster: 5, moderator: 4, vip: 3, subscriber: 2, normal: 1 },
   };
 }
+// defaultConfig: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function defaultConfig(): TtsFilterConfig {
   return {
     mode: "free",
@@ -101,10 +105,13 @@ function defaultConfig(): TtsFilterConfig {
     perPlatform: { Twitch: defaultRules(), Kick: defaultRules(), YouTube: defaultRules() },
   };
 }
+// loadConfig: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function loadConfig(): TtsFilterConfig {
   return defaultConfig();
 }
+// config: valor ou configuração reutilizada neste módulo.
 let config = loadConfig();
+// configListeners: valor ou configuração reutilizada neste módulo.
 const configListeners = new Set<() => void>();
 let diag: DiagnosticState = {
   received: 0,
@@ -114,9 +121,13 @@ let diag: DiagnosticState = {
   reasons: {},
   events: [],
 };
+// diagListeners: valor ou configuração reutilizada neste módulo.
 const diagListeners = new Set<() => void>();
+// repeats: valor ou configuração reutilizada neste módulo.
 const repeats = new Map<string, { text: string; count: number; firstAt: number }>();
+// cooldowns: valor ou configuração reutilizada neste módulo.
 const cooldowns = new Map<string, number>();
+// loadFlaggedUsers: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function loadFlaggedUsers() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY + ":flagged-users");
@@ -132,7 +143,9 @@ function loadFlaggedUsers() {
     >();
   }
 }
+// flaggedUsers: valor ou configuração reutilizada neste módulo.
 const flaggedUsers = loadFlaggedUsers();
+// persistFlaggedUsers: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function persistFlaggedUsers() {
   try {
     localStorage.setItem(
@@ -144,21 +157,27 @@ function persistFlaggedUsers() {
   }
 }
 
+// emitConfig: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function emitConfig() {
   configListeners.forEach((fn) => fn());
 }
+// diagRevision: valor ou configuração reutilizada neste módulo.
 let diagRevision = 0;
+// emitDiag: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function emitDiag() {
   diagRevision++;
   diagListeners.forEach((fn) => fn());
 }
+// getTtsFilterConfig: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getTtsFilterConfig() {
   return config;
 }
+// setTtsFilterConfig: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function setTtsFilterConfig(next: TtsFilterConfig) {
   config = next;
   emitConfig();
 }
+// useTtsFilterConfig: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function useTtsFilterConfig() {
   return useSyncExternalStore(
     (fn) => {
@@ -168,9 +187,11 @@ export function useTtsFilterConfig() {
     () => config,
   );
 }
+// getTtsFilterDiagnostics: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getTtsFilterDiagnostics() {
   return diag;
 }
+// useTtsFilterDiagnostics: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function useTtsFilterDiagnostics() {
   return useSyncExternalStore(
     (fn) => {
@@ -180,10 +201,12 @@ export function useTtsFilterDiagnostics() {
     () => diagRevision,
   );
 }
+// resetTtsFilterDiagnostics: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function resetTtsFilterDiagnostics() {
   diag = { received: 0, accepted: 0, blocked: 0, dropped: 0, reasons: {}, events: [] };
   emitDiag();
 }
+// record: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function record(message: MultiChatMessage, allowed: boolean, reason: string, text: string) {
   diag.received++;
   if (allowed) diag.accepted++;
@@ -203,6 +226,7 @@ function record(message: MultiChatMessage, allowed: boolean, reason: string, tex
   if (diag.events.length > 100) diag.events.length = 100;
   emitDiag();
 }
+// roleOf: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function roleOf(roles: string[] = []) {
   const normalized = roles.map((role) => role.toLowerCase().replace(/[^a-z]/g, ""));
   if (normalized.some((role) => ["broadcaster", "owner", "streamer"].includes(role)))
@@ -213,6 +237,7 @@ function roleOf(roles: string[] = []) {
     return "subscriber";
   return "normal";
 }
+// matchesTrigger: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function matchesTrigger(text: string, trigger: RuleSet["triggers"][number]) {
   const source = text.toLowerCase().trim();
   const value = trigger.value.toLowerCase().trim();
@@ -227,6 +252,7 @@ function matchesTrigger(text: string, trigger: RuleSet["triggers"][number]) {
     return false;
   }
 }
+// removePlatformEmotes: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function removePlatformEmotes(text: string, platform: ChatPlatform, emotes: unknown) {
   const ranges: { start: number; end: number }[] = [];
   if (platform === "Twitch" && typeof emotes === "string") {
@@ -267,15 +293,20 @@ function removePlatformEmotes(text: string, platform: ChatPlatform, emotes: unkn
   if (platform === "YouTube") result = result.replace(/:[a-zA-Z0-9_]+:/g, " ");
   return result.replace(/\s+/g, " ").trim();
 }
+// URL_RE: valor ou configuração reutilizada neste módulo.
 const URL_RE = /\bhttps?:\/\/\S+|www\.\S+/gi;
+// URL_TEST: valor ou configuração reutilizada neste módulo.
 const URL_TEST = /\bhttps?:\/\/\S+|www\.\S+/i;
+// MENTION_RE: valor ou configuração reutilizada neste módulo.
 const MENTION_RE = /@[a-zA-Z0-9_.-]+/g;
+// EMOJI_RE: valor ou configuração reutilizada neste módulo.
 const EMOJI_RE = /(?:[\u{1F000}-\u{1FAFF}\u2600-\u27BF\u2190-\u21FF\u2B00-\u2BFF]|\uFE0F)/gu;
 export type TtsFilterDecision = {
   message: MultiChatMessage | null;
   allowed: boolean;
   reason: string;
 };
+// evaluateTtsFilters: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function evaluateTtsFilters(message: MultiChatMessage): TtsFilterDecision {
   if (config.mode === "free") {
     record(message, true, "Modo Livre", message.text);
@@ -371,9 +402,11 @@ export function evaluateTtsFilters(message: MultiChatMessage): TtsFilterDecision
   record(message, true, "Aceita", text);
   return { message: { ...message, text }, allowed: true, reason: "Aceita" };
 }
+// getFlaggedUsers: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getFlaggedUsers() {
   return Array.from(flaggedUsers.entries()).map(([key, value]) => ({ key, ...value }));
 }
+// toggleFlaggedUser: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function toggleFlaggedUser(key: string) {
   const user = flaggedUsers.get(key);
   if (user) {
@@ -382,11 +415,13 @@ export function toggleFlaggedUser(key: string) {
     emitDiag();
   }
 }
+// clearFlaggedUser: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function clearFlaggedUser(key: string) {
   flaggedUsers.delete(key);
   persistFlaggedUsers();
   emitDiag();
 }
+// recordTtsQueueBlock: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function recordTtsQueueBlock(
   message: Pick<MultiChatMessage, "id" | "platform" | "author" | "text">,
   reason: string,
@@ -405,6 +440,7 @@ export function recordTtsQueueBlock(
   if (diag.events.length > 100) diag.events.length = 100;
   emitDiag();
 }
+// recordTtsQueueDrop: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function recordTtsQueueDrop(
   message: { id: string | number; platform: ChatPlatform; author: string; text: string },
   reason: string,
@@ -448,6 +484,7 @@ const eventLabels: Record<string, string> = {
   youtube_gift_membership_received: "Membresia presente recebida",
   youtube_poll: "Enquete YouTube",
 };
+// Toggle: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function Toggle({
   checked,
   onChange,
@@ -469,6 +506,7 @@ function Toggle({
     </label>
   );
 }
+// Field: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="tts-filter-field">
@@ -477,6 +515,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
     </label>
   );
 }
+// TtsFiltersPanel: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function TtsFiltersPanel() {
   const cfg = useTtsFilterConfig();
   useTtsFilterDiagnostics();
