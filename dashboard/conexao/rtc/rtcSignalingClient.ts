@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica o cliente que envia e recebe mensagens de sinalização RTC. */
 // Cliente de Signaling e Gerenciador WebRTC P2P para o Laboratório RTC
 // Canal exclusivo: "livenexus-rtc-live"
 
