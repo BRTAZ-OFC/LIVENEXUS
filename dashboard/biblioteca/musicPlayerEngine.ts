@@ -41,9 +41,11 @@ let messageHandlerReady = false;
 let progressTimer: ReturnType<typeof setInterval> | null = null;
 let observedPlaying = false;
 
+// snapshot: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function snapshot(): PlayerState {
   return { ...state, queue: [...state.queue], history: [...state.history] };
 }
+// emit: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function emit() {
   const next = snapshot();
   for (const listener of listeners) {
@@ -54,6 +56,7 @@ function emit() {
     }
   }
 }
+// post: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function post(func: string, args: unknown[] = []) {
   try {
     frame?.contentWindow?.postMessage(
@@ -64,6 +67,7 @@ function post(func: string, args: unknown[] = []) {
     /* iframe may still be loading */
   }
 }
+// startProgressPoll: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function startProgressPoll() {
   if (progressTimer) clearInterval(progressTimer);
   progressTimer = setInterval(() => {
@@ -73,6 +77,7 @@ function startProgressPoll() {
     }
   }, 1000);
 }
+// playQueueIndex: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function playQueueIndex(index: number) {
   if (index < 0 || index >= state.queue.length) return;
   const track = state.queue[index];
@@ -100,6 +105,7 @@ function playQueueIndex(index: number) {
   }
   startProgressPoll();
 }
+// subscribeMusicPlayer: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function subscribeMusicPlayer(listener: (next: PlayerState) => void) {
   listeners.add(listener);
   listener(snapshot());
@@ -107,9 +113,11 @@ export function subscribeMusicPlayer(listener: (next: PlayerState) => void) {
     listeners.delete(listener);
   };
 }
+// getMusicPlayerState: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function getMusicPlayerState() {
   return snapshot();
 }
+// connectMusicPlayerFrame: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function connectMusicPlayerFrame(nextFrame: HTMLIFrameElement | null) {
   frame = nextFrame;
   if (!frame || typeof window === "undefined") return;
@@ -156,6 +164,7 @@ export function connectMusicPlayerFrame(nextFrame: HTMLIFrameElement | null) {
     } catch {}
   }, 300);
 }
+// playTrack: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function playTrack(track: MusicTrack) {
   if (!track?.videoId) return;
   state.queue = [track];
@@ -163,6 +172,7 @@ export function playTrack(track: MusicTrack) {
   state.history = [];
   playQueueIndex(0);
 }
+// playTracks: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function playTracks(tracks: MusicTrack[], startIndex = 0) {
   const valid = tracks.filter((track) => Boolean(track?.videoId));
   if (!valid.length) return;
@@ -171,6 +181,7 @@ export function playTracks(tracks: MusicTrack[], startIndex = 0) {
   state.history = [];
   playQueueIndex(Math.min(Math.max(startIndex, 0), valid.length - 1));
 }
+// toggleMusicPlayback: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function toggleMusicPlayback() {
   if (!state.track) return;
   if (state.isPlaying) {
@@ -185,6 +196,7 @@ export function toggleMusicPlayback() {
   }
   emit();
 }
+// advanceMusicTrack: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function advanceMusicTrack(automatic: boolean) {
   if (!state.queue.length || state.index < 0) return;
   if (automatic && state.repeat === "one") {
@@ -206,9 +218,11 @@ function advanceMusicTrack(automatic: boolean) {
   }
   playQueueIndex(nextIndex);
 }
+// nextMusicTrack: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function nextMusicTrack() {
   advanceMusicTrack(false);
 }
+// previousMusicTrack: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function previousMusicTrack() {
   if (state.history.length) {
     const previous = state.history.pop()!;
@@ -224,14 +238,17 @@ export function previousMusicTrack() {
     emit();
   }
 }
+// toggleMusicShuffle: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function toggleMusicShuffle() {
   state.shuffle = !state.shuffle;
   emit();
 }
+// cycleMusicRepeat: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function cycleMusicRepeat() {
   state.repeat = state.repeat === "off" ? "all" : state.repeat === "all" ? "one" : "off";
   emit();
 }
+// seekMusicTo: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function seekMusicTo(seconds: number) {
   const target = Math.max(
     0,
@@ -241,6 +258,7 @@ export function seekMusicTo(seconds: number) {
   state.currentTime = target;
   emit();
 }
+// setMusicVolume: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function setMusicVolume(volume: number) {
   state.volume = Math.max(0, Math.min(100, Math.round(volume)));
   post("setVolume", [state.volume]);
