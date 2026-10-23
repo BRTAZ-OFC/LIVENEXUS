@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica a tela de avaliações e o envio de respostas administrativas. */
 import { useState } from "react";
 import { Star, MessageSquare, ShieldCheck, Send, X } from "lucide-react";
 
