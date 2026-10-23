@@ -11,6 +11,7 @@
  * Rate limit: contador in-memory por isolate (soft, best-effort) — /kick/meta máx 30/min/IP.
  * Sem secrets. Sem setInterval.
  */
+// isAllowedOrigin: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function isAllowedOrigin(origin) {
   if (!origin) return false;
   try {
@@ -24,12 +25,14 @@ const KICK_URLS = ["https://kick.com/api/v1/channels/", "https://kick.com/api/v2
 const META_TTL = 25_000;
 const RESOLVE_TTL = 60_000;
 
+// json: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function json(obj, status = 200, corsH = {}) {
   return new Response(JSON.stringify(obj), {
     status,
     headers: { "Content-Type": "application/json", ...corsH },
   });
 }
+// corsFor: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function corsFor(request) {
   const origin = request.headers.get("Origin") || "";
   return isAllowedOrigin(origin)
@@ -37,6 +40,7 @@ function corsFor(request) {
     : { Vary: "Origin" };
 }
 
+// normalizeSlug: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function normalizeSlug(input) {
   const v = (input || "").trim().toLowerCase();
   const m = v.match(/kick\.com\/([a-z0-9_.]+)/i);
@@ -45,6 +49,7 @@ function normalizeSlug(input) {
   return slug;
 }
 
+// fetchKick: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function fetchKick(slug) {
   for (const base of KICK_URLS) {
     try {
@@ -59,6 +64,7 @@ async function fetchKick(slug) {
 
 // soft rate limit (in-memory por isolate)
 const rlCounters = new Map();
+// rateLimit: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function rateLimit(key, limit, windowMs) {
   const now = Date.now();
   const e = rlCounters.get(key);
@@ -73,6 +79,7 @@ function rateLimit(key, limit, windowMs) {
 
 // Normaliza thumbnail para STRING de URL.
 // ls.thumbnail string -> direto | ls.thumbnail.url -> .url | data.thumbnail.src -> .src | data.thumbnail string -> direto | null
+// normalizeThumbnail: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function normalizeThumbnail(ls, data) {
   const t = ls?.thumbnail;
   if (typeof t === "string") return t;
@@ -87,6 +94,7 @@ function normalizeThumbnail(ls, data) {
   return null;
 }
 
+// buildMeta: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function buildMeta(data) {
   const ls = data?.livestream || data?.current_livestream;
   const followers = typeof data?.followers_count === "number" ? data.followers_count : null;
@@ -118,6 +126,7 @@ function buildMeta(data) {
   };
 }
 
+// handleResolve: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function handleResolve(request, corsH) {
   const body = await request.json().catch(() => ({}));
   const slug = normalizeSlug(body.slug);
@@ -129,6 +138,7 @@ async function handleResolve(request, corsH) {
   return json({ chatroomId }, 200, corsH);
 }
 
+// handleMeta: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function handleMeta(request, corsH) {
   const ip = request.headers.get("CF-Connecting-IP") || "unknown";
   if (!rateLimit(`meta:${ip}`, 30, 60_000))
@@ -150,6 +160,7 @@ async function handleMeta(request, corsH) {
 const X_CLIENT_TOKEN_LAB = "e1393935a959b4020a4491574f6490129f678acdaa92760471263db43487f823";
 const TOKEN_TIMEOUT_MS = 15000;
 
+// fetchWithTimeout: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function fetchWithTimeout(url, opts, ms) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), ms);
@@ -160,6 +171,7 @@ async function fetchWithTimeout(url, opts, ms) {
   }
 }
 
+// attemptToken: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function attemptToken(headers, cookieStr) {
   const h = { ...headers };
   if (cookieStr) h["Cookie"] = cookieStr;
@@ -203,6 +215,7 @@ async function attemptToken(headers, cookieStr) {
   }
 }
 
+// handleLabKickViewerToken: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function handleLabKickViewerToken(request, corsH) {
   const ts = new Date().toISOString();
 
