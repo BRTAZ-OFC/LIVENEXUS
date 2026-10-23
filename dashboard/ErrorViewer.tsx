@@ -1,3 +1,4 @@
+/* LIVENEXUS: Mostra erros da aplicação para facilitar a identificação do que falhou. */
 import React, { Component, useEffect, useState, type ReactNode } from "react";
 import {
   AlertTriangle,
