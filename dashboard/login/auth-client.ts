@@ -8,6 +8,7 @@ type SafeUser = {
 type AuthResult =
   { ok: true; user: SafeUser; token?: string; message: string } | { ok: false; message: string };
 
+// postAuth: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 async function postAuth(
   path: string,
   data: { user: string; password: string },
@@ -42,10 +43,12 @@ async function postAuth(
   return result;
 }
 
+// registerUser: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function registerUser({ data }: { data: { user: string; password: string } }) {
   return postAuth("/api/auth/register", data);
 }
 
+// loginUser: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function loginUser({ data }: { data: { user: string; password: string } }) {
   return postAuth("/api/auth/login", data);
 }
