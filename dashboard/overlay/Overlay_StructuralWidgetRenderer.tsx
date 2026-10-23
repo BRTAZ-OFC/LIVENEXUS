@@ -29,6 +29,7 @@ const LEGACY_PRESET_MAP = {
   "floating-glass": "12",
 };
 
+// StructuralWidgetRenderer: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function StructuralWidgetRenderer({
   widgetId,
   typeId,
@@ -329,6 +330,7 @@ export default function StructuralWidgetRenderer({
 
   if (effectiveWidgetId !== "twitch-chat-box" || selectedPlatforms(config).length <= 1)
     return result;
+  {/* Estrutura visual retornada: div. */}
   return (
     <div className="ln-multichat-pattern w-full h-full">
       <style>{`.ln-multichat-pattern [data-chat-text] { display: -webkit-box !important; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden !important; overflow-wrap: anywhere; white-space: normal !important; }`}</style>
