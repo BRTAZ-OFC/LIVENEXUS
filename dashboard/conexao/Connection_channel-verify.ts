@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica como é verificada a conexão e a identificação do canal. */
 import { randomUUID, randomBytes } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
