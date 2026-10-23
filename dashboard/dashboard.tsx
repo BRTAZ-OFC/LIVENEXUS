@@ -39,6 +39,7 @@ const MemoOverlayCanvas = memo(OverlayCanvas);
 
 /* BLOCO 2 — O dashboard é registrado em dashboard/App.tsx. */
 /* BLOCO 3 — Controla menu lateral, seção ativa e acesso administrativo. */
+// DashboardOverview: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function DashboardOverview() {
   const chatState = useMultiChatSnapshot();
   const connectedPlatforms = ["Twitch", "Kick", "YouTube"].filter((platform) =>
@@ -61,6 +62,7 @@ function DashboardOverview() {
   )
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
+  {/* Estrutura visual retornada: section. */}
   return (
     <section className="dash-overview">
       <div className="dash-overview-heading">
@@ -137,6 +139,7 @@ function DashboardOverview() {
           <ol className="dash-speakers-list" aria-label="Top 10 falantes">
             {Array.from({ length: 10 }, (_, index) => {
               const speaker = speakerCounts[index];
+              {/* Estrutura visual retornada: li. */}
               return (
                 <li key={index} className={speaker ? "" : "is-empty"}>
                   <span className="dash-speaker-rank">{index + 1}</span>
@@ -157,6 +160,7 @@ function DashboardOverview() {
   );
 }
 
+// DashboardPage: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 function DashboardPage() {
   // BLOCO 4 — Inicializa o menu e recupera o papel antes de restaurar a aba ativa.
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
@@ -310,12 +314,15 @@ function DashboardPage() {
   // BLOCO 7 — Renderiza o layout do menu lateral e da área de conteúdo.
 
   if (authLoading) {
+    {/* Estrutura visual retornada: main. */}
     return (
       <main className="dash-flex-min-h-screen-axmrk9 items-center justify-center bg-slate-950 text-slate-300">
         <p className="text-sm">Verificando sessão...</p>
       </main>
     );
   }
+
+  {/* Estrutura visual retornada: div. */}
 
   return (
     <div className="dash-flex-min-h-screen-axmrk9">
