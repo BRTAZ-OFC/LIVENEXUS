@@ -1,3 +1,4 @@
+/* LIVENEXUS: Explica a tela e as ações de conexão de plataformas por identificação do canal. */
 import { useEffect, useState } from "react";
 import { RadioTower, Radio, Youtube, Wifi, WifiOff, ShieldCheck, Copy } from "lucide-react";
 import { channelVerify } from "../configuracao/Config_channelVerify";
