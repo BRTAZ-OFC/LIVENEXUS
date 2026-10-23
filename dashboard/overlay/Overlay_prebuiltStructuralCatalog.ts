@@ -1,5 +1,6 @@
 import { Award, Bell, Users, MessageSquare, Tv, Clock } from "lucide-react";
 
+// STRUCTURAL_PREMOLDS_ARCHETYPES: valor ou configuração reutilizada neste módulo.
 export const STRUCTURAL_PREMOLDS_ARCHETYPES = [
   {
     id: "big-number",
@@ -133,6 +134,7 @@ export const STRUCTURAL_PREMOLDS_ARCHETYPES = [
   },
 ];
 
+// WIDGET_STRUCTURAL_TYPES: valor ou configuração reutilizada neste módulo.
 export const WIDGET_STRUCTURAL_TYPES = [
   {
     id: "goals",
@@ -225,6 +227,7 @@ export const WIDGET_STRUCTURAL_TYPES = [
   },
 ];
 
+// resolveWidgetCategory: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function resolveWidgetCategory(widgetId) {
   if (!widgetId) return "goals";
   const id = widgetId.toLowerCase();
