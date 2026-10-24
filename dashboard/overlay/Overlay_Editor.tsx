@@ -22,6 +22,7 @@ type OverlayEditorProps = {
   onAddFragment: (definition: WidgetDefinition, elementKey: string, label: string) => void;
   onAddText: (text: string, fontSize: number, color: string, fontFamily: string) => void;
   onAddShape: (shape: string) => void;
+  onAddImage: (src: string, name: string) => void;
   onFontChange: (fontFamily: string) => void;
   onTextStyleChange: (patch: { fontSize?: number; color?: string; fontFamily?: string }) => void;
   selectedInstanceId?: string | null;
@@ -815,6 +816,7 @@ export default function Overlay_Editor({
   onAddFragment,
   onAddText,
   onAddShape,
+  onAddImage,
   onFontChange,
   onTextStyleChange,
   selectedInstanceId = null,
@@ -855,6 +857,13 @@ export default function Overlay_Editor({
   const [reactHubQueue, setReactHubQueue] = useState<ReactHubQueueItem[]>([]);
   const [reactHubPopupOpen, setReactHubPopupOpen] = useState(false);
   const [reactHubSelected, setReactHubSelected] = useState<ReactHubQueueItem | null>(null);
+  const [userAlbums, setUserAlbums] = useState<Array<{ id: string; nome: string; imagens: Array<{ id: string; name: string; url: string; type?: string }> }>>([]);
+  const [centralGallery, setCentralGallery] = useState<Array<{ id: string; name: string; url: string }>>([]);
+  const [galleryLoading, setGalleryLoading] = useState(false);
+  const [galleryError, setGalleryError] = useState("");
+  const [galleryPopupOpen, setGalleryPopupOpen] = useState(false);
+  const [galleryPopupTitle, setGalleryPopupTitle] = useState("");
+  const [galleryPopupImages, setGalleryPopupImages] = useState<Array<{ id: string; name: string; url: string }>>([]);
   const panelHeight = `min(${Math.max(190, height)}px, 34vh)`;
   const style: CSSProperties = {
     height: isCollapsed ? "0px" : panelHeight,
@@ -931,6 +940,49 @@ export default function Overlay_Editor({
   useEffect(() => {
     if (selectedInstanceWidgetId) setSelectedWidgetId(selectedInstanceWidgetId);
   }, [selectedInstanceWidgetId]);
+
+  useEffect(() => {
+    if (activeMenu !== "IMAGEMS") return;
+    let cancelled = false;
+    async function loadGalleries() {
+      setGalleryLoading(true);
+      setGalleryError("");
+      try {
+        const [userResponse, centralResponse] = await Promise.all([
+          fetch("/api/galeria-usuarios", { credentials: "include", cache: "no-store" }),
+          fetch("/api/gallery/general", { credentials: "include", cache: "no-store" }),
+        ]);
+        const userData = await userResponse.json();
+        const centralData = await centralResponse.json();
+        if (!userResponse.ok || !userData.ok) throw new Error(userData.message || "Não foi possível carregar os álbuns do usuário.");
+        if (cancelled) return;
+        const albums = Array.isArray(userData.albums) ? userData.albums : [];
+        setUserAlbums(albums.map((album: any) => ({
+          id: String(album.id || album.nome), nome: String(album.nome || "Álbum"),
+          imagens: Array.isArray(album.imagens) ? album.imagens.map((image: any) => ({
+            id: String(image.id || image.url || image.name), name: String(image.name || "Imagem"),
+            url: String(image.url || ""), type: String(image.type || ""),
+          })).filter((image: { url: string }) => image.url) : [],
+        })));
+        const rows = centralResponse.ok && centralData.ok && Array.isArray(centralData.items) ? centralData.items : [];
+        setCentralGallery(rows.map((item: any, index: number) => {
+          const url = String(item.url || item.image_url || item.imageUrl || item.src || item.imagem || item.image || item.path || item.thumbnail || item.thumbnail_url || "");
+          return { id: String(item.id || item.image_id || item.__rowKey || url || index), name: String(item.nome || item.name || item.title || item.titulo || "Imagem da galeria central"), url };
+        }).filter((image: { url: string }) => image.url));
+      } catch (error) {
+        if (!cancelled) setGalleryError(error instanceof Error ? error.message : "Erro ao carregar as galerias.");
+      } finally { if (!cancelled) setGalleryLoading(false); }
+    }
+    void loadGalleries();
+    return () => { cancelled = true; };
+  }, [activeMenu]);
+
+  function openGalleryPopup(title: string, images: Array<{ id: string; name: string; url: string }>) {
+    setGalleryPopupTitle(title); setGalleryPopupImages(images); setGalleryPopupOpen(true);
+  }
+  function chooseGalleryImage(image: { name: string; url: string }) {
+    onAddImage(image.url, image.name); setGalleryPopupOpen(false);
+  }
 
   useEffect(() => {
     if (!selectedFontCategory) return;
@@ -2978,12 +3030,42 @@ export default function Overlay_Editor({
                 </p>
               </div>
             )}
+            {activeMenu === "IMAGEMS" && (
+              <div className="grid h-full min-h-0 min-w-0 grid-cols-2 gap-3 overflow-hidden">
+                <section className="flex min-h-0 min-w-0 flex-col border-r border-white/10 pr-3">
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-300">Álbuns do usuário</p>
+                  <div className="flex min-h-0 flex-1 flex-wrap content-start gap-2 overflow-y-auto">
+                    {userAlbums.map((album) => (
+                      <button key={album.id} type="button" title={album.nome + " (" + album.imagens.length + " imagens)"} onClick={() => openGalleryPopup(album.nome, album.imagens)} className="flex max-w-full items-center gap-1.5 rounded border border-white/10 bg-slate-900/80 p-1 text-left text-[9px] text-slate-200 hover:border-violet-400">
+                        {album.imagens[0]?.url ? <img src={album.imagens[0].url} alt="" className="h-5 w-5 shrink-0 object-cover" /> : <span className="flex h-5 w-5 shrink-0 items-center justify-center border border-white/10 text-[8px]">0</span>}
+                        <span className="max-w-[100px] truncate">{album.nome}</span>
+                      </button>
+                    ))}
+                    {!galleryLoading && userAlbums.length === 0 && <p className="text-[10px] text-slate-500">Nenhum álbum encontrado.</p>}
+                  </div>
+                </section>
+                <section className="flex min-h-0 min-w-0 flex-col">
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-300">Galeria central</p>
+                  <div className="flex min-h-0 flex-1 flex-wrap content-start gap-2 overflow-y-auto">
+                    {centralGallery.map((image) => (
+                      <button key={image.id} type="button" title={image.name} onClick={() => openGalleryPopup("Galeria central", centralGallery)} className="h-5 w-5 shrink-0 overflow-hidden rounded border border-white/10 hover:border-violet-400" aria-label={"Abrir galeria central: " + image.name}>
+                        <img src={image.url} alt={image.name} className="h-5 w-5 object-cover" />
+                      </button>
+                    ))}
+                    {!galleryLoading && centralGallery.length === 0 && <p className="text-[10px] text-slate-500">Nenhuma imagem na galeria central.</p>}
+                  </div>
+                </section>
+                {galleryLoading && <p className="col-span-2 text-[10px] text-slate-400">Carregando galerias…</p>}
+                {galleryError && <p role="alert" className="col-span-2 text-[10px] text-rose-300">{galleryError}</p>}
+              </div>
+            )}
             {![
               "INICIO",
               "WIDGETS",
               "FUNDO",
               "TEXTO",
               "ANIMACAO",
+              "IMAGEMS",
               "ALINHAMENTO",
               "FORMAS",
               "CAMADAS",
@@ -2992,6 +3074,25 @@ export default function Overlay_Editor({
                 Este menu ficará vazio nesta etapa.
               </div>
             )}
+          </div>
+        </div>
+      )}
+      {galleryPopupOpen && (
+        <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/85 p-3" role="dialog" aria-modal="true" aria-label={galleryPopupTitle} onClick={() => setGalleryPopupOpen(false)}>
+          <div className="flex max-h-[90vh] w-[760px] max-w-[95vw] flex-col overflow-hidden rounded-lg border border-white/20 bg-slate-950 p-3 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <p className="text-xs font-semibold text-white">{galleryPopupTitle}</p>
+              <button type="button" onClick={() => setGalleryPopupOpen(false)} className="rounded border border-white/20 px-3 py-1 text-xs text-white">Fechar</button>
+            </div>
+            <div className="grid min-h-0 grid-cols-4 gap-3 overflow-y-auto sm:grid-cols-6">
+              {galleryPopupImages.map((image) => (
+                <button key={image.id} type="button" onClick={() => chooseGalleryImage(image)} title={"Adicionar " + image.name + " ao canvas"} className="flex min-w-0 flex-col gap-1 rounded border border-white/10 bg-slate-900/70 p-2 text-left hover:border-violet-400">
+                  <img src={image.url} alt={image.name} className="aspect-square w-full object-contain" />
+                  <span className="truncate text-[10px] text-slate-200">{image.name}</span>
+                </button>
+              ))}
+              {galleryPopupImages.length === 0 && <p className="col-span-full text-xs text-slate-400">Este álbum não possui imagens.</p>}
+            </div>
           </div>
         </div>
       )}
