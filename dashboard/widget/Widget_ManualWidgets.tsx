@@ -198,14 +198,25 @@ export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false
   );
   const marqueeStyle = { animation: "ln-track-marquee 15s linear infinite" };
 
-  // Lógica de Fragmentação (para templates customizados)
-  // Só renderiza a imagem isolada quando a instância é realmente o fragmento "Capa".
-  // Instâncias completas devem continuar exibindo o layout escolhido, mesmo se dados antigos
-  // tiverem deixado elementKey como "cover".
-  if (elementKey === "cover" && !isFullWidget && /capa/i.test(instanceName))
+  // Fragmentos só são renderizados isoladamente quando a instância corresponde
+  // explicitamente ao fragmento. Instâncias completas podem carregar elementKey antigo.
+  const normalizedInstanceName = String(instanceName || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+  const isFullNowPlayingInstance =
+    isFullWidget || /tocando\s*agora/.test(normalizedInstanceName);
+  const isCoverFragment =
+    !isFullNowPlayingInstance && elementKey === "cover" && /capa|cover/.test(normalizedInstanceName);
+  const isTitleFragment =
+    !isFullNowPlayingInstance && elementKey === "title" && /titulo|title/.test(normalizedInstanceName);
+  const isArtistFragment =
+    !isFullNowPlayingInstance && elementKey === "artist" && /artista|artist/.test(normalizedInstanceName);
+
+  if (isCoverFragment)
     {/* Estrutura visual retornada: img. */}
     return <img src={image} alt="Capa" className="h-full w-full object-cover rounded" />;
-  if (elementKey === "title")
+  if (isTitleFragment)
     {/* Estrutura visual retornada: div. */}
     return (
       <div className="w-full overflow-hidden">
@@ -218,7 +229,7 @@ export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false
         </span>
       </div>
     );
-  if (elementKey === "artist")
+  if (isArtistFragment)
     {/* Estrutura visual retornada: span. */}
     return <span className="text-sm font-medium text-slate-400 truncate">{artist}</span>;
 
