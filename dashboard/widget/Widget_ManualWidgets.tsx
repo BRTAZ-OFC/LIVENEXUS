@@ -204,8 +204,11 @@ export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
+  const hasConfiguredNowPlayingLayout = Boolean(config.structuralPreset || config.layout);
   const isFullNowPlayingInstance =
-    isFullWidget || /tocando\s*agora/.test(normalizedInstanceName);
+    isFullWidget ||
+    hasConfiguredNowPlayingLayout ||
+    /tocando\s*agora/.test(normalizedInstanceName);
   const isCoverFragment =
     !isFullNowPlayingInstance && elementKey === "cover" && /capa|cover/.test(normalizedInstanceName);
   const isTitleFragment =
