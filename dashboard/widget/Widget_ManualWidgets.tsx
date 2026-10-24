@@ -216,11 +216,10 @@ export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false
   const isArtistFragment =
     !isFullNowPlayingInstance && elementKey === "artist" && /artista|artist/.test(normalizedInstanceName);
 
-  if (isCoverFragment)
-    {/* Estrutura visual retornada: img. */}
+  if (isCoverFragment) {
     return <img src={image} alt="Capa" className="h-full w-full object-cover rounded" />;
-  if (isTitleFragment)
-    {/* Estrutura visual retornada: div. */}
+  }
+  if (isTitleFragment) {
     return (
       <div className="w-full overflow-hidden">
         {marqueeAnimation}
@@ -232,9 +231,10 @@ export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false
         </span>
       </div>
     );
-  if (isArtistFragment)
-    {/* Estrutura visual retornada: span. */}
+  }
+  if (isArtistFragment) {
     return <span className="text-sm font-medium text-slate-400 truncate">{artist}</span>;
+  }
 
   // 1. PADRÃO (FAIXA SUPERIOR)
   if (layout === "default") {
