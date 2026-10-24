@@ -1074,6 +1074,8 @@ export default function WidgetElementRenderer({
           <ManualComponent
             config={{ ...manualWidget.defaultConfig, ...config }}
             elementKey={elementKey}
+            isFullWidget={isFullWidget || elementKey === "full_widget"}
+            instanceName={instanceName || ""}
             instanceId={instanceId}
           />
         );
