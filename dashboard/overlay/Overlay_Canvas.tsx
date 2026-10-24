@@ -93,6 +93,7 @@ const catalog = TWITCH_WIDGETS_CATALOG as unknown as WidgetDefinition[];
 const DEFAULT_SIZE = { width: 800, height: 480 };
 const TEXT_WIDGET_ID = "__livenexus_text__";
 const SHAPE_WIDGET_ID = "__livenexus_shape__";
+const IMAGE_WIDGET_ID = "__livenexus_image__";
 const EMPTY_BACKGROUND: CanvasBackground = { type: "transparent", opacity: 100 };
 
 // transparentWidgetConfig: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
@@ -1177,6 +1178,39 @@ export default function OverlayCanvas() {
     setNotice("");
   }
 
+  function addImageInstance(src: string, name: string) {
+    const existing = config.instances || [];
+    const width = Math.min(size.width, 240);
+    const height = Math.min(size.height, 180);
+    const id = makeUniqueWidgetId(name || "imagem", existing);
+    const instance: CanvasInstance = {
+      id,
+      widgetId: IMAGE_WIDGET_ID,
+      elementKey: "image",
+      isFullWidget: false,
+      name: name || "Imagem",
+      x: Math.max(0, Math.min(size.width - width, 24)),
+      y: Math.max(0, Math.min(size.height - height, 24)),
+      width,
+      height,
+      zIndex: existing.reduce((max, item) => Math.max(max, Number(item.zIndex) || 0), 0) + 1,
+      visible: true,
+      config: { src, imageName: name || "Imagem", objectFit: "contain" },
+    };
+    setActiveOverlayId(null);
+    setConfig((current) => ({
+      ...current,
+      id: undefined,
+      name: name || "Imagem",
+      instances: [...(current.instances || []), instance],
+    }));
+    setSelectedInstanceId(id);
+    setEditingTextId(null);
+    setEditorOpen(true);
+    setError("");
+    setNotice("");
+  }
+
   function addShapeInstance(shape: string) {
     const existing = config.instances || [];
     const width = Math.min(size.width, 140);
@@ -1792,7 +1826,14 @@ export default function OverlayCanvas() {
                           defaultWidth: 140,
                           defaultHeight: 100,
                         } as WidgetDefinition)
-                      : undefined);
+                      : instance.widgetId === IMAGE_WIDGET_ID
+                        ? ({
+                            id: IMAGE_WIDGET_ID,
+                            name: instance.name || "Imagem",
+                            defaultWidth: 240,
+                            defaultHeight: 180,
+                          } as WidgetDefinition)
+                        : undefined);
                 if (!definition) return null;
                 const width = Math.max(1, Number(instance.width) || definition.defaultWidth || 280);
                 const height = Math.max(
@@ -2028,7 +2069,15 @@ export default function OverlayCanvas() {
                           instanceId +
                           '"] { background-color: transparent !important; background-image: none !important; box-shadow: none !important; }'}
                       </style>
-                      {instance.widgetId === SHAPE_WIDGET_ID ? (
+                      {instance.widgetId === IMAGE_WIDGET_ID ? (
+                        <img
+                          src={String(widgetConfig["src"] || "")}
+                          alt={String(widgetConfig["imageName"] || instance.name || "Imagem")}
+                          draggable={false}
+                          className="h-full w-full select-none"
+                          style={{ objectFit: String(widgetConfig["objectFit"] || "contain"), opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100 }}
+                        />
+                      ) : instance.widgetId === SHAPE_WIDGET_ID ? (
                         <div
                           className="h-full w-full"
                           style={{
@@ -2283,6 +2332,7 @@ export default function OverlayCanvas() {
           onAddFragment={addWidgetComponent}
           onAddText={addTextInstance}
           onAddShape={addShapeInstance}
+          onAddImage={addImageInstance}
           gridSettings={gridSettings}
           onUpdateGridSettings={updateGridSettings}
           backgroundColor={selectedElementBackgroundColor}
