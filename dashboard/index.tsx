@@ -344,18 +344,6 @@ function HomePage() {
             </span>
           </a>
 
-          <div className="home-hidden-items-center-vc0i0m">
-            <a href="#plataforma" className="home-text-sm-text-slate-300-q5welq">
-              Plataforma
-            </a>
-            <a href="#recursos" className="home-text-sm-text-slate-300-q5welq">
-              Recursos
-            </a>
-            <a href="#comunidade" className="home-text-sm-text-slate-300-q5welq">
-              Comunidade
-            </a>
-          </div>
-
           <div className="home-flex-shrink-0-1mm3j93">
             {isLoggedIn ? (
               <>
