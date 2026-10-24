@@ -65,7 +65,9 @@ function DashboardOverview() {
   )
     .sort((a, b) => b.count - a.count)
     .slice(0, 10);
-  {/* Estrutura visual retornada: section. */}
+  {
+    /* Estrutura visual retornada: section. */
+  }
   return (
     <section className="dash-overview">
       <div className="dash-overview-heading">
@@ -142,7 +144,9 @@ function DashboardOverview() {
           <ol className="dash-speakers-list" aria-label="Top 10 falantes">
             {Array.from({ length: 10 }, (_, index) => {
               const speaker = speakerCounts[index];
-              {/* Estrutura visual retornada: li. */}
+              {
+                /* Estrutura visual retornada: li. */
+              }
               return (
                 <li key={index} className={speaker ? "" : "is-empty"}>
                   <span className="dash-speaker-rank">{index + 1}</span>
@@ -321,7 +325,9 @@ function DashboardPage() {
   // BLOCO 7 — Renderiza o layout do menu lateral e da área de conteúdo.
 
   if (authLoading) {
-    {/* Estrutura visual retornada: main. */}
+    {
+      /* Estrutura visual retornada: main. */
+    }
     return (
       <main className="dash-flex-min-h-screen-axmrk9 items-center justify-center bg-slate-950 text-slate-300">
         <p className="text-sm">Verificando sessão...</p>
@@ -329,7 +335,9 @@ function DashboardPage() {
     );
   }
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div className="dash-flex-min-h-screen-axmrk9">
@@ -410,7 +418,9 @@ function DashboardPage() {
             className={`dash-flex-h-11-141hbqq ${sidebarExpanded ? "dash-gap-3-px-3-x5a6yh" : "dash-justify-center-160tcmj"} ${activeSection === "perfil" ? "dash-bg-violet-500-15-text-vi-1xm6n2h" : "dash-text-white-fmef8d"}`}
           >
             <CircleUserRound className="dash-h-2-5-w-2-5-16znhny" />
-            {sidebarExpanded && <span className="dash-text-7px-font-semibold-r7z1tv">Minha conta</span>}
+            {sidebarExpanded && (
+              <span className="dash-text-7px-font-semibold-r7z1tv">Minha conta</span>
+            )}
           </button>
           <button
             type="button"

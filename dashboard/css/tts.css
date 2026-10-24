@@ -468,57 +468,57 @@
   font-size: 11px;
 }
 @media (max-width: 1100px) {
-/* Estilos para .tts-main-grid. */
-/* Estilos para .tts-main-grid. */
+  /* Estilos para .tts-main-grid. */
+  /* Estilos para .tts-main-grid. */
   .tts-main-grid {
     grid-template-columns: 1fr;
   }
-/* Estilos para .tts-presets. */
-/* Estilos para .tts-presets. */
+  /* Estilos para .tts-presets. */
+  /* Estilos para .tts-presets. */
   .tts-presets {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 @media (max-width: 700px) {
-/* Estilos para .tts-page. */
-/* Estilos para .tts-page. */
+  /* Estilos para .tts-page. */
+  /* Estilos para .tts-page. */
   .tts-page {
     padding: 14px;
   }
-/* Estilos para .tts-page-heading. */
-/* Estilos para .tts-page-heading. */
+  /* Estilos para .tts-page-heading. */
+  /* Estilos para .tts-page-heading. */
   .tts-page-heading {
     align-items: flex-start;
   }
-/* Estilos para .tts-faders. */
-/* Estilos para .tts-faders. */
+  /* Estilos para .tts-faders. */
+  /* Estilos para .tts-faders. */
   .tts-faders {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 12px;
   }
-/* Estilos para .tts-presets. */
-/* Estilos para .tts-presets. */
+  /* Estilos para .tts-presets. */
+  /* Estilos para .tts-presets. */
   .tts-presets {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-/* Estilos para .tts-queue-list article. */
-/* Estilos para .tts-queue-list article. */
+  /* Estilos para .tts-queue-list article. */
+  /* Estilos para .tts-queue-list article. */
   .tts-queue-list article {
     grid-template-columns: auto minmax(0, 1fr);
     align-items: start;
   }
-/* Estilos para .tts-queue-list article p. */
-/* Estilos para .tts-queue-list article p. */
+  /* Estilos para .tts-queue-list article p. */
+  /* Estilos para .tts-queue-list article p. */
   .tts-queue-list article p {
     grid-column: 1/-1;
   }
-/* Estilos para .tts-queue-list article > small. */
-/* Estilos para .tts-queue-list article > small. */
+  /* Estilos para .tts-queue-list article > small. */
+  /* Estilos para .tts-queue-list article > small. */
   .tts-queue-list article > small {
     grid-column: 1/-1;
   }
-/* Estilos para .tts-queue-toolbar. */
-/* Estilos para .tts-queue-toolbar. */
+  /* Estilos para .tts-queue-toolbar. */
+  /* Estilos para .tts-queue-toolbar. */
   .tts-queue-toolbar {
     align-items: flex-start;
     flex-direction: column;
@@ -590,8 +590,8 @@
   line-height: 1.6;
 }
 @media (max-width: 720px) {
-/* Estilos para .tts-voice-effects. */
-/* Estilos para .tts-voice-effects. */
+  /* Estilos para .tts-voice-effects. */
+  /* Estilos para .tts-voice-effects. */
   .tts-voice-effects {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -899,13 +899,13 @@
   line-height: 1.5;
 }
 @media (max-width: 1000px) {
-/* Estilos para .tts-filter-grid. */
-/* Estilos para .tts-filter-grid. */
+  /* Estilos para .tts-filter-grid. */
+  /* Estilos para .tts-filter-grid. */
   .tts-filter-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-/* Estilos para .tts-filter-top. */
-/* Estilos para .tts-filter-top. */
+  /* Estilos para .tts-filter-top. */
+  /* Estilos para .tts-filter-top. */
   .tts-filter-top {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -917,13 +917,13 @@
   .tts-filter-top {
     grid-template-columns: 1fr;
   }
-/* Estilos para .tts-filter-events article. */
-/* Estilos para .tts-filter-events article. */
+  /* Estilos para .tts-filter-events article. */
+  /* Estilos para .tts-filter-events article. */
   .tts-filter-events article {
     grid-template-columns: auto minmax(0, 1fr);
   }
-/* Estilos para .tts-filter-events span. */
-/* Estilos para .tts-filter-events span. */
+  /* Estilos para .tts-filter-events span. */
+  /* Estilos para .tts-filter-events span. */
   .tts-filter-events span {
     grid-column: 1 / -1;
   }
@@ -1049,13 +1049,13 @@
   color: #ef4444;
 }
 @media (max-width: 520px) {
-/* Estilos para .tts-heading-actions. */
-/* Estilos para .tts-heading-actions. */
+  /* Estilos para .tts-heading-actions. */
+  /* Estilos para .tts-heading-actions. */
   .tts-heading-actions {
     gap: 5px;
   }
-/* Estilos para .tts-filter-open-button. */
-/* Estilos para .tts-filter-open-button. */
+  /* Estilos para .tts-filter-open-button. */
+  /* Estilos para .tts-filter-open-button. */
   .tts-filter-open-button {
     padding: 6px 9px;
   }
@@ -1094,14 +1094,14 @@
   color: #fff;
 }
 @media (max-width: 520px) {
-/* Estilos para .tts-heading-actions. */
-/* Estilos para .tts-heading-actions. */
+  /* Estilos para .tts-heading-actions. */
+  /* Estilos para .tts-heading-actions. */
   .tts-heading-actions {
     gap: 5px;
     flex-wrap: wrap;
   }
-/* Estilos para .tts-filter-open-button. */
-/* Estilos para .tts-filter-open-button. */
+  /* Estilos para .tts-filter-open-button. */
+  /* Estilos para .tts-filter-open-button. */
   .tts-filter-open-button {
     padding: 6px 9px;
   }
@@ -1364,8 +1364,8 @@
   background: #ef44442b;
 }
 @media (max-width: 900px) {
-/* Estilos para .tts-platform-grid. */
-/* Estilos para .tts-platform-grid. */
+  /* Estilos para .tts-platform-grid. */
+  /* Estilos para .tts-platform-grid. */
   .tts-platform-grid {
     grid-template-columns: 1fr;
   }

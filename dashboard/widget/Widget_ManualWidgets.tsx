@@ -29,7 +29,9 @@ function Frame({ config = {}, children, label, className = "" }) {
       .replace(/\bborder\b/g, "")
       .replace(/\brounded-[^\s]+/g, "rounded-none");
   }
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
   return (
     <div
       className={`w-full h-full min-w-0 overflow-hidden flex ${style === 2 ? "items-center justify-between gap-3" : style === 4 ? "items-center justify-center gap-3" : "flex-col justify-center gap-2"} ${shellStr} ${className}`}
@@ -50,8 +52,29 @@ function Frame({ config = {}, children, label, className = "" }) {
 
 // DeathCounter: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export function DeathCounter({ config = {}, elementKey }) {
-  const count = Math.max(0, Number(config.deathCount) || 0);
-  {/* Estrutura visual retornada: Frame. */}
+  const [count, setCount] = useState(() => Math.max(0, Number(config.deathCount) || 0));
+
+  useEffect(() => {
+    setCount(Math.max(0, Number(config.deathCount) || 0));
+  }, [config.deathCount]);
+
+  useEffect(() => {
+    const handleUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<{ count?: number }>;
+      if (typeof customEvent?.detail?.count === "number") {
+        setCount(Math.max(0, customEvent.detail.count));
+      }
+    };
+
+    window.addEventListener("livenexus:death-counter-updated", handleUpdate);
+    return () => {
+      window.removeEventListener("livenexus:death-counter-updated", handleUpdate);
+    };
+  }, []);
+
+  {
+    /* Estrutura visual retornada: Frame. */
+  }
   return (
     <Frame config={config} label={elementKey === "count" ? null : "Mortes"}>
       <strong className="text-4xl leading-none tabular-nums">{count}</strong>
@@ -88,7 +111,9 @@ export function ClockWidget({ config = {}, elementKey }) {
     }).format(now);
     date = "";
   }
-  {/* Estrutura visual retornada: Frame. */}
+  {
+    /* Estrutura visual retornada: Frame. */
+  }
   return (
     <Frame config={config} label={elementKey ? null : "Relógio"}>
       {elementKey !== "date" && (
@@ -121,7 +146,9 @@ export function TimerWidget({ config = {}, elementKey }) {
     const id = setInterval(() => setNow(Date.now()), 250);
     return () => clearInterval(id);
   }, [config.timerRunning]);
-  {/* Estrutura visual retornada: Frame. */}
+  {
+    /* Estrutura visual retornada: Frame. */
+  }
   return (
     <Frame config={config} label={elementKey === "timer" ? null : "Temporizador"}>
       <strong className="text-3xl leading-none tabular-nums">{formatDuration(remaining)}</strong>
@@ -176,7 +203,12 @@ function useExistingTrack() {
 }
 
 // NowPlayingWidget: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
-export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false, instanceName = "" }) {
+export function NowPlayingWidget({
+  config = {},
+  elementKey,
+  isFullWidget = false,
+  instanceName = "",
+}) {
   const track = useExistingTrack();
   const title = track?.title || "Nada tocando";
   const artist = track?.artist || track?.artistName || "Sem artista";
@@ -206,15 +238,19 @@ export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false
     .toLowerCase();
   const hasConfiguredNowPlayingLayout = Boolean(config.structuralPreset || config.layout);
   const isFullNowPlayingInstance =
-    isFullWidget ||
-    hasConfiguredNowPlayingLayout ||
-    /tocando\s*agora/.test(normalizedInstanceName);
+    isFullWidget || hasConfiguredNowPlayingLayout || /tocando\s*agora/.test(normalizedInstanceName);
   const isCoverFragment =
-    !isFullNowPlayingInstance && elementKey === "cover" && /capa|cover/.test(normalizedInstanceName);
+    !isFullNowPlayingInstance &&
+    elementKey === "cover" &&
+    /capa|cover/.test(normalizedInstanceName);
   const isTitleFragment =
-    !isFullNowPlayingInstance && elementKey === "title" && /titulo|title/.test(normalizedInstanceName);
+    !isFullNowPlayingInstance &&
+    elementKey === "title" &&
+    /titulo|title/.test(normalizedInstanceName);
   const isArtistFragment =
-    !isFullNowPlayingInstance && elementKey === "artist" && /artista|artist/.test(normalizedInstanceName);
+    !isFullNowPlayingInstance &&
+    elementKey === "artist" &&
+    /artista|artist/.test(normalizedInstanceName);
 
   if (isCoverFragment) {
     return <img src={image} alt="Capa" className="h-full w-full object-cover rounded" />;
@@ -239,7 +275,9 @@ export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false
   // 1. PADRÃO (FAIXA SUPERIOR)
   if (layout === "default") {
     const textRepeated = `${title} • `.repeat(15);
-    {/* Estrutura visual retornada: div. */}
+    {
+      /* Estrutura visual retornada: div. */
+    }
     return (
       <div
         className="w-full h-full flex items-center p-3 select-none relative overflow-hidden"
@@ -272,7 +310,9 @@ export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false
   // 2. QUADRADO
   if (layout === "square") {
     const textRepeated = `${title} • `.repeat(10);
-    {/* Estrutura visual retornada: div. */}
+    {
+      /* Estrutura visual retornada: div. */
+    }
     return (
       <div
         className="w-full h-full flex flex-col justify-between p-4 select-none relative overflow-hidden"
@@ -329,7 +369,9 @@ export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false
   // 3. LATERAL
   if (layout === "horizontal") {
     const textRepeated = `${title} • `.repeat(10);
-    {/* Estrutura visual retornada: div. */}
+    {
+      /* Estrutura visual retornada: div. */
+    }
     return (
       <div
         className="w-full h-full flex items-center p-3 gap-4 select-none relative overflow-hidden"
@@ -397,7 +439,9 @@ export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false
   // 4. VINIL
   if (layout === "vinil") {
     const textRepeated = `${title} • ${artist} • `.repeat(4);
-    {/* Estrutura visual retornada: div. */}
+    {
+      /* Estrutura visual retornada: div. */
+    }
     return (
       <div
         className="w-full h-full flex flex-col items-center justify-center p-3 select-none relative overflow-hidden"
@@ -491,7 +535,9 @@ export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false
   // 5. FAIXA (SÓ MARQUEE)
   if (layout === "marquee") {
     const textRepeated = `${title} • `.repeat(15);
-    {/* Estrutura visual retornada: div. */}
+    {
+      /* Estrutura visual retornada: div. */
+    }
     return (
       <div
         className="w-full h-full flex items-center p-3 select-none relative overflow-hidden"

@@ -9,7 +9,7 @@ import { platformIsOnline, platformMeta, platformViewers } from "../Overlay_plat
  * @param {import('../types/WidgetConfig').WidgetConfig} props.config
  */
 // TwitchStatusLabel: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
-export default function TwitchStatusLabel({ config = {} }) {
+export default function TwitchStatusLabel({ config = {} as any }) {
   const { connections, streamMeta } = useStreaming();
 
   const isOnline = platformIsOnline(connections, config);
@@ -29,7 +29,9 @@ export default function TwitchStatusLabel({ config = {} }) {
     fontFamily: config.fontFamily || "Inter, sans-serif",
   };
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div

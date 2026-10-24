@@ -14,6 +14,8 @@ import Overlay_Editor from "./Overlay_Editor";
 import AnimacoesTexto from "../animacoes/AnimacoesTexto";
 import { loadGoogleFont } from "../fontes/Font_Loader";
 import { useStreaming } from "../widget/runtime";
+import { syncDeathCounter } from "../widget/deathCounterEngine";
+import { registerCanvasHotkeyHandler } from "../hotkeys/useGlobalHotkeys";
 
 type JsonObject = Record<string, unknown>;
 type CanvasInstance = {
@@ -265,133 +267,147 @@ function OverlayShape({
     plus: "38,3 62,3 62,38 97,38 97,62 62,62 62,97 38,97 38,62 3,62 3,38 38,38",
     minus: "5,38 95,38 95,62 5,62",
   };
-  if (["circle", "ellipse", "ring"].includes(shape))
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <ellipse
-          cx="50"
-          cy="50"
-          rx={shape === "ellipse" ? 48 : 43}
-          ry={shape === "ellipse" ? 30 : 43}
-          fill={shape === "ring" ? "none" : fill}
-          fillOpacity={Math.max(0, Math.min(100, Number(fillOpacity) || 0)) / 100}
-          stroke={strokeColor}
-          strokeWidth={strokeWidth}
-          vectorEffect="non-scaling-stroke"
-        />
-      </svg>
-    );
-  if (["rectangle", "square", "rounded-rectangle"].includes(shape))
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <rect
-          x={shape === "square" ? 5 : 2}
-          y={shape === "square" ? 5 : 20}
-          width={shape === "square" ? 90 : 96}
-          height={shape === "square" ? 90 : 60}
-          rx={shape === "rounded-rectangle" ? 12 : 0}
-          {...common}
-        />
-      </svg>
-    );
-  if (shape === "star")
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <polygon points="50,3 61,36 96,36 68,57 79,93 50,71 21,93 32,57 4,36 39,36" {...common} />
-      </svg>
-    );
-  if (shape === "heart")
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <path
-          d="M50 91 C40 78 7 56 7 30 C7 5 38 1 50 24 C63 1 94 5 94 30 C94 56 60 79 50 91Z"
-          {...common}
-        />
-      </svg>
-    );
-  if (shape === "lightning")
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <polygon points="57,2 18,56 44,56 35,98 83,37 56,37" {...common} />
-      </svg>
-    );
-  if (shape === "speech-bubble")
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <path d="M8 12 H92 V72 H42 L20 92 V72 H8Z" {...common} />
-      </svg>
-    );
-  if (shape === "cylinder")
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <path d="M8 20 C8 3 92 3 92 20 V80 C92 98 8 98 8 80Z" {...common} />
-        <ellipse
-          cx="50"
-          cy="20"
-          rx="42"
-          ry="14"
-          fill={fill}
-          stroke={strokeColor}
-          strokeWidth={strokeWidth}
-        />
-      </svg>
-    );
-  if (shape === "cloud")
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <path
-          d="M22 76 C1 76 1 48 21 43 C18 17 48 9 60 31 C82 21 100 40 91 58 C109 77 87 88 72 85 H23Z"
-          {...common}
-        />
-      </svg>
-    );
-  if (shape === "arch")
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <path d="M10 95 V48 A40 40 0 0 1 90 48 V95 H68 V48 A18 18 0 0 0 32 48 V95Z" {...common} />
-      </svg>
-    );
-  if (shape === "wave")
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <path
-          d="M4 35 C25 5 35 65 50 35 S75 5 96 35 V65 C75 35 65 95 50 65 S25 35 4 65Z"
-          {...common}
-        />
-      </svg>
-    );
-  if (shape === "pie")
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <path d="M50 50 L50 5 A45 45 0 0 1 95 50Z" {...common} />
-        <circle cx="50" cy="50" r="45" fill="none" stroke={strokeColor} strokeWidth={strokeWidth} />
-      </svg>
-    );
-  if (shape === "line")
-    {/* Estrutura visual retornada: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
-        <path
-          d="M8 90 L92 10"
-          fill="none"
-          stroke={strokeColor || color}
-          strokeWidth={Math.max(1, strokeWidth)}
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  {/* Estrutura visual retornada: svg. */}
+  if (["circle", "ellipse", "ring"].includes(shape)) {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <ellipse
+        cx="50"
+        cy="50"
+        rx={shape === "ellipse" ? 48 : 43}
+        ry={shape === "ellipse" ? 30 : 43}
+        fill={shape === "ring" ? "none" : fill}
+        fillOpacity={Math.max(0, Math.min(100, Number(fillOpacity) || 0)) / 100}
+        stroke={strokeColor}
+        strokeWidth={strokeWidth}
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+  if (["rectangle", "square", "rounded-rectangle"].includes(shape)) {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <rect
+        x={shape === "square" ? 5 : 2}
+        y={shape === "square" ? 5 : 20}
+        width={shape === "square" ? 90 : 96}
+        height={shape === "square" ? 90 : 60}
+        rx={shape === "rounded-rectangle" ? 12 : 0}
+        {...common}
+      />
+    </svg>
+  );
+  if (shape === "star") {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <polygon points="50,3 61,36 96,36 68,57 79,93 50,71 21,93 32,57 4,36 39,36" {...common} />
+    </svg>
+  );
+  if (shape === "heart") {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <path
+        d="M50 91 C40 78 7 56 7 30 C7 5 38 1 50 24 C63 1 94 5 94 30 C94 56 60 79 50 91Z"
+        {...common}
+      />
+    </svg>
+  );
+  if (shape === "lightning") {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <polygon points="57,2 18,56 44,56 35,98 83,37 56,37" {...common} />
+    </svg>
+  );
+  if (shape === "speech-bubble") {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <path d="M8 12 H92 V72 H42 L20 92 V72 H8Z" {...common} />
+    </svg>
+  );
+  if (shape === "cylinder") {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <path d="M8 20 C8 3 92 3 92 20 V80 C92 98 8 98 8 80Z" {...common} />
+      <ellipse
+        cx="50"
+        cy="20"
+        rx="42"
+        ry="14"
+        fill={fill}
+        stroke={strokeColor}
+        strokeWidth={strokeWidth}
+      />
+    </svg>
+  );
+  if (shape === "cloud") {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <path
+        d="M22 76 C1 76 1 48 21 43 C18 17 48 9 60 31 C82 21 100 40 91 58 C109 77 87 88 72 85 H23Z"
+        {...common}
+      />
+    </svg>
+  );
+  if (shape === "arch") {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <path d="M10 95 V48 A40 40 0 0 1 90 48 V95 H68 V48 A18 18 0 0 0 32 48 V95Z" {...common} />
+    </svg>
+  );
+  if (shape === "wave") {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <path
+        d="M4 35 C25 5 35 65 50 35 S75 5 96 35 V65 C75 35 65 95 50 65 S25 35 4 65Z"
+        {...common}
+      />
+    </svg>
+  );
+  if (shape === "pie") {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <path d="M50 50 L50 5 A45 45 0 0 1 95 50Z" {...common} />
+      <circle cx="50" cy="50" r="45" fill="none" stroke={strokeColor} strokeWidth={strokeWidth} />
+    </svg>
+  );
+  if (shape === "line") {
+    /* Estrutura visual retornada: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
+      <path
+        d="M8 90 L92 10"
+        fill="none"
+        stroke={strokeColor || color}
+        strokeWidth={Math.max(1, strokeWidth)}
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+  {
+    /* Estrutura visual retornada: svg. */
+  }
   return (
     <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="h-full w-full">
       <polygon points={points[shape] || points.hexagon} {...common} />
@@ -748,6 +764,41 @@ export default function OverlayCanvas() {
     return () => window.removeEventListener("livenexus:trigger-tempo-visivel", handleTrigger);
   }, []);
 
+  // Sincroniza instâncias locais de contador de mortes quando o evento global de mortes for disparado
+  useEffect(() => {
+    const handleDeathCounterUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<{ count?: number }>;
+      const nextCount =
+        typeof customEvent?.detail?.count === "number"
+          ? Math.max(0, customEvent.detail.count)
+          : null;
+      if (nextCount === null) return;
+
+      setConfig((current) => {
+        let changed = false;
+        const instances = (current.instances || []).map((item) => {
+          if (item.widgetId === "manual-death-counter") {
+            const currentDeath = Math.max(0, Number(item.config?.deathCount) || 0);
+            if (currentDeath !== nextCount) {
+              changed = true;
+              return {
+                ...item,
+                config: { ...(item.config || {}), deathCount: nextCount },
+              };
+            }
+          }
+          return item;
+        });
+        return changed ? { ...current, instances } : current;
+      });
+    };
+
+    window.addEventListener("livenexus:death-counter-updated", handleDeathCounterUpdate);
+    return () => {
+      window.removeEventListener("livenexus:death-counter-updated", handleDeathCounterUpdate);
+    };
+  }, []);
+
   // Ativa visibilidade temporária dos widgets em modo "event" quando um novo evento ao vivo chega
   useEffect(() => {
     const currentLen = liveActivityItems?.length || 0;
@@ -791,8 +842,15 @@ export default function OverlayCanvas() {
           rows[0];
         if (!cancelled) setOverlays(rows);
         if (!cancelled && firstConfigured) {
-          setConfig(getCanvasConfig(firstConfigured));
+          const loadedConfig = getCanvasConfig(firstConfigured);
+          setConfig(loadedConfig);
           setActiveOverlayId(String(firstConfigured.id ?? "") || null);
+          const deathInst = loadedConfig.instances?.find(
+            (item) => item.widgetId === "manual-death-counter",
+          );
+          if (deathInst?.config?.deathCount !== undefined) {
+            syncDeathCounter(Number(deathInst.config.deathCount) || 0);
+          }
           if (requestedScenario) sessionStorage.removeItem("livenexus_active_scenario_id");
         } else if (!cancelled) {
           setActiveOverlayId(null);
@@ -865,58 +923,56 @@ export default function OverlayCanvas() {
   }, [size.width, size.height]);
 
   useEffect(() => {
-    function handleCanvasKeyDown(event: KeyboardEvent) {
-      const target = event.target as HTMLElement | null;
-      const activeIds =
-        selectedInstanceIds.length > 0
-          ? selectedInstanceIds
-          : selectedInstanceId
-            ? [selectedInstanceId]
-            : [];
+    registerCanvasHotkeyHandler({
+      handleKeyDown: (event: KeyboardEvent) => {
+        const activeIds =
+          selectedInstanceIds.length > 0
+            ? selectedInstanceIds
+            : selectedInstanceId
+              ? [selectedInstanceId]
+              : [];
 
-      if (
-        activeIds.length === 0 ||
-        target?.closest("input, textarea, select, [contenteditable='true'], [role='textbox']")
-      ) {
-        return;
-      }
-      if (event.altKey || event.ctrlKey || event.metaKey) return;
+        if (activeIds.length === 0) return false;
+        if (event.altKey || event.ctrlKey || event.metaKey) return false;
 
-      if (event.key === "Delete" || event.key === "Backspace") {
+        if (event.key === "Delete" || event.key === "Backspace") {
+          event.preventDefault();
+          deleteInstance(activeIds);
+          return true;
+        }
+
+        const step = event.shiftKey ? 10 : 1;
+        let dx = 0;
+        let dy = 0;
+        if (event.key === "ArrowLeft") dx = -step;
+        else if (event.key === "ArrowRight") dx = step;
+        else if (event.key === "ArrowUp") dy = -step;
+        else if (event.key === "ArrowDown") dy = step;
+        else return false;
+
         event.preventDefault();
-        deleteInstance(activeIds);
-        return;
-      }
+        const targetSet = new Set(activeIds);
+        setConfig((current) => ({
+          ...current,
+          instances: (current.instances || []).map((item, index) => {
+            const itemKey = item.id || `${item.widgetId}-${index}`;
+            if (!targetSet.has(itemKey)) return item;
+            const width = Math.max(1, Number(item.width) || 280);
+            const height = Math.max(1, Number(item.height) || 120);
+            return {
+              ...item,
+              x: Math.max(0, Math.min(size.width - width, (Number(item.x) || 0) + dx)),
+              y: Math.max(0, Math.min(size.height - height, (Number(item.y) || 0) + dy)),
+            };
+          }),
+        }));
+        return true;
+      },
+    });
 
-      const step = event.shiftKey ? 10 : 1;
-      let dx = 0;
-      let dy = 0;
-      if (event.key === "ArrowLeft") dx = -step;
-      else if (event.key === "ArrowRight") dx = step;
-      else if (event.key === "ArrowUp") dy = -step;
-      else if (event.key === "ArrowDown") dy = step;
-      else return;
-
-      event.preventDefault();
-      const targetSet = new Set(activeIds);
-      setConfig((current) => ({
-        ...current,
-        instances: (current.instances || []).map((item, index) => {
-          const itemKey = item.id || `${item.widgetId}-${index}`;
-          if (!targetSet.has(itemKey)) return item;
-          const width = Math.max(1, Number(item.width) || 280);
-          const height = Math.max(1, Number(item.height) || 120);
-          return {
-            ...item,
-            x: Math.max(0, Math.min(size.width - width, (Number(item.x) || 0) + dx)),
-            y: Math.max(0, Math.min(size.height - height, (Number(item.y) || 0) + dy)),
-          };
-        }),
-      }));
-    }
-
-    window.addEventListener("keydown", handleCanvasKeyDown);
-    return () => window.removeEventListener("keydown", handleCanvasKeyDown);
+    return () => {
+      registerCanvasHotkeyHandler(null);
+    };
   }, [config.instances, selectedInstanceId, selectedInstanceIds, size.width, size.height]);
 
   function selectOverlay(id: string) {
@@ -1485,7 +1541,9 @@ export default function OverlayCanvas() {
     });
   }
 
-  {/* Estrutura visual retornada: section. */}
+  {
+    /* Estrutura visual retornada: section. */
+  }
 
   return (
     <section className="relative flex w-full min-w-0 flex-col items-center gap-4 px-2 pb-40 pt-[10px]">
@@ -1611,7 +1669,9 @@ export default function OverlayCanvas() {
               const overlayName = String(
                 overlay.name ?? getCanvasConfig(overlay).name ?? overlayId,
               );
-              {/* Estrutura visual retornada: button. */}
+              {
+                /* Estrutura visual retornada: button. */
+              }
               return (
                 <button
                   key={overlayId}
@@ -1946,7 +2006,9 @@ export default function OverlayCanvas() {
                   fontSize: `${Math.max(1, Number(widgetConfig["fontSize"]) || 16)}px`,
                   color: String(widgetConfig["color"] || widgetConfig["textColor"] || "#ffffff"),
                 };
-                {/* Estrutura visual retornada: div. */}
+                {
+                  /* Estrutura visual retornada: div. */
+                }
                 return (
                   <div
                     key={instanceId}
@@ -2075,7 +2137,12 @@ export default function OverlayCanvas() {
                           alt={String(widgetConfig["imageName"] || instance.name || "Imagem")}
                           draggable={false}
                           className="h-full w-full select-none"
-                          style={{ objectFit: String(widgetConfig["objectFit"] || "contain"), opacity: Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) / 100 }}
+                          style={{
+                            objectFit: String(widgetConfig["objectFit"] || "contain"),
+                            opacity:
+                              Math.max(0, Math.min(100, Number(widgetConfig["opacity"] ?? 100))) /
+                              100,
+                          }}
                         />
                       ) : instance.widgetId === SHAPE_WIDGET_ID ? (
                         <div

@@ -56,7 +56,9 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -102,7 +104,9 @@ function createGoalTemplates({
         const strokeDash = 2 * Math.PI * 40;
         const strokeOffset = strokeDash - (strokeDash * pct) / 100;
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -165,7 +169,9 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -202,7 +208,9 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -239,7 +247,9 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -279,7 +289,9 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -310,7 +322,9 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -352,7 +366,9 @@ function createGoalTemplates({
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
         const activeBlocks = Math.round((pct / 100) * 10);
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -393,7 +409,9 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div className="w-full h-full flex bg-gradient-to-r from-red-600 via-rose-700 to-slate-950 p-3 rounded-xl shadow-2xl select-none text-left border-l-4 border-amber-400 items-center justify-between">
@@ -427,7 +445,9 @@ function createGoalTemplates({
         const tgt = target > 0 ? target : defaultTarget;
         const pct = Math.min(100, Math.round((cur / tgt) * 100));
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div

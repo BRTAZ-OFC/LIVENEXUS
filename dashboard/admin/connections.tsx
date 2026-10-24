@@ -127,7 +127,9 @@ export default function AdminConnectionsPage() {
     setNotice("Todas as conexões administrativas foram desconectadas.");
   }
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div className="w-full space-y-5">
@@ -170,7 +172,9 @@ export default function AdminConnectionsPage() {
             item.status.toLowerCase(),
           );
           const online = ["connected", "open"].includes(item.status.toLowerCase());
-          {/* Estrutura visual retornada: article. */}
+          {
+            /* Estrutura visual retornada: article. */
+          }
           return (
             <article
               key={platform}

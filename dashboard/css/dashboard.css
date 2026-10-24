@@ -572,25 +572,25 @@
 }
 
 @media (min-width: 900px) {
-/* Estilos para .dash-overview. */
-/* Estilos para .dash-overview. */
+  /* Estilos para .dash-overview. */
+  /* Estilos para .dash-overview. */
   .dash-overview {
     @apply px-6;
   }
-/* Estilos para .dash-live-stats. */
-/* Estilos para .dash-live-stats. */
+  /* Estilos para .dash-live-stats. */
+  /* Estilos para .dash-live-stats. */
   .dash-live-stats {
     @apply grid-cols-4;
   }
-/* Estilos para .dash-live-workspace. */
-/* Estilos para .dash-live-workspace. */
+  /* Estilos para .dash-live-workspace. */
+  /* Estilos para .dash-live-workspace. */
   .dash-live-workspace {
     grid-template-columns: minmax(0, 1fr) 280px;
   }
 }
 @media (max-width: 899px) {
-/* Estilos para .dash-live-workspace. */
-/* Estilos para .dash-live-workspace. */
+  /* Estilos para .dash-live-workspace. */
+  /* Estilos para .dash-live-workspace. */
   .dash-live-workspace {
     @apply grid-cols-1;
   }

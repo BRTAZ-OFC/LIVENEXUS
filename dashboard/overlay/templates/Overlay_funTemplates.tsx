@@ -32,7 +32,9 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 6);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-none bg-slate-950/90 flex flex-col justify-between select-none text-left shadow-xl">
@@ -73,7 +75,9 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 6);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-black/85 border border-white/10 flex flex-col justify-between select-none text-left shadow-xl">
@@ -114,7 +118,9 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 3);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full rounded-full bg-slate-950/90 border border-purple-500/40 p-4 flex flex-col items-center justify-center select-none shadow-xl aspect-square text-center">
@@ -143,7 +149,9 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 4);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-xl bg-black/80 border border-white/10 flex flex-col justify-between select-none text-left">
@@ -183,7 +191,9 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 3);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 bg-black border border-cyan-400 font-mono text-xs flex flex-col justify-between select-none text-left">
@@ -217,7 +227,9 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 3);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/90 border border-purple-500/30 flex flex-col justify-between select-none text-left shadow-xl">
@@ -261,7 +273,9 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 4);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-2 flex flex-col justify-center select-none text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
@@ -296,7 +310,9 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 5);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full px-4 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left">
@@ -336,7 +352,9 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 5);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3.5 rounded-2xl bg-black/85 border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.18)] flex flex-col justify-between select-none text-left">
@@ -374,7 +392,9 @@ export const WORD_CLOUD_TEMPLATES = [
     render: ({ messages = [], isOnline = false }) => {
       const words = getChatWords(messages).slice(0, 4);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full rounded-xl bg-slate-950 border border-slate-700 flex flex-col overflow-hidden select-none text-left shadow-2xl">

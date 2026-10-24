@@ -9,7 +9,9 @@ export function TextMarquee({
   style = {},
 }) {
   if (isMainChat) {
-    {/* Estrutura visual retornada: div. */}
+    {
+      /* Estrutura visual retornada: div. */
+    }
     return (
       <div className={className} style={style}>
         {text}
@@ -19,7 +21,9 @@ export function TextMarquee({
 
   const str = String(text || "");
   if (!forceMarquee && str.length <= 35) {
-    {/* Estrutura visual retornada: div. */}
+    {
+      /* Estrutura visual retornada: div. */
+    }
     return (
       <div
         className={className}
@@ -30,7 +34,9 @@ export function TextMarquee({
     );
   }
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div className={`overflow-hidden whitespace-nowrap relative ${className}`} style={style}>

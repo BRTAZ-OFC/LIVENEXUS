@@ -98,7 +98,9 @@ export default function TwitchChatBox({ config = {} }) {
     return "";
   };
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div

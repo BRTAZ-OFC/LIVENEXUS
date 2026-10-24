@@ -262,7 +262,9 @@ export default function JSONTablesPanel({ tableId, title, refreshKey = 0 }: Prop
     }
   }
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div className="space-y-4 min-w-0">
@@ -351,7 +353,9 @@ export default function JSONTablesPanel({ tableId, title, refreshKey = 0 }: Prop
                 {(columns.length ? columns : ["Registro"]).map((column) => {
                   const value = column === "Registro" ? row.__rowKey : row[column];
                   const text = cellValue(value);
-                  {/* Estrutura visual retornada: td. */}
+                  {
+                    /* Estrutura visual retornada: td. */
+                  }
                   return (
                     <td
                       key={column}

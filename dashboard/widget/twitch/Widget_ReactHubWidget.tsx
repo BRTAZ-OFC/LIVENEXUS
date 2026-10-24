@@ -152,7 +152,9 @@ export default function ReactHubWidget({ config = {} }) {
   const borderRadius = config.borderRadius || "12px";
   const backgroundColor = config.backgroundColor || "rgba(15, 23, 42, 0.9)";
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div
@@ -217,7 +219,9 @@ export default function ReactHubWidget({ config = {} }) {
 
   // Sub-component: List of user-submitted video links for the stream view
   function renderVideoQueueList() {
-    {/* Estrutura visual retornada: div. */}
+    {
+      /* Estrutura visual retornada: div. */
+    }
     return (
       <div
         ref={containerRef}
@@ -236,7 +240,9 @@ export default function ReactHubWidget({ config = {} }) {
             const isPlaying = activeVideo && activeVideo.id === item.id;
             const isWatched = item.status === "watched";
 
-            {/* Estrutura visual retornada: div. */}
+            {
+              /* Estrutura visual retornada: div. */
+            }
 
             return (
               <div

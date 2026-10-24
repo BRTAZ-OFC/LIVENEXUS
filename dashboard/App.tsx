@@ -5,6 +5,7 @@ import LoginPage from "./login/index"; // Carrega a tela de entrada da conta.
 import RegisterPage from "./login/registro"; // Carrega o formulário de criação de conta.
 import DatabasePage from "./admin/banco"; // Carrega a área de consulta e administração dos dados.
 import OverlayReceiver from "./overlay/Overlay_Receiver"; // Carrega a tela que recebe e exibe um overlay.
+import { useGlobalHotkeys } from "./hotkeys/useGlobalHotkeys"; // Inicializa as hotkeys globais do sistema.
 
 /**
  * Mostra uma página simples quando o endereço acessado não existe.
@@ -32,6 +33,8 @@ function NotFoundPage() {
 
 /* Define os endereços disponíveis sem gerar rotas automaticamente. */
 export default function App() {
+  useGlobalHotkeys();
+
   return (
     // Escolhe qual página mostrar de acordo com o endereço acessado.
     <Routes>

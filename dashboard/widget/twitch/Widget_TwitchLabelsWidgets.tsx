@@ -7,7 +7,7 @@ import { Sparkles, Trophy, Heart, Flame, Users, Award } from "lucide-react";
  * @param {Object} props
  * @param {import('../types/WidgetConfig').WidgetConfig} props.config
  */
-export function TwitchLatestSub({ config = {} }) {
+export function TwitchLatestSub({ config = {} as any }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = connections?.Twitch?.status === "connected";
 
@@ -52,7 +52,7 @@ export function TwitchLatestSub({ config = {} }) {
 }
 
 // 2. TwitchLatestCheer (Último Cheer)
-export function TwitchLatestCheer({ config = {} }) {
+export function TwitchLatestCheer({ config = {} as any }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = connections?.Twitch?.status === "connected";
 
@@ -93,7 +93,7 @@ export function TwitchLatestCheer({ config = {} }) {
 }
 
 // 3. TwitchLatestRaid (Última Raid)
-export function TwitchLatestRaid({ config = {} }) {
+export function TwitchLatestRaid({ config = {} as any }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = connections?.Twitch?.status === "connected";
 
@@ -134,7 +134,7 @@ export function TwitchLatestRaid({ config = {} }) {
 }
 
 // 4. TwitchTopCheer (Maior Cheer)
-export function TwitchTopCheer({ config = {} }) {
+export function TwitchTopCheer({ config = {} as any }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = connections?.Twitch?.status === "connected";
 
@@ -180,7 +180,7 @@ export function TwitchTopCheer({ config = {} }) {
 }
 
 // 5. TwitchSubCounter (Contador de Subs)
-export function TwitchSubCounter({ config = {} }) {
+export function TwitchSubCounter({ config = {} as any }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = connections?.Twitch?.status === "connected";
 
@@ -227,7 +227,7 @@ export function TwitchSubCounter({ config = {} }) {
 }
 
 // 6. TwitchBitsCounter (Contador de Bits)
-export function TwitchBitsCounter({ config = {} }) {
+export function TwitchBitsCounter({ config = {} as any }) {
   const { liveActivity, connections } = useStreaming();
   const isOnline = connections?.Twitch?.status === "connected";
 

@@ -21,17 +21,17 @@
 
 /* Cascata: a letra cai de cima, ultrapassa levemente a posição e estabiliza. */
 @keyframes animacao-cascata {
-/* Estilos para 0%. */
+  /* Estilos para 0%. */
   0% {
     opacity: 0;
     transform: translate3d(0, -1.5em, 0) scale(0.92);
   }
-/* Estilos para 72%. */
+  /* Estilos para 72%. */
   72% {
     opacity: 1;
     transform: translate3d(0, 0.12em, 0) scale(1.02);
   }
-/* Estilos para 100%. */
+  /* Estilos para 100%. */
   100% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
@@ -40,17 +40,17 @@
 
 /* Casanique: a animação visual é complementada pelo embaralhamento em React. */
 @keyframes animacao-casanique {
-/* Estilos para 0%. */
+  /* Estilos para 0%. */
   0% {
     opacity: 0.35;
     transform: translateY(0.8em) rotateX(-90deg);
   }
-/* Estilos para 60%. */
+  /* Estilos para 60%. */
   60% {
     opacity: 1;
     transform: translateY(-0.15em) rotateX(18deg);
   }
-/* Estilos para 100%. */
+  /* Estilos para 100%. */
   100% {
     opacity: 1;
     transform: translateY(0) rotateX(0);
@@ -59,17 +59,17 @@
 
 /* Rolar: cada letra executa um flip vertical completo em perspectiva. */
 @keyframes animacao-rolar {
-/* Estilos para 0%. */
+  /* Estilos para 0%. */
   0% {
     opacity: 0;
     transform: perspective(500px) rotateX(-180deg);
   }
-/* Estilos para 55%. */
+  /* Estilos para 55%. */
   55% {
     opacity: 1;
     transform: perspective(500px) rotateX(18deg);
   }
-/* Estilos para 100%. */
+  /* Estilos para 100%. */
   100% {
     opacity: 1;
     transform: perspective(500px) rotateX(0);
@@ -78,12 +78,12 @@
 
 /* Encarrilha: revela cada letra da esquerda para a direita. */
 @keyframes animacao-encarrilha {
-/* Estilos para from. */
+  /* Estilos para from. */
   from {
     opacity: 0;
     transform: translateX(-0.35em);
   }
-/* Estilos para to. */
+  /* Estilos para to. */
   to {
     opacity: 1;
     transform: translateX(0);

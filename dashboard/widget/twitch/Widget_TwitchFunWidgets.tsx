@@ -76,7 +76,9 @@ export function TwitchWordCloud({ config = {} }) {
     "text-[8px] text-slate-400",
   ];
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div
@@ -149,7 +151,9 @@ export function TwitchEmoteShower({ config = {} }) {
     }
   }, [liveActivity?.lastMessage, isOnline]);
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div

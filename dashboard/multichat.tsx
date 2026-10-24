@@ -229,7 +229,9 @@ export function disconnectAllMultiChat() {
 // MultiChatPanel: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
 export default function MultiChatPanel() {
   const state = useMultiChatSnapshot();
-  {/* Estrutura visual retornada: section. */}
+  {
+    /* Estrutura visual retornada: section. */
+  }
   return (
     <section className="dash-chat-panel">
       <header className="dash-panel-header">

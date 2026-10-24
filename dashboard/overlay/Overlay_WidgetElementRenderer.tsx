@@ -796,7 +796,9 @@ export default function WidgetElementRenderer({
       contentAnimationsCSS = `animation: ${contentAnimations.join(", ")} !important; `;
     }
 
-    {/* Estrutura visual retornada: style. */}
+    {
+      /* Estrutura visual retornada: style. */
+    }
 
     return (
       <style>{`
@@ -1069,7 +1071,9 @@ export default function WidgetElementRenderer({
       const manualWidget = TWITCH_WIDGETS_CATALOG.find((widget) => widget.id === widgetId);
       if (manualWidget) {
         const ManualComponent = manualWidget.component;
-        {/* Estrutura visual retornada: ManualComponent. */}
+        {
+          /* Estrutura visual retornada: ManualComponent. */
+        }
         return (
           <ManualComponent
             config={{ ...manualWidget.defaultConfig, ...config }}
@@ -1258,7 +1262,9 @@ export default function WidgetElementRenderer({
         uptimeString = "Aguardando dados";
       }
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div
@@ -1295,7 +1301,9 @@ export default function WidgetElementRenderer({
     // If it's a full widget instance, render the whole widget component!
     if (foundWidget && (isFullWidget || elementKey === "full_widget")) {
       const WidgetComponent = foundWidget.component;
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
       return (
         <div
           className="w-full h-full relative overflow-hidden widget-inner-content"
@@ -1308,7 +1316,9 @@ export default function WidgetElementRenderer({
 
     if (widgetId === "youtube-native-poll" && foundWidget) {
       const PollComponent = foundWidget.component;
-      {/* Estrutura visual retornada: PollComponent. */}
+      {
+        /* Estrutura visual retornada: PollComponent. */
+      }
       return (
         <PollComponent
           config={{ ...foundWidget.defaultConfig, ...config }}
@@ -1328,7 +1338,9 @@ export default function WidgetElementRenderer({
         platformMeta(streamMeta, connections, config, "game").game || (isOnline ? "Geral" : "");
 
       if (elementKey === "status_badge") {
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
         return (
           <div
             className="flex items-center gap-2 p-2 w-full h-full justify-center"
@@ -1348,7 +1360,9 @@ export default function WidgetElementRenderer({
       }
 
       if (elementKey === "viewers_count") {
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
         return (
           <div
             className="flex items-center gap-2 p-2 w-full h-full justify-center font-semibold"
@@ -1367,7 +1381,9 @@ export default function WidgetElementRenderer({
       }
 
       if (elementKey === "stream_title") {
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
         return (
           <div
             className="flex items-center p-3 w-full h-full justify-center overflow-hidden min-w-[120px]"
@@ -1384,7 +1400,9 @@ export default function WidgetElementRenderer({
       }
 
       if (elementKey === "stream_game") {
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
         return (
           <div
             className="flex items-center gap-2 p-2 w-full h-full justify-center font-semibold truncate px-3"
@@ -1418,7 +1436,9 @@ export default function WidgetElementRenderer({
         targetValue > 0 ? Math.min(Math.round((subCount / targetValue) * 100), 100) : 0;
 
       if (elementKey === "goal_title") {
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
         return (
           <div
             className="flex items-center gap-2 p-2 w-full h-full justify-center font-bold"
@@ -1431,7 +1451,9 @@ export default function WidgetElementRenderer({
       }
 
       if (elementKey === "goal_progress_bar") {
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
         return (
           <div
             className="p-2.5 w-full h-full flex items-center justify-center"
@@ -1466,7 +1488,9 @@ export default function WidgetElementRenderer({
         );
       }
       if (isEditing) {
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
         return (
           <div className="w-full h-full p-2" style={containerStyle}>
             <textarea
@@ -1516,7 +1540,9 @@ export default function WidgetElementRenderer({
         letterSpacing: textType === "label" ? "0.05em" : "normal",
       };
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className={classes} style={containerStyle}>
@@ -1533,7 +1559,9 @@ export default function WidgetElementRenderer({
       const fillColor = config.textColor || "#8b5cf6";
 
       if (config.bgImage || config.backgroundImage) {
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
         return (
           <div className="h-full w-full" style={containerStyle}>
             <img
@@ -1549,25 +1577,39 @@ export default function WidgetElementRenderer({
       const renderSvgShape = () => {
         switch (shapeType) {
           case "circle":
-            {/* Estrutura visual retornada: circle. */}
+            {
+              /* Estrutura visual retornada: circle. */
+            }
             return <circle cx="50%" cy="50%" r="48%" fill={fillColor} />;
           case "ellipse":
-            {/* Estrutura visual retornada: ellipse. */}
+            {
+              /* Estrutura visual retornada: ellipse. */
+            }
             return <ellipse cx="50%" cy="50%" rx="48%" ry="40%" fill={fillColor} />;
           case "triangle":
-            {/* Estrutura visual retornada: polygon. */}
+            {
+              /* Estrutura visual retornada: polygon. */
+            }
             return <polygon points="50,4 96,94 4,94" fill={fillColor} />;
           case "rhombus":
-            {/* Estrutura visual retornada: polygon. */}
+            {
+              /* Estrutura visual retornada: polygon. */
+            }
             return <polygon points="50,4 96,50 50,96 4,50" fill={fillColor} />;
           case "pentagon":
-            {/* Estrutura visual retornada: polygon. */}
+            {
+              /* Estrutura visual retornada: polygon. */
+            }
             return <polygon points="50,4 96,38 78,94 22,94 4,38" fill={fillColor} />;
           case "hexagon":
-            {/* Estrutura visual retornada: polygon. */}
+            {
+              /* Estrutura visual retornada: polygon. */
+            }
             return <polygon points="50,4 96,27 96,73 50,96 4,73 4,27" fill={fillColor} />;
           case "star":
-            {/* Estrutura visual retornada: polygon. */}
+            {
+              /* Estrutura visual retornada: polygon. */
+            }
             return (
               <polygon
                 points="50,4 63,38 98,38 70,59 81,94 50,73 19,94 30,59 2,38 37,38"
@@ -1575,7 +1617,9 @@ export default function WidgetElementRenderer({
               />
             );
           case "heart":
-            {/* Estrutura visual retornada: path. */}
+            {
+              /* Estrutura visual retornada: path. */
+            }
             return (
               <path
                 d="M12,21.35L10.55,20.03C5.4,15.36,2,12.28,2,8.5C2,5.42,4.42,3,7.5,3C9.24,3,10.91,3.81,12,5.09C13.09,3.81,14.76,3,16.5,3C19.58,3,22,5.42,22,8.5c0,3.78-3.4,6.86-8.55,11.54L12,21.35z"
@@ -1587,13 +1631,17 @@ export default function WidgetElementRenderer({
           case "square":
           default: {
             const rx = shapeType === "rounded-rectangle" ? parseInt(config.borderRadius) || 12 : 0;
-            {/* Estrutura visual retornada: rect. */}
+            {
+              /* Estrutura visual retornada: rect. */
+            }
             return <rect x="2" y="2" width="96%" height="96%" rx={rx} fill={fillColor} />;
           }
         }
       };
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full flex items-center justify-center p-1" style={containerStyle}>
@@ -1620,7 +1668,9 @@ export default function WidgetElementRenderer({
       const isDivisor = config.lineType === "divisor";
 
       if (isDivisor) {
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
         return (
           <div
             className="w-full h-full flex items-center justify-center px-4"
@@ -1634,7 +1684,9 @@ export default function WidgetElementRenderer({
         );
       }
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full flex items-center justify-center px-4" style={containerStyle}>
@@ -1688,7 +1740,9 @@ export default function WidgetElementRenderer({
     // 4. ICON
     if (widgetId === "library-icon") {
       const IconComponent = LUCIDE_ICONS_MAP[config.iconType || "heart"] || Heart;
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
       return (
         <div className="w-full h-full flex items-center justify-center p-2" style={containerStyle}>
           <IconComponent
@@ -1720,7 +1774,9 @@ export default function WidgetElementRenderer({
       const SocialIcon = SOCIAL_ICONS[platform] || SOCIAL_ICONS.twitch;
 
       if (isEditing && displayMode !== "icon") {
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
         return (
           <div className="w-full h-full flex items-center gap-2 p-2" style={containerStyle}>
             {displayMode !== "text" && (
@@ -1752,7 +1808,9 @@ export default function WidgetElementRenderer({
         );
       }
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div
@@ -1785,7 +1843,9 @@ export default function WidgetElementRenderer({
     }
 
     // Fallback default placeholder
-    {/* Estrutura visual retornada: div. */}
+    {
+      /* Estrutura visual retornada: div. */
+    }
     return (
       <div className="w-full h-full p-2.5 flex items-center justify-center" style={containerStyle}>
         <TextMarquee text={config.text || "Elemento de Overlay"} style={baseStyle} />
@@ -1793,7 +1853,9 @@ export default function WidgetElementRenderer({
     );
   };
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div

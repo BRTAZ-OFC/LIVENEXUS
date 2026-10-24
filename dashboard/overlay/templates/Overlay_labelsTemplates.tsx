@@ -49,7 +49,9 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
         const u = user || (isOnline ? "Aguardando dados" : "Live não conectada");
         const d = detail || (isOnline ? "Nenhum registro" : "Live offline");
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -83,7 +85,9 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando" : "Offline");
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -110,7 +114,9 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
         const u = user || (isOnline ? "Standby" : "Offline");
         const d = detail || "";
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -139,7 +145,9 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando" : "Offline");
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -171,7 +179,9 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
         const u = user || (isOnline ? "WAITING" : "OFFLINE");
         const d = detail || "";
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -208,7 +218,9 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
         const u = user || (isOnline ? "Aguardando" : "Offline");
         const d = detail || "";
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div className="w-full h-full px-3.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -236,7 +248,9 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando dados" : "Live offline");
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div className="w-full h-full p-2.5 rounded-xl bg-black/80 border border-white/10 flex flex-col justify-between select-none text-left shadow-lg">
@@ -263,7 +277,9 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, detail, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando" : "Offline");
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -296,7 +312,9 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando" : "Offline");
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -326,7 +344,9 @@ function createLabelTemplates({ title, icon: Icon, defaultColor = "purple" }) {
       render: ({ user, isOnline = false }) => {
         const u = user || (isOnline ? "Aguardando" : "Offline");
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -379,7 +399,9 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -411,7 +433,9 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -438,7 +462,9 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -465,7 +491,9 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div className="w-full h-full p-2.5 rounded-xl bg-black/85 border border-white/10 flex items-center justify-between select-none text-left shadow-lg">
@@ -494,7 +522,9 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -526,7 +556,9 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div className="w-full h-full p-2 flex flex-col justify-end select-none text-left drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
@@ -552,7 +584,9 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div className="w-full h-full rounded-xl bg-slate-950 border border-white/10 flex flex-col overflow-hidden select-none text-left shadow-xl">
@@ -581,7 +615,9 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -610,7 +646,9 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div className="w-full h-full px-3.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -637,7 +675,9 @@ function createCounterTemplates({ title, icon: Icon, defaultColor = "purple" }) 
       render: ({ count = 0, isOnline = false }) => {
         const val = isOnline ? count : 0;
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div

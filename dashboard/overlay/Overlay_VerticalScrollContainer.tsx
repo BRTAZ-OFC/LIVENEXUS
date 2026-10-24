@@ -51,7 +51,9 @@ export default function VerticalScrollContainer({
 
   const hasButtons = canScrollUp || canScrollDown;
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div className={`relative flex items-center w-full gap-1.5 ${className}`}>

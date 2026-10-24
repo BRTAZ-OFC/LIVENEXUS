@@ -741,7 +741,9 @@ export default function BibliotecaSearch() {
       {CATEGORIES.map((entry) => {
         const Icon = entry.icon;
         const items = library[entry.key];
-        {/* Estrutura visual: section. */}
+        {
+          /* Estrutura visual: section. */
+        }
         return (
           <section key={entry.key} className="space-y-3">
             <header className="flex items-center gap-2 text-white">
@@ -825,7 +827,9 @@ export default function BibliotecaSearch() {
     </div>
   );
 
-  {/* Estrutura visual: section. */}
+  {
+    /* Estrutura visual: section. */
+  }
 
   return (
     <section className="w-full min-w-0 px-4 py-6 sm:px-8">
@@ -850,7 +854,9 @@ export default function BibliotecaSearch() {
           ] as const
         ).map((entry) => {
           const Icon = entry.icon;
-          {/* Estrutura visual: button. */}
+          {
+            /* Estrutura visual: button. */
+          }
           return (
             <button
               key={entry.key}
@@ -1008,7 +1014,9 @@ export default function BibliotecaSearch() {
                 <div className="space-y-2">
                   {(section.items || []).map((entry: any, entryIndex: number) => {
                     const isTrack = Boolean(entry.videoId);
-                    {/* Estrutura visual: article. */}
+                    {
+                      /* Estrutura visual: article. */
+                    }
                     return (
                       <article
                         key={entry.videoId || entry.browseId || entryIndex}
@@ -1149,7 +1157,9 @@ export default function BibliotecaSearch() {
                   const Icon =
                     CATEGORIES.find((entry) => entry.key === itemCategory(item))?.icon || Music2;
                   const saved = isSaved(item);
-                  {/* Estrutura visual: article. */}
+                  {
+                    /* Estrutura visual: article. */
+                  }
                   return (
                     <article
                       key={itemId(item)}

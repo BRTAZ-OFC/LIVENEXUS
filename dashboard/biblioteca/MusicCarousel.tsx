@@ -24,7 +24,9 @@ export default function MusicCarousel({ title, items, onOpen }: Props) {
   const shift = (direction: number) =>
     trackRef.current?.scrollBy({ left: direction * step, behavior: "smooth" });
 
-  {/* Estrutura visual retornada: section. */}
+  {
+    /* Estrutura visual retornada: section. */
+  }
 
   return (
     <section className="min-w-0 space-y-3">
@@ -58,7 +60,9 @@ export default function MusicCarousel({ title, items, onOpen }: Props) {
       <div ref={trackRef} className="overflow-x-auto" style={{ scrollbarWidth: "none" }}>
         <div className="flex w-max">
           {carouselItems.map((item, offset) => {
-            {/* Estrutura visual retornada: article. */}
+            {
+              /* Estrutura visual retornada: article. */
+            }
             return (
               <article
                 key={`${keyOf(item)}-${offset}`}

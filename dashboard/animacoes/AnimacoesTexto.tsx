@@ -288,7 +288,9 @@ export default function AnimacoesTexto({
     return () => clearTimeout(timer);
   }, [repetir, caracteres.length, atrasoSeguro, duracaoSegura, vaiEVem, tipoValido, versao]);
 
-  {/* Estrutura visual retornada: span. */}
+  {
+    /* Estrutura visual retornada: span. */
+  }
 
   return (
     <span

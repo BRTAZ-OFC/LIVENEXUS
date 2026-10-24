@@ -51,7 +51,9 @@ export default function ManualWidgetConfig({ instance, onUpdateInstance }) {
       }
     };
 
-    {/* Estrutura visual retornada: form. */}
+    {
+      /* Estrutura visual retornada: form. */
+    }
 
     return (
       <form key={instance.id} onSubmit={handleSavePix} className="space-y-3 text-xs text-slate-300">
@@ -158,7 +160,9 @@ export default function ManualWidgetConfig({ instance, onUpdateInstance }) {
       }
     };
 
-    {/* Estrutura visual retornada: div. */}
+    {
+      /* Estrutura visual retornada: div. */
+    }
 
     return (
       <div className="space-y-3 text-xs text-slate-300">
@@ -207,7 +211,9 @@ export default function ManualWidgetConfig({ instance, onUpdateInstance }) {
     const showKick = config.showKick !== false;
     const showYouTube = config.showYouTube !== false;
 
-    {/* Estrutura visual retornada: div. */}
+    {
+      /* Estrutura visual retornada: div. */
+    }
 
     return (
       <div className="space-y-3 text-xs text-slate-300">
@@ -254,26 +260,27 @@ export default function ManualWidgetConfig({ instance, onUpdateInstance }) {
     );
   }
 
-  if (id === "manual-clock")
-    {/* Estrutura visual retornada: label. */}
-    return (
-      <label className="block space-y-2 text-xs text-slate-300">
-        <span>Fuso horário do relógio</span>
-        <select
-          value={config.timeZone || ""}
-          onChange={(event) => save({ timeZone: event.target.value })}
-          className="w-full rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white"
-        >
-          <option value="">Fuso do dispositivo</option>
-          {!zones.includes("UTC") && <option value="UTC">UTC</option>}
-          {zones.map((zone) => (
-            <option key={zone} value={zone}>
-              {zone.replaceAll("_", " ")}
-            </option>
-          ))}
-        </select>
-      </label>
-    );
+  if (id === "manual-clock") {
+    /* Estrutura visual retornada: label. */
+  }
+  return (
+    <label className="block space-y-2 text-xs text-slate-300">
+      <span>Fuso horário do relógio</span>
+      <select
+        value={config.timeZone || ""}
+        onChange={(event) => save({ timeZone: event.target.value })}
+        className="w-full rounded-lg border border-white/20 bg-slate-900 px-3 py-2 text-white"
+      >
+        <option value="">Fuso do dispositivo</option>
+        {!zones.includes("UTC") && <option value="UTC">UTC</option>}
+        {zones.map((zone) => (
+          <option key={zone} value={zone}>
+            {zone.replaceAll("_", " ")}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
 
   if (id !== "manual-timer") return null;
 
@@ -305,7 +312,9 @@ export default function ManualWidgetConfig({ instance, onUpdateInstance }) {
   };
   const pause = () => save({ timerRunning: false, remainingSeconds: remaining, timerEndAt: null });
   const reset = () => save({ timerRunning: false, remainingSeconds: duration, timerEndAt: null });
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
   return (
     <div className="space-y-2 text-xs text-slate-300">
       <span>Tempo inicial do temporizador</span>

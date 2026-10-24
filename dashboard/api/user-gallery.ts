@@ -12,8 +12,25 @@ import {
 import { readSession } from "../login/session.js";
 
 type SessionData = { user_id?: string; role?: string };
-type GalleryImage = { id: string; name: string; type: string; size: number; url: string; created_at: string; filename: string };
-type Album = { id: string; user_id: string; nome: string; descricao: string; imagens: GalleryImage[]; data_criacao: string; data_edicao: string; __rowKey?: string };
+type GalleryImage = {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  url: string;
+  created_at: string;
+  filename: string;
+};
+type Album = {
+  id: string;
+  user_id: string;
+  nome: string;
+  descricao: string;
+  imagens: GalleryImage[];
+  data_criacao: string;
+  data_edicao: string;
+  __rowKey?: string;
+};
 
 const PROJECT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const IMAGE_ROOT = resolve(PROJECT_ROOT, "dashboard/imagen/usuarios");
@@ -24,7 +41,10 @@ const ALLOWED_TYPES: Record<string, string> = { "image/png": ".png", "image/gif"
 function sessionUser(req: Request, res: Response): string | null {
   const session = readSession(req) as SessionData | null;
   if (!session?.user_id) {
-    res.status(401).set(NO_CACHE).json({ ok: false, message: "Faça login para acessar sua galeria." });
+    res
+      .status(401)
+      .set(NO_CACHE)
+      .json({ ok: false, message: "Faça login para acessar sua galeria." });
     return null;
   }
   return session.user_id;
@@ -47,7 +67,7 @@ async function ownedAlbum(userId: string, albumId: string): Promise<Album | null
 
 async function saveAlbum(album: Album): Promise<Album> {
   if (!album.__rowKey) throw new Error("Álbum não encontrado.");
-  const saved = await updateJsonTableRecord("galeria_usuarios", album.__rowKey, {
+  const saved = (await updateJsonTableRecord("galeria_usuarios", album.__rowKey, {
     id: album.id,
     user_id: album.user_id,
     nome: album.nome,
@@ -55,7 +75,7 @@ async function saveAlbum(album: Album): Promise<Album> {
     imagens: album.imagens,
     data_criacao: album.data_criacao,
     data_edicao: new Date().toISOString(),
-  }) as Album;
+  })) as Album;
   return saved;
 }
 
@@ -70,7 +90,10 @@ export function registerUserGalleryRoutes(app: Express) {
         .map(({ __rowKey: _rowKey, ...row }) => row);
       return res.set(NO_CACHE).json({ ok: true, albums });
     } catch {
-      return res.status(500).set(NO_CACHE).json({ ok: false, message: "Não foi possível carregar os álbuns." });
+      return res
+        .status(500)
+        .set(NO_CACHE)
+        .json({ ok: false, message: "Não foi possível carregar os álbuns." });
     }
   });
 
@@ -79,12 +102,16 @@ export function registerUserGalleryRoutes(app: Express) {
     if (!userId) return;
     const nome = String(req.body?.nome ?? "").trim();
     const descricao = String(req.body?.descricao ?? "").trim();
-    if (!nome) return res.status(400).set(NO_CACHE).json({ ok: false, message: "Informe o nome do álbum." });
+    if (!nome)
+      return res.status(400).set(NO_CACHE).json({ ok: false, message: "Informe o nome do álbum." });
     if (nome.length > 80 || descricao.length > 500)
-      return res.status(400).set(NO_CACHE).json({ ok: false, message: "Nome ou descrição excede o limite permitido." });
+      return res
+        .status(400)
+        .set(NO_CACHE)
+        .json({ ok: false, message: "Nome ou descrição excede o limite permitido." });
     try {
       const now = new Date().toISOString();
-      const album = await createJsonTableRecord("galeria_usuarios", {
+      const album = (await createJsonTableRecord("galeria_usuarios", {
         id: randomUUID(),
         user_id: userId,
         nome,
@@ -92,11 +119,14 @@ export function registerUserGalleryRoutes(app: Express) {
         imagens: [],
         data_criacao: now,
         data_edicao: now,
-      }) as Album;
+      })) as Album;
       const { __rowKey: _rowKey, ...publicAlbum } = album;
       return res.status(201).set(NO_CACHE).json({ ok: true, album: publicAlbum });
     } catch {
-      return res.status(500).set(NO_CACHE).json({ ok: false, message: "Não foi possível criar o álbum." });
+      return res
+        .status(500)
+        .set(NO_CACHE)
+        .json({ ok: false, message: "Não foi possível criar o álbum." });
     }
   });
 
@@ -105,16 +135,24 @@ export function registerUserGalleryRoutes(app: Express) {
     if (!userId) return;
     try {
       const album = await ownedAlbum(userId, String(req.params["albumId"] ?? ""));
-      if (!album) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Álbum não encontrado." });
+      if (!album)
+        return res.status(404).set(NO_CACHE).json({ ok: false, message: "Álbum não encontrado." });
       const nome = req.body?.nome === undefined ? album.nome : String(req.body.nome).trim();
-      const descricao = req.body?.descricao === undefined ? album.descricao : String(req.body.descricao).trim();
+      const descricao =
+        req.body?.descricao === undefined ? album.descricao : String(req.body.descricao).trim();
       if (!nome || nome.length > 80 || descricao.length > 500)
-        return res.status(400).set(NO_CACHE).json({ ok: false, message: "Nome ou descrição inválidos." });
+        return res
+          .status(400)
+          .set(NO_CACHE)
+          .json({ ok: false, message: "Nome ou descrição inválidos." });
       const saved = await saveAlbum({ ...album, nome, descricao });
       const { __rowKey: _rowKey, ...publicAlbum } = saved;
       return res.set(NO_CACHE).json({ ok: true, album: publicAlbum });
     } catch {
-      return res.status(500).set(NO_CACHE).json({ ok: false, message: "Não foi possível atualizar o álbum." });
+      return res
+        .status(500)
+        .set(NO_CACHE)
+        .json({ ok: false, message: "Não foi possível atualizar o álbum." });
     }
   });
 
@@ -123,13 +161,18 @@ export function registerUserGalleryRoutes(app: Express) {
     if (!userId) return;
     try {
       const album = await ownedAlbum(userId, String(req.params["albumId"] ?? ""));
-      if (!album?.__rowKey) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Álbum não encontrado." });
+      if (!album?.__rowKey)
+        return res.status(404).set(NO_CACHE).json({ ok: false, message: "Álbum não encontrado." });
       await rm(imageDirectory(userId, album.id), { recursive: true, force: true });
       const deleted = await deleteJsonTableRecord("galeria_usuarios", album.__rowKey);
-      if (!deleted) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Álbum não encontrado." });
+      if (!deleted)
+        return res.status(404).set(NO_CACHE).json({ ok: false, message: "Álbum não encontrado." });
       return res.set(NO_CACHE).json({ ok: true });
     } catch {
-      return res.status(500).set(NO_CACHE).json({ ok: false, message: "Não foi possível excluir o álbum." });
+      return res
+        .status(500)
+        .set(NO_CACHE)
+        .json({ ok: false, message: "Não foi possível excluir o álbum." });
     }
   });
 
@@ -140,26 +183,57 @@ export function registerUserGalleryRoutes(app: Express) {
       const userId = sessionUser(req, res);
       if (!userId) return;
       const albumId = String(req.params["albumId"] ?? "");
-      const type = String(req.headers["content-type"] ?? "").split(";")[0].trim().toLowerCase();
+      const type = String(req.headers["content-type"] ?? "")
+        .split(";")[0]
+        .trim()
+        .toLowerCase();
       const extension = ALLOWED_TYPES[type];
       const filenameHeader = req.headers["x-file-name"];
-      const originalName = (Array.isArray(filenameHeader) ? filenameHeader[0] : filenameHeader) ?? "";
+      const originalName =
+        (Array.isArray(filenameHeader) ? filenameHeader[0] : filenameHeader) ?? "";
       let filename = originalName;
-      try { filename = decodeURIComponent(originalName); } catch { /* filename será validado abaixo */ }
+      try {
+        filename = decodeURIComponent(originalName);
+      } catch {
+        /* filename será validado abaixo */
+      }
       if (!extension || !filename || !filename.toLowerCase().endsWith(extension))
-        return res.status(415).set(NO_CACHE).json({ ok: false, message: "Este formato nao e permitido neste ambiente." });
+        return res
+          .status(415)
+          .set(NO_CACHE)
+          .json({ ok: false, message: "Este formato nao e permitido neste ambiente." });
       if (!Buffer.isBuffer(req.body) || req.body.length === 0)
-        return res.status(400).set(NO_CACHE).json({ ok: false, message: "Arquivo de imagem vazio ou inválido." });
-      const isPng = type === "image/png" && req.body.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+        return res
+          .status(400)
+          .set(NO_CACHE)
+          .json({ ok: false, message: "Arquivo de imagem vazio ou inválido." });
+      const isPng =
+        type === "image/png" &&
+        req.body
+          .subarray(0, 8)
+          .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
       const signature = req.body.subarray(0, 6).toString("ascii");
       const isGif = type === "image/gif" && (signature === "GIF87a" || signature === "GIF89a");
       if (!isPng && !isGif)
-        return res.status(415).set(NO_CACHE).json({ ok: false, message: "Este formato nao e permitido neste ambiente." });
+        return res
+          .status(415)
+          .set(NO_CACHE)
+          .json({ ok: false, message: "Este formato nao e permitido neste ambiente." });
       if (req.body.length > MAX_IMAGE_SIZE)
-        return res.status(413).set(NO_CACHE).json({ ok: false, message: "Este tamanho de arquivo ultrapassa o limite permitido de 5 MB por imagem." });
+        return res
+          .status(413)
+          .set(NO_CACHE)
+          .json({
+            ok: false,
+            message: "Este tamanho de arquivo ultrapassa o limite permitido de 5 MB por imagem.",
+          });
       try {
         const album = await ownedAlbum(userId, albumId);
-        if (!album) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Álbum não encontrado." });
+        if (!album)
+          return res
+            .status(404)
+            .set(NO_CACHE)
+            .json({ ok: false, message: "Álbum não encontrado." });
         const imageId = randomUUID();
         const storedFilename = imageId + extension;
         const directory = imageDirectory(userId, albumId);
@@ -176,46 +250,79 @@ export function registerUserGalleryRoutes(app: Express) {
         };
         const saved = await saveAlbum({ ...album, imagens: [...album.imagens, image] });
         const { __rowKey: _rowKey, ...publicAlbum } = saved;
-        return res.status(201).set(NO_CACHE).json({ ok: true, album: publicAlbum, image: { ...image, filename: undefined } });
+        return res
+          .status(201)
+          .set(NO_CACHE)
+          .json({ ok: true, album: publicAlbum, image: { ...image, filename: undefined } });
       } catch {
-        return res.status(500).set(NO_CACHE).json({ ok: false, message: "Não foi possível salvar a imagem." });
+        return res
+          .status(500)
+          .set(NO_CACHE)
+          .json({ ok: false, message: "Não foi possível salvar a imagem." });
       }
     },
   );
 
-  app.get("/api/galeria-usuarios/:albumId/imagens/:imageId", async (req: Request, res: Response) => {
-    const userId = sessionUser(req, res);
-    if (!userId) return;
-    try {
-      const album = await ownedAlbum(userId, String(req.params["albumId"] ?? ""));
-      const imageId = String(req.params["imageId"] ?? "");
-      const image = album?.imagens.find((item) => item.id === imageId);
-      if (!album || !image) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Imagem não encontrada." });
-      const path = resolve(imageDirectory(userId, album.id), image.filename);
-      if (!path.startsWith(imageDirectory(userId, album.id) + sep))
-        return res.status(400).set(NO_CACHE).json({ ok: false, message: "Caminho de imagem inválido." });
-      const data = await readFile(path);
-      return res.status(200).set(NO_CACHE).type(image.type).send(data);
-    } catch {
-      return res.status(404).set(NO_CACHE).json({ ok: false, message: "Imagem não encontrada." });
-    }
-  });
+  app.get(
+    "/api/galeria-usuarios/:albumId/imagens/:imageId",
+    async (req: Request, res: Response) => {
+      const userId = sessionUser(req, res);
+      if (!userId) return;
+      try {
+        const album = await ownedAlbum(userId, String(req.params["albumId"] ?? ""));
+        const imageId = String(req.params["imageId"] ?? "");
+        const image = album?.imagens.find((item) => item.id === imageId);
+        if (!album || !image)
+          return res
+            .status(404)
+            .set(NO_CACHE)
+            .json({ ok: false, message: "Imagem não encontrada." });
+        const path = resolve(imageDirectory(userId, album.id), image.filename);
+        if (!path.startsWith(imageDirectory(userId, album.id) + sep))
+          return res
+            .status(400)
+            .set(NO_CACHE)
+            .json({ ok: false, message: "Caminho de imagem inválido." });
+        const data = await readFile(path);
+        return res.status(200).set(NO_CACHE).type(image.type).send(data);
+      } catch {
+        return res.status(404).set(NO_CACHE).json({ ok: false, message: "Imagem não encontrada." });
+      }
+    },
+  );
 
-  app.delete("/api/galeria-usuarios/:albumId/imagens/:imageId", async (req: Request, res: Response) => {
-    const userId = sessionUser(req, res);
-    if (!userId) return;
-    try {
-      const album = await ownedAlbum(userId, String(req.params["albumId"] ?? ""));
-      if (!album?.__rowKey) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Álbum não encontrado." });
-      const imageId = String(req.params["imageId"] ?? "");
-      const image = album.imagens.find((item) => item.id === imageId);
-      if (!image) return res.status(404).set(NO_CACHE).json({ ok: false, message: "Imagem não encontrada." });
-      await unlink(resolve(imageDirectory(userId, album.id), image.filename)).catch(() => {});
-      const saved = await saveAlbum({ ...album, imagens: album.imagens.filter((item) => item.id !== imageId) });
-      const { __rowKey: _rowKey, ...publicAlbum } = saved;
-      return res.set(NO_CACHE).json({ ok: true, album: publicAlbum });
-    } catch {
-      return res.status(500).set(NO_CACHE).json({ ok: false, message: "Não foi possível excluir a imagem." });
-    }
-  });
+  app.delete(
+    "/api/galeria-usuarios/:albumId/imagens/:imageId",
+    async (req: Request, res: Response) => {
+      const userId = sessionUser(req, res);
+      if (!userId) return;
+      try {
+        const album = await ownedAlbum(userId, String(req.params["albumId"] ?? ""));
+        if (!album?.__rowKey)
+          return res
+            .status(404)
+            .set(NO_CACHE)
+            .json({ ok: false, message: "Álbum não encontrado." });
+        const imageId = String(req.params["imageId"] ?? "");
+        const image = album.imagens.find((item) => item.id === imageId);
+        if (!image)
+          return res
+            .status(404)
+            .set(NO_CACHE)
+            .json({ ok: false, message: "Imagem não encontrada." });
+        await unlink(resolve(imageDirectory(userId, album.id), image.filename)).catch(() => {});
+        const saved = await saveAlbum({
+          ...album,
+          imagens: album.imagens.filter((item) => item.id !== imageId),
+        });
+        const { __rowKey: _rowKey, ...publicAlbum } = saved;
+        return res.set(NO_CACHE).json({ ok: true, album: publicAlbum });
+      } catch {
+        return res
+          .status(500)
+          .set(NO_CACHE)
+          .json({ ok: false, message: "Não foi possível excluir a imagem." });
+      }
+    },
+  );
 }

@@ -15,7 +15,9 @@ export const CHAT_SPEED_TEMPLATES = [
       const spd = isOnline ? speed : 0;
       const pct = Math.min(100, Math.round((spd / 120) * 100));
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-none bg-slate-950/90 flex flex-col items-center justify-center select-none aspect-square text-center shadow-xl">
@@ -42,7 +44,9 @@ export const CHAT_SPEED_TEMPLATES = [
       const spd = isOnline ? speed : 0;
       const pct = Math.min(100, Math.round((spd / 120) * 100));
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-slate-950/90 border border-white/10 flex flex-col justify-between select-none text-left shadow-lg">
@@ -74,7 +78,9 @@ export const CHAT_SPEED_TEMPLATES = [
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/85 border border-purple-500/40 flex flex-col justify-between select-none text-left shadow-xl">
@@ -104,7 +110,9 @@ export const CHAT_SPEED_TEMPLATES = [
       const spd = isOnline ? speed : 0;
       const zone = !isOnline ? "OFFLINE" : spd > 60 ? "ALTO" : spd > 25 ? "MÉDIO" : "TRANQUILO";
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-black/80 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -135,7 +143,9 @@ export const CHAT_SPEED_TEMPLATES = [
       const pct = Math.min(100, Math.round((spd / 120) * 100));
       const activeLeds = Math.round((pct / 100) * 8);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div
@@ -173,7 +183,9 @@ export const CHAT_SPEED_TEMPLATES = [
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full px-3 rounded-full bg-slate-900/90 border border-cyan-500/40 flex items-center justify-between select-none shadow-md text-left">
@@ -195,7 +207,9 @@ export const CHAT_SPEED_TEMPLATES = [
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-slate-950/90 border border-slate-700 flex flex-col justify-between select-none text-left shadow-lg">
@@ -225,7 +239,9 @@ export const CHAT_SPEED_TEMPLATES = [
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-black/85 border border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.18)] flex flex-col justify-between select-none text-left">
@@ -250,7 +266,9 @@ export const CHAT_SPEED_TEMPLATES = [
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full px-3.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -277,7 +295,9 @@ export const CHAT_SPEED_TEMPLATES = [
     render: ({ speed = 0, isOnline = false }) => {
       const spd = isOnline ? speed : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-2.5 rounded-lg bg-slate-900 border-l-4 border-cyan-400 border-t border-b border-r border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -311,7 +331,9 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-none bg-slate-950/90 flex flex-col items-center justify-between select-none shadow-xl">
@@ -342,7 +364,9 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-xl bg-slate-950/90 border border-amber-500/40 flex flex-col justify-between select-none text-left shadow-xl">
@@ -381,7 +405,9 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full rounded-full bg-slate-950/90 border border-orange-500/40 p-2 flex flex-col items-center justify-center relative select-none shadow-xl aspect-square">
@@ -404,7 +430,9 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/85 border border-orange-500/40 flex flex-col justify-between select-none text-left shadow-xl">
@@ -433,7 +461,9 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full px-3.5 rounded-full bg-slate-900/90 border border-orange-500/40 flex items-center justify-between select-none shadow-md">
@@ -458,7 +488,9 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div
@@ -495,7 +527,9 @@ export const HYPE_METER_TEMPLATES = [
       const hp = isOnline ? hype : 0;
       const activeLevels = Math.round((hp / 100) * 5);
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-slate-950/90 border border-white/10 flex flex-col justify-between select-none text-left shadow-lg">
@@ -527,7 +561,9 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-black/85 border border-orange-500/40 shadow-[0_0_20px_rgba(249,115,22,0.2)] flex items-center justify-between select-none text-left">
@@ -554,7 +590,9 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full px-3.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -579,7 +617,9 @@ export const HYPE_METER_TEMPLATES = [
     render: ({ hype = 50, isOnline = false }) => {
       const hp = isOnline ? hype : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-2.5 rounded-lg bg-slate-900 border-l-4 border-orange-500 border-t border-b border-r border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -608,7 +648,9 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full rounded-none bg-slate-950/90 p-3 flex flex-col items-center justify-between select-none text-center shadow-xl">
@@ -635,7 +677,9 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-slate-950/90 border border-emerald-500/40 flex flex-col justify-between select-none text-left shadow-lg">
@@ -670,7 +714,9 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/85 border border-emerald-500/40 flex flex-col justify-between select-none text-left shadow-xl">
@@ -699,7 +745,9 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full px-3.5 rounded-full bg-slate-900/90 border border-emerald-500/40 flex items-center justify-between select-none shadow-md">
@@ -724,7 +772,9 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div
@@ -767,7 +817,9 @@ export const CHAT_VIBE_TEMPLATES = [
             ? "ESTÁVEL"
             : "TENSO";
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-2.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-lg">
@@ -796,7 +848,9 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-2 rounded-full bg-slate-950/90 border border-emerald-500/40 flex flex-col items-center justify-center select-none text-center shadow-xl aspect-square">
@@ -819,7 +873,9 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-black/85 border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.2)] flex items-center justify-between select-none text-left">
@@ -846,7 +902,9 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full px-3.5 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -873,7 +931,9 @@ export const CHAT_VIBE_TEMPLATES = [
     render: ({ vibeScore = 50, isOnline = false }) => {
       const score = isOnline ? vibeScore : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-2.5 rounded-lg bg-slate-900 border-l-4 border-emerald-400 border-t border-b border-r border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -902,7 +962,9 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-none bg-slate-950/90 shadow-xl flex flex-col justify-between select-none text-left">
@@ -941,7 +1003,9 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-xl bg-black/80 border border-white/10 flex flex-col justify-between select-none text-left shadow-lg">
@@ -971,7 +1035,9 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/90 border border-purple-500/40 flex flex-col justify-between select-none text-left shadow-xl">
@@ -1006,7 +1072,9 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-xl bg-black/80 border border-white/10 flex items-center justify-between select-none text-left shadow-md">
@@ -1031,7 +1099,9 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 bg-slate-950/95 border border-emerald-500/40 flex flex-col justify-between font-mono select-none text-left shadow-2xl">
@@ -1061,7 +1131,9 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/90 border border-purple-500/30 flex items-center justify-between select-none text-left shadow-xl">
@@ -1090,7 +1162,9 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-black border border-cyan-400/60 shadow-[0_0_20px_rgba(6,182,212,0.2)] flex flex-col justify-between select-none text-left">
@@ -1120,7 +1194,9 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-xl bg-slate-950/90 border border-white/10 flex flex-col justify-between select-none text-left shadow-lg">
@@ -1145,7 +1221,9 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full p-3 rounded-2xl bg-slate-950/90 border border-purple-500/30 flex flex-col justify-between select-none text-center shadow-xl">
@@ -1172,7 +1250,9 @@ export const VIEWERS_CHART_TEMPLATES = [
     render: ({ currentViewers = 0, isOnline = false }) => {
       const cur = isOnline ? currentViewers : 0;
 
-      {/* Estrutura visual retornada: div. */}
+      {
+        /* Estrutura visual retornada: div. */
+      }
 
       return (
         <div className="w-full h-full px-4 rounded-xl bg-slate-950/90 border border-white/10 flex items-center justify-between select-none text-left shadow-md">

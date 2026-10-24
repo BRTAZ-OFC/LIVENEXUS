@@ -216,137 +216,151 @@ function ShapeIcon({ shape }: { shape: string }) {
     plus: "38,3 62,3 62,38 97,38 97,62 62,62 62,97 38,97 38,62 3,62 3,38 38,38",
     minus: "5,38 95,38 95,62 5,62",
   };
-  if (["circle", "ellipse", "ring"].includes(shape))
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-3 w-3 shrink-0" aria-hidden="true">
-        <ellipse
-          cx="50"
-          cy="50"
-          rx={shape === "ellipse" ? 48 : 43}
-          ry={shape === "ellipse" ? 30 : 43}
-          fill={shape === "ring" ? "none" : "currentColor"}
-          stroke="currentColor"
-          strokeWidth={shape === "ring" ? 9 : 2}
-        />
-      </svg>
-    );
-  if (["rectangle", "square", "rounded-rectangle"].includes(shape))
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
-        <rect
-          x={shape === "square" ? 8 : 3}
-          y={shape === "square" ? 8 : 20}
-          width={shape === "square" ? 84 : 94}
-          height={shape === "square" ? 84 : 60}
-          rx={shape === "rounded-rectangle" ? 14 : 1}
-          fill="currentColor"
-        />
-      </svg>
-    );
-  if (shape === "star")
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
-        <polygon
-          points="50,3 61,36 96,36 68,57 79,93 50,71 21,93 32,57 4,36 39,36"
-          fill="currentColor"
-        />
-      </svg>
-    );
-  if (shape === "heart")
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
-        <path
-          d="M50 91 C40 78 7 56 7 30 C7 5 38 1 50 24 C63 1 94 5 94 30 C94 56 60 79 50 91Z"
-          fill="currentColor"
-        />
-      </svg>
-    );
-  if (shape === "lightning")
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
-        <polygon points="57,2 18,56 44,56 35,98 83,37 56,37" fill="currentColor" />
-      </svg>
-    );
-  if (shape === "speech-bubble")
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
-        <path d="M8 12 H92 V72 H42 L20 92 V72 H8Z" fill="currentColor" />
-      </svg>
-    );
-  if (shape === "cylinder")
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
-        <path d="M8 20 C8 3 92 3 92 20 V80 C92 98 8 98 8 80Z" fill="currentColor" />
-        <ellipse
-          cx="50"
-          cy="20"
-          rx="42"
-          ry="14"
-          fill="currentColor"
-          stroke="#ddd6fe"
-          strokeWidth="4"
-        />
-      </svg>
-    );
-  if (shape === "cloud")
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
-        <path
-          d="M22 76 C1 76 1 48 21 43 C18 17 48 9 60 31 C82 21 100 40 91 58 C109 77 87 88 72 85 H23Z"
-          fill="currentColor"
-        />
-      </svg>
-    );
-  if (shape === "arch")
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
-        <path
-          d="M10 95 V48 A40 40 0 0 1 90 48 V95 H68 V48 A18 18 0 0 0 32 48 V95Z"
-          fill="currentColor"
-        />
-      </svg>
-    );
-  if (shape === "wave")
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
-        <path
-          d="M4 35 C25 5 35 65 50 35 S75 5 96 35 V65 C75 35 65 95 50 65 S25 35 4 65Z"
-          fill="currentColor"
-        />
-      </svg>
-    );
-  if (shape === "pie")
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
-        <path d="M50 50 L50 5 A45 45 0 0 1 95 50Z" fill="currentColor" />
-        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" />
-      </svg>
-    );
-  if (shape === "line")
-    {/* Estrutura visual: svg. */}
-    return (
-      <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
-        <path
-          d="M8 90 L92 10"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="10"
-          strokeLinecap="round"
-        />
-      </svg>
-    );
-  {/* Estrutura visual: svg. */}
+  if (["circle", "ellipse", "ring"].includes(shape)) {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-3 w-3 shrink-0" aria-hidden="true">
+      <ellipse
+        cx="50"
+        cy="50"
+        rx={shape === "ellipse" ? 48 : 43}
+        ry={shape === "ellipse" ? 30 : 43}
+        fill={shape === "ring" ? "none" : "currentColor"}
+        stroke="currentColor"
+        strokeWidth={shape === "ring" ? 9 : 2}
+      />
+    </svg>
+  );
+  if (["rectangle", "square", "rounded-rectangle"].includes(shape)) {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <rect
+        x={shape === "square" ? 8 : 3}
+        y={shape === "square" ? 8 : 20}
+        width={shape === "square" ? 84 : 94}
+        height={shape === "square" ? 84 : 60}
+        rx={shape === "rounded-rectangle" ? 14 : 1}
+        fill="currentColor"
+      />
+    </svg>
+  );
+  if (shape === "star") {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <polygon
+        points="50,3 61,36 96,36 68,57 79,93 50,71 21,93 32,57 4,36 39,36"
+        fill="currentColor"
+      />
+    </svg>
+  );
+  if (shape === "heart") {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <path
+        d="M50 91 C40 78 7 56 7 30 C7 5 38 1 50 24 C63 1 94 5 94 30 C94 56 60 79 50 91Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+  if (shape === "lightning") {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <polygon points="57,2 18,56 44,56 35,98 83,37 56,37" fill="currentColor" />
+    </svg>
+  );
+  if (shape === "speech-bubble") {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <path d="M8 12 H92 V72 H42 L20 92 V72 H8Z" fill="currentColor" />
+    </svg>
+  );
+  if (shape === "cylinder") {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <path d="M8 20 C8 3 92 3 92 20 V80 C92 98 8 98 8 80Z" fill="currentColor" />
+      <ellipse
+        cx="50"
+        cy="20"
+        rx="42"
+        ry="14"
+        fill="currentColor"
+        stroke="#ddd6fe"
+        strokeWidth="4"
+      />
+    </svg>
+  );
+  if (shape === "cloud") {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <path
+        d="M22 76 C1 76 1 48 21 43 C18 17 48 9 60 31 C82 21 100 40 91 58 C109 77 87 88 72 85 H23Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+  if (shape === "arch") {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <path
+        d="M10 95 V48 A40 40 0 0 1 90 48 V95 H68 V48 A18 18 0 0 0 32 48 V95Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+  if (shape === "wave") {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <path
+        d="M4 35 C25 5 35 65 50 35 S75 5 96 35 V65 C75 35 65 95 50 65 S25 35 4 65Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+  if (shape === "pie") {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <path d="M50 50 L50 5 A45 45 0 0 1 95 50Z" fill="currentColor" />
+      <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="3" />
+    </svg>
+  );
+  if (shape === "line") {
+    /* Estrutura visual: svg. */
+  }
+  return (
+    <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
+      <path
+        d="M8 90 L92 10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="10"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+  {
+    /* Estrutura visual: svg. */
+  }
   return (
     <svg viewBox="0 0 100 100" className="h-4 w-4 shrink-0" aria-hidden="true">
       <polygon points={pts[shape] || pts.hexagon} fill="currentColor" />
@@ -518,7 +532,9 @@ function CommandEditor({
         .filter((item) => item.name.trim()),
     );
   }
-  {/* Estrutura visual: div. */}
+  {
+    /* Estrutura visual: div. */
+  }
   return (
     <div className="flex flex-col gap-1.5">
       {normalized.map((command, index) => (
@@ -599,7 +615,9 @@ function StringListEditor({
   placeholder: string;
 }) {
   const [draft, setDraft] = useState("");
-  {/* Estrutura visual: div. */}
+  {
+    /* Estrutura visual: div. */
+  }
   return (
     <div className="rounded border border-white/10 bg-slate-900 p-2">
       <p className="mb-1 text-[11px] font-semibold text-slate-200">{title}</p>
@@ -671,7 +689,9 @@ function ScheduleEditor({
     hour: String(item?.hour || ""),
     label: String(item?.label || ""),
   }));
-  {/* Estrutura visual: div. */}
+  {
+    /* Estrutura visual: div. */
+  }
   return (
     <div className="rounded border border-white/10 bg-slate-900 p-2">
       <p className="mb-1 text-[11px] font-semibold text-slate-200">Agenda de Streams</p>
@@ -754,7 +774,9 @@ function PollOptionsEditor({
     text: String(option?.text || ""),
     label: String(option?.label || String(i + 1)),
   }));
-  {/* Estrutura visual: div. */}
+  {
+    /* Estrutura visual: div. */
+  }
   return (
     <div className="rounded border border-white/10 bg-slate-900 p-2">
       <p className="mb-1 text-[11px] font-semibold text-slate-200">Opções de voto (!voto número)</p>
@@ -857,13 +879,23 @@ export default function Overlay_Editor({
   const [reactHubQueue, setReactHubQueue] = useState<ReactHubQueueItem[]>([]);
   const [reactHubPopupOpen, setReactHubPopupOpen] = useState(false);
   const [reactHubSelected, setReactHubSelected] = useState<ReactHubQueueItem | null>(null);
-  const [userAlbums, setUserAlbums] = useState<Array<{ id: string; nome: string; imagens: Array<{ id: string; name: string; url: string; type?: string }> }>>([]);
-  const [centralGallery, setCentralGallery] = useState<Array<{ id: string; name: string; url: string }>>([]);
+  const [userAlbums, setUserAlbums] = useState<
+    Array<{
+      id: string;
+      nome: string;
+      imagens: Array<{ id: string; name: string; url: string; type?: string }>;
+    }>
+  >([]);
+  const [centralGallery, setCentralGallery] = useState<
+    Array<{ id: string; name: string; url: string }>
+  >([]);
   const [galleryLoading, setGalleryLoading] = useState(false);
   const [galleryError, setGalleryError] = useState("");
   const [galleryPopupOpen, setGalleryPopupOpen] = useState(false);
   const [galleryPopupTitle, setGalleryPopupTitle] = useState("");
-  const [galleryPopupImages, setGalleryPopupImages] = useState<Array<{ id: string; name: string; url: string }>>([]);
+  const [galleryPopupImages, setGalleryPopupImages] = useState<
+    Array<{ id: string; name: string; url: string }>
+  >([]);
   const panelHeight = `min(${Math.max(190, height)}px, 34vh)`;
   const style: CSSProperties = {
     height: isCollapsed ? "0px" : panelHeight,
@@ -954,34 +986,83 @@ export default function Overlay_Editor({
         ]);
         const userData = await userResponse.json();
         const centralData = await centralResponse.json();
-        if (!userResponse.ok || !userData.ok) throw new Error(userData.message || "Não foi possível carregar os álbuns do usuário.");
+        if (!userResponse.ok || !userData.ok)
+          throw new Error(userData.message || "Não foi possível carregar os álbuns do usuário.");
         if (cancelled) return;
         const albums = Array.isArray(userData.albums) ? userData.albums : [];
-        setUserAlbums(albums.map((album: any) => ({
-          id: String(album.id || album.nome), nome: String(album.nome || "Álbum"),
-          imagens: Array.isArray(album.imagens) ? album.imagens.map((image: any) => ({
-            id: String(image.id || image.url || image.name), name: String(image.name || "Imagem"),
-            url: String(image.url || ""), type: String(image.type || ""),
-          })).filter((image: { url: string }) => image.url) : [],
-        })));
-        const rows = centralResponse.ok && centralData.ok && Array.isArray(centralData.items) ? centralData.items : [];
-        setCentralGallery(rows.map((item: any, index: number) => {
-          const url = String(item.url || item.image_url || item.imageUrl || item.src || item.imagem || item.image || item.path || item.thumbnail || item.thumbnail_url || "");
-          return { id: String(item.id || item.image_id || item.__rowKey || url || index), name: String(item.nome || item.name || item.title || item.titulo || "Imagem da galeria central"), url };
-        }).filter((image: { url: string }) => image.url));
+        setUserAlbums(
+          albums.map((album: any) => ({
+            id: String(album.id || album.nome),
+            nome: String(album.nome || "Álbum"),
+            imagens: Array.isArray(album.imagens)
+              ? album.imagens
+                  .map((image: any) => ({
+                    id: String(image.id || image.url || image.name),
+                    name: String(image.name || "Imagem"),
+                    url: String(image.url || ""),
+                    type: String(image.type || ""),
+                  }))
+                  .filter((image: { url: string }) => image.url)
+              : [],
+          })),
+        );
+        const rows =
+          centralResponse.ok && centralData.ok && Array.isArray(centralData.items)
+            ? centralData.items
+            : [];
+        setCentralGallery(
+          rows
+            .map((item: any, index: number) => {
+              const url = String(
+                item.url ||
+                  item.image_url ||
+                  item.imageUrl ||
+                  item.src ||
+                  item.imagem ||
+                  item.image ||
+                  item.path ||
+                  item.thumbnail ||
+                  item.thumbnail_url ||
+                  "",
+              );
+              return {
+                id: String(item.id || item.image_id || item.__rowKey || url || index),
+                name: String(
+                  item.nome ||
+                    item.name ||
+                    item.title ||
+                    item.titulo ||
+                    "Imagem da galeria central",
+                ),
+                url,
+              };
+            })
+            .filter((image: { url: string }) => image.url),
+        );
       } catch (error) {
-        if (!cancelled) setGalleryError(error instanceof Error ? error.message : "Erro ao carregar as galerias.");
-      } finally { if (!cancelled) setGalleryLoading(false); }
+        if (!cancelled)
+          setGalleryError(error instanceof Error ? error.message : "Erro ao carregar as galerias.");
+      } finally {
+        if (!cancelled) setGalleryLoading(false);
+      }
     }
     void loadGalleries();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [activeMenu]);
 
-  function openGalleryPopup(title: string, images: Array<{ id: string; name: string; url: string }>) {
-    setGalleryPopupTitle(title); setGalleryPopupImages(images); setGalleryPopupOpen(true);
+  function openGalleryPopup(
+    title: string,
+    images: Array<{ id: string; name: string; url: string }>,
+  ) {
+    setGalleryPopupTitle(title);
+    setGalleryPopupImages(images);
+    setGalleryPopupOpen(true);
   }
   function chooseGalleryImage(image: { name: string; url: string }) {
-    onAddImage(image.url, image.name); setGalleryPopupOpen(false);
+    onAddImage(image.url, image.name);
+    setGalleryPopupOpen(false);
   }
 
   useEffect(() => {
@@ -998,7 +1079,9 @@ export default function Overlay_Editor({
     onTextStyleChange({ fontFamily: font });
   }
 
-  {/* Estrutura visual: section. */}
+  {
+    /* Estrutura visual: section. */
+  }
 
   return (
     <section
@@ -1171,14 +1254,20 @@ export default function Overlay_Editor({
                               <button
                                 type="button"
                                 disabled={!hasSelectedInstance}
-                                onClick={() =>
-                                  onUpdateSelectedConfig({
-                                    deathCount: Math.max(
-                                      0,
-                                      Number(editableConfig.deathCount || 0) - 1,
-                                    ),
-                                  })
-                                }
+                                onClick={() => {
+                                  const next = Math.max(
+                                    0,
+                                    Number(editableConfig.deathCount || 0) - 1,
+                                  );
+                                  onUpdateSelectedConfig({ deathCount: next });
+                                  if (typeof window !== "undefined") {
+                                    window.dispatchEvent(
+                                      new CustomEvent("livenexus:death-counter-updated", {
+                                        detail: { count: next, timestamp: Date.now() },
+                                      }),
+                                    );
+                                  }
+                                }}
                                 className="h-8 w-8 rounded border border-white/15 text-lg disabled:opacity-40"
                               >
                                 −
@@ -1189,14 +1278,20 @@ export default function Overlay_Editor({
                               <button
                                 type="button"
                                 disabled={!hasSelectedInstance}
-                                onClick={() =>
-                                  onUpdateSelectedConfig({
-                                    deathCount: Math.max(
-                                      0,
-                                      Number(editableConfig.deathCount || 0) + 1,
-                                    ),
-                                  })
-                                }
+                                onClick={() => {
+                                  const next = Math.max(
+                                    0,
+                                    Number(editableConfig.deathCount || 0) + 1,
+                                  );
+                                  onUpdateSelectedConfig({ deathCount: next });
+                                  if (typeof window !== "undefined") {
+                                    window.dispatchEvent(
+                                      new CustomEvent("livenexus:death-counter-updated", {
+                                        detail: { count: next, timestamp: Date.now() },
+                                      }),
+                                    );
+                                  }
+                                }}
                                 className="h-8 w-8 rounded border border-white/15 text-lg disabled:opacity-40"
                               >
                                 +
@@ -1598,7 +1693,9 @@ export default function Overlay_Editor({
                                 typeof value === "string" &&
                                 /(?:color|colour)$/i.test(key) &&
                                 /^#[0-9a-f]{6}$/i.test(value);
-                              {/* Estrutura visual: label. */}
+                              {
+                                /* Estrutura visual: label. */
+                              }
                               return (
                                 <label
                                   key={key}
@@ -1748,7 +1845,9 @@ export default function Overlay_Editor({
                           editableConfig.structuralPreset ??
                             (selectedWidget?.id === "manual-now-playing" ? "01" : "01"),
                         ) === preset.id;
-                      {/* Estrutura visual: button. */}
+                      {
+                        /* Estrutura visual: button. */
+                      }
                       return (
                         <button
                           key={preset.id}
@@ -1825,7 +1924,9 @@ export default function Overlay_Editor({
                     ),
                   );
 
-                  {/* Estrutura visual: section. */}
+                  {
+                    /* Estrutura visual: section. */
+                  }
 
                   return (
                     <section
@@ -1874,7 +1975,9 @@ export default function Overlay_Editor({
                           },
                         ].map((mode) => {
                           const isActive = currentDisplayMode === mode.id;
-                          {/* Estrutura visual: button. */}
+                          {
+                            /* Estrutura visual: button. */
+                          }
                           return (
                             <button
                               key={mode.id}
@@ -2289,7 +2392,9 @@ export default function Overlay_Editor({
                         !animation.label ||
                         selectedInstanceWidgetId !== "__livenexus_text__" ||
                         !selectedInstanceConfig;
-                      {/* Estrutura visual: button. */}
+                      {
+                        /* Estrutura visual: button. */
+                      }
                       return (
                         <button
                           key={animation.id}
@@ -2920,7 +3025,9 @@ export default function Overlay_Editor({
                         .filter((_, index) => index % 3 === column)
                         .map((layer) => {
                           const index = layers.findIndex((item) => item.id === layer.id);
-                          {/* Estrutura visual: div. */}
+                          {
+                            /* Estrutura visual: div. */
+                          }
                           return (
                             <div
                               key={layer.id}
@@ -3033,30 +3140,69 @@ export default function Overlay_Editor({
             {activeMenu === "IMAGEMS" && (
               <div className="grid h-full min-h-0 min-w-0 grid-cols-2 gap-3 overflow-hidden">
                 <section className="flex min-h-0 min-w-0 flex-col border-r border-white/10 pr-3">
-                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-300">Álbuns do usuário</p>
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-300">
+                    Álbuns do usuário
+                  </p>
                   <div className="flex min-h-0 flex-1 flex-wrap content-start gap-2 overflow-y-auto">
                     {userAlbums.map((album) => (
-                      <button key={album.id} type="button" title={album.nome + " (" + album.imagens.length + " imagens)"} onClick={() => openGalleryPopup(album.nome, album.imagens)} className="flex max-w-full items-center gap-1.5 rounded border border-white/10 bg-slate-900/80 p-1 text-left text-[9px] text-slate-200 hover:border-violet-400">
-                        {album.imagens[0]?.url ? <img src={album.imagens[0].url} alt="" className="h-5 w-5 shrink-0 object-cover" /> : <span className="flex h-5 w-5 shrink-0 items-center justify-center border border-white/10 text-[8px]">0</span>}
+                      <button
+                        key={album.id}
+                        type="button"
+                        title={album.nome + " (" + album.imagens.length + " imagens)"}
+                        onClick={() => openGalleryPopup(album.nome, album.imagens)}
+                        className="flex max-w-full items-center gap-1.5 rounded border border-white/10 bg-slate-900/80 p-1 text-left text-[9px] text-slate-200 hover:border-violet-400"
+                      >
+                        {album.imagens[0]?.url ? (
+                          <img
+                            src={album.imagens[0].url}
+                            alt=""
+                            className="h-5 w-5 shrink-0 object-cover"
+                          />
+                        ) : (
+                          <span className="flex h-5 w-5 shrink-0 items-center justify-center border border-white/10 text-[8px]">
+                            0
+                          </span>
+                        )}
                         <span className="max-w-[100px] truncate">{album.nome}</span>
                       </button>
                     ))}
-                    {!galleryLoading && userAlbums.length === 0 && <p className="text-[10px] text-slate-500">Nenhum álbum encontrado.</p>}
+                    {!galleryLoading && userAlbums.length === 0 && (
+                      <p className="text-[10px] text-slate-500">Nenhum álbum encontrado.</p>
+                    )}
                   </div>
                 </section>
                 <section className="flex min-h-0 min-w-0 flex-col">
-                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-300">Galeria central</p>
+                  <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-300">
+                    Galeria central
+                  </p>
                   <div className="flex min-h-0 flex-1 flex-wrap content-start gap-2 overflow-y-auto">
                     {centralGallery.map((image) => (
-                      <button key={image.id} type="button" title={image.name} onClick={() => openGalleryPopup("Galeria central", centralGallery)} className="h-5 w-5 shrink-0 overflow-hidden rounded border border-white/10 hover:border-violet-400" aria-label={"Abrir galeria central: " + image.name}>
+                      <button
+                        key={image.id}
+                        type="button"
+                        title={image.name}
+                        onClick={() => openGalleryPopup("Galeria central", centralGallery)}
+                        className="h-5 w-5 shrink-0 overflow-hidden rounded border border-white/10 hover:border-violet-400"
+                        aria-label={"Abrir galeria central: " + image.name}
+                      >
                         <img src={image.url} alt={image.name} className="h-5 w-5 object-cover" />
                       </button>
                     ))}
-                    {!galleryLoading && centralGallery.length === 0 && <p className="text-[10px] text-slate-500">Nenhuma imagem na galeria central.</p>}
+                    {!galleryLoading && centralGallery.length === 0 && (
+                      <p className="text-[10px] text-slate-500">
+                        Nenhuma imagem na galeria central.
+                      </p>
+                    )}
                   </div>
                 </section>
-                {galleryLoading && <p className="col-span-2 text-[10px] text-slate-400">Carregando galerias…</p>}
-                {galleryError && <p role="alert" className="col-span-2 text-[10px] text-rose-300">{galleryError}</p>}
+                {galleryLoading && (
+                  <p className="col-span-2 text-[10px] text-slate-400">Carregando galerias…</p>
+                )}
+                {galleryError && (
+                  <p role="alert" className="col-span-2 text-[10px] text-rose-300">
+                    {galleryError}
+                  </p>
+                )}
               </div>
             )}
             {![
@@ -3078,20 +3224,49 @@ export default function Overlay_Editor({
         </div>
       )}
       {galleryPopupOpen && (
-        <div className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/85 p-3" role="dialog" aria-modal="true" aria-label={galleryPopupTitle} onClick={() => setGalleryPopupOpen(false)}>
-          <div className="flex max-h-[90vh] w-[760px] max-w-[95vw] flex-col overflow-hidden rounded-lg border border-white/20 bg-slate-950 p-3 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-[10001] flex items-center justify-center bg-black/85 p-3"
+          role="dialog"
+          aria-modal="true"
+          aria-label={galleryPopupTitle}
+          onClick={() => setGalleryPopupOpen(false)}
+        >
+          <div
+            className="flex max-h-[90vh] w-[760px] max-w-[95vw] flex-col overflow-hidden rounded-lg border border-white/20 bg-slate-950 p-3 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
             <div className="mb-3 flex items-center justify-between gap-3">
               <p className="text-xs font-semibold text-white">{galleryPopupTitle}</p>
-              <button type="button" onClick={() => setGalleryPopupOpen(false)} className="rounded border border-white/20 px-3 py-1 text-xs text-white">Fechar</button>
+              <button
+                type="button"
+                onClick={() => setGalleryPopupOpen(false)}
+                className="rounded border border-white/20 px-3 py-1 text-xs text-white"
+              >
+                Fechar
+              </button>
             </div>
             <div className="grid min-h-0 grid-cols-4 gap-3 overflow-y-auto sm:grid-cols-6">
               {galleryPopupImages.map((image) => (
-                <button key={image.id} type="button" onClick={() => chooseGalleryImage(image)} title={"Adicionar " + image.name + " ao canvas"} className="flex min-w-0 flex-col gap-1 rounded border border-white/10 bg-slate-900/70 p-2 text-left hover:border-violet-400">
-                  <img src={image.url} alt={image.name} className="aspect-square w-full object-contain" />
+                <button
+                  key={image.id}
+                  type="button"
+                  onClick={() => chooseGalleryImage(image)}
+                  title={"Adicionar " + image.name + " ao canvas"}
+                  className="flex min-w-0 flex-col gap-1 rounded border border-white/10 bg-slate-900/70 p-2 text-left hover:border-violet-400"
+                >
+                  <img
+                    src={image.url}
+                    alt={image.name}
+                    className="aspect-square w-full object-contain"
+                  />
                   <span className="truncate text-[10px] text-slate-200">{image.name}</span>
                 </button>
               ))}
-              {galleryPopupImages.length === 0 && <p className="col-span-full text-xs text-slate-400">Este álbum não possui imagens.</p>}
+              {galleryPopupImages.length === 0 && (
+                <p className="col-span-full text-xs text-slate-400">
+                  Este álbum não possui imagens.
+                </p>
+              )}
             </div>
           </div>
         </div>

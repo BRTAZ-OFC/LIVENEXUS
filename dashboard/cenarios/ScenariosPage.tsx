@@ -119,7 +119,9 @@ function ScenarioThumbnail({ row }: { row: ScenarioRecord }) {
     "border-blue-300/70 bg-blue-400/20 text-blue-100",
   ];
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div
@@ -147,7 +149,9 @@ function ScenarioThumbnail({ row }: { row: ScenarioRecord }) {
         );
         const label = String(instance.name || instance.widgetId || `Widget ${index + 1}`);
 
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
 
         return (
           <div
@@ -279,7 +283,9 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
     }
   }
 
-  {/* Estrutura visual retornada: section. */}
+  {
+    /* Estrutura visual retornada: section. */
+  }
 
   return (
     <section className="w-full min-w-0 px-4 py-6 sm:px-6">
@@ -326,7 +332,9 @@ export default function ScenariosPage({ onOpenScenario }: ScenariosPageProps) {
           {scenarios.map((scenario, index) => {
             const id = String(scenario.id ?? "");
             const config = getScenarioConfig(scenario);
-            {/* Estrutura visual retornada: button. */}
+            {
+              /* Estrutura visual retornada: button. */
+            }
             return (
               <button
                 type="button"

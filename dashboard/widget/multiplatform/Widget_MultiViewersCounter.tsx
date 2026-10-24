@@ -99,7 +99,9 @@ export default function MultiViewersCounter({ config = {}, elementKey = "full_wi
     fontFamily: config.fontFamily || "Inter, sans-serif",
   };
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div
@@ -135,7 +137,9 @@ export default function MultiViewersCounter({ config = {}, elementKey = "full_wi
             : "OFFLINE";
           const IconComponent = plat.icon;
 
-          {/* Estrutura visual retornada: div. */}
+          {
+            /* Estrutura visual retornada: div. */
+          }
 
           return (
             <div

@@ -225,7 +225,9 @@ export default function PlatformBioConnections() {
     setNotice(`Conectando ao canal ${platform} verificado.`);
   }
 
-  {/* Estrutura visual retornada: section. */}
+  {
+    /* Estrutura visual retornada: section. */
+  }
 
   return (
     <section className="tts-card tts-platform-connections">
@@ -285,7 +287,9 @@ export default function PlatformBioConnections() {
               : platform === "Kick"
                 ? "Slug do canal (ex.: xqc)"
                 : "@canal ou URL do canal";
-          {/* Estrutura visual retornada: article. */}
+          {
+            /* Estrutura visual retornada: article. */
+          }
           return (
             <article key={platform} className="tts-platform-card">
               <div className="tts-platform-card-heading">

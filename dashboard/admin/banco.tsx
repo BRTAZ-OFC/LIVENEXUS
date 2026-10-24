@@ -376,7 +376,9 @@ function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProp
         : /^(fields)$/i.test(name)
           ? { name: "", type: "texto" }
           : "";
-    {/* Estrutura visual: fieldset. */}
+    {
+      /* Estrutura visual: fieldset. */
+    }
     return (
       <fieldset
         className={`min-w-0 rounded-lg border border-white/10 p-3 ${depth > 0 ? "mt-2" : ""}`}
@@ -424,7 +426,9 @@ function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProp
 
   if (value !== null && typeof value === "object") {
     const record = value as Record<string, unknown>;
-    {/* Estrutura visual: fieldset. */}
+    {
+      /* Estrutura visual: fieldset. */
+    }
     return (
       <fieldset
         className={`min-w-0 rounded-lg border border-white/10 p-3 ${depth > 0 ? "mt-2" : ""}`}
@@ -486,7 +490,9 @@ function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProp
   }
 
   if (typeof value === "boolean") {
-    {/* Estrutura visual: label. */}
+    {
+      /* Estrutura visual: label. */
+    }
     return (
       <label className="flex min-w-0 items-center gap-2 rounded-lg border border-white/10 p-2 text-[10px] text-slate-300">
         <span className="min-w-0 flex-1">{label}</span>
@@ -505,7 +511,9 @@ function JsonValueField({ name, value, onChange, depth = 0 }: JsonValueFieldProp
     typeof value === "string" &&
     (stringValue.length > 80 ||
       /^(message|mensagem|resposta_admin|description|descricao|prompt|content)$/i.test(name));
-  {/* Estrutura visual: label. */}
+  {
+    /* Estrutura visual: label. */
+  }
   return (
     <label className="block min-w-0 space-y-1 text-[10px] text-slate-400">
       <span>{label}</span>
@@ -1046,7 +1054,9 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
   }
 
   if (!embedded && !isAdmin) {
-    {/* Estrutura visual: main. */}
+    {
+      /* Estrutura visual: main. */
+    }
     return (
       <main className="db-flex-min-h-screen-ejpwfw">
         <section className="db-rounded-xl-border-1yymjbi">
@@ -1062,7 +1072,9 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
     );
   }
 
-  {/* Estrutura visual: div. */}
+  {
+    /* Estrutura visual: div. */
+  }
 
   return (
     <div className={embedded ? "db-flex-min-h-0-1yrwjzw" : "db-flex-min-h-screen-axmrk9"}>
@@ -1236,7 +1248,9 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     )}
                     {users.map((row) => {
                       const editing = editingId === row.user_id && draft !== null;
-                      {/* Estrutura visual: tr. */}
+                      {
+                        /* Estrutura visual: tr. */
+                      }
                       return (
                         <tr key={row.user_id} className="db-bg-white-0-02-lcbolw">
                           <td className="db-max-w-44-px-2-5-1uhmtbx" title={row.user_id}>
@@ -1409,7 +1423,9 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     )}
                     {reviews.map((row) => {
                       const editing = reviewEditingId === row.avaliacao_id && reviewDraft !== null;
-                      {/* Estrutura visual: tr. */}
+                      {
+                        /* Estrutura visual: tr. */
+                      }
                       return (
                         <tr key={row.avaliacao_id} className="db-bg-white-0-02-lcbolw">
                           <td className="db-max-w-44-px-2-5-1uhmtbx" title={row.avaliacao_id}>
@@ -1816,7 +1832,9 @@ export default function DatabasePage({ embedded = false }: { embedded?: boolean 
                     )}
                     {platforms.map((row) => {
                       const editing = platformEditingId === row.id && platformDraft !== null;
-                      {/* Estrutura visual: tr. */}
+                      {
+                        /* Estrutura visual: tr. */
+                      }
                       return (
                         <tr key={row.id} className="db-bg-white-0-02-lcbolw">
                           <td className="db-max-w-44-px-2-5-1uhmtbx" title={row.id}>

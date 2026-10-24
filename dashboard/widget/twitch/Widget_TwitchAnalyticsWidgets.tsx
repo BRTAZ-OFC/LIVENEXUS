@@ -38,7 +38,9 @@ export function TwitchChatSpeed({ config = {} }) {
     return () => clearInterval(interval);
   }, [liveActivity, isOnline, config.platform, config.platforms]);
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div
@@ -94,7 +96,9 @@ export function TwitchHypeMeter({ config = {} }) {
     setHypeLevel(Math.round(computedHype));
   }, [liveActivity, isOnline]);
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div
@@ -197,7 +201,9 @@ export function TwitchChatVibe({ config = {} }) {
     return { score: clamped, label };
   }, [liveActivity, isOnline, config.platform, config.platforms]);
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div
@@ -263,7 +269,9 @@ export function TwitchViewersChart({ config = {} }) {
     return () => clearInterval(interval);
   }, [currentViewers, isOnline, audienceSource]);
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div
@@ -298,7 +306,9 @@ export function TwitchViewersChart({ config = {} }) {
           history.map((val, idx) => {
             const maxVal = Math.max(...history, 1);
             const heightPct = Math.max(Math.round((val / maxVal) * 100), 10);
-            {/* Estrutura visual retornada: div. */}
+            {
+              /* Estrutura visual retornada: div. */
+            }
             return (
               <div
                 key={idx}

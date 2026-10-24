@@ -302,8 +302,8 @@ hr {
   }
 
   /* Os letreiros precisam continuar em movimento mesmo com movimento reduzido ativo. */
-/* Estilos para .ln-marquee-motion. */
-/* Estilos para .ln-marquee-motion. */
+  /* Estilos para .ln-marquee-motion. */
+  /* Estilos para .ln-marquee-motion. */
   .ln-marquee-motion {
     animation-duration: 12s !important;
     animation-iteration-count: infinite !important;

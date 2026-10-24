@@ -54,7 +54,9 @@ export default function ReviewsManager({
     }
   }
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div className="space-y-4">

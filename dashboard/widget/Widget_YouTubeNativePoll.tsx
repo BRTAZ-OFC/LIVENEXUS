@@ -12,13 +12,14 @@ export default function YouTubeNativePoll({ config = {}, elementKey = "full_widg
   const question = meta.question || meta.title || poll?.text;
   const options = Array.isArray(meta.options) ? meta.options : [];
 
-  if (!poll)
-    {/* Estrutura visual retornada: div. */}
-    return (
-      <div className="flex h-full items-center justify-center text-xs text-slate-400">
-        Aguardando enquete do YouTube
-      </div>
-    );
+  if (!poll) {
+    /* Estrutura visual retornada: div. */
+  }
+  return (
+    <div className="flex h-full items-center justify-center text-xs text-slate-400">
+      Aguardando enquete do YouTube
+    </div>
+  );
 
   const title = (
     <div className="font-semibold text-white break-words">{question || "Enquete do YouTube"}</div>
@@ -30,7 +31,9 @@ export default function YouTubeNativePoll({ config = {}, elementKey = "full_widg
           typeof option === "string" ? option : option.text || option.label || option.title;
         const votes =
           typeof option === "object" && option !== null ? (option.voteCount ?? option.votes) : null;
-        {/* Estrutura visual retornada: div. */}
+        {
+          /* Estrutura visual retornada: div. */
+        }
         return (
           <div
             key={typeof option === "object" && option !== null ? (option.id ?? index) : index}
@@ -50,7 +53,9 @@ export default function YouTubeNativePoll({ config = {}, elementKey = "full_widg
   if (elementKey === "poll_status")
     return status && <span className="text-slate-300">{status}</span>;
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div

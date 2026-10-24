@@ -31,7 +31,9 @@ export function TwitchSubGoal({ config = {} }) {
   const percentage =
     targetValue > 0 ? Math.min(Math.round((subCount / targetValue) * 100), 100) : 0;
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div
@@ -95,7 +97,9 @@ export function TwitchBitsGoal({ config = {} }) {
   const percentage =
     targetValue > 0 ? Math.min(Math.round((currentBits / targetValue) * 100), 100) : 0;
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div
@@ -157,7 +161,9 @@ export function TwitchRaidGoal({ config = {} }) {
   const percentage =
     targetValue > 0 ? Math.min(Math.round((currentRaids / targetValue) * 100), 100) : 0;
 
-  {/* Estrutura visual retornada: div. */}
+  {
+    /* Estrutura visual retornada: div. */
+  }
 
   return (
     <div

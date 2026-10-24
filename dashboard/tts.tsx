@@ -466,7 +466,9 @@ export default function TTSPage() {
     setShowFilters(panel === "filters");
   }
 
-  {/* Estrutura visual retornada: section. */}
+  {
+    /* Estrutura visual retornada: section. */
+  }
 
   return (
     <section className="tts-page">
@@ -721,7 +723,9 @@ function RangeControl({
   onChange: (value: number) => void;
 }) {
   const shown = display ?? (Number.isInteger(value) ? value : value.toFixed(2));
-  {/* Estrutura visual retornada: label. */}
+  {
+    /* Estrutura visual retornada: label. */
+  }
   return (
     <label className="tts-range">
       <span>{label}</span>
