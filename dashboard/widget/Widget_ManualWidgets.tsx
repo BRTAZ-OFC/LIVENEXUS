@@ -176,7 +176,7 @@ function useExistingTrack() {
 }
 
 // NowPlayingWidget: executa a tarefa indicada pelo nome e pelos parâmetros recebidos.
-export function NowPlayingWidget({ config = {}, elementKey }) {
+export function NowPlayingWidget({ config = {}, elementKey, isFullWidget = false, instanceName = "" }) {
   const track = useExistingTrack();
   const title = track?.title || "Nada tocando";
   const artist = track?.artist || track?.artistName || "Sem artista";
@@ -199,7 +199,10 @@ export function NowPlayingWidget({ config = {}, elementKey }) {
   const marqueeStyle = { animation: "ln-track-marquee 15s linear infinite" };
 
   // Lógica de Fragmentação (para templates customizados)
-  if (elementKey === "cover")
+  // Só renderiza a imagem isolada quando a instância é realmente o fragmento "Capa".
+  // Instâncias completas devem continuar exibindo o layout escolhido, mesmo se dados antigos
+  // tiverem deixado elementKey como "cover".
+  if (elementKey === "cover" && !isFullWidget && /capa/i.test(instanceName))
     {/* Estrutura visual retornada: img. */}
     return <img src={image} alt="Capa" className="h-full w-full object-cover rounded" />;
   if (elementKey === "title")
